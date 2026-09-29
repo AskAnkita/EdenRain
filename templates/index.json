@@ -15,10 +15,10 @@
         "ai_gen_block_96df9c3_qgC4Nb": {
           "type": "ai_gen_block_96df9c3",
           "settings": {
-            "desktop_video": "shopify://files/videos/e71f5eb3a470468faee7dc9fd8f87e45.mp4",
+            "placeholder_desktop_video_url": "https://cdn.shopify.com/videos/c/o/v/d104411d81c940fb996fc439f675d3c2.mp4",
             "enable_full_height": true,
             "desktop_height": 100,
-            "mobile_video": "shopify://files/videos/9ffc8d1fb7db44e3858fa4a2c457bc09.mp4",
+            "placeholder_mobile_video_url": "https://cdn.shopify.com/videos/c/o/v/a44d0c0308f5486c9329c4ca6df1d823.mp4",
             "mobile_height": 66,
             "enable_autoplay": true,
             "enable_loop": true,
@@ -1664,7 +1664,8 @@
           "name": "t:names.video",
           "settings": {
             "source": "uploaded",
-            "video": "shopify://files/videos/homevideo.mp4",
+            "placeholder_video_url": "https://cdn.shopify.com/videos/c/o/v/2b1c254c5fa44dccab5968f71652e5a2.mp4",
+            "placeholder_poster_url": "https://www.miadonna.com/cdn/shop/files/engagement-coll.jpg?width=1600",
             "video_url": "",
             "video_autoplay": true,
             "video_loop": true,
@@ -6842,20 +6843,6 @@
     },
     "178644090228bc2e70": {
       "type": "apps",
-      "blocks": {
-        "okendo_reviews_carousel_kzajke": {
-          "type": "shopify://apps/okendo/blocks/reviews-carousel/bb689e69-ea70-4661-8fb7-ad24a2e23c29",
-          "settings": {
-            "show_heading": false,
-            "heading": "",
-            "badge_link": "",
-            "product": ""
-          }
-        }
-      },
-      "block_order": [
-        "okendo_reviews_carousel_kzajke"
-      ],
       "settings": {
         "include_margins": true
       }

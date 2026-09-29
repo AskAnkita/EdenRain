@@ -569,7 +569,26 @@
 
 <luxury-video-hero-{{ ai_gen_id }} class="ai-luxury-video-hero-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-luxury-video-hero-container-{{ ai_gen_id }}">
-    {% if block.settings.desktop_video != blank %}
+    {% liquid
+      # Dev-only placeholder videos: used when no Shopify video is picked, never on the published (live) theme
+      assign show_placeholder = true
+      if theme.role == 'main' and request.design_mode == false
+        assign show_placeholder = false
+      endif
+      assign desktop_video_src = block.settings.desktop_video.sources[1].url
+      assign desktop_video_type = block.settings.desktop_video.sources[1].mime_type
+      if block.settings.desktop_video == blank and show_placeholder and block.settings.placeholder_desktop_video_url != blank
+        assign desktop_video_src = block.settings.placeholder_desktop_video_url
+        assign desktop_video_type = 'video/mp4'
+      endif
+      assign mobile_video_src = block.settings.mobile_video.sources[1].url
+      assign mobile_video_type = block.settings.mobile_video.sources[1].mime_type
+      if block.settings.mobile_video == blank and show_placeholder and block.settings.placeholder_mobile_video_url != blank
+        assign mobile_video_src = block.settings.placeholder_mobile_video_url
+        assign mobile_video_type = 'video/mp4'
+      endif
+    %}
+    {% if desktop_video_src != blank %}
       <video
         class="ai-luxury-video-hero-video-{{ ai_gen_id }} ai-luxury-video-hero-desktop-video-{{ ai_gen_id }}"
         {% if block.settings.enable_autoplay %}autoplay{% endif %}
@@ -578,11 +597,11 @@
         playsinline
         data-desktop-video
       >
-        <source src="{{ block.settings.desktop_video.sources[1].url }}" type="{{ block.settings.desktop_video.sources[1].mime_type }}">
+        <source src="{{ desktop_video_src }}" type="{{ desktop_video_type }}">
       </video>
     {% endif %}
 
-    {% if block.settings.mobile_video != blank %}
+    {% if mobile_video_src != blank %}
       <video
         class="ai-luxury-video-hero-video-{{ ai_gen_id }} ai-luxury-video-hero-mobile-video-{{ ai_gen_id }}"
         {% if block.settings.enable_autoplay %}autoplay{% endif %}
@@ -592,7 +611,7 @@
         data-mobile-video
         style="display: none;"
       >
-        <source src="{{ block.settings.mobile_video.sources[1].url }}" type="{{ block.settings.mobile_video.sources[1].mime_type }}">
+        <source src="{{ mobile_video_src }}" type="{{ mobile_video_type }}">
       </video>
     {% endif %}
 
@@ -703,6 +722,12 @@
       "label": "Desktop video"
     },
     {
+      "type": "url",
+      "id": "placeholder_desktop_video_url",
+      "label": "Placeholder desktop video URL",
+      "info": "Used while no desktop video is picked. Hidden on the published (live) theme."
+    },
+    {
       "type": "checkbox",
       "id": "enable_full_height",
       "label": "Enable full height",
@@ -726,6 +751,12 @@
       "type": "video",
       "id": "mobile_video",
       "label": "Mobile video"
+    },
+    {
+      "type": "url",
+      "id": "placeholder_mobile_video_url",
+      "label": "Placeholder mobile video URL",
+      "info": "Used while no mobile video is picked. Hidden on the published (live) theme."
     },
     {
       "type": "range",

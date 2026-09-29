@@ -5,7 +5,26 @@
    --size-style-aspect-ratio: {% if block.settings.source == 'uploaded' %}{{ block.settings.video.aspect_ratio | default: 'auto' }}{% elsif block.settings.cover_image == blank %}{{ block.settings.aspect_ratio }}{% else %}auto{% endif %};
 {% endcapture %}
 
-{% if block.settings.source == 'uploaded' %}
+{% liquid
+  # Dev-only placeholder: used while no video is picked, never on the published (live) theme
+  assign show_placeholder = true
+  if theme.role == 'main' and request.design_mode == false
+    assign show_placeholder = false
+  endif
+%}
+{% if block.settings.source == 'uploaded' and block.settings.video == blank and show_placeholder and block.settings.placeholder_video_url != blank %}
+  <video
+    class="spacing-style size-style border-style"
+    style="{{ video_style | strip_newlines }} object-fit: cover;"
+    {% if block.settings.video_autoplay %}autoplay muted{% endif %}
+    {% if block.settings.video_loop %}loop{% endif %}
+    playsinline
+    {% if block.settings.placeholder_poster_url != blank %}poster="{{ block.settings.placeholder_poster_url }}"{% endif %}
+    {{ block.shopify_attributes }}
+  >
+    <source src="{{ block.settings.placeholder_video_url }}" type="video/mp4">
+  </video>
+{% elsif block.settings.source == 'uploaded' %}
   {% render 'video',
     video: block.settings.video,
     video_class: 'spacing-style size-style border-style',
@@ -52,6 +71,19 @@
       "type": "video",
       "id": "video",
       "label": "t:settings.video",
+      "visible_if": "{{ block.settings.source == 'uploaded' }}"
+    },
+    {
+      "type": "url",
+      "id": "placeholder_video_url",
+      "label": "Placeholder video URL",
+      "info": "Used while no video is picked. Hidden on the published (live) theme.",
+      "visible_if": "{{ block.settings.source == 'uploaded' }}"
+    },
+    {
+      "type": "url",
+      "id": "placeholder_poster_url",
+      "label": "Placeholder poster image URL",
       "visible_if": "{{ block.settings.source == 'uploaded' }}"
     },
     {

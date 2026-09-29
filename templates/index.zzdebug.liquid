@@ -1,0 +1,14 @@
+{% layout none %}
+MENUS
+{% for l in linklists %}== {{ l.handle }} | {{ l.title }} ({{ l.links.size }})
+{% for a in l.links %}  - {{ a.title }} -> {{ a.url }}
+{% for b in a.links %}      - {{ b.title }} -> {{ b.url }}
+{% for c in b.links %}          - {{ c.title }} -> {{ c.url }}
+{% endfor %}{% endfor %}{% endfor %}{% endfor %}
+COLLECTIONS
+{% paginate collections by 250 %}{% for c in collections %}{{ c.handle }} | {{ c.title }} | {{ c.products_count }}
+{% endfor %}{% endpaginate %}
+PAGES
+{% for p in pages %}{{ p.handle }} | {{ p.title }}
+{% endfor %}
+BLOGS {% for b in blogs %}{{ b.handle }} {% endfor %}

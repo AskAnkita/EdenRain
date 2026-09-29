@@ -1,0 +1,4 @@
+# Brand source files (not theme assets; Shopify assets/ cannot contain subfolders)
+assets/logo/*
+.DS_Store
+assets/.DS_Store
