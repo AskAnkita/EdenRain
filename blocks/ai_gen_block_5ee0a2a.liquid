@@ -220,7 +220,7 @@
   }
 
   .ai-collection-carousel-container-{{ ai_gen_id }} {
-    max-width: 100%;
+    max-width: var(--page-width, 1920px);
     margin: 0 auto;
     position: relative;
   }
@@ -257,7 +257,10 @@
   }
 
   .ai-collection-carousel-link-{{ ai_gen_id }} {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: clamp(420px, 50vh, 680px);
+    height: clamp(420px, 50svh, 680px);
     text-decoration: none;
     color: inherit;
     position: relative;
@@ -286,13 +289,15 @@
   .ai-collection-carousel-image-wrapper-{{ ai_gen_id }} {
     position: relative;
     width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow: hidden;
   }
 
   .ai-collection-carousel-image-{{ ai_gen_id }},
   .ai-collection-carousel-hover-image-{{ ai_gen_id }} {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
     object-fit: cover;
     transition: opacity 0.3s ease;
@@ -303,6 +308,78 @@
     top: 0;
     left: 0;
     opacity: 0;
+  }
+
+  .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-heading-{{ ai_gen_id }} {
+    font-family: var(--font-heading--family);
+    font-style: var(--font-heading--style);
+    font-weight: var(--font-heading--weight);
+  }
+
+  .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }} {
+    height: auto;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+    background: #f8f8f6;
+  }
+
+  .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-wrapper-{{ ai_gen_id }} {
+    position: absolute;
+    inset: 0;
+    background: #f8f8f6;
+  }
+
+  .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-{{ ai_gen_id }} {
+    object-fit: contain;
+    transform: scale(0.74);
+  }
+
+  .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-hover-image-{{ ai_gen_id }} {
+    object-fit: cover;
+    transform: none;
+  }
+
+  .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-title-{{ ai_gen_id }} {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    bottom: 24px;
+    width: max-content;
+    max-width: calc(100% - 32px);
+    padding: 0 0 8px;
+    border-bottom: 1px solid currentColor;
+    transform: translateX(-50%);
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+    font-family: var(--font-body--family);
+    font-style: var(--font-body--style);
+    font-weight: var(--font-body--weight);
+    line-height: 1.2;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:hover .ai-collection-carousel-image-{{ ai_gen_id }},
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:focus-visible .ai-collection-carousel-image-{{ ai_gen_id }} {
+      opacity: 0;
+    }
+
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:hover .ai-collection-carousel-hover-image-{{ ai_gen_id }},
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:focus-visible .ai-collection-carousel-hover-image-{{ ai_gen_id }} {
+      opacity: 1;
+    }
+
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:hover .ai-collection-carousel-title-{{ ai_gen_id }},
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:focus-visible .ai-collection-carousel-title-{{ ai_gen_id }} {
+      color: #ffffff;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+    }
   }
 
   .ai-collection-carousel-title-{{ ai_gen_id }} {
@@ -321,18 +398,18 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: {{ block.settings.arrow_background }};
-    border: {{ block.settings.arrow_border_width }}px solid {{ block.settings.arrow_border_color }};
-    border-radius: {{ block.settings.arrow_border_radius }}px;
-    width: {{ block.settings.arrow_size }}px;
-    height: {{ block.settings.arrow_size }}px;
+    background: var(--arrow-background, {{ block.settings.arrow_background }});
+    border: var(--arrow-border-thickness, {{ block.settings.arrow_border_width }}px) solid var(--arrow-border, {{ block.settings.arrow_border_color }});
+    border-radius: var(--arrow-radius, {{ block.settings.arrow_border_radius }}px);
+    width: var(--arrow-width, {{ block.settings.arrow_size }}px);
+    height: var(--arrow-height, {{ block.settings.arrow_size }}px);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     z-index: 10;
     transition: all 0.3s ease;
-    color: {{ block.settings.arrow_color }};
+    color: var(--arrow-color, {{ block.settings.arrow_color }});
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }}:hover {
@@ -349,31 +426,45 @@
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }} svg {
-    width: {{ block.settings.arrow_icon_size }}px;
-    height: {{ block.settings.arrow_icon_size }}px;
+    width: var(--arrow-icon-size, {{ block.settings.arrow_icon_size }}px);
+    height: auto;
+  }
+
+  .ai-collection-carousel-nav-{{ ai_gen_id }}.prev svg {
+    transform: rotate(180deg);
+  }
+
+  .ai-collection-carousel-nav-{{ ai_gen_id }}.is-disabled {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .ai-collection-carousel-pagination-{{ ai_gen_id }} {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
+    position: relative;
+    width: 100%;
+    height: 4px;
     margin-top: {{ block.settings.pagination_spacing }}px;
-  }
-
-  .ai-collection-carousel-dot-{{ ai_gen_id }} {
-    width: {{ block.settings.dot_size }}px;
-    height: {{ block.settings.dot_size }}px;
-    border-radius: 50%;
+    overflow: hidden;
     background: {{ block.settings.pagination_color }};
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.3s ease;
-    border: none;
-    padding: 0;
   }
 
-  .ai-collection-carousel-dot-{{ ai_gen_id }}.active {
+  .ai-collection-carousel-progress-{{ ai_gen_id }} {
+    position: absolute;
+    inset: 0;
     background: {{ block.settings.pagination_active_color }};
-    transform: scale(1.2);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.4s ease-in-out;
+  }
+
+  @media screen and (min-width: 1025px) {
+    .ai-collection-carousel-nav-{{ ai_gen_id }}:not(.is-disabled) {
+      opacity: 0;
+    }
+
+    .ai-collection-carousel-wrapper-{{ ai_gen_id }}:hover .ai-collection-carousel-nav-{{ ai_gen_id }}:not(.is-disabled) {
+      opacity: 1;
+    }
   }
 
   @media screen and (max-width: 989px) {
@@ -427,6 +518,21 @@
       display: none;
     }
 
+    .ai-collection-carousel-link-{{ ai_gen_id }} {
+      height: clamp(360px, 50vh, 560px);
+      height: clamp(360px, 50svh, 560px);
+    }
+
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }} {
+      height: auto;
+    }
+
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-title-{{ ai_gen_id }} {
+      bottom: 16px;
+      max-width: calc(100% - 20px);
+      padding-bottom: 6px;
+    }
+
     @media (hover: hover) {
       .ai-collection-carousel-link-{{ ai_gen_id }}:hover {
         transform: none;
@@ -464,7 +570,7 @@
   }
 {% endstyle %}
 
-<collection-carousel-{{ ai_gen_id }} class="ai-collection-carousel-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+<collection-carousel-{{ ai_gen_id }} class="ai-collection-carousel-{{ ai_gen_id }}{% if block.settings.use_diamond_shape_placeholders %} is-diamond-shape{% endif %}" {{ block.shopify_attributes }}>
   <div class="ai-collection-carousel-container-{{ ai_gen_id }}">
     {% if block.settings.heading != blank %}
       <h2 class="ai-collection-carousel-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
@@ -490,9 +596,114 @@
             assign hide_tablet = block.settings[hide_tablet_key]
             assign hide_mobile_key = 'hide_mobile_' | append: i
             assign hide_mobile = block.settings[hide_mobile_key]
+            assign placeholder_image = blank
+            assign placeholder_hover_image = blank
+            assign model_hover_image = blank
+            assign model_hover_alt = blank
+            assign placeholder_width = 684
+            assign placeholder_height = 1014
+            assign placeholder_hover_width = 416
+            assign placeholder_hover_height = 617
+
+            if block.settings.use_placeholder_images
+              case i
+                when 1
+                  assign placeholder_image = 'style-solitaire.png'
+                  assign placeholder_hover_image = 'style-solitaire-hover.jpg'
+                when 2
+                  assign placeholder_image = 'style-side-stone.png'
+                  assign placeholder_hover_image = 'style-side-stone-hover.jpg'
+                when 3
+                  assign placeholder_image = 'style-halo.png'
+                  assign placeholder_hover_image = 'style-halo-hover.jpg'
+                when 4
+                  assign placeholder_image = 'style-hidden-halo.png'
+                  assign placeholder_hover_image = 'style-hidden-halo-hover.jpg'
+                when 5
+                  assign placeholder_image = 'style-three-stone.png'
+                  assign placeholder_hover_image = 'style-three-stone-hover.jpg'
+                when 6
+                  assign placeholder_image = 'style-vintage.png'
+                  assign placeholder_hover_image = 'style-vintage-hover.jpg'
+                when 7
+                  assign placeholder_image = 'style-nature-inspired.png'
+                  assign placeholder_hover_image = 'style-nature-inspired-hover.jpg'
+                when 8
+                  assign placeholder_image = 'style-promise.png'
+                  assign placeholder_hover_image = 'style-promise-hover.jpg'
+              endcase
+            elsif block.settings.use_diamond_shape_placeholders
+              assign placeholder_width = 900
+              assign placeholder_height = 900
+              assign placeholder_hover_width = 900
+              assign placeholder_hover_height = 900
+
+              case i
+                when 1
+                  assign placeholder_image = 'diamond-shape-round.png'
+                when 2
+                  assign placeholder_image = 'diamond-shape-oval.png'
+                when 3
+                  assign placeholder_image = 'diamond-shape-emerald.png'
+                when 4
+                  assign placeholder_image = 'diamond-shape-cushion.png'
+                when 5
+                  assign placeholder_image = 'diamond-shape-marquise.png'
+                when 6
+                  assign placeholder_image = 'diamond-shape-radiant.png'
+                when 7
+                  assign placeholder_image = 'diamond-shape-pear.png'
+                when 8
+                  assign placeholder_image = 'diamond-shape-princess.png'
+                when 9
+                  assign placeholder_image = 'diamond-shape-asscher.png'
+                when 10
+                  assign placeholder_image = 'diamond-shape-heart.png'
+              endcase
+
+              comment
+                Hover photos: the store's own lifestyle shots, matched to each shape
+              endcomment
+              case i
+                when 1
+                  assign model_hover_image = 'lifestyle-round-necklace.jpg'
+                  assign model_hover_alt = 'Round diamond pendant worn by a model'
+                when 2
+                  assign model_hover_image = 'lifestyle-necklace.jpg'
+                  assign model_hover_alt = 'Oval diamond pendant worn by a model'
+                when 3
+                  assign model_hover_image = 'lifestyle-emerald-earring.jpg'
+                  assign model_hover_alt = 'Emerald cut diamond huggie earring worn by a model'
+                when 4
+                  assign model_hover_image = 'lifestyle-earring.jpg'
+                  assign model_hover_alt = 'Diamond stud earring worn by a model'
+                when 5
+                  assign model_hover_image = 'lifestyle-marquise-bracelet.jpg'
+                  assign model_hover_alt = 'Marquise diamond bracelet worn by a model'
+                when 6
+                  assign model_hover_image = 'lifestyle-radiant-bracelet.jpg'
+                  assign model_hover_alt = 'Diamond tennis bracelet worn by a model'
+                when 7
+                  assign model_hover_image = 'lifestyle-pear-necklace.jpg'
+                  assign model_hover_alt = 'Pear diamond pendant worn by a model'
+                when 8
+                  assign model_hover_image = 'lifestyle-princess-ring.jpg'
+                  assign model_hover_alt = 'Princess cut diamond ring worn by a model'
+                when 9
+                  assign model_hover_image = 'lifestyle-bracelet.jpg'
+                  assign model_hover_alt = 'Square cut diamond bracelet worn by a model'
+                when 10
+                  assign model_hover_image = 'lifestyle-heart-necklace.jpg'
+                  assign model_hover_alt = 'Heart diamond pendant worn by a model'
+              endcase
+
+              assign placeholder_hover_image = model_hover_image
+              assign placeholder_hover_width = 816
+              assign placeholder_hover_height = 1088
+            endif
           %}
 
-          {% if image != blank %}
+          {% if image != blank or placeholder_image != blank %}
             <div 
               class="ai-collection-carousel-item-{{ ai_gen_id }}{% if hide_tablet %} hide-tablet{% endif %}{% if hide_mobile %} hide-mobile{% endif %}"
               data-hide-tablet="{{ hide_tablet }}"
@@ -504,21 +715,49 @@
                 {% if open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
               >
                 <div class="ai-collection-carousel-image-wrapper-{{ ai_gen_id }}">
-                  <img
-                    src="{{ image | image_url: width: 800 }}"
-                    alt="{{ image.alt | default: title | escape }}"
-                    loading="lazy"
-                    width="{{ image.width }}"
-                    height="{{ image.height }}"
-                    class="ai-collection-carousel-image-{{ ai_gen_id }}"
-                  >
-                  {% if hover_image != blank %}
+                  {% if image != blank %}
                     <img
-                      src="{{ hover_image | image_url: width: 800 }}"
-                      alt="{{ hover_image.alt | default: title | escape }}"
+                      src="{{ image | image_url: width: 800 }}"
+                      alt="{{ image.alt | default: title | escape }}"
                       loading="lazy"
-                      width="{{ hover_image.width }}"
-                      height="{{ hover_image.height }}"
+                      width="{{ image.width }}"
+                      height="{{ image.height }}"
+                      class="ai-collection-carousel-image-{{ ai_gen_id }}"
+                    >
+                    {% if model_hover_image != blank %}
+                      <img
+                        src="{{ model_hover_image | asset_url }}"
+                        alt="{{ model_hover_alt | escape }}"
+                        loading="lazy"
+                        width="816"
+                        height="1088"
+                        class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
+                      >
+                    {% elsif hover_image != blank %}
+                      <img
+                        src="{{ hover_image | image_url: width: 800 }}"
+                        alt="{{ hover_image.alt | default: title | escape }}"
+                        loading="lazy"
+                        width="{{ hover_image.width }}"
+                        height="{{ hover_image.height }}"
+                        class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
+                      >
+                    {% endif %}
+                  {% elsif placeholder_image != blank %}
+                    <img
+                      src="{{ placeholder_image | asset_url }}"
+                      alt="{{ title | escape }}"
+                      loading="lazy"
+                      width="{{ placeholder_width }}"
+                      height="{{ placeholder_height }}"
+                      class="ai-collection-carousel-image-{{ ai_gen_id }}"
+                    >
+                    <img
+                      src="{{ placeholder_hover_image | asset_url }}"
+                      alt="{{ model_hover_alt | default: title | escape }}"
+                      loading="lazy"
+                      width="{{ placeholder_hover_width }}"
+                      height="{{ placeholder_hover_height }}"
                       class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
                     >
                   {% endif %}
@@ -536,13 +775,13 @@
 
       {% if block.settings.show_arrows %}
         <button class="ai-collection-carousel-nav-{{ ai_gen_id }} prev" aria-label="Previous slide">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"></polyline>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10" aria-hidden="true">
+            <path fill="currentColor" fill-rule="evenodd" d="M8.537.808a.5.5 0 0 1 .817-.162l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 1 1-.708-.708L11.793 5.5H1a.5.5 0 0 1 0-1h10.793L8.646 1.354a.5.5 0 0 1-.109-.546" clip-rule="evenodd"/>
           </svg>
         </button>
         <button class="ai-collection-carousel-nav-{{ ai_gen_id }} next" aria-label="Next slide">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"></polyline>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10" aria-hidden="true">
+            <path fill="currentColor" fill-rule="evenodd" d="M8.537.808a.5.5 0 0 1 .817-.162l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 1 1-.708-.708L11.793 5.5H1a.5.5 0 0 1 0-1h10.793L8.646 1.354a.5.5 0 0 1-.109-.546" clip-rule="evenodd"/>
           </svg>
         </button>
       {% endif %}
@@ -631,7 +870,7 @@
         } else {
           if (this.prevBtn) this.prevBtn.style.display = 'flex';
           if (this.nextBtn) this.nextBtn.style.display = 'flex';
-          if (this.pagination) this.pagination.style.display = 'flex';
+          if (this.pagination) this.pagination.style.display = 'block';
         }
       }
 
@@ -643,7 +882,7 @@
           return 1;
         }
         
-        return visibleCount - columnsPerView + 1;
+        return Math.ceil(visibleCount - columnsPerView) + 1;
       }
 
       setupEventListeners() {
@@ -707,8 +946,12 @@
           offset += this.visibleItems[i].offsetWidth + gap;
         }
 
+        const maxOffset = Math.max(0, this.track.scrollWidth - this.wrapper.clientWidth);
+        offset = Math.min(offset, maxOffset);
+
         this.track.style.transform = `translateX(-${offset}px)`;
-        this.updatePaginationDots();
+        this.updatePaginationProgress();
+        this.updateControls();
       }
 
       next() {
@@ -758,33 +1001,38 @@
           return;
         }
 
-        this.pagination.style.display = 'flex';
+        this.pagination.style.display = 'block';
 
-        for (let i = 0; i < totalSlides; i++) {
-          const dot = document.createElement('button');
-          dot.classList.add('ai-collection-carousel-dot-{{ ai_gen_id }}');
-          dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
-          dot.addEventListener('click', () => {
-            this.currentIndex = i;
-            this.updateSlidePosition();
-          });
-          this.pagination.appendChild(dot);
-        }
-
-        this.updatePaginationDots();
+        const progress = document.createElement('span');
+        progress.classList.add('ai-collection-carousel-progress-{{ ai_gen_id }}');
+        this.pagination.appendChild(progress);
+        this.updatePaginationProgress();
       }
 
-      updatePaginationDots() {
+      updatePaginationProgress() {
         if (!this.pagination) return;
 
-        const dots = this.pagination.querySelectorAll('.ai-collection-carousel-dot-{{ ai_gen_id }}');
-        dots.forEach((dot, index) => {
-          if (index === this.currentIndex) {
-            dot.classList.add('active');
-          } else {
-            dot.classList.remove('active');
-          }
-        });
+        const progress = this.pagination.querySelector('.ai-collection-carousel-progress-{{ ai_gen_id }}');
+        if (!progress) return;
+
+        const totalSlides = this.getTotalSlides();
+        const progressValue = totalSlides <= 1 ? 1 : (this.currentIndex + 1) / totalSlides;
+        progress.style.transform = `scaleX(${progressValue})`;
+      }
+
+      updateControls() {
+        const totalSlides = this.getTotalSlides();
+        const atStart = !this.settings.loop && this.currentIndex === 0;
+        const atEnd = !this.settings.loop && this.currentIndex >= totalSlides - 1;
+
+        if (this.prevBtn) {
+          this.prevBtn.classList.toggle('is-disabled', atStart);
+          this.prevBtn.setAttribute('aria-disabled', atStart.toString());
+        }
+        if (this.nextBtn) {
+          this.nextBtn.classList.toggle('is-disabled', atEnd);
+          this.nextBtn.setAttribute('aria-disabled', atEnd.toString());
+        }
       }
 
       startAutoplay() {
@@ -828,6 +1076,18 @@
       "id": "heading",
       "label": "Heading text",
       "default": "FIND YOUR STYLE"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_placeholder_images",
+      "label": "Use development placeholder images",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "use_diamond_shape_placeholders",
+      "label": "Use loose diamond placeholders",
+      "default": false
     },
     {
       "type": "select",
@@ -927,8 +1187,8 @@
       "label": "Desktop columns",
       "min": 2,
       "max": 8,
-      "step": 1,
-      "default": 5
+      "step": 0.5,
+      "default": 4.5
     },
     {
       "type": "range",

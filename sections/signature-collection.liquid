@@ -1,0 +1,366 @@
+{% comment %}
+  Signature collection grid: one large feature (video or image) on the left, up to four product cards in a 2x2 grid on the right.
+  Placeholder media/titles are used only when nothing is picked, and never on the published (live) theme.
+{% endcomment %}
+
+{%- liquid
+  assign show_placeholder = true
+  if theme.role == 'main' and request.design_mode == false
+    assign show_placeholder = false
+  endif
+
+  assign feature_link = section.settings.feature_link
+-%}
+
+{% style %}
+  .signature-grid-{{ section.id }} {
+    padding: {{ section.settings.padding_top }}px 30px {{ section.settings.padding_bottom }}px;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__heading {
+    margin: 0 auto;
+    text-align: center;
+    max-width: 90rem;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__description {
+    margin: 1.6rem auto 0;
+    text-align: center;
+    max-width: 72rem;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: {{ section.settings.gap }}px;
+    margin-top: {% if section.settings.heading != blank or section.settings.description != blank %}4rem{% else %}0{% endif %};
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__feature {
+    grid-row: span 2;
+    position: relative;
+    overflow: hidden;
+    background: {{ section.settings.card_background }};
+    /* Stretch to the height of the two card rows so top and bottom edges line up */
+    min-height: 100%;
+    display: block;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__feature video,
+  .signature-grid-{{ section.id }} .signature-grid__feature img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__card {
+    background: {{ section.settings.card_background }};
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2.4rem 2rem 3.2rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__card-media {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__card-media img {
+    max-width: 80%;
+    max-height: 100%;
+    object-fit: contain;
+    /* Blend white product-photo backgrounds into the card colour */
+    mix-blend-mode: multiply;
+    transition: transform 0.4s ease;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__card:hover .signature-grid__card-media img {
+    transform: scale(1.04);
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__card-title {
+    margin-top: 1.6rem;
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.8;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.6rem;
+    max-width: 100%;
+    flex-shrink: 0;
+    /* Long product names wrap to two lines; the last line stays on the shared baseline */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 989px) {
+    .signature-grid-{{ section.id }} .signature-grid__layout {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .signature-grid-{{ section.id }} .signature-grid__feature {
+      grid-column: span 2;
+      grid-row: auto;
+      aspect-ratio: 1 / 1;
+      min-height: 0;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .signature-grid-{{ section.id }} {
+      padding-inline: 16px;
+    }
+
+    .signature-grid-{{ section.id }} .signature-grid__layout {
+      gap: 12px;
+    }
+
+    .signature-grid-{{ section.id }} .signature-grid__card {
+      padding: 1.6rem 1.2rem 2rem;
+    }
+
+    .signature-grid-{{ section.id }} .signature-grid__card-title {
+      font-size: 1.2rem;
+    }
+  }
+{% endstyle %}
+
+<div class="signature-grid-{{ section.id }} color-{{ section.settings.color_scheme }}">
+  {%- if section.settings.heading != blank -%}
+    <h2 class="signature-grid__heading h2">{{ section.settings.heading }}</h2>
+  {%- endif -%}
+  {%- if section.settings.description != blank -%}
+    <div class="signature-grid__description rte">{{ section.settings.description }}</div>
+  {%- endif -%}
+
+  <div class="signature-grid__layout">
+    {%- liquid
+      assign feature_video_src = section.settings.feature_video.sources[1].url
+      assign feature_poster = section.settings.feature_image | image_url: width: 1600
+      if section.settings.feature_video == blank and show_placeholder and section.settings.placeholder_video_url != blank
+        assign feature_video_src = section.settings.placeholder_video_url
+      endif
+      if section.settings.feature_image == blank and show_placeholder
+        assign feature_poster = section.settings.placeholder_poster_url
+      endif
+    -%}
+    <a class="signature-grid__feature" {% if feature_link != blank %}href="{{ feature_link }}"{% endif %}>
+      {%- if feature_video_src != blank -%}
+        <video autoplay muted loop playsinline preload="metadata" {% if feature_poster != blank %}poster="{{ feature_poster }}"{% endif %}>
+          <source src="{{ feature_video_src }}" type="video/mp4">
+        </video>
+      {%- elsif section.settings.feature_image != blank -%}
+        {{ section.settings.feature_image | image_url: width: 1600 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 50vw, 100vw' }}
+      {%- elsif feature_poster != blank -%}
+        <img src="{{ feature_poster }}" alt="" width="1600" height="1600" loading="lazy">
+      {%- endif -%}
+    </a>
+
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign card_product = block.settings.product
+        if card_product == blank and block.settings.collection != blank
+          assign card_product = block.settings.collection.products.first
+        endif
+        assign card_image = block.settings.image | default: card_product.featured_image
+        assign card_title = block.settings.title | default: card_product.title
+        assign card_link = block.settings.link | default: card_product.url
+        assign card_placeholder = false
+        if card_image == blank and card_title == blank and show_placeholder
+          assign card_placeholder = true
+          assign card_title = block.settings.placeholder_title
+        endif
+      -%}
+      {%- if card_image != blank or card_title != blank -%}
+        <a class="signature-grid__card" {% if card_link != blank %}href="{{ card_link }}"{% endif %} {{ block.shopify_attributes }}>
+          <div class="signature-grid__card-media">
+            {%- if card_image != blank -%}
+              {{ card_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, 50vw', alt: card_title }}
+            {%- elsif card_placeholder and block.settings.placeholder_image_url != blank -%}
+              <img src="{{ block.settings.placeholder_image_url }}" alt="{{ card_title | escape }}" width="900" height="900" loading="lazy">
+            {%- endif -%}
+          </div>
+          {%- if card_title != blank -%}
+            <span class="signature-grid__card-title">{{ card_title | escape }}</span>
+          {%- endif -%}
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Signature collection grid",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "header",
+      "content": "Feature (left)"
+    },
+    {
+      "type": "video",
+      "id": "feature_video",
+      "label": "Video"
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_image",
+      "label": "Image",
+      "info": "Used as the video poster, or on its own when no video is picked"
+    },
+    {
+      "type": "url",
+      "id": "feature_link",
+      "label": "Link"
+    },
+    {
+      "type": "url",
+      "id": "placeholder_video_url",
+      "label": "Placeholder video URL",
+      "info": "Used while no video is picked. Hidden on the published (live) theme."
+    },
+    {
+      "type": "url",
+      "id": "placeholder_poster_url",
+      "label": "Placeholder poster image URL",
+      "info": "Hidden on the published (live) theme."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#f4f4f0"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Product card",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product",
+          "info": "Fills the image, title and link automatically"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Or: collection",
+          "info": "Shows the first product of this collection when no product is picked"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (overrides product image)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title (overrides product title)"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (overrides product link)"
+        },
+        {
+          "type": "header",
+          "content": "Placeholder"
+        },
+        {
+          "type": "url",
+          "id": "placeholder_image_url",
+          "label": "Placeholder image URL",
+          "info": "Used while nothing above is set. Hidden on the published (live) theme."
+        },
+        {
+          "type": "text",
+          "id": "placeholder_title",
+          "label": "Placeholder title",
+          "info": "Hidden on the published (live) theme."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Signature collection grid",
+      "blocks": [
+        { "type": "card" },
+        { "type": "card" },
+        { "type": "card" },
+        { "type": "card" }
+      ]
+    }
+  ]
+}
+{% endschema %}

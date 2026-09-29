@@ -1423,6 +1423,13 @@
         "default": 0
       },
       {
+        "type": "checkbox",
+        "id": "menu_drawer",
+        "label": "Open menus in a side drawer",
+        "info": "Desktop: menu items with sub-links open a drawer with image tiles instead of a dropdown",
+        "default": false
+      },
+      {
         "type": "header",
         "content": "Menu link level 1",
       },
@@ -1785,6 +1792,13 @@
         "id": "message",
         "label": "t:settings.message",
         "default": "<p>Summer Sale – Up to 30% OFF</p>",
+        "visible_if": "{{ section.settings.show_message }}"
+      },
+      {
+        "type": "text",
+        "id": "right_menu_items",
+        "label": "Menu items on the right",
+        "info": "Comma-separated top-level menu item names shown on the right, next to the icons, when the message is empty. Example: Learn, About, Contact Us",
         "visible_if": "{{ section.settings.show_message }}"
       },
       {

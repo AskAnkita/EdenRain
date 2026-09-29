@@ -14,9 +14,25 @@
   endif
 
   assign icon_type = section.settings.icon_type
+  assign drawer_pages = ''
+
+  # Top-level items listed in the header's "Menu items on the right" setting render on the right (side: 'right')
+  assign right_menu_handles = ','
+  assign right_menu_items = header_settings.right_menu_items | split: ','
+  for item in right_menu_items
+    assign item_handle = item | strip | handle
+    if item_handle != blank
+      assign right_menu_handles = right_menu_handles | append: item_handle | append: ','
+    endif
+  endfor
 -%}
 
-<div class="header-block header-menu grid__item flex items-center">
+{%- if header_settings.menu_drawer and side != 'right' -%}
+  {{ 'menu-drawer-desktop.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'menu-drawer-desktop.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+<div class="header-block header-menu{% if side == 'right' %} header-menu--right{% endif %} grid__item flex items-center">
   {%- liquid
     assign vertical_menu_blocks = blocks | where: 'type', 'vertical_menu'
 
@@ -25,7 +41,7 @@
       assign vertical_menu_style = bl_stts.vertical_menu_style
     endfor
 
-    if vertical_menu_style == 'style_1'
+    if vertical_menu_style == 'style_1' and side != 'right'
       render 'header-menu-vertical', blocks: blocks, bl_stts: bl_stts, menu_gap: menu_gap
     endif
 
@@ -33,12 +49,59 @@
 
     assign block_id = 'MainMenu'
   -%}
-  <div class="header__menu-wrapper" data-main-menu>
+  <div class="header__menu-wrapper"{% unless side == 'right' %} data-main-menu{% endunless %}>
     <nav class="header__inline-menu">
       <ul class="list-menu list-menu-desktop list-menu--inline{% if has_menu_tab %} header-menu--tab{% endif %}" style="--gap-x: {{ menu_gap }}px;" role="list">
         {%- for link in header_settings.menu.links -%}
+          {%- liquid
+            assign link_handle = link.title | handle
+            assign link_handle_key = ',' | append: link_handle | append: ','
+            assign is_right_link = false
+            if right_menu_handles contains link_handle_key
+              assign is_right_link = true
+            endif
+            assign skip_link = is_right_link
+            if side == 'right'
+              assign skip_link = true
+              if is_right_link
+                assign skip_link = false
+              endif
+            endif
+          -%}
+          {%- liquid
+            # Drawer: items with sub-links, or collection links (shown as product tiles)
+            assign drawer_eligible = false
+            if header_settings.menu_drawer
+              if link.links != blank
+                assign drawer_eligible = true
+              elsif link.type == 'collection_link' and link.object.products_count > 0
+                assign drawer_eligible = true
+              endif
+            endif
+          -%}
+          {%- unless skip_link -%}
           <li>
-            {%- if link.links != blank -%}
+            {%- if drawer_eligible -%}
+              {%- assign drawer_id = 'MenuDrawer-' | append: section.id | append: '-' | append: forloop.index -%}
+              <a
+                id="HeaderMenu-{{ link.handle }}"
+                href="{{ link.url }}"
+                class="
+                  header__menu-item list-menu__item link link--text focus-inset link--hover-underline
+                  {% render 'highlight-class', order: '1', keys: keys, compare: link.title, settings: section.settings %}
+                "
+                data-menu-drawer-trigger="{{ drawer_id }}"
+                aria-haspopup="dialog"
+                aria-expanded="false"
+                aria-controls="{{ drawer_id }}"
+              >
+                <span class="text{% if link.child_active %} header__active-menu-item{% endif %}">{{- link.title | escape -}}</span>
+              </a>
+              {%- capture drawer_page -%}
+                {%- render 'header-menu-drawer-panel', link: link, drawer_id: drawer_id -%}
+              {%- endcapture -%}
+              {%- assign drawer_pages = drawer_pages | append: drawer_page -%}
+            {%- elsif link.links != blank -%}
               <details
                 id="Details-HeaderMenu-{{ forloop.index }}"
                 class="details--dropdown mega-menu"
@@ -120,8 +183,18 @@
               </a>
             {%- endif -%}
           </li>
+          {%- endunless -%}
         {%- endfor -%}
       </ul>
     </nav>
   </div>
+  {%- if drawer_pages != blank -%}
+    {%- comment -%} Desktop menu drawer (MiaDonna-style); moved to <body> by menu-drawer-desktop.js {%- endcomment -%}
+    <div class="menu-drawer-desktop color-{{ section.settings.menu_mobile_color_scheme }}" data-menu-drawer-root hidden>
+      <div class="menu-drawer-desktop__overlay" data-menu-drawer-close></div>
+      <div class="menu-drawer-desktop__sheet" role="dialog" aria-modal="true">
+        {{ drawer_pages }}
+      </div>
+    </div>
+  {%- endif -%}
 </div>

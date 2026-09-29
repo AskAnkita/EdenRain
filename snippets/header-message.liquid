@@ -1,5 +1,12 @@
-{% if settings.show_message %}
-  <div class="header-message custom-typography custom-font-size max-md:hidden" style="{% render 'typography-style', settings: settings, preset: 'custom', case: settings.message_case %}">
-    {{ settings.message }}
-  </div>
-{% endif %}
+{%- if settings.show_message -%}
+  {%- if settings.message != blank -%}
+    <div class="header-message custom-typography custom-font-size max-md:hidden" style="{% render 'typography-style', settings: settings, preset: 'custom', case: settings.message_case %}">
+      {{ settings.message }}
+    </div>
+  {%- elsif settings.right_menu_items != blank -%}
+    {%- comment -%} No message: show the menu items listed in "Menu items on the right" instead {%- endcomment -%}
+    <div class="header-message header-message--menu max-md:hidden">
+      {% render 'header-menu', header_settings: settings, blocks: blocks, menu_gap: settings.menu_gap, side: 'right' %}
+    </div>
+  {%- endif -%}
+{%- endif -%}

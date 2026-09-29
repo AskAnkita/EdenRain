@@ -159,6 +159,9 @@
       href="{{ link }}"
       class="group-block__link"
       aria-label="Group Block Link"
+      {% if link == request.path %}
+        aria-current="page"
+      {% endif %}
       {% if open_in_new_tab %}
         target="_blank" rel="noopener"
       {% endif %}

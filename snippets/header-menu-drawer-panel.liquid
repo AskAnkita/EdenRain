@@ -1,0 +1,76 @@
+{% comment %}
+  One page of the desktop menu drawer (MiaDonna-style): categories on the left, image tiles on the right.
+
+  Accepts:
+  - link: {Object} top-level menu link
+  - drawer_id: {String} unique id for this page
+
+  Works with 3-level menus (top > categories > links), 2-level menus (top > links, shown as one category)
+  and single collection links (shown as that collection's products).
+{% endcomment %}
+
+{%- liquid
+  assign has_third_level = false
+  for child in link.links
+    if child.links != blank
+      assign has_third_level = true
+      break
+    endif
+  endfor
+-%}
+
+<div class="menu-drawer-desktop__page" id="{{ drawer_id }}" data-menu-drawer-page hidden>
+  <nav class="menu-drawer-desktop__categories" aria-label="{{ link.title | escape }}">
+    <ul role="list">
+      {%- if has_third_level -%}
+        {%- for child in link.links -%}
+          <li>
+            {%- if child.links != blank -%}
+              <button
+                type="button"
+                class="menu-drawer-desktop__category{% if forloop.first %} is-active{% endif %}"
+                data-menu-drawer-category="{{ drawer_id }}-{{ forloop.index }}"
+              >
+                <span>{{ child.title | escape }}</span>
+                <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+              </button>
+            {%- else -%}
+              <a class="menu-drawer-desktop__category" href="{{ child.url }}">
+                <span>{{ child.title | escape }}</span>
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        <li>
+          <button type="button" class="menu-drawer-desktop__category is-active" data-menu-drawer-category="{{ drawer_id }}-1">
+            <span>{{ link.title | escape }}</span>
+            <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+          </button>
+        </li>
+      {%- endif -%}
+    </ul>
+  </nav>
+
+  <div class="menu-drawer-desktop__content">
+    <button type="button" class="menu-drawer-desktop__close" data-menu-drawer-close aria-label="{{ 'accessibility.close' | t }}">
+      <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+    </button>
+
+    {%- if has_third_level -%}
+      {%- for child in link.links -%}
+        {%- if child.links != blank -%}
+          {%- assign group_id = drawer_id | append: '-' | append: forloop.index -%}
+          {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: child, active: forloop.first -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- elsif link.links != blank -%}
+      {%- assign group_id = drawer_id | append: '-1' -%}
+      {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: link, active: true -%}
+    {%- else -%}
+      {%- comment -%} Collection link without sub-links: show its products {%- endcomment -%}
+      {%- assign group_id = drawer_id | append: '-1' -%}
+      {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: link, collection: link.object, active: true -%}
+    {%- endif -%}
+  </div>
+</div>

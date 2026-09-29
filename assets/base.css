@@ -18529,6 +18529,82 @@ summary.header__icon .svg-wrapper {
   width: var(--minimum-touch-target);
 }
 
+@media screen and (min-width: 1025px) {
+  #header-component .header__columns {
+    position: relative;
+    grid-template-areas: 'left right';
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+    min-height: 4.4rem;
+  }
+
+  #header-component .header__column--center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    grid-area: auto;
+    transform: translate(-50%, -50%);
+  }
+
+  #header-component .header__column--left {
+    min-width: 0;
+  }
+
+  #header-component .header-menu,
+  #header-component .header__menu-wrapper,
+  #header-component .header__inline-menu {
+    width: max-content;
+  }
+
+  #header-component .list-menu--inline {
+    display: flex;
+    flex-wrap: nowrap !important;
+  }
+
+  #header-component .list-menu--inline > li > .header__menu-item,
+  #header-component .list-menu--inline > li > details > .header__menu-item {
+    padding-inline: 0.8rem;
+    white-space: nowrap;
+  }
+
+  #header-component .header__column--right {
+    gap: 0.4rem;
+  }
+
+  /* Left menu: spaced uppercase, like MiaDonna */
+  #header-component .header__column--left .list-menu--inline > li > .header__menu-item > .text,
+  #header-component .header__column--left .list-menu--inline > li > details > .header__menu-item .text {
+    letter-spacing: 0.06em;
+  }
+
+  /* Right menu ("Menu items on the right"): title case, no tracking */
+  #header-component .header-message--menu {
+    margin-inline-end: 1.2rem;
+    white-space: nowrap;
+  }
+
+  #header-component .header-message--menu .header__menu-item,
+  #header-component .header-message--menu .header__menu-item .text {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  #header-component .header__column--right .header__icon,
+  #header-component .header__column--right .header__icon .svg-wrapper {
+    width: 3.6rem;
+    height: 3.6rem;
+    min-width: 3.6rem;
+    min-height: 3.6rem;
+  }
+
+  #header-component .header__column--right .header__icon .icon {
+    width: 1.8rem;
+    height: 1.8rem;
+    min-width: 1.8rem;
+    min-height: 1.8rem;
+  }
+}
+
 .header__icon--both.header__icon--cart [data-cart-count] {
   padding-inline-end: 1.2rem;
 }
@@ -20759,4 +20835,109 @@ width: 50% !important;
   height:250px!important;
   object-fit:cover!important;
 }
+}
+
+/* Homepage editorial feature: image left, centered story content right. */
+#shopify-section-section_87hr6F .section-content-wrapper {
+  align-items: stretch !important;
+  gap: 40px !important;
+  max-width: 1800px;
+  margin-inline: auto;
+}
+
+#shopify-section-section_87hr6F .section-content-wrapper > .image-block,
+#shopify-section-section_87hr6F .section-content-wrapper > .group-block {
+  flex: 1 1 calc(50% - 20px) !important;
+  width: calc(50% - 20px) !important;
+  max-width: calc(50% - 20px) !important;
+}
+
+#shopify-section-section_87hr6F .section-content-wrapper > .image-block {
+  aspect-ratio: 1.2 / 1;
+  overflow: hidden;
+  border-radius: 4px;
+  background: url('./editorial-stella-placeholder-desktop.png') center / cover no-repeat;
+}
+
+#shopify-section-section_87hr6F .image-block__image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  opacity: 0;
+}
+
+#shopify-section-section_87hr6F .group-block-content {
+  width: 100%;
+  height: 100%;
+  padding: 48px 64px;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center;
+}
+
+#shopify-section-section_87hr6F .group-block-content h2 {
+  max-width: 620px;
+  margin-inline: auto;
+  font-family: var(--font-heading--family);
+  font-size: 46px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 2px;
+}
+
+#shopify-section-section_87hr6F .group-block-content .rte p {
+  max-width: 620px;
+  margin-inline: auto;
+  font-family: var(--font-body--family);
+  font-size: 17px;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+#shopify-section-section_87hr6F .group-block-content .button {
+  width: auto !important;
+  min-width: 248px !important;
+  min-height: 58px;
+  padding: 14px 28px !important;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+
+@media screen and (max-width: 989px) {
+  #shopify-section-section_87hr6F .section-content-wrapper {
+    flex-direction: column !important;
+    gap: 28px !important;
+  }
+
+  #shopify-section-section_87hr6F .section-content-wrapper > .image-block,
+  #shopify-section-section_87hr6F .section-content-wrapper > .group-block {
+    flex-basis: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #shopify-section-section_87hr6F .section-content-wrapper > .image-block {
+    aspect-ratio: 1 / 1;
+    background-image: url('./editorial-stella-placeholder-mobile.png');
+  }
+
+  #shopify-section-section_87hr6F .group-block-content {
+    padding: 24px 16px 12px;
+  }
+
+  #shopify-section-section_87hr6F .group-block-content h2 {
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  #shopify-section-section_87hr6F .group-block-content .rte p {
+    font-size: 15px;
+  }
+
+  #shopify-section-section_87hr6F .group-block-content .button {
+    min-width: 220px !important;
+    min-height: 52px;
+  }
 }

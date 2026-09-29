@@ -26,6 +26,10 @@
         type="image/png"
         href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
       >
+    {%- else -%}
+      {%- comment -%} Eden Raine ER monogram bundled in assets, used until a favicon is picked in Theme settings {%- endcomment -%}
+      <link rel="icon" type="image/png" href="{{ 'eden-raine-favicon.png' | asset_url }}">
+      <link rel="apple-touch-icon" href="{{ 'eden-raine-favicon.png' | asset_url }}">
     {%- endif -%}
 
     {%- unless settings.type_header_font.system?
@@ -61,6 +65,9 @@
     {% render 'global-style' %}
 
     {% render 'global-css', direction: direction %}
+    {%- if template.name == 'collection' -%}
+      {{ 'collection-style-row.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
     {%- render 'global-script' -%}
 
     {{ content_for_header }}

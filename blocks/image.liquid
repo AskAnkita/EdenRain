@@ -10,6 +10,27 @@
       assign ratio = block.settings.image.aspect_ratio
   endcase
 
+  # Theme-asset fallback (shown everywhere, including the live site) when no image is picked
+  assign fallback_asset_url = blank
+  if block.settings.image == blank and block.settings.fallback_asset != blank
+    assign fallback_asset_url = block.settings.fallback_asset | strip | asset_url
+    if block.settings.image_ratio == 'adapt' and block.settings.fallback_asset_ratio != blank
+      assign ratio = block.settings.fallback_asset_ratio
+    endif
+  endif
+
+  # Dev-only placeholder image: used while no image is picked, never on the published (live) theme
+  assign use_placeholder_image = false
+  if block.settings.image == blank and fallback_asset_url == blank and block.settings.placeholder_image_url != blank
+    assign use_placeholder_image = true
+    if theme.role == 'main' and request.design_mode == false
+      assign use_placeholder_image = false
+    endif
+    if use_placeholder_image and block.settings.image_ratio == 'adapt' and block.settings.placeholder_image_ratio != blank
+      assign ratio = block.settings.placeholder_image_ratio
+    endif
+  endif
+
   if ratio == 0 or ratio == null
     assign ratio = 1
   endif
@@ -126,6 +147,26 @@
       fetch_priority: fetch_priority,
       style: style_value
     -%}
+  {%- elsif fallback_asset_url != blank -%}
+    <img
+      src="{{ fallback_asset_url }}"
+      class="{{ class_img | strip }}"
+      style="{{ style_value }}"
+      alt=""
+      width="1600"
+      height="1600"
+      loading="lazy"
+    >
+  {%- elsif use_placeholder_image -%}
+    <img
+      src="{{ block.settings.placeholder_image_url }}"
+      class="{{ class_img | strip }}"
+      style="{{ style_value }}"
+      alt=""
+      width="1600"
+      height="1600"
+      loading="lazy"
+    >
   {%- else -%}
     {{ 'hero-apparel-1' | placeholder_svg_tag: 'image-block__image placeholder-svg' }}
   {%- endif -%}
@@ -140,6 +181,30 @@
       "type": "image_picker",
       "id": "image",
       "label": "t:settings.image"
+    },
+    {
+      "type": "text",
+      "id": "fallback_asset",
+      "label": "Fallback theme image",
+      "info": "File name in the theme's assets folder, shown when no image is picked (including on the live site)"
+    },
+    {
+      "type": "text",
+      "id": "fallback_asset_ratio",
+      "label": "Fallback image ratio",
+      "info": "Width / height, e.g. 1086 / 1448"
+    },
+    {
+      "type": "url",
+      "id": "placeholder_image_url",
+      "label": "Placeholder image URL",
+      "info": "Used while no image is picked. Hidden on the published (live) theme."
+    },
+    {
+      "type": "text",
+      "id": "placeholder_image_ratio",
+      "label": "Placeholder image ratio",
+      "info": "Width / height of the placeholder, e.g. 1348 / 1130"
     },
     {
       "type": "url",

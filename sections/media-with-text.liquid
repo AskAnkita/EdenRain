@@ -19,6 +19,85 @@
 
 {% render 'section', section: section, children: children %}
 
+{%- assign category_menu = section.settings.category_menu -%}
+{%- if category_menu != blank -%}
+  <style>
+    #shopify-section-{{ section.id }} .media-withtext__content .swiper-slide > .group-block > .group-block__media-wrapper .background-image-container {
+      aspect-ratio: auto;
+      height: clamp(420px, 50vh, 680px);
+      height: clamp(420px, 50svh, 680px);
+    }
+
+    @media screen and (max-width: 749px) {
+      #shopify-section-{{ section.id }} .media-withtext__content .swiper-slide > .group-block > .group-block__media-wrapper .background-image-container {
+        height: clamp(360px, 50vh, 560px);
+        height: clamp(360px, 50svh, 560px);
+      }
+    }
+  </style>
+
+  <script>
+    (() => {
+      const sectionRoot = document.getElementById('shopify-section-{{ section.id }}');
+      if (!sectionRoot) return;
+
+      const allMenuLinks = [
+        {%- for link in category_menu.links -%}
+          { handle: {{ link.title | handle | json }}, title: {{ link.title | json }}, url: {{ link.url | json }} }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      ];
+      const configuredHandles = {{ section.settings.category_menu_items | json }};
+      const requestedHandles = (configuredHandles || 'best-sellers,earrings,necklaces,rings,bracelets')
+        .split(',')
+        .map((handle) => handle.trim().toLowerCase())
+        .filter(Boolean);
+      const menuLinks = requestedHandles
+        .map((handle) => allMenuLinks.find((link) => link.handle === handle))
+        .filter(Boolean);
+      const categoryImages = {
+        'best-sellers': {{ 'category-best-sellers.png' | asset_url | json }},
+        necklaces: {{ 'category-necklaces.png' | asset_url | json }},
+        rings: {{ 'category-rings.png' | asset_url | json }},
+        bracelets: {{ 'category-bracelets.png' | asset_url | json }},
+        earrings: {{ 'category-earrings.png' | asset_url | json }}
+      };
+
+      const categoryCards = sectionRoot.querySelectorAll('.media-withtext__content .swiper-slide');
+      categoryCards.forEach((card, index) => {
+        const menuLink = menuLinks[index];
+        if (!menuLink) return;
+
+        const imageContainer = card.querySelector('.group-block__media-wrapper .background-image-container');
+        const imageUrl = categoryImages[menuLink.handle];
+        if (imageContainer && imageUrl) {
+          const image = document.createElement('img');
+          image.src = imageUrl;
+          image.alt = menuLink.title;
+          image.className = 'background-image-img';
+          image.loading = 'lazy';
+          imageContainer.replaceChildren(image);
+        }
+
+        const cardLink = card.querySelector('.group-block > .group-block__link');
+        if (cardLink) {
+          cardLink.href = menuLink.url;
+          cardLink.setAttribute('aria-label', menuLink.title);
+        }
+
+        const labelLink = card.querySelector('.group-block-content a.link');
+        if (!labelLink) return;
+
+        labelLink.href = menuLink.url;
+        labelLink.removeAttribute('role');
+        labelLink.removeAttribute('aria-disabled');
+        labelLink.querySelectorAll('.text, .button-text-main').forEach((label) => {
+          label.textContent = menuLink.title;
+        });
+      });
+    })();
+  </script>
+{%- endif -%}
+
 {% schema %}
 {
   "name": "t:names.media_with_text",
@@ -38,6 +117,18 @@
     "groups": ["header", "custom.popup", "aside"]
   },
   "settings": [
+    {
+      "type": "link_list",
+      "id": "category_menu",
+      "label": "Category menu",
+      "info": "Uses menu names and links for the cards in order."
+    },
+    {
+      "type": "text",
+      "id": "category_menu_items",
+      "label": "Category menu items",
+      "info": "Comma-separated menu item handles in the order shown."
+    },
     {
       "type": "header",
       "content": "t:content.layout"

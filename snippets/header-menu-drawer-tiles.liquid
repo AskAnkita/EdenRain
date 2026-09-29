@@ -1,0 +1,63 @@
+{% comment %}
+  Image tiles for one category of the desktop menu drawer.
+
+  Accepts:
+  - group_id: {String}
+  - parent: {Object} menu link whose children become tiles
+  - active: {Boolean} shown first
+  - collection: {Object} optional; when set, tiles are this collection's products instead of sub-links
+{% endcomment %}
+
+<div class="menu-drawer-desktop__group" data-menu-drawer-group="{{ group_id }}"{% unless active %} hidden{% endunless %}>
+  {%- if parent.url != blank and parent.url != '#' -%}
+    <a class="menu-drawer-desktop__shop-all" href="{{ parent.url }}">
+      {{- 'Shop All ' | append: parent.title | escape -}}
+    </a>
+  {%- else -%}
+    <p class="menu-drawer-desktop__shop-all">{{ parent.title | escape }}</p>
+  {%- endif -%}
+
+  <ul class="menu-drawer-desktop__tiles" role="list">
+    {%- if collection != blank -%}
+      {%- for product in collection.products limit: 9 -%}
+        <li>
+          <a class="menu-drawer-desktop__tile" href="{{ product.url }}">
+            <span class="menu-drawer-desktop__tile-media">
+              {%- if product.featured_image != blank -%}
+                {{ product.featured_image | image_url: width: 400 | image_tag: loading: 'lazy', sizes: '180px', alt: product.title }}
+              {%- endif -%}
+            </span>
+            <span class="menu-drawer-desktop__tile-title">{{ product.title | escape }}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    {%- endif -%}
+    {%- for item in parent.links -%}
+      {%- comment -%} Skip "All …" links that duplicate the Shop All link {%- endcomment -%}
+      {%- if item.url == parent.url -%}
+        {%- continue -%}
+      {%- endif -%}
+      {%- liquid
+        assign tile_image = blank
+        case item.type
+          when 'collection_link'
+            assign tile_image = item.object.featured_image
+          when 'product_link'
+            assign tile_image = item.object.featured_image
+          when 'catalog_link'
+            assign tile_image = collections.all.featured_image
+        endcase
+      -%}
+      <li>
+        <a class="menu-drawer-desktop__tile" href="{{ item.url }}">
+          <span class="menu-drawer-desktop__tile-media">
+            {%- if tile_image != blank -%}
+              {{ tile_image | image_url: width: 400 | image_tag: loading: 'lazy', sizes: '180px', alt: item.title }}
+            {%- endif -%}
+          </span>
+          <span class="menu-drawer-desktop__tile-title">{{ item.title | escape }}</span>
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>

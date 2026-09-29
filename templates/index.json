@@ -27,18 +27,18 @@
             "overlay_color": "#000000",
             "overlay_opacity": 30,
             "heading": "Diamonds, made for your moment",
-            "description": "Elegantly crafted. Timelessly beautiful.",
+            "description": "Elegantly Crafted. Timelessly Beautiful.",
             "desktop_vertical_position": "bottom",
             "desktop_horizontal_alignment": "center",
             "mobile_content_alignment": "center",
             "mobile_content_background": "#ffffff",
-            "heading_font_size": 56,
-            "heading_font_weight": 700,
-            "heading_letter_spacing": 1,
+            "heading_font_size": 30,
+            "heading_font_weight": 500,
+            "heading_letter_spacing": 2,
             "heading_line_height": 1.2,
-            "mobile_heading_font_size": 32,
-            "mobile_heading_font_weight": 700,
-            "mobile_heading_letter_spacing": 0.5,
+            "mobile_heading_font_size": 24,
+            "mobile_heading_font_weight": 500,
+            "mobile_heading_letter_spacing": 1,
             "mobile_heading_line_height": 1.2,
             "description_font_size": 18,
             "description_font_weight": 400,
@@ -46,7 +46,7 @@
             "description_line_height": 1.5,
             "mobile_description_font_size": 16,
             "mobile_description_font_weight": 400,
-            "mobile_description_letter_spacing": 0.5,
+            "mobile_description_letter_spacing": 1,
             "mobile_description_line_height": 1.5,
             "heading_padding_top": 0,
             "heading_padding_bottom": 0,
@@ -61,16 +61,16 @@
             "mobile_buttons_padding_top": 0,
             "mobile_buttons_padding_bottom": 0,
             "heading_description_gap": 20,
-            "description_buttons_gap": 30,
+            "description_buttons_gap": 40,
             "mobile_heading_description_gap": 15,
             "mobile_description_buttons_gap": 25,
             "heading_color": "#ffffff",
             "description_color": "#ffffff",
             "mobile_heading_color": "#000000",
             "mobile_description_color": "#000000",
-            "button_1_text": "Engagement rings",
+            "button_1_text": "ENGAGEMENT RINGS",
             "button_1_link": "",
-            "button_2_text": "Fine jewelry",
+            "button_2_text": "FINE JEWELLERY",
             "button_2_link": "",
             "button_style": "solid",
             "button_background_color": "#ffffff",
@@ -83,15 +83,15 @@
             "button_padding_horizontal": 30,
             "button_padding_vertical": 15,
             "button_border_radius": 4,
-            "button_font_size": 16,
-            "button_font_weight": 600,
-            "button_letter_spacing": 1,
+            "button_font_size": 15,
+            "button_font_weight": 500,
+            "button_letter_spacing": 0.5,
             "mobile_button_width": 160,
             "mobile_button_height": 44,
             "mobile_button_padding_horizontal": 20,
             "mobile_button_padding_vertical": 10,
             "mobile_button_font_size": 14,
-            "mobile_button_font_weight": 600,
+            "mobile_button_font_weight": 500,
             "mobile_button_letter_spacing": 0.5
           },
           "blocks": {}
@@ -103,8 +103,7 @@
       "custom_css": [
         "[class*=\"ai-luxury-video-hero-button\"] {border-radius: 35px; white-space: nowrap; min-width: 200px; width: auto !important;}",
         "[class*=\"ai-luxury-video-hero-button\"]:hover,[class*=\"ai-luxury-video-hero-mobile-button\"]:hover {color: #fff;}",
-        "[class*=\"ai-luxury-video-hero-mobile-button\"] {border-color: #001514; color: #001514; border-radius: 35px; white-space: nowrap;}",
-        "@media screen and (min-width: 750px) {[class*=\"ai-luxury-video-hero-container\"] {height: 85vh !important; }}"
+        "[class*=\"ai-luxury-video-hero-mobile-button\"] {border-color: #001514; color: #001514; border-radius: 35px; white-space: nowrap;}"
       ],
       "settings": {}
     },
@@ -1413,6 +1412,8 @@
       },
       "name": "t:names.media_with_text",
       "settings": {
+        "category_menu": "main-menu",
+        "category_menu_items": "best-sellers,earrings,necklaces,rings,bracelets",
         "content_direction": "row",
         "content_direction_mobile": "column",
         "horizontal_alignment": "flex-start",
@@ -1656,8 +1657,57 @@
         "padding-inline-end-mb": 0
       }
     },
+    "signature_grid_Er26Sg": {
+      "type": "signature-collection",
+      "blocks": {
+        "card_poppy": {
+          "type": "card",
+          "settings": {
+            "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/poppy-pear-lab-grown-diamond-side-stone-engagement-ring-whitegold-001-web_1600x.png",
+            "placeholder_title": "The Poppy \u2013 13 \u00bd ctw"
+          }
+        },
+        "card_cassandra": {
+          "type": "card",
+          "settings": {
+            "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/cassandra-oval-lab-grown-diamond-hidden-halo-engagement-ring-signature-collection-rosegold-11ct-001-web_1600x.png",
+            "placeholder_title": "The Cassandra - 11 ctw"
+          }
+        },
+        "card_london": {
+          "type": "card",
+          "settings": {
+            "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/the-london_1600x.png",
+            "placeholder_title": "The London \u2013 10 \u00be ctw"
+          }
+        },
+        "card_kristina": {
+          "type": "card",
+          "settings": {
+            "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/the-kristina_1600x.jpg",
+            "placeholder_title": "The Kristina \u2013 17 \u2153 ctw"
+          }
+        }
+      },
+      "block_order": [
+        "card_poppy",
+        "card_cassandra",
+        "card_london",
+        "card_kristina"
+      ],
+      "settings": {
+        "placeholder_video_url": "https://cdn.shopify.com/videos/c/o/v/2b1c254c5fa44dccab5968f71652e5a2.mp4",
+        "placeholder_poster_url": "https://www.miadonna.com/cdn/shop/files/engagement-coll.jpg?width=1600",
+        "card_background": "#f4f4f0",
+        "gap": 40,
+        "padding_top": 40,
+        "padding_bottom": 60,
+        "color_scheme": "scheme-1"
+      }
+    },
     "section_MGpMxp": {
       "type": "section",
+      "disabled": true,
       "blocks": {
         "video_tFbknk": {
           "type": "video",
@@ -2696,6 +2746,7 @@
           "type": "ai_gen_block_5ee0a2a",
           "settings": {
             "heading": "FIND YOUR STYLE",
+            "use_placeholder_images": true,
             "heading_alignment": "center",
             "heading_font": "josefin_sans_n4",
             "heading_font_size": 30,
@@ -2703,7 +2754,7 @@
             "heading_letter_spacing": 0,
             "heading_text_transform": "uppercase",
             "heading_spacing": 40,
-            "columns_desktop": 6,
+            "columns_desktop": 4.5,
             "columns_tablet": 5,
             "columns_mobile": 2,
             "item_gap_desktop": 20,
@@ -2711,7 +2762,7 @@
             "item_gap_mobile": 12,
             "show_arrows": true,
             "hide_arrows_tablet": true,
-            "show_pagination": false,
+            "show_pagination": true,
             "enable_loop": false,
             "enable_autoplay": false,
             "autoplay_interval": 4,
@@ -2734,7 +2785,7 @@
             "pagination_color": "#cccccc",
             "pagination_active_color": "#333333",
             "dot_size": 10,
-            "pagination_spacing": 24,
+            "pagination_spacing": 40,
             "item_border_width": 0,
             "item_border_radius": 8,
             "shadow": "",
@@ -2746,7 +2797,7 @@
             "title_text_transform": "none",
             "title_padding": 16,
             "padding_top": 72,
-            "padding_bottom": 72,
+            "padding_bottom": 32,
             "padding_left": 32,
             "padding_right": 32,
             "collection_1": "",
@@ -2847,8 +2898,55 @@
       "name": "Find Your Shape",
       "settings": {}
     },
+    "brand_benefits_9Kx2Lm": {
+      "type": "brand-benefits",
+      "blocks": {
+        "benefit_guarantee": {
+          "type": "benefit",
+          "settings": {
+            "icon": "diamond",
+            "title": "Lifetime guarantee"
+          }
+        },
+        "benefit_shipping": {
+          "type": "benefit",
+          "settings": {
+            "icon": "shipping",
+            "title": "Complimentary shipping"
+          }
+        },
+        "benefit_returns": {
+          "type": "benefit",
+          "settings": {
+            "icon": "returns",
+            "title": "60-day returns"
+          }
+        },
+        "benefit_crafted": {
+          "type": "benefit",
+          "settings": {
+            "icon": "crafted",
+            "title": "Consciously crafted"
+          }
+        }
+      },
+      "block_order": [
+        "benefit_guarantee",
+        "benefit_shipping",
+        "benefit_returns",
+        "benefit_crafted"
+      ],
+      "settings": {
+        "heading": "Made for your story",
+        "description": "<p>At Eden Raine, we create elegant engagement rings and fine jewellery set with high-quality lab-grown diamonds. Beautiful statements made to last.</p>",
+        "background_color": "#f4f4f0",
+        "text_color": "#000000",
+        "icon_size": 96
+      }
+    },
     "section_GzhCGT": {
       "type": "section",
+      "disabled": true,
       "blocks": {
         "group_WRmmHF": {
           "type": "group",
@@ -3956,14 +4054,15 @@
           "type": "ai_gen_block_5ee0a2a",
           "settings": {
             "heading": "Find Your Shape",
-            "heading_alignment": "center",
+            "use_diamond_shape_placeholders": true,
+            "heading_alignment": "left",
             "heading_font": "josefin_sans_n4",
             "heading_font_size": 30,
             "heading_line_height": 1.4,
             "heading_letter_spacing": 0,
             "heading_text_transform": "uppercase",
             "heading_spacing": 40,
-            "columns_desktop": 6,
+            "columns_desktop": 4.5,
             "columns_tablet": 5,
             "columns_mobile": 2,
             "item_gap_desktop": 20,
@@ -3971,7 +4070,7 @@
             "item_gap_mobile": 12,
             "show_arrows": true,
             "hide_arrows_tablet": true,
-            "show_pagination": false,
+            "show_pagination": true,
             "enable_loop": false,
             "enable_autoplay": false,
             "autoplay_interval": 4,
@@ -3994,7 +4093,7 @@
             "pagination_color": "#cccccc",
             "pagination_active_color": "#333333",
             "dot_size": 10,
-            "pagination_spacing": 24,
+            "pagination_spacing": 40,
             "item_border_width": 0,
             "item_border_radius": 8,
             "shadow": "",
@@ -4003,10 +4102,10 @@
             "title_font_size": 16,
             "title_line_height": 1.4,
             "title_letter_spacing": 0,
-            "title_text_transform": "none",
+            "title_text_transform": "uppercase",
             "title_padding": 16,
             "padding_top": 72,
-            "padding_bottom": 72,
+            "padding_bottom": 32,
             "padding_left": 32,
             "padding_right": 32,
             "collection_1": "",
@@ -4019,7 +4118,7 @@
             "hide_mobile_1": false,
             "collection_2": "",
             "image_2": "shopify://shop_images/Oval.png",
-            "hover_image_2": "shopify://shop_images/Round_Hover.png",
+            "hover_image_2": "shopify://shop_images/Oval_Hover.png",
             "title_2": "Oval",
             "url_2": "",
             "open_new_tab_2": false,
@@ -4436,6 +4535,8 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/SECTION_1.png",
+            "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/My_MiaDonna_Rewards_Desktop_2000x.png",
+            "placeholder_image_ratio": "1348 / 1130",
             "link": "",
             "hide_on_mobile": false,
             "image_ratio": "adapt",
@@ -4523,6 +4624,8 @@
         "image_3agYtm": {
           "type": "image",
           "settings": {
+            "fallback_asset": "lifestyle-bracelet.jpg",
+            "fallback_asset_ratio": "1086 / 1448",
             "image": "shopify://shop_images/image1.png",
             "link": "",
             "hide_on_mobile": false,
@@ -4716,7 +4819,7 @@
             "text_PqHpNq": {
               "type": "text",
               "settings": {
-                "text": "<p>See Stella McCartney shine in beautifully crafted lab-grown diamond jewelry.</p>",
+                "text": "<p>Everyday brilliance, beautifully crafted in lab-grown diamonds and made to be worn and loved.</p>",
                 "collection_description_only": false,
                 "collapse_text": false,
                 "typing_text": false,
@@ -5252,6 +5355,8 @@
         "image_hthdCe": {
           "type": "image",
           "settings": {
+            "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/Exceptional_Value_Edit_Desktop_2000x.png",
+            "placeholder_image_ratio": "2000 / 1677",
             "image": "shopify://shop_images/image2.png",
             "link": "",
             "hide_on_mobile": false,
@@ -5344,6 +5449,8 @@
         "image_WfFGGA": {
           "type": "image",
           "settings": {
+            "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/MiaDonna_Boutique_Bridgeport_Village_Oregon_2000x.png",
+            "placeholder_image_ratio": "1348 / 1130",
             "image": "shopify://shop_images/SECTION_3.png",
             "link": "",
             "hide_on_mobile": false,
@@ -5902,6 +6009,7 @@
       }
     },
     "section_q4cDV4": {
+      "custom_css": [".button {width: auto !important; min-width: 220px !important;}", ".button-overflow,.button-text-main {white-space: nowrap !important;}"],
       "type": "section",
       "blocks": {
         "group_bmjdFA": {
@@ -6225,6 +6333,8 @@
         "image_RWe9n8": {
           "type": "image",
           "settings": {
+            "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/Why_Make_it_MiaDonna_Desktop_2000x.png",
+            "placeholder_image_ratio": "2000 / 1677",
             "image": "shopify://shop_images/SECTION_4.png",
             "link": "",
             "hide_on_mobile": false,
@@ -6311,102 +6421,67 @@
       "type": "marquee",
       "blocks": {
         "icon_iCKDJM": {
-          "type": "icon",
-          "name": "t:names.icon",
+          "type": "text",
           "settings": {
-            "icon": "price_tag",
-            "icon_custom": "image",
-            "svg_upload": "",
-            "svg_width": "fit-content",
-            "custom_width": 80,
-            "svg_height": "fit-content",
-            "custom_height": 80,
-            "image_upload": "shopify://shop_images/Forbes.png",
-            "link": "",
-            "open_in_new_tab": false,
-            "width": 180,
-            "width_mb": 100,
-            "animation_type": "none"
+            "text": "<p>Lab-grown diamonds</p>",
+            "width": "fit-content",
+            "type_preset": "custom",
+            "font": "var(--font-heading--family)",
+            "font_size": "2.2rem",
+            "letter_spacing": "loose",
+            "case": "uppercase"
           },
           "blocks": {}
         },
         "icon_VEYhF8": {
-          "type": "icon",
-          "name": "t:names.icon",
+          "type": "text",
           "settings": {
-            "icon": "price_tag",
-            "icon_custom": "image",
-            "svg_upload": "",
-            "svg_width": "fit-content",
-            "custom_width": 80,
-            "svg_height": "fit-content",
-            "custom_height": 80,
-            "image_upload": "shopify://shop_images/brides.png",
-            "link": "",
-            "open_in_new_tab": false,
-            "width": 180,
-            "width_mb": 100,
-            "animation_type": "none"
+            "text": "<p>925 Sterling silver</p>",
+            "width": "fit-content",
+            "type_preset": "custom",
+            "font": "var(--font-heading--family)",
+            "font_size": "2.2rem",
+            "letter_spacing": "loose",
+            "case": "uppercase"
           },
           "blocks": {}
         },
         "icon_K6zmBJ": {
-          "type": "icon",
-          "name": "t:names.icon",
+          "type": "text",
           "settings": {
-            "icon": "price_tag",
-            "icon_custom": "image",
-            "svg_upload": "",
-            "svg_width": "fit-content",
-            "custom_width": 80,
-            "svg_height": "fit-content",
-            "custom_height": 80,
-            "image_upload": "shopify://shop_images/Vogue.png",
-            "link": "",
-            "open_in_new_tab": false,
-            "width": 180,
-            "width_mb": 100,
-            "animation_type": "none"
+            "text": "<p>18k gold</p>",
+            "width": "fit-content",
+            "type_preset": "custom",
+            "font": "var(--font-heading--family)",
+            "font_size": "2.2rem",
+            "letter_spacing": "loose",
+            "case": "uppercase"
           },
           "blocks": {}
         },
         "icon_97YHyW": {
-          "type": "icon",
-          "name": "t:names.icon",
+          "type": "text",
           "settings": {
-            "icon": "price_tag",
-            "icon_custom": "image",
-            "svg_upload": "",
-            "svg_width": "fit-content",
-            "custom_width": 80,
-            "svg_height": "fit-content",
-            "custom_height": 80,
-            "image_upload": "shopify://shop_images/Today.png",
-            "link": "",
-            "open_in_new_tab": false,
-            "width": 180,
-            "width_mb": 100,
-            "animation_type": "none"
+            "text": "<p>Designed in London</p>",
+            "width": "fit-content",
+            "type_preset": "custom",
+            "font": "var(--font-heading--family)",
+            "font_size": "2.2rem",
+            "letter_spacing": "loose",
+            "case": "uppercase"
           },
           "blocks": {}
         },
         "icon_kX7QWb": {
-          "type": "icon",
-          "name": "t:names.icon",
+          "type": "text",
           "settings": {
-            "icon": "price_tag",
-            "icon_custom": "image",
-            "svg_upload": "",
-            "svg_width": "fit-content",
-            "custom_width": 80,
-            "svg_height": "fit-content",
-            "custom_height": 80,
-            "image_upload": "shopify://shop_images/Instyle.png",
-            "link": "",
-            "open_in_new_tab": false,
-            "width": 180,
-            "width_mb": 100,
-            "animation_type": "none"
+            "text": "<p>Made to last</p>",
+            "width": "fit-content",
+            "type_preset": "custom",
+            "font": "var(--font-heading--family)",
+            "font_size": "2.2rem",
+            "letter_spacing": "loose",
+            "case": "uppercase"
           },
           "blocks": {}
         }
@@ -7620,8 +7695,10 @@
     "17835081052bb8f290",
     "media_with_text_eLCFDd",
     "section_cdCbRn",
+    "signature_grid_Er26Sg",
     "section_MGpMxp",
     "178498476563ecd091",
+    "brand_benefits_9Kx2Lm",
     "section_GzhCGT",
     "blocks_DTAzNP",
     "section_r7YYjA",

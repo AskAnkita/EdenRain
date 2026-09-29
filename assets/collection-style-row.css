@@ -1,0 +1,65 @@
+/*
+  Collection pages: "shop by style" row (All / Solitaire / Side Stone …), MiaDonna-style.
+  The row is the section_xyhtgf section in the collection*.json templates. Its styles live here
+  because Shopify limits a section's custom CSS to 500 characters.
+*/
+
+.shopify-section[id$='__section_xyhtgf'] .section--page-width {
+  border-bottom: 1px solid #ddd;
+}
+
+/* Cards */
+.shopify-section[id$='__section_xyhtgf'] .swiper-slide > .group-block {
+  border: 1px solid #eee !important;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.shopify-section[id$='__section_xyhtgf'] .swiper-slide > .group-block:hover {
+  border-color: #999 !important;
+}
+
+.shopify-section[id$='__section_xyhtgf'] .swiper-slide > .group-block:has(> .group-block__link[aria-current]) {
+  border-color: #000 !important;
+}
+
+/* Labels: smaller and letter-spaced; two-word labels wrap evenly instead of overflowing */
+.shopify-section[id$='__section_xyhtgf'] .text-block {
+  --font-size: 1.3rem;
+  --letter-spacing: 0.06em;
+}
+
+.shopify-section[id$='__section_xyhtgf'] .text-block p {
+  text-wrap: balance;
+  text-align: center;
+  padding-inline: 6px;
+}
+
+/* Arrows: round white buttons, always visible, hidden at either end */
+.shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-prev,
+.shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-next {
+  --button-width: 56px;
+  --button-height: 56px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
+  opacity: 1;
+  transform: none;
+}
+
+.shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-disabled {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* 1025–1399px shows exactly four cards, so keep the arrow small to cover less of the last label */
+@media screen and (max-width: 1399px) {
+  .shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-prev,
+  .shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-next {
+    --button-width: 40px;
+    --button-height: 40px;
+    --button-icon-size: 1.4rem;
+  }
+}

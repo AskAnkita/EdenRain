@@ -334,7 +334,9 @@
     position: relative;
     width: 100%;
     {% if block.settings.enable_full_height %}
-      height: {{ block.settings.desktop_height }}vh;
+      /* Fill the screen below the header + announcement bar on every device */
+      height: calc({{ block.settings.desktop_height }}vh - var(--header-group-height, 0px));
+      height: calc({{ block.settings.desktop_height }}svh - var(--header-group-height, 0px));
     {% else %}
       height: {{ block.settings.desktop_height }}vh;
     {% endif %}
@@ -372,7 +374,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 40px;
+    padding: 40px 40px 88px;
     z-index: 2;
     {% if block.settings.desktop_vertical_position == 'top' %}
       justify-content: flex-start;
@@ -468,9 +470,51 @@
     display: none;
   }
 
+  {% if block.settings.enable_full_height %}
+  /* Full height on mobile too: video fills the screen and the text sits on top of it */
+  @media screen and (max-width: 749px) {
+    /* Visible screen = viewport minus header and the fixed bottom toolbar */
+    .ai-luxury-video-hero-container-{{ ai_gen_id }} {
+      height: calc({{ block.settings.desktop_height }}vh - var(--header-group-height, 0px) - var(--toolbar-mobile-height, 0px));
+      height: calc({{ block.settings.desktop_height }}svh - var(--header-group-height, 0px) - var(--toolbar-mobile-height, 0px));
+    }
+
+    .ai-luxury-video-hero-content-{{ ai_gen_id }} {
+      padding: 24px 20px 56px;
+    }
+
+    .ai-luxury-video-hero-heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.mobile_heading_font_size }}px;
+      font-weight: {{ block.settings.mobile_heading_font_weight }};
+      letter-spacing: {{ block.settings.mobile_heading_letter_spacing }}px;
+      line-height: {{ block.settings.mobile_heading_line_height }};
+    }
+
+    .ai-luxury-video-hero-description-{{ ai_gen_id }} {
+      font-size: {{ block.settings.mobile_description_font_size }}px;
+      letter-spacing: {{ block.settings.mobile_description_letter_spacing }}px;
+      margin-top: {{ block.settings.mobile_heading_description_gap }}px;
+    }
+
+    .ai-luxury-video-hero-buttons-{{ ai_gen_id }} {
+      gap: 12px;
+      justify-content: center;
+      margin-top: {{ block.settings.mobile_description_buttons_gap }}px;
+    }
+
+    .ai-luxury-video-hero-button-{{ ai_gen_id }} {
+      width: {{ block.settings.mobile_button_width }}px;
+      height: {{ block.settings.mobile_button_height }}px;
+      padding: {{ block.settings.mobile_button_padding_vertical }}px {{ block.settings.mobile_button_padding_horizontal }}px;
+      font-size: {{ block.settings.mobile_button_font_size }}px;
+      font-weight: {{ block.settings.mobile_button_font_weight }};
+      letter-spacing: {{ block.settings.mobile_button_letter_spacing }}px;
+    }
+  }
+  {% else %}
   @media screen and (max-width: 749px) {
     .ai-luxury-video-hero-container-{{ ai_gen_id }} {
-      height: 45vh;
+      height: {{ block.settings.mobile_height }}vh;
     }
 
     .ai-luxury-video-hero-content-{{ ai_gen_id }} {
@@ -565,6 +609,7 @@
       {% endif %}
     }
   }
+  {% endif %}
 {% endstyle %}
 
 <luxury-video-hero-{{ ai_gen_id }} class="ai-luxury-video-hero-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
@@ -731,6 +776,7 @@
       "type": "checkbox",
       "id": "enable_full_height",
       "label": "Enable full height",
+      "info": "Fills the screen below the header on desktop and mobile, with the text over the video",
       "default": true
     },
     {

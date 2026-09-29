@@ -8,6 +8,7 @@
   @param {number} width - The width setting from block.settings.width
   @param {string} class_name - CSS class name for the rendered element
   @param {object} [attributes] - Additional HTML attributes to add to the element
+  @param {string} [placeholder_url] - Image URL shown when no image is uploaded
 {%- enddoc -%}
 
 {%- if icon != 'none' and icon_custom == 'none' -%}
@@ -47,6 +48,16 @@
         | image_url: width: 1025
         | image_tag: widths: widths, class: class_name, style: image_style, sizes: sizes
       }}
+    {%- elsif placeholder_url != blank -%}
+      <img
+        src="{{ placeholder_url }}"
+        class="{{ class_name }}"
+        style="width: {{ width }}px;"
+        width="{{ width }}"
+        height="{{ width }}"
+        alt=""
+        loading="lazy"
+      >
     {%- else -%}
       <div class="placeholder-svg" style="width: {{ width }}px; height: {{ width }}px;">
         {{ 'hero-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
