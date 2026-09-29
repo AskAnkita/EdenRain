@@ -1,0 +1,127 @@
+{% comment %}
+  Renders a mega_menu for the header.
+
+  Usage:
+  {% render 'header-menu' %}
+{% endcomment %}
+
+{%- liquid
+  assign menu_tab = blocks | where: 'type', 'menu_tab'
+  if menu_tab.size > 0
+    assign has_menu_tab = true
+  else
+    assign has_menu_tab = false
+  endif
+
+  assign icon_type = section.settings.icon_type
+-%}
+
+<div class="header-block header-menu grid__item flex items-center">
+  {%- liquid
+    assign vertical_menu_blocks = blocks | where: 'type', 'vertical_menu'
+
+    for block in vertical_menu_blocks
+      assign bl_stts = block.settings
+      assign vertical_menu_style = bl_stts.vertical_menu_style
+    endfor
+
+    if vertical_menu_style == 'style_1'
+      render 'header-menu-vertical', blocks: blocks, bl_stts: bl_stts, menu_gap: menu_gap
+    endif
+
+    assign keys = 'highlighted_item_,new_label_,sale_label_,hot_label_'
+
+    assign block_id = 'MainMenu'
+  -%}
+  <div class="header__menu-wrapper" data-main-menu>
+    <nav class="header__inline-menu">
+      <ul class="list-menu list-menu-desktop list-menu--inline{% if has_menu_tab %} header-menu--tab{% endif %}" style="--gap-x: {{ menu_gap }}px;" role="list">
+        {%- for link in header_settings.menu.links -%}
+          <li>
+            {%- if link.links != blank -%}
+              <details
+                id="Details-HeaderMenu-{{ forloop.index }}"
+                class="details--dropdown mega-menu"
+                is="mega-menu-details"
+                data-mega-menu-item
+                activate-event="hover"
+                data-index="0"
+              >
+                <section-fetcher data-section-id="{{ section.id }}" data-target-id="MegaMenu-Content-{{ section.id }}-{{ forloop.index }}-{{ block_id }}" data-activate="interaction"></section-fetcher>
+                <summary
+                  id="HeaderMenu-{{ link.handle }}"
+                  class="
+                    details__summary
+                    list-menu__item menu__link--level-1 header__menu-item list-menu__item link focus-inset link--hover-underline
+                    {% render 'highlight-class', order: '1', keys: keys, compare: link.title, settings: section.settings %}
+                  "
+                  {%- if link.links != blank -%}
+                    aria-controls="submenu-{{ forloop.index }}"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  {%- endif -%}
+                  style="{%  render 'highlight-style', order: '1', keys: keys, compare: link.title, settings: section.settings %}"
+                >
+                  {% render 'header-menu-summary-link', link: link %}
+                  {% if icon_type == 'caret' %}
+                    <span class="svg-wrapper">
+                      {{- 'icon-caret.svg' | inline_asset_content -}}
+                    </span>
+                  {% endif %}
+                  {% render 'highlight-label-menu',
+                    order: '1',
+                    keys: keys,
+                    compare: link.title,
+                    settings: section.settings
+                  %}
+                </summary>
+                <div
+                  class="details__list mega-menu__content z-1 motion-reduce global-settings-popup color-{{ section.settings.menu_mobile_color_scheme }}"
+                  tabindex="-1"
+                >
+                  {%- render 'header-nav-mega',
+                    blocks: blocks,
+                    link: link,
+                    forloopIndex: forloop.index,
+                    block: block,
+                    icon_type: icon_type,
+                    keys: keys,
+                    sec_settings: section.settings,
+                    class_item_hover_reveal: class_item_hover_reveal,
+                    block_id: block_id
+                  -%}
+                </div>
+              </details>
+            {%- else -%}
+              <a
+                id="HeaderMenu-{{ link.handle }}"
+                href="{{ link.url }}"
+                class="
+                  header__menu-item list-menu__item link link--text focus-inset link--hover-underline
+                  {% render 'highlight-class', order: '1', keys: keys, compare: link.title, settings: section.settings %}
+                "
+                {% if link.current %}
+                  aria-current="page"
+                {% endif %}
+                style="{%  render 'highlight-style', order: '1', keys: keys, compare: link.title, settings: section.settings %}"
+              >
+                <span
+                  class="text{% if link.current %} header__active-menu-item{% endif %}"
+                >
+                  {{- link.title | escape -}}
+                </span>
+
+                {% render 'highlight-label-menu',
+                  order: '1',
+                  keys: keys,
+                  compare: link.title,
+                  settings: section.settings
+                %}
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  </div>
+</div>

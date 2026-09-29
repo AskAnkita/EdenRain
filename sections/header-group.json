@@ -1,0 +1,416 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "Header group",
+  "type": "header",
+  "sections": {
+    "announcement_bar_4tGfEp": {
+      "type": "announcement-bar",
+      "blocks": {
+        "group_announcement_bar_PeTpTw": {
+          "type": "_group-announcement-bar",
+          "settings": {
+            "padding_top": 0,
+            "padding_right": 0,
+            "padding_bottom": 0,
+            "padding_left": 0,
+            "content_direction": "row",
+            "wrap": "wrap",
+            "align_items": "start",
+            "justify_content": "start",
+            "gap_x": 0,
+            "gap_y": 0,
+            "show_line_separator": false,
+            "inherit_color_scheme": true,
+            "scheme_background": "#f0ede5",
+            "scheme_background_gradient": "",
+            "scheme_foreground_heading": "#000000",
+            "scheme_foreground": "#001514",
+            "scheme_primary": "#001514",
+            "scheme_primary_hover": "#000000",
+            "scheme_border": "#e6e6e6",
+            "scheme_shadow": "#001514"
+          },
+          "blocks": {
+            "group_announcement_9yj6cq": {
+              "type": "_group-announcement",
+              "settings": {
+                "width_grid_item": 100,
+                "autoplay": true,
+                "autoplay_speed": 3,
+                "inherit_color_scheme": true,
+                "scheme_background": "#ffffff",
+                "scheme_background_gradient": "",
+                "scheme_foreground_heading": "#000000",
+                "scheme_foreground": "#000000",
+                "scheme_primary": "#000f9f",
+                "scheme_primary_hover": "#000000",
+                "scheme_border": "#e6e6e6",
+                "scheme_shadow": "#000000"
+              },
+              "blocks": {
+                "announcement_text_BXhKCE": {
+                  "type": "_announcement-text",
+                  "settings": {
+                    "text": "Choose up to 36 monthly payments, from 0% APR financing. Terms apply.",
+                    "font": "body",
+                    "font_size": "1.2rem",
+                    "font_weight": "default",
+                    "text_align": "center"
+                  },
+                  "blocks": {}
+                },
+                "announcement_text_Uf8kpj": {
+                  "type": "_announcement-text",
+                  "settings": {
+                    "text": "My MiaDonna Rewards is here – earn points on every order. Join now!",
+                    "font": "body",
+                    "font_size": "1.2rem",
+                    "font_weight": "400",
+                    "text_align": "center"
+                  },
+                  "blocks": {}
+                },
+                "announcement_text_fUhgWe": {
+                  "type": "_announcement-text",
+                  "settings": {
+                    "text": "FREE Shipping + FREE 60-Day Returns",
+                    "font": "body",
+                    "font_size": "1.2rem",
+                    "font_weight": "400",
+                    "text_align": "center"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "announcement_text_BXhKCE",
+                "announcement_text_Uf8kpj",
+                "announcement_text_fUhgWe"
+              ]
+            }
+          },
+          "block_order": [
+            "group_announcement_9yj6cq"
+          ]
+        }
+      },
+      "block_order": [
+        "group_announcement_bar_PeTpTw"
+      ],
+      "name": "t:names.announcement_bar",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "margin_bottom": 0,
+        "padding_top": 9,
+        "padding_bottom": 8
+      }
+    },
+    "header_rGFz4d": {
+      "type": "header",
+      "blocks": {
+        "mega_menu_1_hN4fR6": {
+          "type": "mega_menu_1",
+          "settings": {
+            "grid": "6",
+            "menu_item": "Engagement",
+            "width": "page-width",
+            "show_promotion_banner": true,
+            "promotion_banner_layout": "right",
+            "image_border_thickness": 1,
+            "image_corner_radius": 0,
+            "image_1": "shopify://shop_images/three-stone-hover_2.png",
+            "link_url_1": "",
+            "link_url_2": "",
+            "link_url_3": ""
+          }
+        },
+        "mega_menu_1_W4xwBN": {
+          "type": "mega_menu_1",
+          "settings": {
+            "grid": "5",
+            "menu_item": "Wedding",
+            "width": "page-width",
+            "show_promotion_banner": true,
+            "promotion_banner_layout": "right",
+            "image_border_thickness": 1,
+            "image_corner_radius": 0,
+            "image_1": "shopify://shop_images/three-stone-hover_2.png",
+            "link_url_1": "",
+            "link_url_2": "",
+            "link_url_3": ""
+          }
+        },
+        "mega_menu_1_xGKwyM": {
+          "type": "mega_menu_1",
+          "settings": {
+            "grid": "5",
+            "menu_item": "Jewelry",
+            "width": "page-width",
+            "show_promotion_banner": true,
+            "promotion_banner_layout": "right",
+            "image_border_thickness": 1,
+            "image_corner_radius": 0,
+            "image_1": "shopify://shop_images/three-stone-hover_2.png",
+            "link_url_1": "",
+            "link_url_2": "",
+            "link_url_3": ""
+          }
+        }
+      },
+      "block_order": [
+        "mega_menu_1_hN4fR6",
+        "mega_menu_1_W4xwBN",
+        "mega_menu_1_xGKwyM"
+      ],
+      "custom_css": [
+        ".header-block.header-logo.grid__item.block {margin: 11px 0px;}"
+      ],
+      "name": "Header - Jewelry",
+      "settings": {
+        "gap": 12,
+        "align_items": "center",
+        "logo_width": 260,
+        "logo_width_mobile": 150,
+        "logo_spacing_left": 0,
+        "logo_spacing_right": 0,
+        "logo_position": "center",
+        "logo_row": "top",
+        "reveal_logo_on_sticky": false,
+        "menu": "main-menu-2026",
+        "menu_position": "left",
+        "menu_row": "top",
+        "icon_type": "none",
+        "menu_gap": 0,
+        "button_type_font_link": "body",
+        "button_type_size_link": "1.4rem",
+        "button_font_weight_link": "600",
+        "case": "uppercase",
+        "button_type_font_link_2": "body",
+        "button_type_size_link_2": "1.4rem",
+        "button_font_weight_link_2": "default",
+        "case_link_2": "none",
+        "button_type_font_link_3": "body",
+        "button_type_size_link_3": "1.4rem",
+        "button_font_weight_link_3": "default",
+        "case_link_3": "none",
+        "show_message": true,
+        "message": "",
+        "font": "var(--font-body--family)",
+        "font_size": "1rem",
+        "message_case": "none",
+        "message_position": "right",
+        "message_row": "top",
+        "show_account": true,
+        "enable_account_drawer": false,
+        "account_type": "icon",
+        "account_display_type": "block",
+        "account_row": "top",
+        "show_search": true,
+        "search_display_type": "icon",
+        "search_display": "block",
+        "search_type": "frame",
+        "search_underline_opacity": 0,
+        "search_position": "right",
+        "search_row": "top",
+        "search_icon_pos_right": 1,
+        "search_icon_pos_top": 1,
+        "show_country": true,
+        "show_language": true,
+        "country_selector_style": true,
+        "localization_font": "body",
+        "localization_font_size": "1.2rem",
+        "localization_type": "icon",
+        "show_localization_shortcode": false,
+        "localization_position": "right",
+        "localization_row": "top",
+        "gift_cards_enabled": false,
+        "link_giftcards": "",
+        "actions_type": "icon",
+        "actions_display_type": "block",
+        "actions_row": "top",
+        "header_actions_order": "account,search,localization,actions",
+        "custom_header_utility": false,
+        "header_utility_size": "1.6rem",
+        "header_utility_font": "var(--font-body--family)",
+        "header_utility_weight": "",
+        "header_utility_line_height": "normal",
+        "header_utility_letter_spacing": "normal",
+        "header_utility_case": "none",
+        "header_utility_wrap": "pretty",
+        "section_width": "full-width",
+        "page_width_custom": 1570,
+        "enable_sticky_header": "always",
+        "divider_width": 0,
+        "divider_size": "page-width",
+        "border_width": 0,
+        "enable_shadow": false,
+        "color_scheme_top": "scheme-6",
+        "color_scheme_top_mb": "scheme-6",
+        "color_scheme_search_inline": "scheme-6",
+        "color_scheme_bottom": "",
+        "color_scheme_transparent": "scheme-4",
+        "menu_mobile_color_scheme": "scheme-6",
+        "highlighted_item_1": "",
+        "highlighted_item_2": "",
+        "highlighted_item_3": "",
+        "highlighted_item_color": "#d12442",
+        "new_label_1": "",
+        "new_label_2": "",
+        "new_label_3": "",
+        "new_label_color": "#ffffff",
+        "new_label_bg": "#BAE4ED",
+        "sale_label_1": "",
+        "sale_label_2": "",
+        "sale_label_3": "",
+        "sale_label_color": "#ffffff",
+        "sale_label_bg": "#BAE4ED",
+        "hot_label_1": "",
+        "hot_label_2": "",
+        "hot_label_3": "",
+        "hot_label_color": "#ffffff",
+        "hot_label_bg": "#d62828",
+        "enable_transparent_header_home": false,
+        "home_color_scheme": "inverse",
+        "custom_bubble_transparent_header": false,
+        "bubble_background_transparent_header": "#ffffff",
+        "bubble_color_transparent_header": "#212121",
+        "bubble_size_transparent_header": 22,
+        "enable_transparent_header_product": false,
+        "product_color_scheme": "default",
+        "enable_transparent_header_collection": false,
+        "collection_color_scheme": "default",
+        "padding-block-start-top": 10,
+        "padding-block-end-top": 10,
+        "padding-block-start-bottom": 0,
+        "padding-block-end-bottom": 0
+      }
+    },
+    "header_mobile_MqfLk9": {
+      "type": "header_mobile",
+      "blocks": {
+        "static-menu-tab-heading": {
+          "type": "_menu_tab_headings",
+          "disabled": true,
+          "static": true,
+          "settings": {
+            "color_scheme": "scheme-3"
+          },
+          "blocks": {
+            "menu_tab_heading_X7rqfc": {
+              "type": "_menu_tab_heading",
+              "name": "Heading",
+              "disabled": true,
+              "settings": {
+                "title": "Close"
+              },
+              "blocks": {}
+            },
+            "menu_tab_heading_nCEGbq": {
+              "type": "_menu_tab_heading",
+              "name": "Heading",
+              "disabled": true,
+              "settings": {
+                "title": "Close"
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "menu_tab_heading_X7rqfc",
+            "menu_tab_heading_nCEGbq"
+          ]
+        },
+        "static-menu-tab-content": {
+          "type": "_menu_tab_contents",
+          "static": true,
+          "settings": {},
+          "blocks": {
+            "menu_tab_list_JdVVGD": {
+              "type": "_menu-tab-list",
+              "name": "Menu tab list",
+              "settings": {
+                "tab_for": "Close",
+                "divider": true,
+                "scheme_border": "#e6e6e6"
+              },
+              "blocks": {
+                "menu_tab_item_r9NdJL": {
+                  "type": "_menu-tab-item",
+                  "name": "t:names.menu_item",
+                  "settings": {
+                    "title": "Close",
+                    "link": "#",
+                    "sub_menu": "",
+                    "image_type_level_1": "image",
+                    "svg_upload_level_1": ""
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "menu_tab_item_r9NdJL"
+              ]
+            },
+            "menu_tab_list_JpCa9Y": {
+              "type": "_menu-tab-list",
+              "name": "Menu tab list",
+              "settings": {
+                "tab_for": "Demo",
+                "divider": true,
+                "scheme_border": "#e6e6e6"
+              },
+              "blocks": {
+                "menu_tab_item_ya7mTy": {
+                  "type": "_menu-tab-item",
+                  "name": "t:names.menu_item",
+                  "settings": {
+                    "title": "Menu",
+                    "link": "",
+                    "sub_menu": "main-menu",
+                    "image_type_level_1": "image",
+                    "svg_upload_level_1": ""
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "menu_tab_item_ya7mTy"
+              ]
+            }
+          },
+          "block_order": [
+            "menu_tab_list_JdVVGD",
+            "menu_tab_list_JpCa9Y"
+          ]
+        }
+      },
+      "name": "Header mobile multi-tab",
+      "settings": {
+        "show_image_level_1": false,
+        "media_type": "circle",
+        "media_width": 35,
+        "show_image_sub_menu": false,
+        "sub_media_type": "rectangle",
+        "media_width_sub_menu": 70,
+        "show_country": false,
+        "country_selector_style": true,
+        "show_language": false,
+        "localization_font": "body",
+        "localization_font_size": "1.4rem"
+      }
+    }
+  },
+  "order": [
+    "announcement_bar_4tGfEp",
+    "header_rGFz4d",
+    "header_mobile_MqfLk9"
+  ]
+}

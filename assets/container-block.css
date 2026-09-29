@@ -1,0 +1,158 @@
+.container-max-350 {
+  container-type: inline-size;
+  container-name: containerBlockMax350;
+  width: 100%;
+}
+
+.container-max-400 {
+  container-type: inline-size;
+  container-name: containerBlockMax400;
+  width: 100%;
+}
+
+.container-max-450 {
+  container-type: inline-size;
+  container-name: containerBlockMax450;
+  width: 100%;
+}
+
+.container-max-500 {
+  container-type: inline-size;
+  container-name: containerBlockMax500;
+  width: 100%;
+}
+
+.container-max-700 {
+  container-type: inline-size;
+  container-name: containerBlockMax700;
+  width: 100%;
+}
+
+.container-max-900 {
+  container-type: inline-size;
+  container-name: containerBlockMax900;
+  width: 100%;
+}
+
+@container containerBlockMax350 (width <=350px) {
+
+  .email-signup__input-groups.email-signup__auto-responsive,
+  .subscription-form.email-signup__auto-responsive {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    flex-direction: column !important;
+    gap: var(--gap, 15px) !important;
+  }
+
+  .email-signup__auto-responsive .email-signup__input,
+  .email-signup__auto-responsive .email-signup__button,
+  .email-signup__auto-responsive .button {
+    width: 100% !important;
+  }
+}
+
+@container containerBlockMax400 (width <=400px) {
+
+  .email-signup__input-groups.email-signup__auto-responsive,
+  .subscription-form.email-signup__auto-responsive {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    flex-direction: column !important;
+    gap: var(--gap, 15px) !important;
+  }
+
+  .email-signup__auto-responsive .email-signup__input,
+  .email-signup__auto-responsive .email-signup__button,
+  .email-signup__auto-responsive .button {
+    width: 100% !important;
+  }
+}
+
+@container containerBlockMax450 (width <=450px) {
+  .countdown-timer {
+    flex-wrap: nowrap !important;
+  }
+
+  .email-signup__input-groups.email-signup__auto-responsive,
+  .subscription-form.email-signup__auto-responsive {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    flex-direction: column !important;
+    gap: var(--gap, 15px) !important;
+  }
+
+  .email-signup__auto-responsive .email-signup__input,
+  .email-signup__auto-responsive .email-signup__button,
+  .email-signup__auto-responsive .button {
+    width: 100% !important;
+  }
+}
+
+@container containerBlockMax500 (width <=500px) {
+
+  .flex.flex-row,
+  .layout-panel-flex.layout-panel-flex--row {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .email-signup__input-groups.email-signup__auto-responsive,
+  .subscription-form.email-signup__auto-responsive {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    flex-direction: column !important;
+    gap: var(--gap, 15px) !important;
+  }
+
+  .email-signup__auto-responsive .email-signup__input,
+  .email-signup__auto-responsive .email-signup__button,
+  .email-signup__auto-responsive .button {
+    width: 100% !important;
+  }
+}
+
+@container containerBlockMax700 (width <=700px) {
+
+  .flex.flex-row,
+  .layout-panel-flex.layout-panel-flex--row {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .email-signup__input-groups.email-signup__auto-responsive,
+  .subscription-form.email-signup__auto-responsive {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    flex-direction: column !important;
+    gap: var(--gap, 15px) !important;
+  }
+
+  .email-signup__auto-responsive .email-signup__input,
+  .email-signup__auto-responsive .email-signup__button,
+  .email-signup__auto-responsive .button {
+    width: 100% !important;
+  }
+}
+
+@container containerBlockMax900 (width <=900px) {
+
+  .flex.flex-row,
+  .layout-panel-flex.layout-panel-flex--row {
+    flex-direction: column !important;
+  }
+
+  .email-signup__input-groups.email-signup__auto-responsive,
+  .subscription-form.email-signup__auto-responsive {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    flex-direction: column !important;
+    gap: var(--gap, 15px) !important;
+  }
+
+  .email-signup__auto-responsive .email-signup__input,
+  .email-signup__auto-responsive .email-signup__button,
+  .email-signup__auto-responsive .button {
+    width: 100% !important;
+  }
+}
+

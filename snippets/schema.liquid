@@ -1,0 +1,88 @@
+{%- if product == blank -%}
+  {%- comment -%} Skip schema when no product is available. {%- endcomment -%}
+{%- else -%}
+  {%- liquid
+    assign product_description = product.description | default: product.title | strip_html | strip_newlines | truncate: 300
+    assign price_valid_until = 'now' | date: '%s' | plus: 31536000 | date: '%Y-%m-%d'
+    assign product_id = shop.url | append: product.url | append: '#product'
+    assign product_url = shop.url | append: product.url
+  -%}
+
+  {%- capture aggregate_rating -%}
+    {%- render 'product-review-rating', product: product -%}
+  {%- endcapture -%}
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "@id": {{ product_id | json }},
+    "name": {{ product.title | strip_html | json }},
+    "url": {{ product_url | json }},
+    "description": {{ product_description | json }},
+    {%- if product.images.size > 0 -%}
+    "image": [
+      {%- for image in product.images limit: 10 -%}
+        {{ image | image_url: width: 2048 | prepend: 'https:' | json }}{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ],
+    {%- endif -%}
+    "brand": {
+      "@type": "Brand",
+      "name": {{ product.vendor | json }}
+    }
+    {%- if product.type != blank -%}
+    ,
+    "category": {{ product.type | json }}
+    {%- endif -%}
+    {{ aggregate_rating }}
+    ,
+    "offers": [
+      {%- for variant in product.variants -%}
+        {%- liquid
+          assign offer_id = shop.url | append: product.url | append: '#offer-' | append: variant.id
+          assign offer_url = shop.url | append: variant.url
+          assign variant_sku = variant.sku | strip
+        -%}
+        {
+          "@type": "Offer",
+          "@id": {{ offer_id | json }},
+          "url": {{ offer_url | json }},
+          "priceCurrency": {{ cart.currency.iso_code | json }},
+          "price": {{ variant.price | divided_by: 100.0 | json }},
+          "availability": "https://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
+          "itemCondition": "https://schema.org/NewCondition",
+          "priceValidUntil": {{ price_valid_until | json }},
+          "seller": {
+            "@type": "Organization",
+            "name": {{ shop.name | json }}
+          }
+          {%- if variant_sku != blank -%}
+          ,
+          "sku": {{ variant_sku | json }}
+          {%- endif -%}
+          {%- if variant.barcode != blank -%}
+            {%- assign barcode_length = variant.barcode | size -%}
+            {%- if barcode_length == 8 -%}
+          ,
+          "gtin8": {{ variant.barcode | json }}
+            {%- elsif barcode_length == 12 -%}
+          ,
+          "gtin12": {{ variant.barcode | json }}
+            {%- elsif barcode_length == 13 -%}
+          ,
+          "gtin13": {{ variant.barcode | json }}
+            {%- elsif barcode_length == 14 -%}
+          ,
+          "gtin14": {{ variant.barcode | json }}
+            {%- endif -%}
+          {%- elsif variant_sku != blank -%}
+          ,
+          "mpn": {{ variant_sku | json }}
+          {%- endif -%}
+        }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ]
+  }
+  </script>
+{%- endif -%}

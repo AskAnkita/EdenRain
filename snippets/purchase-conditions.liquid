@@ -1,0 +1,89 @@
+{%- doc -%}
+  Renders purchase conditions checkbox from theme settings.
+
+  @param {string} id_suffix - Unique suffix for checkbox and popup IDs (e.g. cart-checkout, cart-drawer)
+{%- enddoc -%}
+
+{%- liquid
+  assign id_suffix = id_suffix | default: 'cart'
+  assign checkbox_id = 'agree_condition-' | append: id_suffix
+-%}
+
+{%- if settings.enable_purchase_conditions and settings.purchase_conditions_text != blank -%}
+  {%- if settings.purchase_conditions_popup_text != blank -%}
+    {%- capture purchase_conditions_popup_text -%}
+      <side-drawer-opener
+        class="popup agree-condition-popup-modal__opener--keep product-popup-modal__opener--keep"
+        data-side-drawer="#PopupModal-{{ id_suffix }}"
+      >
+        <button
+          id="PopupModalButton-{{ id_suffix }}"
+          class="button button-unstyled popup__button"
+          type="button"
+        >
+          {{ settings.purchase_conditions_popup_text }}
+        </button>
+      </side-drawer-opener>
+      {%- if settings.purchase_conditions_popup_page != blank -%}
+        <side-drawer
+          class="popup__content agree-condition-popup-modal__drawer--keep product-popup-modal__drawer--keep drawer fixed top-0 left-0 z-10 w-screen h-full flex justify-center no-js-hidden"
+          element-s-popup
+          id="PopupModal-{{ id_suffix }}"
+        >
+          <div id="Drawer-Overlay-{{ id_suffix }}" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+          <div
+            class="popup__inner color-{{ settings.popover_color_scheme }} w-full h-auto absolute-c-c flex flex-column global-settings-popup"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Agree condition"
+            tabindex="-1"
+            style="--modal-max-width: 72rem;"
+          >
+            <button
+              onclick="this.closest('side-drawer').close()"
+              class="drawer__close block t-button bor-none rounded-full cursor-pointer absolute"
+              type="button"
+              aria-label="{{ 'accessibility.close_dialog' | t }}"
+              style="--top: 0.5rem; --right: 0.5rem;"
+            >
+              {{- 'icon-close.svg' | inline_asset_content -}}
+            </button>
+            <div class="w-full h-full overflow-auto cus-scrollbar" style="--p: 2rem 1rem;">
+              <div
+                class="drawer__header relative center"
+                style="--p: 1.5rem 0; --mb: 2.5rem;"
+              >
+                <h5 class="drawer__heading break m-0">
+                  {{ settings.purchase_conditions_popup_text }}
+                </h5>
+              </div>
+              <div class="agree-condition-popup-modal__content-info m-auto">
+                {{ settings.purchase_conditions_popup_page.content }}
+              </div>
+            </div>
+          </div>
+        </side-drawer>
+      {%- endif -%}
+    {%- endcapture -%}
+  {%- endif -%}
+
+  <div
+    class="spacing-style newsletter-form__checkbox purchase-conditions"
+    style="--padding-block-start: {{ settings.purchase-conditions-padding-block-start }}px; --padding-block-end: {{- settings.purchase-conditions-padding-block-end -}}px;--padding-inline-start: 0px;--padding-inline-end: 0px;"
+  >
+    {%- if purchase_conditions_popup_text != blank -%}
+      {%- assign purchase_conditions_label = settings.purchase_conditions_text | replace: '[popup_text]', purchase_conditions_popup_text -%}
+    {%- else -%}
+      {%- assign purchase_conditions_label = settings.purchase_conditions_text -%}
+    {%- endif -%}
+    {%- assign purchase_conditions_label_default = settings.purchase_conditions_popup_text -%}
+    {% render 'checkbox',
+      class: 'agree-condition-checkbox',
+      label_content: purchase_conditions_label,
+      label: purchase_conditions_label_default,
+      id: checkbox_id,
+      name: checkbox_id,
+      required: true
+    %}
+  </div>
+{%- endif -%}

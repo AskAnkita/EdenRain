@@ -1,0 +1,1374 @@
+{% doc %}
+  @prompt
+    Create a Shopify Online Store 2.0 section named:
+    
+    "Shape Carousel"
+    
+    Build a premium minimal jewelry shape selector section similar to the provided reference image.
+    
+    The main priority is:
+    
+    The carousel must work correctly on both desktop and mobile.
+    
+    Do not create a static grid.
+    
+    Use a real functional carousel/slider.
+    
+    IMPORTANT: DO NOT ADD DEFAULT CONTENT
+    
+    Do not add any default heading text.
+    
+    Do not add any default card titles.
+    
+    Do not add placeholder text.
+    
+    I will add all text manually from Shopify theme editor.
+    
+    Only create the structure and settings.
+    
+    SECTION STRUCTURE
+    
+    The section should contain:
+    
+    Optional heading block
+    Carousel container
+    Shape cards
+    
+    The merchant can add/edit all content from Shopify theme settings.
+    
+    DESKTOP CAROUSEL REQUIREMENTS
+    
+    Create a proper horizontal carousel.
+    
+    Desktop Layout:
+    
+    Display:
+    
+    5 cards visible at the same time
+    
+    Example:
+    
+    CARD 1 | CARD 2 | CARD 3 | CARD 4 | CARD 5
+    Desktop Slider Functionality
+    
+    The carousel must:
+    
+    ✅ Work with next arrow
+    ✅ Work with previous arrow
+    ✅ Support mouse drag
+    ✅ Support touch swipe
+    ✅ Infinite loop
+    ✅ Smooth sliding animation
+    ✅ No blank spaces
+    ✅ No broken slides
+    ✅ No layout jumping
+    
+    When clicking next:
+    
+    Move only ONE card.
+    
+    Example:
+    
+    Before:
+    
+    1  2  3  4  5
+    
+    After:
+    
+    2  3  4  5  6
+    MOBILE CAROUSEL REQUIREMENTS
+    
+    Mobile must have a completely different layout.
+    
+    Do NOT simply shrink desktop carousel.
+    
+    Create a mobile-specific carousel layout.
+    
+    Mobile Card Layout
+    
+    Show:
+    
+    2 columns × 2 rows
+    
+    Example:
+    {
+    -----------------
+    | Card 1 | Card 2 |
+    -----------------
+    | Card 3 | Card 4 |
+    -----------------
+    }
+    This group of 4 cards is one slide.
+    
+    Mobile Slider Movement
+    
+    IMPORTANT:
+    
+    Move FOUR cards together.
+    
+    Example:
+    
+    Slide 1:
+    
+    Card 1   Card 2
+    
+    Card 3   Card 4
+    
+    Next slide:
+    
+    Card 5   Card 6
+    
+    Card 7   Card 8
+    
+    Do NOT:
+    
+    ❌ Move one card at a time
+    ❌ Show one row only
+    ❌ Create horizontal scrolling
+    ❌ Break the 2x2 layout
+    
+    MOBILE CAROUSEL FUNCTION
+    
+    Mobile must support:
+    
+    ✅ Touch swipe
+    ✅ Next/previous navigation
+    ✅ Infinite loop
+    ✅ Smooth transition
+    ✅ Pagination dots
+    ✅ Proper spacing
+    ✅ Fixed card layout
+    
+    CARD DESIGN
+    
+    Create simple luxury-style cards.
+    
+    No effects.
+    
+    No animation.
+    
+    No shadows.
+    
+    No zoom.
+    
+    No hover scaling.
+    
+    Card Appearance
+    
+    Card:
+    
+    Clean white/light background
+    Minimal design
+    Center aligned image
+    Text area below image (empty by default)
+    IMAGE SETTINGS
+    
+    Each card should support:
+    
+    Image upload
+    Optional hover image upload
+    
+    Image rules:
+    
+    ✅ Maintain original image ratio
+    ✅ No forced square image
+    ✅ No cropping
+    ✅ No stretching
+    ✅ Use object-fit: contain
+    
+    Image size should be adjustable.
+    
+    CARD SETTINGS
+    
+    Maximum cards:
+    
+    12
+    
+    Only display cards that have images uploaded.
+    
+    If merchant adds:
+    
+    5 cards → show 5 cards
+    
+    If merchant adds:
+    
+    12 cards → show 12 cards
+    
+    CARD CUSTOMIZATION SETTINGS
+    
+    Add theme editor controls:
+    
+    Desktop:
+    Card width
+    Card height
+    Image size
+    Gap between cards
+    Mobile:
+    
+    Separate controls:
+    
+    Card width
+    Card height
+    Image size
+    Gap between cards
+    HEADING SETTINGS
+    
+    Create optional heading block.
+    
+    Settings:
+    
+    Heading text field
+    Font family
+    Font size
+    Font weight
+    Letter spacing
+    Line height
+    Color
+    Alignment
+    
+    Desktop alignment:
+    
+    Center
+    
+    Mobile alignment:
+    
+    Center
+    
+    SPACING SETTINGS
+    
+    Create separate padding controls.
+    
+    Desktop Section Padding:
+    Top
+    Bottom
+    Left
+    Right
+    Mobile Section Padding:
+    Top
+    Bottom
+    Left
+    Right
+    NAVIGATION SETTINGS
+    
+    Desktop:
+    
+    Show:
+    
+    Previous arrow
+    Next arrow
+    
+    Arrow style:
+    
+    Simple circular button
+    No shadow
+    No animation
+    
+    Mobile:
+    
+    Optional arrows.
+    
+    Primary navigation:
+    
+    Touch swipe + dots.
+    
+    PAGINATION SETTINGS
+    
+    Add bottom pagination.
+    
+    Style:
+    
+    Minimal dots / progress indicator.
+    
+    Controls:
+    
+    Enable/disable
+    Color
+    Size
+    RESPONSIVE RULES
+    
+    Desktop:
+    
+    5 cards visible
+    Move 1 card
+    Horizontal slider
+    
+    Tablet:
+    
+    3 cards visible
+    Move 1 card
+    
+    Mobile:
+    
+    2 columns
+    2 rows
+    4 cards visible
+    Move 4 cards
+    DEVELOPMENT REQUIREMENTS
+    
+    The carousel must:
+    
+    Use a real JavaScript slider
+    Initialize correctly in Shopify theme editor
+    Reinitialize after section reload
+    Work in live storefront
+    Work on iOS and Android
+    Work on desktop browsers
+    
+    Do NOT use:
+    
+    ❌ CSS-only slider
+    ❌ overflow scrolling
+    ❌ fake carousel
+    ❌ static grid pretending to be carousel
+    
+    FINAL OUTPUT
+    
+    Create a clean luxury jewelry shape carousel:
+    
+    ✅ Fully editable Shopify section
+    ✅ No default text
+    ✅ No shadows
+    ✅ No zoom effects
+    ✅ No hover animations
+    ✅ Correct desktop carousel
+    ✅ Correct mobile 2x2 grouped carousel
+    ✅ Mobile moves 4 cards together
+    ✅ Natural image ratio
+    ✅ Minimal premium jewelry UI
+    ✅ Matches the provided reference image style
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-shape-carousel-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding-top: {{ block.settings.padding_top_desktop }}px;
+    padding-bottom: {{ block.settings.padding_bottom_desktop }}px;
+    padding-left: {{ block.settings.padding_left_desktop }}px;
+    padding-right: {{ block.settings.padding_right_desktop }}px;
+  }
+
+  .ai-shape-carousel__heading-{{ ai_gen_id }} {
+    text-align: center;
+    margin: 0 0 {{ block.settings.heading_margin_bottom }}px;
+    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+    font-weight: {{ block.settings.heading_font.weight }};
+    font-size: {{ block.settings.heading_font_size }}px;
+    letter-spacing: {{ block.settings.heading_letter_spacing }}px;
+    line-height: {{ block.settings.heading_line_height }};
+    color: {{ block.settings.heading_color }};
+  }
+
+  .ai-shape-carousel__container-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .ai-shape-carousel__track-{{ ai_gen_id }} {
+    display: flex;
+    transition: transform 0.5s ease;
+    gap: {{ block.settings.gap_desktop }}px;
+  }
+
+  .ai-shape-carousel__card-{{ ai_gen_id }} {
+    flex: 0 0 auto;
+    width: {{ block.settings.card_width_desktop }}px;
+    height: {{ block.settings.card_height_desktop }}px;
+    background-color: {{ block.settings.card_background }};
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .ai-shape-carousel__image-wrapper-{{ ai_gen_id }} {
+    width: 100%;
+    height: {{ block.settings.image_size_desktop }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .ai-shape-carousel__image-{{ ai_gen_id }} {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-shape-carousel__image-{{ ai_gen_id }}.hover-image {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .ai-shape-carousel__card-{{ ai_gen_id }}:hover .ai-shape-carousel__image-{{ ai_gen_id }}.hover-image {
+    opacity: 1;
+  }
+
+  .ai-shape-carousel__card-{{ ai_gen_id }}:hover .ai-shape-carousel__image-{{ ai_gen_id }}.main-image {
+    opacity: 0;
+  }
+
+  .ai-shape-carousel__text-{{ ai_gen_id }} {
+    margin-top: 10px;
+    font-size: 14px;
+    color: {{ block.settings.card_text_color }};
+  }
+
+  .ai-shape-carousel__nav-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: {{ block.settings.arrow_background }};
+    border: 1px solid {{ block.settings.arrow_border }};
+    color: {{ block.settings.arrow_color }};
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.3s ease;
+  }
+
+  .ai-shape-carousel__nav-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.arrow_background_hover }};
+    color: {{ block.settings.arrow_color_hover }};
+  }
+
+  .ai-shape-carousel__nav-{{ ai_gen_id }}.prev {
+    left: 10px;
+  }
+
+  .ai-shape-carousel__nav-{{ ai_gen_id }}.next {
+    right: 10px;
+  }
+
+  .ai-shape-carousel__pagination-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .ai-shape-carousel__dot-{{ ai_gen_id }} {
+    width: {{ block.settings.pagination_size }}px;
+    height: {{ block.settings.pagination_size }}px;
+    border-radius: 50%;
+    background-color: {{ block.settings.pagination_color }};
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-shape-carousel__dot-{{ ai_gen_id }}.active {
+    background-color: {{ block.settings.pagination_active_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-shape-carousel-{{ ai_gen_id }} {
+      padding-top: {{ block.settings.padding_top_mobile }}px;
+      padding-bottom: {{ block.settings.padding_bottom_mobile }}px;
+      padding-left: {{ block.settings.padding_left_mobile }}px;
+      padding-right: {{ block.settings.padding_right_mobile }}px;
+    }
+
+    .ai-shape-carousel__track-{{ ai_gen_id }} {
+      gap: {{ block.settings.gap_mobile }}px;
+      flex-wrap: wrap;
+    }
+
+    .ai-shape-carousel__card-{{ ai_gen_id }} {
+      width: calc(50% - {{ block.settings.gap_mobile | divided_by: 2 }}px);
+      height: {{ block.settings.card_height_mobile }}px;
+    }
+
+    .ai-shape-carousel__image-wrapper-{{ ai_gen_id }} {
+      height: {{ block.settings.image_size_mobile }}px;
+    }
+
+    .ai-shape-carousel__nav-{{ ai_gen_id }} {
+      {% if block.settings.show_arrows_mobile == false %}
+        display: none;
+      {% endif %}
+    }
+  }
+{% endstyle %}
+
+<shape-carousel-{{ ai_gen_id }} class="ai-shape-carousel-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.heading != blank %}
+    <h2 class="ai-shape-carousel__heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+  {% endif %}
+
+  <div class="ai-shape-carousel__container-{{ ai_gen_id }}">
+    {% if block.settings.show_arrows %}
+      <button class="ai-shape-carousel__nav-{{ ai_gen_id }} prev" aria-label="Previous">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button class="ai-shape-carousel__nav-{{ ai_gen_id }} next" aria-label="Next">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    {% endif %}
+
+    <div class="ai-shape-carousel__track-{{ ai_gen_id }}">
+      {% for i in (1..12) %}
+        {% assign image_key = 'card_' | append: i | append: '_image' %}
+        {% assign hover_image_key = 'card_' | append: i | append: '_hover_image' %}
+        {% assign text_key = 'card_' | append: i | append: '_text' %}
+        {% assign link_key = 'card_' | append: i | append: '_link' %}
+        
+        {% assign card_image = block.settings[image_key] %}
+        {% assign card_hover_image = block.settings[hover_image_key] %}
+        {% assign card_text = block.settings[text_key] %}
+        {% assign card_link = block.settings[link_key] %}
+
+        {% if card_image %}
+          <div class="ai-shape-carousel__card-{{ ai_gen_id }}" data-card-index="{{ i }}">
+            {% if card_link != blank %}
+              <a href="{{ card_link }}" style="text-decoration: none; color: inherit; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            {% endif %}
+            
+            <div class="ai-shape-carousel__image-wrapper-{{ ai_gen_id }}" style="position: relative;">
+              <img 
+                src="{{ card_image | image_url: width: 500 }}" 
+                alt="{{ card_image.alt | escape }}"
+                class="ai-shape-carousel__image-{{ ai_gen_id }} main-image"
+                loading="lazy"
+                width="{{ card_image.width }}"
+                height="{{ card_image.height }}"
+              >
+              {% if card_hover_image %}
+                <img 
+                  src="{{ card_hover_image | image_url: width: 500 }}" 
+                  alt="{{ card_hover_image.alt | escape }}"
+                  class="ai-shape-carousel__image-{{ ai_gen_id }} hover-image"
+                  loading="lazy"
+                  width="{{ card_hover_image.width }}"
+                  height="{{ card_hover_image.height }}"
+                >
+              {% endif %}
+            </div>
+            
+            {% if card_text != blank %}
+              <div class="ai-shape-carousel__text-{{ ai_gen_id }}">{{ card_text }}</div>
+            {% endif %}
+
+            {% if card_link != blank %}
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if block.settings.show_pagination %}
+    <div class="ai-shape-carousel__pagination-{{ ai_gen_id }}"></div>
+  {% endif %}
+</shape-carousel-{{ ai_gen_id }}>
+
+<script>
+(function() {
+  class ShapeCarousel{{ ai_gen_id }} extends HTMLElement {
+    constructor() {
+      super();
+      this.currentIndex = 0;
+      this.isMobile = window.innerWidth < 750;
+      this.isDragging = false;
+      this.startPos = 0;
+      this.currentTranslate = 0;
+      this.prevTranslate = 0;
+      this.animationID = 0;
+    }
+
+    connectedCallback() {
+      this.track = this.querySelector('.ai-shape-carousel__track-{{ ai_gen_id }}');
+      this.cards = Array.from(this.querySelectorAll('.ai-shape-carousel__card-{{ ai_gen_id }}'));
+      this.prevBtn = this.querySelector('.ai-shape-carousel__nav-{{ ai_gen_id }}.prev');
+      this.nextBtn = this.querySelector('.ai-shape-carousel__nav-{{ ai_gen_id }}.next');
+      this.pagination = this.querySelector('.ai-shape-carousel__pagination-{{ ai_gen_id }}');
+
+      if (this.cards.length === 0) return;
+
+      this.setupCarousel();
+      this.setupEventListeners();
+      this.updateCarousel();
+
+      window.addEventListener('resize', () => {
+        const wasMobile = this.isMobile;
+        this.isMobile = window.innerWidth < 750;
+        if (wasMobile !== this.isMobile) {
+          this.currentIndex = 0;
+          this.setupCarousel();
+          this.updateCarousel();
+        }
+      });
+    }
+
+    setupCarousel() {
+      if (this.isMobile) {
+        this.cardsPerSlide = 4;
+        this.totalSlides = Math.ceil(this.cards.length / this.cardsPerSlide);
+      } else {
+        this.cardsPerSlide = 1;
+        this.totalSlides = this.cards.length;
+      }
+
+      if (this.pagination) {
+        this.pagination.innerHTML = '';
+        for (let i = 0; i < this.totalSlides; i++) {
+          const dot = document.createElement('div');
+          dot.className = 'ai-shape-carousel__dot-{{ ai_gen_id }}';
+          dot.addEventListener('click', () => this.goToSlide(i));
+          this.pagination.appendChild(dot);
+        }
+      }
+    }
+
+    setupEventListeners() {
+      if (this.prevBtn) {
+        this.prevBtn.addEventListener('click', () => this.prev());
+      }
+      if (this.nextBtn) {
+        this.nextBtn.addEventListener('click', () => this.next());
+      }
+
+      this.track.addEventListener('mousedown', this.touchStart.bind(this));
+      this.track.addEventListener('touchstart', this.touchStart.bind(this));
+      this.track.addEventListener('mouseup', this.touchEnd.bind(this));
+      this.track.addEventListener('touchend', this.touchEnd.bind(this));
+      this.track.addEventListener('mousemove', this.touchMove.bind(this));
+      this.track.addEventListener('touchmove', this.touchMove.bind(this));
+      this.track.addEventListener('mouseleave', this.touchEnd.bind(this));
+    }
+
+    touchStart(event) {
+      this.isDragging = true;
+      this.startPos = this.getPositionX(event);
+      this.animationID = requestAnimationFrame(this.animation.bind(this));
+      this.track.style.cursor = 'grabbing';
+    }
+
+    touchMove(event) {
+      if (this.isDragging) {
+        const currentPosition = this.getPositionX(event);
+        this.currentTranslate = this.prevTranslate + currentPosition - this.startPos;
+      }
+    }
+
+    touchEnd() {
+      this.isDragging = false;
+      cancelAnimationFrame(this.animationID);
+      
+      const movedBy = this.currentTranslate - this.prevTranslate;
+      
+      if (movedBy < -50 && this.currentIndex < this.totalSlides - 1) {
+        this.currentIndex += 1;
+      }
+      
+      if (movedBy > 50 && this.currentIndex > 0) {
+        this.currentIndex -= 1;
+      }
+      
+      this.updateCarousel();
+      this.track.style.cursor = 'grab';
+    }
+
+    getPositionX(event) {
+      return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+    }
+
+    animation() {
+      if (this.isDragging) {
+        this.track.style.transform = `translateX(${this.currentTranslate}px)`;
+        requestAnimationFrame(this.animation.bind(this));
+      }
+    }
+
+    prev() {
+      if (this.currentIndex > 0) {
+        this.currentIndex--;
+      } else {
+        this.currentIndex = this.totalSlides - 1;
+      }
+      this.updateCarousel();
+    }
+
+    next() {
+      if (this.currentIndex < this.totalSlides - 1) {
+        this.currentIndex++;
+      } else {
+        this.currentIndex = 0;
+      }
+      this.updateCarousel();
+    }
+
+    goToSlide(index) {
+      this.currentIndex = index;
+      this.updateCarousel();
+    }
+
+    updateCarousel() {
+      if (this.isMobile) {
+        const cardWidth = this.cards[0].offsetWidth;
+        const gap = {{ block.settings.gap_mobile }};
+        const rowWidth = (cardWidth * 2) + gap;
+        const offset = -this.currentIndex * (rowWidth + gap) * 2;
+        this.track.style.transform = `translateX(${offset}px)`;
+        this.prevTranslate = offset;
+        this.currentTranslate = offset;
+      } else {
+        const cardWidth = this.cards[0].offsetWidth;
+        const gap = {{ block.settings.gap_desktop }};
+        const offset = -this.currentIndex * (cardWidth + gap);
+        this.track.style.transform = `translateX(${offset}px)`;
+        this.prevTranslate = offset;
+        this.currentTranslate = offset;
+      }
+
+      if (this.pagination) {
+        const dots = this.pagination.querySelectorAll('.ai-shape-carousel__dot-{{ ai_gen_id }}');
+        dots.forEach((dot, index) => {
+          if (index === this.currentIndex) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+    }
+  }
+
+  customElements.define('shape-carousel-{{ ai_gen_id }}', ShapeCarousel{{ ai_gen_id }});
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Shape carousel",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Font",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Font size",
+      "min": 16,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height",
+      "label": "Line height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.2
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom",
+      "label": "Margin bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Desktop card settings"
+    },
+    {
+      "type": "range",
+      "id": "card_width_desktop",
+      "label": "Card width",
+      "min": 100,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 200
+    },
+    {
+      "type": "range",
+      "id": "card_height_desktop",
+      "label": "Card height",
+      "min": 100,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "default": 250
+    },
+    {
+      "type": "range",
+      "id": "image_size_desktop",
+      "label": "Image size",
+      "min": 50,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 180
+    },
+    {
+      "type": "range",
+      "id": "gap_desktop",
+      "label": "Gap between cards",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Mobile card settings"
+    },
+    {
+      "type": "range",
+      "id": "card_height_mobile",
+      "label": "Card height",
+      "min": 100,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 200
+    },
+    {
+      "type": "range",
+      "id": "image_size_mobile",
+      "label": "Image size",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 140
+    },
+    {
+      "type": "range",
+      "id": "gap_mobile",
+      "label": "Gap between cards",
+      "min": 0,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Card style"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows_mobile",
+      "label": "Show arrows on mobile",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Arrow color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "arrow_background",
+      "label": "Arrow background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_border",
+      "label": "Arrow border",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color_hover",
+      "label": "Hover arrow color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "arrow_background_hover",
+      "label": "Hover arrow background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "header",
+      "content": "Pagination"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pagination",
+      "label": "Show pagination",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "pagination_size",
+      "label": "Dot size",
+      "min": 6,
+      "max": 16,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "pagination_color",
+      "label": "Dot color",
+      "default": "#cecece"
+    },
+    {
+      "type": "color",
+      "id": "pagination_active_color",
+      "label": "Active dot color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Desktop section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "padding_left_desktop",
+      "label": "Left",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right_desktop",
+      "label": "Right",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Mobile section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_left_mobile",
+      "label": "Left",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "padding_right_mobile",
+      "label": "Right",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Card 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_1_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_1_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_1_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_2_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_2_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_2_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_3_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_3_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_3_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_4_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_4_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_4_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_4_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_5_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_5_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_5_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_5_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_6_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_6_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_6_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_6_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_7_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_7_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_7_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_7_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_8_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_8_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_8_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_8_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_9_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_9_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_9_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_9_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 10"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_10_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_10_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_10_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_10_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 11"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_11_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_11_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_11_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_11_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Card 12"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_12_image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_12_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "card_12_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "card_12_link",
+      "label": "Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shape carousel"
+    }
+  ]
+}
+{% endschema %}

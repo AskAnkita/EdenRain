@@ -1,0 +1,27 @@
+{%- liquid
+  assign columns_count = columns_count | default: 4
+  assign links_count = link.links.size
+  assign rows_count = links_count | plus: columns_count | minus: 1 | divided_by: columns_count
+-%}
+
+{%- for col in (1..columns_count) -%}
+  <li class="mega-menu__column">
+    <ul class="mega-menu__column-list list-unstyled" role="list">
+      {%- for row in (1..rows_count) -%}
+        {%- assign item_index = row | minus: 1 | times: columns_count | plus: col | minus: 1 -%}
+        {%- if item_index < links_count -%}
+          {%- assign childlink = link.links[item_index] -%}
+          <li>
+            {%- render 'mega-menu-link-block',
+              parent_link: link,
+              childlink: childlink,
+              keys: keys,
+              sec_settings: sec_settings,
+              highlight_color: highlight_color
+            -%}
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </li>
+{%- endfor -%}

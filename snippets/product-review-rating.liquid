@@ -1,0 +1,120 @@
+{%- comment -%}
+  1. Shopify standard — reviews.rating / reviews.rating_count
+  2. Loox — loox.avg_rating / loox.num_reviews
+  3. Yotpo — yotpo.reviews_average / yotpo.reviews_count
+  4. Stamped — stamped.reviews_average / stamped.reviews_count
+  5. Okendo — okendo.summaryData or legacy ReviewAverageValue / ReviewCount
+  6. Junip — junip.rating_average / junip.rating_count
+  7. REVIEWS.io — reviewscouk.rating / reviewscouk.total
+  8. Opinew — opinew_metafields.reviews_rating / reviews_count
+  9. Rivyo — rivyo.th_ratingValue / th_ratingCount
+{%- endcomment -%}
+
+{%- liquid
+  assign rating_value = blank
+  assign rating_count = blank
+  assign rating_scale_max = 5
+  assign rating_scale_min = 1
+
+  assign standard_rating = product.metafields.reviews.rating.value
+  assign standard_count = product.metafields.reviews.rating_count
+  if standard_count == blank
+    assign standard_count = product.metafields.reviews.rating_count.value
+  endif
+
+  if standard_rating != blank and standard_count != blank
+    assign rating_value = standard_rating.rating
+    assign rating_count = standard_count
+    assign rating_scale_max = standard_rating.scale_max | default: 5
+    assign rating_scale_min = standard_rating.scale_min | default: 1
+  endif
+
+  if rating_value == blank and product.metafields.loox.avg_rating != blank and product.metafields.loox.num_reviews != blank
+    assign rating_value = product.metafields.loox.avg_rating
+    assign rating_count = product.metafields.loox.num_reviews
+  endif
+
+  if rating_value == blank and product.metafields.yotpo.reviews_average != blank and product.metafields.yotpo.reviews_count != blank
+    assign yotpo_count = product.metafields.yotpo.reviews_count | plus: 0
+    if yotpo_count > 0
+      assign rating_value = product.metafields.yotpo.reviews_average
+      assign rating_count = yotpo_count
+    endif
+  endif
+
+  if rating_value == blank and product.metafields.stamped.reviews_average != blank and product.metafields.stamped.reviews_count != blank
+    assign stamped_count = product.metafields.stamped.reviews_count | plus: 0
+    if stamped_count > 0
+      assign rating_value = product.metafields.stamped.reviews_average
+      assign rating_count = stamped_count
+    endif
+  endif
+
+  if rating_value == blank
+    assign okendo_summary = product.metafields.okendo.summaryData.value | default: product.metafields.okendo.summaryData
+    if okendo_summary.reviewCount != blank
+      assign okendo_count = okendo_summary.reviewCount | plus: 0
+      if okendo_count > 0
+        assign rating_value = okendo_summary.reviewAverageValue
+        assign rating_count = okendo_count
+      endif
+    elsif product.metafields.okendo.ReviewCount != blank
+      assign okendo_count = product.metafields.okendo.ReviewCount | plus: 0
+      if okendo_count > 0
+        assign rating_value = product.metafields.okendo.ReviewAverageValue
+        assign rating_count = okendo_count
+      endif
+    endif
+  endif
+
+  if rating_value == blank and product.metafields.junip.rating_average != blank and product.metafields.junip.rating_count != blank
+    assign junip_count = product.metafields.junip.rating_count | plus: 0
+    if junip_count > 0
+      assign rating_value = product.metafields.junip.rating_average
+      assign rating_count = junip_count
+    endif
+  endif
+
+  if rating_value == blank and product.metafields.reviewscouk.rating != blank and product.metafields.reviewscouk.total != blank
+    assign reviewscouk_count = product.metafields.reviewscouk.total | plus: 0
+    if reviewscouk_count > 0
+      assign rating_value = product.metafields.reviewscouk.rating
+      assign rating_count = reviewscouk_count
+    endif
+  endif
+
+  if rating_value == blank and product.metafields.opinew_metafields.reviews_rating != blank and product.metafields.opinew_metafields.reviews_count != blank
+    assign opinew_count = product.metafields.opinew_metafields.reviews_count | plus: 0
+    if opinew_count > 0
+      assign rating_value = product.metafields.opinew_metafields.reviews_rating
+      assign rating_count = opinew_count
+    endif
+  endif
+
+  if rating_value == blank and product.metafields.rivyo.th_ratingValue != blank and product.metafields.rivyo.th_ratingCount != blank
+    assign rivyo_count = product.metafields.rivyo.th_ratingCount | plus: 0
+    if rivyo_count > 0
+      assign rating_value = product.metafields.rivyo.th_ratingValue
+      assign rating_count = rivyo_count
+    endif
+  endif
+
+  assign show_aggregate_rating = false
+  if rating_value != blank and rating_count != blank
+    assign rating_count_num = rating_count | plus: 0
+    if rating_count_num > 0
+      assign show_aggregate_rating = true
+    endif
+  endif
+-%}
+
+{%- if show_aggregate_rating -%}
+,
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": {{ rating_value | plus: 0 | json }},
+    "reviewCount": {{ rating_count | plus: 0 | json }},
+    "bestRating": {{ rating_scale_max | plus: 0 | json }},
+    "worstRating": {{ rating_scale_min | plus: 0 | json }}
+  }
+{%- endif -%}

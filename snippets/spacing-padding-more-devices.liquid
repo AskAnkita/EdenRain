@@ -1,0 +1,17 @@
+{%- comment -%}
+  Intended for blocks and sections that provide values for all the referenced settings.
+
+  <div style="{%  render 'spacing-padding-more-devices', settings: section.settings %}">
+
+   Accepts:
+      settings: {block.settings || section.settings}
+{%- endcomment -%}
+
+--tablet-padding-top: {{ settings.padding-block-start-tl |  append: 'px' }};
+--tablet-padding-bottom: {{ settings.padding-block-end-tl |  append: 'px' }};
+--tablet-padding-left: {{ settings.padding-inline-start-tl |  append: 'px' }};
+--tablet-padding-right: {{ settings.padding-inline-end-tl |  append: 'px' }};
+--mobile-padding-top: {{ settings.padding-block-start-mb |  append: 'px' }};
+--mobile-padding-bottom: {{ settings.padding-block-end-mb |  append: 'px' }};
+--mobile-padding-left: {{ settings.padding-inline-start-mb |  append: 'px' }};
+--mobile-padding-right: {{ settings.padding-inline-end-mb |  append: 'px' }};

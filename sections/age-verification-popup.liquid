@@ -1,0 +1,492 @@
+<link rel="stylesheet" href="{{ 'component-age-verification-popup.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+<noscript>{{ 'component-age-verification-popup.css' | asset_url | stylesheet_tag }}</noscript>
+
+{% liquid
+  assign logo = section.settings.age_verification_logo
+  assign logo_width = section.settings.age_verification_logo_width
+  assign logo_mg_bottom = section.settings.age_verification_logo_mg_bottom
+  assign title = section.settings.age_verification_popup_title
+  assign title_color = section.settings.age_verification_popup_title_color
+  assign title_font_size = section.settings.age_verification_title_font_size
+  assign title_mg_bottom = section.settings.age_verification_title_mg_bottom
+  assign desc = section.settings.age_verification_popup_desc
+  assign desc_color = section.settings.age_verification_popup_desc_color
+  assign desc_font_size = section.settings.age_verification_desc_font_size
+  assign eligible_label = section.settings.age_verification_eligible
+  assign not_eligible_label = section.settings.age_verification_not_eligible
+  assign not_eligible_link = section.settings.not_eligible_link
+  assign content_actions_gap = section.settings.content_actions_gap
+  assign content_actions_gap_mobile = section.settings.content_actions_gap_mobile
+
+  if logo != blank
+    assign logo_alt = logo.alt | default: shop.name | escape
+    assign logo_image_class = 'age-verification-popup__logo-image'
+    assign logo_sizes = logo_width | append: 'px'
+  endif
+%}
+
+<age-verification-popup
+  class="modal--popup age-verification-popup fixed top-0 left-0 z-9 w-screen h-full flex-center no-js-hidden"
+  element-s-popup
+  id="Age-verification-popup-{{ section.id }}"
+  data-expire="{{ section.settings.age_verification_popup_expire }}"
+  data-delay="{{ section.settings.popup_delay | times: 1000 }}"
+  tabindex="-1"
+>
+  <div id="Drawer-Overlay-Age-{{ section.id }}" class="drawer__overlay fixed inset-0" aria-hidden="true"></div>
+  <div
+    class="popup__inner age-verification-popup-wrapper global-settings-popup color-{{ section.settings.color_scheme }} text-center cus-scrollbar"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ title | default: 'Age verification' | escape }}"
+    style="
+      --modal-max-width: 100rem;
+      --modal-max-height: min(100%, 90vh);
+      --age-verification-logo-width: {{ logo_width }}px;
+      --age-verification-logo-mg-bottom: {{ logo_mg_bottom }}px;
+      --age-verification-title-color: {{ title_color }};
+      --age-verification-title-font-size: {{ title_font_size }};
+      --age-verification-title-mg-bottom: {{ title_mg_bottom }}px;
+      --age-verification-desc-color: {{ desc_color }};
+      --age-verification-desc-font-size: {{ desc_font_size }};
+      --age-verification-content-actions-gap: {{ content_actions_gap }}px;
+      --age-verification-content-actions-gap-mobile: {{ content_actions_gap_mobile }}px;
+      --p: 5rem 1rem;
+    "
+  >
+    <div class="age-verification-popup__content">
+      {%- if logo != blank -%}
+        <div class="age-verification-popup__logo">
+          {{
+            logo
+            | image_url: width: logo_width
+            | image_tag:
+              widths: '100, 200, 300, 400',
+              width: logo_width,
+              alt: logo_alt,
+              class: logo_image_class,
+              sizes: logo_sizes,
+              loading: 'lazy',
+              fetchpriority: 'low'
+          }}
+        </div>
+      {%- endif -%}
+
+      {%- if title != blank -%}
+        <h2 class="age-verification-popup__heading h2">{{ title }}</h2>
+      {%- endif -%}
+
+      {%- if desc != blank -%}
+        <div class="age-verification-popup__description rte">{{ desc }}</div>
+      {%- endif -%}
+    </div>
+
+    <div class="age-verification-popup__actions">
+      {%- if not_eligible_label != blank -%}
+        <a class="button-secondary age-verification-popup__button age-verification-popup__button--decline" href="{{ not_eligible_link }}">
+          {{ not_eligible_label }}
+        </a>
+      {%- endif -%}
+      {%- if eligible_label != blank -%}
+        <button
+          type="button"
+          class="button age-verification-popup__button age-verification-popup__button--confirm"
+          data-age-verification-confirm
+        >
+          {{ eligible_label }}
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+</age-verification-popup>
+
+<script src="{{ 'age-verification-popup.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Age verification popup",
+  "tag": "section",
+  "class": "section-age-verification-popup",
+  "limit": 1,
+  "enabled_on": {
+    "groups": ["custom.popup"]
+  },
+  "settings": [
+    {
+      "type": "range",
+      "id": "age_verification_popup_expire",
+      "label": "t:settings.show_again_after",
+      "max": 30,
+      "min": 1,
+      "step": 1,
+      "unit": "day",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "popup_delay",
+      "max": 60,
+      "min": 0,
+      "step": 1,
+      "unit": "s",
+      "label": "t:settings.delay_time",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.content"
+    },
+    {
+      "type": "image_picker",
+      "id": "age_verification_logo",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "range",
+      "id": "age_verification_logo_width",
+      "label": "t:settings.width",
+      "max": 400,
+      "min": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 220
+    },
+    {
+      "type": "range",
+      "id": "age_verification_logo_mg_bottom",
+      "label": "t:settings.spacing_bottom",
+      "max": 100,
+      "min": 0,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "text",
+      "id": "age_verification_popup_title",
+      "label": "t:settings.heading",
+      "default": "Are you over 18 years old?"
+    },
+    {
+      "type": "color",
+      "id": "age_verification_popup_title_color",
+      "label": "t:settings.color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "age_verification_title_font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.default"
+        },
+        {
+          "value": "1.0rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        },
+        {
+          "value": "2.0rem",
+          "label": "20px"
+        },
+        {
+          "value": "2.2rem",
+          "label": "22px"
+        },
+        {
+          "value": "2.4rem",
+          "label": "24px"
+        },
+        {
+          "value": "2.6rem",
+          "label": "26px"
+        },
+        {
+          "value": "2.8rem",
+          "label": "28px"
+        },
+        {
+          "value": "3.0rem",
+          "label": "30px"
+        },
+        {
+          "value": "3.2rem",
+          "label": "32px"
+        },
+        {
+          "value": "3.4rem",
+          "label": "34px"
+        },
+        {
+          "value": "3.6rem",
+          "label": "36px"
+        },
+        {
+          "value": "4.0rem",
+          "label": "40px"
+        },
+        {
+          "value": "4.8rem",
+          "label": "48px"
+        },
+        {
+          "value": "5.0rem",
+          "label": "50px"
+        },
+        {
+          "value": "6.0rem",
+          "label": "60px"
+        },
+        {
+          "value": "6.4rem",
+          "label": "64px"
+        },
+        {
+          "value": "7.0rem",
+          "label": "70px"
+        },
+        {
+          "value": "8.0rem",
+          "label": "80px"
+        },
+        {
+          "value": "9.0rem",
+          "label": "90px"
+        },
+        {
+          "value": "10.0rem",
+          "label": "100px"
+        },
+        {
+          "value": "12.0rem",
+          "label": "120px"
+        }
+      ],
+      "default": "4.8rem"
+    },
+    {
+      "type": "range",
+      "id": "age_verification_title_mg_bottom",
+      "label": "t:settings.spacing_bottom",
+      "max": 50,
+      "min": 0,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "inline_richtext",
+      "id": "age_verification_popup_desc",
+      "label": "t:settings.description",
+      "default": "Please verify your age to enter this site."
+    },
+    {
+      "type": "color",
+      "id": "age_verification_popup_desc_color",
+      "label": "t:settings.color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "age_verification_desc_font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.default"
+        },
+        {
+          "value": "1.0rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        },
+        {
+          "value": "2.0rem",
+          "label": "20px"
+        },
+        {
+          "value": "2.2rem",
+          "label": "22px"
+        },
+        {
+          "value": "2.4rem",
+          "label": "24px"
+        },
+        {
+          "value": "2.6rem",
+          "label": "26px"
+        },
+        {
+          "value": "2.8rem",
+          "label": "28px"
+        },
+        {
+          "value": "3.0rem",
+          "label": "30px"
+        },
+        {
+          "value": "3.2rem",
+          "label": "32px"
+        },
+        {
+          "value": "3.4rem",
+          "label": "34px"
+        },
+        {
+          "value": "3.6rem",
+          "label": "36px"
+        },
+        {
+          "value": "4.0rem",
+          "label": "40px"
+        },
+        {
+          "value": "4.8rem",
+          "label": "48px"
+        },
+        {
+          "value": "5.0rem",
+          "label": "50px"
+        },
+        {
+          "value": "6.0rem",
+          "label": "60px"
+        },
+        {
+          "value": "6.4rem",
+          "label": "64px"
+        },
+        {
+          "value": "7.0rem",
+          "label": "70px"
+        },
+        {
+          "value": "8.0rem",
+          "label": "80px"
+        },
+        {
+          "value": "9.0rem",
+          "label": "90px"
+        },
+        {
+          "value": "10.0rem",
+          "label": "100px"
+        },
+        {
+          "value": "12.0rem",
+          "label": "120px"
+        }
+      ],
+      "default": "2.4rem"
+    },
+    {
+      "type": "header",
+      "content": "t:content.buttons"
+    },
+    {
+      "type": "range",
+      "id": "content_actions_gap",
+      "label": "Spacing between content and buttons",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "content_actions_gap_mobile",
+      "label": "Spacing between content and buttons (mobile)",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "text",
+      "id": "age_verification_not_eligible",
+      "label": "Not eligible button",
+      "default": "I am under 18"
+    },
+    {
+      "type": "url",
+      "id": "not_eligible_link",
+      "label": "Not eligible link"
+    },
+    {
+      "type": "text",
+      "id": "age_verification_eligible",
+      "label": "Eligible button",
+      "default": "I am over 18"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Age verification popup",
+      "settings": {
+        "age_verification_popup_expire": 1,
+        "popup_delay": 0,
+        "color_scheme": "",
+        "age_verification_logo": "",
+        "age_verification_logo_width": 220,
+        "age_verification_logo_mg_bottom": 50,
+        "age_verification_popup_title": "Are you over 18 years old?",
+        "age_verification_popup_title_color": "#000",
+        "age_verification_title_font_size": "4.8rem",
+        "age_verification_title_mg_bottom": 13,
+        "age_verification_popup_desc": "Please verify your age to enter this site.",
+        "age_verification_popup_desc_color": "#000",
+        "age_verification_desc_font_size": "2.4rem",
+        "content_actions_gap": 60,
+        "content_actions_gap_mobile": 30,
+        "age_verification_not_eligible": "No, i'm under 18",
+        "not_eligible_link": "https://www.google.com/",
+        "age_verification_eligible": "Yes, i'm over 18"
+      }
+    }
+  ]
+}
+{% endschema %}

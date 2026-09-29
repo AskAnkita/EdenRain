@@ -1,0 +1,55 @@
+<a
+  id="HeaderMenu-{{ parent_link.handle }}-{{ childlink.handle }}"
+  href="{{ childlink.url }}"
+  class="
+    header__menu-item mega-menu__link mega-menu__link--level-2 link link--hover-underline
+    {% if childlink.current %} list-menu__item--active{% endif %}
+    {% render 'highlight-class', order: '2', keys: keys, compare: childlink.title, settings: sec_settings %}
+  "
+  {% if childlink.current %}
+    aria-current="page"
+  {% endif %}
+  style="{% render 'highlight-style', order: '2', keys: keys, compare: childlink.title, color: highlight_color, settings: sec_settings %}"
+>
+  <span class="text">
+    {{ childlink.title | escape }}
+  </span>
+  {% render 'highlight-label-menu',
+    order: '2',
+    keys: keys,
+    compare: childlink.title,
+    settings: sec_settings,
+    color: highlight_color
+  %}
+</a>
+{%- if childlink.links != blank -%}
+  <ul class="list-unstyled" role="list">
+    {%- for grandchildlink in childlink.links -%}
+      <li>
+        <a
+          id="HeaderMenu-{{ parent_link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+          href="{{ grandchildlink.url }}"
+          class="
+            header__menu-item mega-menu__link link link--hover-underline mega-menu__link--level-3
+            {% if grandchildlink.current %} list-menu__item--active{% endif %}
+            {% render 'highlight-class', order: '3', keys: keys, compare: grandchildlink.title, settings: sec_settings %}
+          "
+          {% if grandchildlink.current %}
+            aria-current="page"
+          {% endif %}
+          style="{% render 'highlight-style', order: '3', keys: keys, compare: grandchildlink.title, color: highlight_color, settings: sec_settings %}"
+        >
+          <span class="text">
+            {{ grandchildlink.title | escape }}
+          </span>
+          {% render 'highlight-label-menu',
+            order: '3',
+            keys: keys,
+            compare: grandchildlink.title,
+            settings: sec_settings
+          %}
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

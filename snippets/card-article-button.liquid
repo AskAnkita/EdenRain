@@ -1,0 +1,41 @@
+{%- liquid
+  assign bl_stts = block.settings
+  assign type_preset = bl_stts.type_preset
+  assign type_preset_class = type_preset
+  assign style_class = block.settings.style_class
+  assign color = block.settings.color
+
+  if type_preset_class == 'rte'
+    assign type_preset_class = blank
+  endif
+
+  capture text_block_classes
+    if type_preset == 'custom'
+      echo ' custom-typography '
+      if bl_stts.font_size != ''
+        echo ' custom-font-size '
+      endif
+    endif
+  endcapture
+-%}
+
+<div
+  class="card_article__button spacing-style {% if style_class != 'link' %} button {% endif %} {{ type_preset_class }}{{ text_block_classes }}"
+  style="
+    {%- render 'size-style', settings: bl_stts -%}
+    {%- render 'spacing-style', settings: bl_stts -%}
+    {%- render 'typography-style', settings: bl_stts, preset: type_preset, type: 'body', line_height: 'normal', button_link: true -%}
+    {% if color != 'default' %}
+    --color: {{ color }};
+    {% endif %}
+  "
+>
+  <a
+    href="{{ card_article.url }}"
+    id="StandardCardNoMediaLink-{{ section_id }}-{{ card_article.id }}"
+    class="{% if color == 'default' %} full-unstyled-link{% endif %} card-button-change"
+    aria-labelledby="StandardCardNoMediaLink-{{ section_id }}-{{ card_article.id }} NoMediaStandardBadge-{{ section_id }}-{{ card_article.id }}"
+  >
+    {{ bl_stts.text | default: 'Read more...' }}
+  </a>
+</div>

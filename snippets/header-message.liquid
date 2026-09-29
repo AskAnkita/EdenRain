@@ -1,0 +1,5 @@
+{% if settings.show_message %}
+  <div class="header-message custom-typography custom-font-size max-md:hidden" style="{% render 'typography-style', settings: settings, preset: 'custom', case: settings.message_case %}">
+    {{ settings.message }}
+  </div>
+{% endif %}

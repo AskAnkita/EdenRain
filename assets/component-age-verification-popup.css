@@ -1,0 +1,88 @@
+.modal--popup.age-verification-popup .popup__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--age-verification-content-actions-gap, 66px);
+  padding: var(--p, 5rem 1rem);
+  text-align: center;
+}
+
+.age-verification-popup__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.age-verification-popup__logo {
+  width: var(--age-verification-logo-width);
+  margin-bottom: var(--age-verification-logo-mg-bottom);
+}
+
+.age-verification-popup__logo-image {
+  width: var(--age-verification-logo-width);
+  height: auto;
+  margin-inline: auto;
+}
+
+.age-verification-popup__heading {
+  color: var(--age-verification-title-color, var(--color-foreground));
+  font-size: var(--age-verification-title-font-size);
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 0 0 var(--age-verification-title-mg-bottom);
+}
+
+.age-verification-popup__description {
+  color: var(--age-verification-desc-color, var(--color-foreground));
+  font-size: var(--age-verification-desc-font-size);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.age-verification-popup__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1.6rem;
+  width: 100%;
+}
+
+@media screen and (max-width: 1024px) {
+  .age-verification-popup__button {
+    min-width: calc(50% - 0.8rem);
+    flex: 1 1 calc(50% - 0.8rem);
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .age-verification-popup.popup__inner {
+    gap: var(--age-verification-content-actions-gap-mobile, var(--age-verification-content-actions-gap, 33px));
+    padding: 3.5rem;
+  }
+
+  .age-verification-popup__logo-image {
+    width: calc(var(--age-verification-logo-width) * 0.75);
+  }
+
+  .age-verification-popup__heading {
+    font-size: calc(var(--age-verification-title-font-size) * 0.75);
+  }
+
+  .age-verification-popup__description {
+    font-size: calc(var(--age-verification-desc-font-size) * 0.75);
+  }
+}
+
+@media screen and (max-width: 551px) {
+  .age-verification-popup__actions {
+    gap: 0.8rem;
+  }
+
+  .age-verification-popup__button {
+    min-width: calc(50% - 0.4rem);
+    flex: 1 1 calc(50% - 0.4rem);
+  }
+}

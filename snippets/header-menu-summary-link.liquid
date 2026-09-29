@@ -1,0 +1,10 @@
+<span
+  class="text{% if link.child_active %} header__active-menu-item{% endif %}{% if link.url != blank %} header__menu-parent-link{% endif %}"
+  {% if link.url != blank %}
+    data-href="{{ link.url }}"
+  {% else %}
+    aria-disabled="true"
+  {% endif %}
+>
+  {{- link.title | escape -}}
+</span>

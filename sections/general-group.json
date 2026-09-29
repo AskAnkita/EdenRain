@@ -1,0 +1,97 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "General group",
+  "type": "aside",
+  "sections": {
+    "color_swatches_wJV8Fg": {
+      "type": "color-swatches",
+      "blocks": {
+        "color_swatch_item_CNLt68": {
+          "type": "color_swatch_item",
+          "settings": {
+            "color_swatch_name": "{{ metaobjects.metal_type_swatchs[\"yellow-gold-14-k\"].metal_type.value }}",
+            "color_swatch_color_1": "",
+            "color_swatch_color_2": "",
+            "color_swatch_image": "shopify://shop_images/Yellow_Gold_14k.png"
+          }
+        },
+        "color_swatch_item_RtnKKM": {
+          "type": "color_swatch_item",
+          "settings": {
+            "color_swatch_name": "{{ metaobjects.metal_type_swatchs[\"white-gold-14-k\"].metal_type.value }}",
+            "color_swatch_color_1": "",
+            "color_swatch_color_2": "",
+            "color_swatch_image": "shopify://shop_images/White_Gold_14k.png"
+          }
+        },
+        "color_swatch_item_DJzLry": {
+          "type": "color_swatch_item",
+          "settings": {
+            "color_swatch_name": "{{ metaobjects.metal_type_swatchs[\"rose-gold-14-k\"].metal_type.value }}",
+            "color_swatch_color_1": "",
+            "color_swatch_color_2": "",
+            "color_swatch_image": "shopify://shop_images/Rose_Gold_14k.png"
+          }
+        },
+        "color_swatch_item_rMKCGj": {
+          "type": "color_swatch_item",
+          "settings": {
+            "color_swatch_name": "{{ metaobjects.metal_type_swatchs[\"yellow-gold-18-k\"].metal_type.value }}",
+            "color_swatch_color_1": "",
+            "color_swatch_color_2": "",
+            "color_swatch_image": "shopify://shop_images/Yellow_Gold_18k.png"
+          }
+        },
+        "color_swatch_item_AbPFhz": {
+          "type": "color_swatch_item",
+          "settings": {
+            "color_swatch_name": "{{ metaobjects.metal_type_swatchs[\"white-gold-18-k\"].metal_type.value }}",
+            "color_swatch_color_1": "",
+            "color_swatch_color_2": "",
+            "color_swatch_image": "shopify://shop_images/White_Gold_18k.png"
+          }
+        },
+        "color_swatch_item_y7YYdm": {
+          "type": "color_swatch_item",
+          "settings": {
+            "color_swatch_name": "{{ metaobjects.metal_type_swatchs[\"rose-gold-18-k\"].metal_type.value }}",
+            "color_swatch_color_1": "",
+            "color_swatch_color_2": "",
+            "color_swatch_image": "shopify://shop_images/Rose_Gold_18k.png"
+          }
+        },
+        "color_swatch_item_8kEaYz": {
+          "type": "color_swatch_item",
+          "settings": {
+            "color_swatch_name": "{{ metaobjects.metal_type_swatchs.platinum.metal_type.value }}",
+            "color_swatch_color_1": "",
+            "color_swatch_color_2": "",
+            "color_swatch_image": "shopify://shop_images/Platinum.png"
+          }
+        }
+      },
+      "block_order": [
+        "color_swatch_item_CNLt68",
+        "color_swatch_item_RtnKKM",
+        "color_swatch_item_DJzLry",
+        "color_swatch_item_rMKCGj",
+        "color_swatch_item_AbPFhz",
+        "color_swatch_item_y7YYdm",
+        "color_swatch_item_8kEaYz"
+      ],
+      "name": "Color Swatches",
+      "settings": {}
+    }
+  },
+  "order": [
+    "color_swatches_wJV8Fg"
+  ]
+}

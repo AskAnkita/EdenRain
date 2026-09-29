@@ -1,0 +1,1521 @@
+{% doc %}
+  @prompt
+    Create a highly customizable, responsive Video Hero Section for a Shopify theme.
+    
+    The section should replicate a premium luxury jewelry homepage hero experience similar to a diamond engagement ring brand website.
+    
+    🎬 VIDEO SETTINGS (CORE FEATURE)
+    Desktop Video
+    Add a Shopify video picker/upload option for desktop video.
+    Do NOT use video URL input.
+    Video should support Shopify hosted video files only.
+    Video should:
+    Autoplay
+    Muted by default
+    Loop continuously
+    Play inline
+    Use object-fit: cover
+    Mobile Video
+    Add a separate Shopify video picker/upload option for mobile video.
+    Mobile video must be independent from desktop video.
+    Do NOT use video URL input.
+    Automatically load mobile video on mobile devices.
+    Video Height Control
+    
+    Add separate height controls:
+    
+    Desktop Video Height
+    
+    Full screen (100vh default)
+    Custom height option
+    
+    Mobile Video Height
+    
+    Fixed responsive height
+    Default: 66vh
+    Adjustable from theme editor
+    
+    Video must maintain:
+    
+    Fixed width
+    Fixed height
+    Proper cover behavior
+    No stretching
+    No unwanted cropping
+    🖥️ DESKTOP HERO LAYOUT
+    
+    Create overlay content on top of the desktop video.
+    
+    Content structure:
+    
+    Heading
+    Description
+    Button 1 + Button 2
+    
+    Example:
+    
+    Heading:
+    "DIAMONDS, MADE FOR YOUR MOMENT"
+    
+    Description:
+    "Elegantly Crafted. Timelessly Beautiful."
+    
+    Buttons:
+    
+    Engagement Rings
+    Fine Jewelry
+    📱 MOBILE DESIGN CHANGE (IMPORTANT)
+    
+    On mobile devices:
+    
+    The video should appear first.
+    
+    Below the video create a separate white content area.
+    
+    Mobile layout:
+    
+    [ Mobile Video ]
+    
+    White Background Section
+    
+    Heading
+    Description
+    Two Buttons
+    
+    Requirements:
+    
+    Remove text overlay on mobile.
+    Content should NOT sit on top of video.
+    Use white background.
+    Center align content by default.
+    Maintain luxury jewelry brand style.
+    Proper spacing between video and content.
+    🎨 BUTTON SETTINGS
+    
+    Both buttons should be treated as Primary Buttons.
+    
+    Remove secondary button styling.
+    
+    Both buttons should have:
+    
+    Same design
+    Same size
+    Same height
+    Same padding
+    Same font style
+    
+    Button settings:
+    
+    Desktop Button Settings
+    Button width control
+    Button height control
+    Horizontal padding
+    Vertical padding
+    Border radius
+    Font size
+    Mobile Button Settings
+    
+    Separate controls:
+    
+    Mobile button width
+    Mobile button height
+    Mobile padding
+    Mobile font size
+    
+    Buttons should support:
+    
+    Solid style
+    Outline style
+    Rounded corners
+    Hover animation
+    📐 SPACING & PADDING MANAGEMENT
+    
+    Create separate spacing controls for each element.
+    
+    Do NOT use one global spacing setting.
+    
+    Add individual controls:
+    
+    Heading Spacing
+    
+    Desktop:
+    
+    Top padding
+    Bottom padding
+    
+    Mobile:
+    
+    Top padding
+    Bottom padding
+    Description Spacing
+    
+    Desktop:
+    
+    Top padding
+    Bottom padding
+    
+    Mobile:
+    
+    Top padding
+    Bottom padding
+    Button Area Spacing
+    
+    Desktop:
+    
+    Top padding
+    Bottom padding
+    
+    Mobile:
+    
+    Top padding
+    Bottom padding
+    🔤 TYPOGRAPHY SETTINGS
+    
+    Create separate typography controls.
+    
+    Heading Text Settings
+    
+    Desktop:
+    
+    Font size
+    Font weight
+    Letter spacing
+    Line height
+    
+    Mobile:
+    
+    Font size
+    Font weight
+    Letter spacing
+    Line height
+    Description Text Settings
+    
+    Desktop:
+    
+    Font size
+    Font weight
+    Letter spacing
+    Line height
+    
+    Mobile:
+    
+    Font size
+    Font weight
+    Letter spacing
+    Line height
+    Button Text Settings
+    
+    Desktop:
+    
+    Font size
+    Font weight
+    Letter spacing
+    
+    Mobile:
+    
+    Font size
+    Font weight
+    Letter spacing
+    🎛️ CONTENT POSITION SETTINGS
+    Desktop Overlay Position
+    
+    Options:
+    
+    Top
+    Center
+    Bottom
+    Desktop Horizontal Alignment
+    
+    Options:
+    
+    Left
+    Center
+    Right
+    Mobile Content Alignment
+    
+    Options:
+    
+    Left
+    Center
+    Right
+    📏 GAP CONTROL
+    
+    Add individual gap controls:
+    
+    Heading → Description spacing
+    Description → Buttons spacing
+    
+    Desktop:
+    0px – 100px range
+    
+    Mobile:
+    0px – 80px range
+    
+    🌗 OVERLAY SETTINGS
+    
+    Desktop only:
+    
+    Add optional video overlay.
+    
+    Controls:
+    
+    Enable/Disable overlay
+    Overlay color picker
+    Overlay opacity slider (0%–80%)
+    
+    Support:
+    
+    Black overlay
+    White overlay
+    Gradient overlay
+    📱 MOBILE RESPONSIVE REQUIREMENTS
+    
+    Must be fully responsive.
+    
+    Mobile requirements:
+    
+    Separate mobile video support
+    Fixed mobile video height
+    White content section below video
+    No text cropping
+    No horizontal overflow
+    Buttons resize correctly
+    Typography scales properly
+    Maintain premium luxury appearance
+    ⚙️ EXTRA SETTINGS
+    
+    Add theme editor controls for:
+    
+    Video Controls
+    Enable autoplay
+    Enable loop
+    Enable muted mode
+    Section Controls
+    Enable/disable full height
+    Desktop height
+    Mobile height
+    Color Controls
+    Heading color
+    Description color
+    Button background color
+    Button text color
+    Button border color
+    Mobile content background color
+    🎯 FINAL OUTPUT
+    
+    Create a Shopify theme section named:
+    
+    "Luxury Video Hero With Responsive Content"
+    
+    The section must be:
+    
+    ✅ Shopify Online Store 2.0 compatible
+    ✅ Fully customizable from theme editor
+    ✅ Mobile-first responsive
+    ✅ Performance optimized
+    ✅ Uses Shopify video picker (not URLs)
+    ✅ Separate desktop/mobile videos
+    ✅ Separate desktop/mobile typography controls
+    ✅ Separate spacing controls for heading, description, and buttons
+    ✅ Both buttons styled as primary buttons
+    ✅ Luxury jewelry brand aesthetic
+    ✅ Clean, premium, modern design matching high-end diamond websites, Can you also add this setting need to change (Heading, Description) text color in mobile
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-luxury-video-hero-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    display: block;
+  }
+
+  .ai-luxury-video-hero-container-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    {% if block.settings.enable_full_height %}
+      height: {{ block.settings.desktop_height }}vh;
+    {% else %}
+      height: {{ block.settings.desktop_height }}vh;
+    {% endif %}
+    overflow: hidden;
+  }
+
+  .ai-luxury-video-hero-video-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-luxury-video-hero-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: {{ block.settings.overlay_color }};
+    opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }};
+    pointer-events: none;
+    {% unless block.settings.enable_overlay %}
+      display: none;
+    {% endunless %}
+  }
+
+  .ai-luxury-video-hero-content-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    z-index: 2;
+    {% if block.settings.desktop_vertical_position == 'top' %}
+      justify-content: flex-start;
+    {% elsif block.settings.desktop_vertical_position == 'center' %}
+      justify-content: center;
+    {% else %}
+      justify-content: flex-end;
+    {% endif %}
+    {% if block.settings.desktop_horizontal_alignment == 'left' %}
+      align-items: flex-start;
+      text-align: left;
+    {% elsif block.settings.desktop_horizontal_alignment == 'center' %}
+      align-items: center;
+      text-align: center;
+    {% else %}
+      align-items: flex-end;
+      text-align: right;
+    {% endif %}
+  }
+
+  .ai-luxury-video-hero-heading-{{ ai_gen_id }} {
+    color: {{ block.settings.heading_color }};
+    font-size: {{ block.settings.heading_font_size }}px;
+    font-weight: {{ block.settings.heading_font_weight }};
+    letter-spacing: {{ block.settings.heading_letter_spacing }}px;
+    line-height: {{ block.settings.heading_line_height }};
+    margin: 0;
+    padding-top: {{ block.settings.heading_padding_top }}px;
+    padding-bottom: {{ block.settings.heading_padding_bottom }}px;
+    max-width: 800px;
+  }
+
+  .ai-luxury-video-hero-description-{{ ai_gen_id }} {
+    color: {{ block.settings.description_color }};
+    font-size: {{ block.settings.description_font_size }}px;
+    font-weight: {{ block.settings.description_font_weight }};
+    letter-spacing: {{ block.settings.description_letter_spacing }}px;
+    line-height: {{ block.settings.description_line_height }};
+    margin: 0;
+    padding-top: {{ block.settings.description_padding_top }}px;
+    padding-bottom: {{ block.settings.description_padding_bottom }}px;
+    margin-top: {{ block.settings.heading_description_gap }}px;
+    max-width: 600px;
+  }
+
+  .ai-luxury-video-hero-buttons-{{ ai_gen_id }} {
+    display: flex;
+    gap: 16px;
+    padding-top: {{ block.settings.buttons_padding_top }}px;
+    padding-bottom: {{ block.settings.buttons_padding_bottom }}px;
+    margin-top: {{ block.settings.description_buttons_gap }}px;
+    flex-wrap: wrap;
+  }
+
+  .ai-luxury-video-hero-button-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: {{ block.settings.button_width }}px;
+    height: {{ block.settings.button_height }}px;
+    padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: {{ block.settings.button_font_size }}px;
+    font-weight: {{ block.settings.button_font_weight }};
+    letter-spacing: {{ block.settings.button_letter_spacing }}px;
+    {% if block.settings.button_style == 'solid' %}
+      background-color: {{ block.settings.button_background_color }};
+      color: {{ block.settings.button_text_color }};
+      border: 2px solid {{ block.settings.button_background_color }};
+    {% else %}
+      background-color: transparent;
+      color: {{ block.settings.button_text_color }};
+      border: 2px solid {{ block.settings.button_border_color }};
+    {% endif %}
+  }
+
+  .ai-luxury-video-hero-button-{{ ai_gen_id }}:hover {
+    {% if block.settings.button_style == 'solid' %}
+      background-color: {{ block.settings.button_hover_background_color }};
+      border-color: {{ block.settings.button_hover_background_color }};
+      color: {{ block.settings.button_hover_text_color }};
+    {% else %}
+      background-color: {{ block.settings.button_border_color }};
+      color: {{ block.settings.button_background_color }};
+    {% endif %}
+    transform: translateY(-2px);
+  }
+
+  .ai-luxury-video-hero-mobile-content-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-luxury-video-hero-container-{{ ai_gen_id }} {
+      height: 45vh;
+    }
+
+    .ai-luxury-video-hero-content-{{ ai_gen_id }} {
+      display: none;
+    }
+
+    .ai-luxury-video-hero-mobile-content-{{ ai_gen_id }} {
+      display: block;
+      background-color: {{ block.settings.mobile_content_background }};
+      padding: 40px 20px;
+      {% if block.settings.mobile_content_alignment == 'left' %}
+        text-align: left;
+      {% elsif block.settings.mobile_content_alignment == 'center' %}
+        text-align: center;
+      {% else %}
+        text-align: right;
+      {% endif %}
+    }
+
+    .ai-luxury-video-hero-mobile-heading-{{ ai_gen_id }} {
+      color: {{ block.settings.mobile_heading_color }};
+      font-size: {{ block.settings.mobile_heading_font_size }}px;
+      font-weight: {{ block.settings.mobile_heading_font_weight }};
+      letter-spacing: {{ block.settings.mobile_heading_letter_spacing }}px;
+      line-height: {{ block.settings.mobile_heading_line_height }};
+      margin: 0;
+      padding-top: {{ block.settings.mobile_heading_padding_top }}px;
+      padding-bottom: {{ block.settings.mobile_heading_padding_bottom }}px;
+    }
+
+    .ai-luxury-video-hero-mobile-description-{{ ai_gen_id }} {
+      color: {{ block.settings.mobile_description_color }};
+      font-size: {{ block.settings.mobile_description_font_size }}px;
+      font-weight: {{ block.settings.mobile_description_font_weight }};
+      letter-spacing: {{ block.settings.mobile_description_letter_spacing }}px;
+      line-height: {{ block.settings.mobile_description_line_height }};
+      margin: 0;
+      padding-top: {{ block.settings.mobile_description_padding_top }}px;
+      padding-bottom: {{ block.settings.mobile_description_padding_bottom }}px;
+      margin-top: {{ block.settings.mobile_heading_description_gap }}px;
+    }
+
+    .ai-luxury-video-hero-mobile-buttons-{{ ai_gen_id }} {
+      display: flex;
+      gap: 12px;
+      padding-top: {{ block.settings.mobile_buttons_padding_top }}px;
+      padding-bottom: {{ block.settings.mobile_buttons_padding_bottom }}px;
+      margin-top: {{ block.settings.mobile_description_buttons_gap }}px;
+      flex-wrap: wrap;
+      {% if block.settings.mobile_content_alignment == 'left' %}
+        justify-content: flex-start;
+      {% elsif block.settings.mobile_content_alignment == 'center' %}
+        justify-content: center;
+      {% else %}
+        justify-content: flex-end;
+      {% endif %}
+    }
+
+    .ai-luxury-video-hero-mobile-button-{{ ai_gen_id }} {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: {{ block.settings.mobile_button_width }}px;
+      height: {{ block.settings.mobile_button_height }}px;
+      padding: {{ block.settings.mobile_button_padding_vertical }}px {{ block.settings.mobile_button_padding_horizontal }}px;
+      border-radius: {{ block.settings.button_border_radius }}px;
+      font-size: {{ block.settings.mobile_button_font_size }}px;
+      font-weight: {{ block.settings.mobile_button_font_weight }};
+      letter-spacing: {{ block.settings.mobile_button_letter_spacing }}px;
+      {% if block.settings.button_style == 'solid' %}
+        background-color: {{ block.settings.button_background_color }};
+        color: {{ block.settings.button_text_color }};
+        border: 2px solid {{ block.settings.button_background_color }};
+      {% else %}
+        background-color: transparent;
+        color: {{ block.settings.button_text_color }};
+        border: 2px solid {{ block.settings.button_border_color }};
+      {% endif %}
+    }
+
+    .ai-luxury-video-hero-mobile-button-{{ ai_gen_id }}:hover {
+      {% if block.settings.button_style == 'solid' %}
+        background-color: {{ block.settings.button_hover_background_color }};
+        border-color: {{ block.settings.button_hover_background_color }};
+        color: {{ block.settings.button_hover_text_color }};
+      {% else %}
+        background-color: {{ block.settings.button_border_color }};
+        color: {{ block.settings.button_background_color }};
+      {% endif %}
+    }
+  }
+{% endstyle %}
+
+<luxury-video-hero-{{ ai_gen_id }} class="ai-luxury-video-hero-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-luxury-video-hero-container-{{ ai_gen_id }}">
+    {% if block.settings.desktop_video != blank %}
+      <video
+        class="ai-luxury-video-hero-video-{{ ai_gen_id }} ai-luxury-video-hero-desktop-video-{{ ai_gen_id }}"
+        {% if block.settings.enable_autoplay %}autoplay{% endif %}
+        {% if block.settings.enable_loop %}loop{% endif %}
+        {% if block.settings.enable_muted %}muted{% endif %}
+        playsinline
+        data-desktop-video
+      >
+        <source src="{{ block.settings.desktop_video.sources[1].url }}" type="{{ block.settings.desktop_video.sources[1].mime_type }}">
+      </video>
+    {% endif %}
+
+    {% if block.settings.mobile_video != blank %}
+      <video
+        class="ai-luxury-video-hero-video-{{ ai_gen_id }} ai-luxury-video-hero-mobile-video-{{ ai_gen_id }}"
+        {% if block.settings.enable_autoplay %}autoplay{% endif %}
+        {% if block.settings.enable_loop %}loop{% endif %}
+        {% if block.settings.enable_muted %}muted{% endif %}
+        playsinline
+        data-mobile-video
+        style="display: none;"
+      >
+        <source src="{{ block.settings.mobile_video.sources[1].url }}" type="{{ block.settings.mobile_video.sources[1].mime_type }}">
+      </video>
+    {% endif %}
+
+    <div class="ai-luxury-video-hero-overlay-{{ ai_gen_id }}"></div>
+
+    <div class="ai-luxury-video-hero-content-{{ ai_gen_id }}">
+      {% if block.settings.heading != blank %}
+        <h1 class="ai-luxury-video-hero-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h1>
+      {% endif %}
+
+      {% if block.settings.description != blank %}
+        <p class="ai-luxury-video-hero-description-{{ ai_gen_id }}">{{ block.settings.description }}</p>
+      {% endif %}
+
+      {% if block.settings.button_1_text != blank or block.settings.button_2_text != blank %}
+        <div class="ai-luxury-video-hero-buttons-{{ ai_gen_id }}">
+          {% if block.settings.button_1_text != blank %}
+            <a href="{{ block.settings.button_1_link }}" class="ai-luxury-video-hero-button-{{ ai_gen_id }}">
+              {{ block.settings.button_1_text }}
+            </a>
+          {% endif %}
+
+          {% if block.settings.button_2_text != blank %}
+            <a href="{{ block.settings.button_2_link }}" class="ai-luxury-video-hero-button-{{ ai_gen_id }}">
+              {{ block.settings.button_2_text }}
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="ai-luxury-video-hero-mobile-content-{{ ai_gen_id }}">
+    {% if block.settings.heading != blank %}
+      <h1 class="ai-luxury-video-hero-mobile-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h1>
+    {% endif %}
+
+    {% if block.settings.description != blank %}
+      <p class="ai-luxury-video-hero-mobile-description-{{ ai_gen_id }}">{{ block.settings.description }}</p>
+    {% endif %}
+
+    {% if block.settings.button_1_text != blank or block.settings.button_2_text != blank %}
+      <div class="ai-luxury-video-hero-mobile-buttons-{{ ai_gen_id }}">
+        {% if block.settings.button_1_text != blank %}
+          <a href="{{ block.settings.button_1_link }}" class="ai-luxury-video-hero-mobile-button-{{ ai_gen_id }}">
+            {{ block.settings.button_1_text }}
+          </a>
+        {% endif %}
+
+        {% if block.settings.button_2_text != blank %}
+          <a href="{{ block.settings.button_2_link }}" class="ai-luxury-video-hero-mobile-button-{{ ai_gen_id }}">
+            {{ block.settings.button_2_text }}
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</luxury-video-hero-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class LuxuryVideoHero{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.desktopVideo = this.querySelector('[data-desktop-video]');
+        this.mobileVideo = this.querySelector('[data-mobile-video]');
+      }
+
+      connectedCallback() {
+        this.handleResponsiveVideo();
+        window.addEventListener('resize', () => this.handleResponsiveVideo());
+      }
+
+      handleResponsiveVideo() {
+        const isMobile = window.innerWidth <= 749;
+        
+        if (this.desktopVideo && this.mobileVideo) {
+          if (isMobile) {
+            this.desktopVideo.style.display = 'none';
+            this.mobileVideo.style.display = 'block';
+            this.desktopVideo.pause();
+            this.mobileVideo.play();
+          } else {
+            this.desktopVideo.style.display = 'block';
+            this.mobileVideo.style.display = 'none';
+            this.mobileVideo.pause();
+            this.desktopVideo.play();
+          }
+        }
+      }
+    }
+
+    customElements.define('luxury-video-hero-{{ ai_gen_id }}', LuxuryVideoHero{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Luxury video hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Desktop video"
+    },
+    {
+      "type": "video",
+      "id": "desktop_video",
+      "label": "Desktop video"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_full_height",
+      "label": "Enable full height",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "Desktop height",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Mobile video"
+    },
+    {
+      "type": "video",
+      "id": "mobile_video",
+      "label": "Mobile video"
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "Mobile height",
+      "min": 40,
+      "max": 100,
+      "step": 2,
+      "unit": "vh",
+      "default": 66
+    },
+    {
+      "type": "header",
+      "content": "Video controls"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_autoplay",
+      "label": "Enable autoplay",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_loop",
+      "label": "Enable loop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_muted",
+      "label": "Enable muted",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_overlay",
+      "label": "Enable overlay",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Diamonds, made for your moment"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Elegantly crafted. Timelessly beautiful."
+    },
+    {
+      "type": "header",
+      "content": "Desktop content position"
+    },
+    {
+      "type": "select",
+      "id": "desktop_vertical_position",
+      "label": "Vertical position",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "desktop_horizontal_alignment",
+      "label": "Horizontal alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Mobile content alignment"
+    },
+    {
+      "type": "select",
+      "id": "mobile_content_alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "mobile_content_background",
+      "label": "Mobile background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Desktop heading typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Font size",
+      "min": 20,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "heading_font_weight",
+      "label": "Font weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 700
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 10,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height",
+      "label": "Line height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.2
+    },
+    {
+      "type": "header",
+      "content": "Mobile heading typography"
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_font_size",
+      "label": "Font size",
+      "min": 16,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_font_weight",
+      "label": "Font weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 700
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0.5
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_line_height",
+      "label": "Line height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.2
+    },
+    {
+      "type": "header",
+      "content": "Desktop description typography"
+    },
+    {
+      "type": "range",
+      "id": "description_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "description_font_weight",
+      "label": "Font weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "description_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0.5
+    },
+    {
+      "type": "range",
+      "id": "description_line_height",
+      "label": "Line height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.5
+    },
+    {
+      "type": "header",
+      "content": "Mobile description typography"
+    },
+    {
+      "type": "range",
+      "id": "mobile_description_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "mobile_description_font_weight",
+      "label": "Font weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "mobile_description_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 3,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0.5
+    },
+    {
+      "type": "range",
+      "id": "mobile_description_line_height",
+      "label": "Line height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.5
+    },
+    {
+      "type": "header",
+      "content": "Desktop heading spacing"
+    },
+    {
+      "type": "range",
+      "id": "heading_padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Mobile heading spacing"
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Desktop description spacing"
+    },
+    {
+      "type": "range",
+      "id": "description_padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "description_padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Mobile description spacing"
+    },
+    {
+      "type": "range",
+      "id": "mobile_description_padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_description_padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Desktop button spacing"
+    },
+    {
+      "type": "range",
+      "id": "buttons_padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "buttons_padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Mobile button spacing"
+    },
+    {
+      "type": "range",
+      "id": "mobile_buttons_padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_buttons_padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Desktop gap control"
+    },
+    {
+      "type": "range",
+      "id": "heading_description_gap",
+      "label": "Heading to description",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "description_buttons_gap",
+      "label": "Description to buttons",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Mobile gap control"
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_description_gap",
+      "label": "Heading to description",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "mobile_description_buttons_gap",
+      "label": "Description to buttons",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "header",
+      "content": "Desktop colors"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Mobile colors"
+    },
+    {
+      "type": "color",
+      "id": "mobile_heading_color",
+      "label": "Heading",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "mobile_description_color",
+      "label": "Description",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Button 1"
+    },
+    {
+      "type": "text",
+      "id": "button_1_text",
+      "label": "Text",
+      "default": "Engagement rings"
+    },
+    {
+      "type": "url",
+      "id": "button_1_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Button 2"
+    },
+    {
+      "type": "text",
+      "id": "button_2_text",
+      "label": "Text",
+      "default": "Fine jewelry"
+    },
+    {
+      "type": "url",
+      "id": "button_2_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "solid",
+          "label": "Solid"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Border",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background_color",
+      "label": "Hover background",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Hover text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Desktop button settings"
+    },
+    {
+      "type": "range",
+      "id": "button_width",
+      "label": "Width",
+      "min": 100,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 200
+    },
+    {
+      "type": "range",
+      "id": "button_height",
+      "label": "Height",
+      "min": 40,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "button_padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "button_padding_vertical",
+      "label": "Vertical padding",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Desktop button typography"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_font_weight",
+      "label": "Font weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "button_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Mobile button settings"
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_width",
+      "label": "Width",
+      "min": 80,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 160
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_height",
+      "label": "Height",
+      "min": 36,
+      "max": 70,
+      "step": 2,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_padding_vertical",
+      "label": "Vertical padding",
+      "min": 5,
+      "max": 25,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Mobile button typography"
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_font_weight",
+      "label": "Font weight",
+      "min": 300,
+      "max": 900,
+      "step": 100,
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 3,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0.5
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxury video hero"
+    }
+  ]
+}
+{% endschema %}
