@@ -569,7 +569,7 @@
             "columns_carousel": 6.4,
             "tablet_columns_grid": 4,
             "mobile_columns_grid": "2",
-            "mobile_columns_carousel": "2",
+            "mobile_columns_carousel": "1.3",
             "vertical_alignment_flex_direction_column": "flex-start",
             "vertical_gap": 12,
             "column_gap": 12,
@@ -711,7 +711,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -978,7 +978,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -1245,7 +1245,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -1512,7 +1512,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -1779,7 +1779,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -2046,7 +2046,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -2313,7 +2313,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -2580,7 +2580,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -2847,7 +2847,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -3114,7 +3114,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -3381,7 +3381,7 @@
                     "link": "",
                     "open_in_new_tab": false,
                     "width": 84,
-                    "width_mb": 30,
+                    "width_mb": 72,
                     "animation_type": "none"
                   },
                   "blocks": {}
