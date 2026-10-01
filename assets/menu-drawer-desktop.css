@@ -555,7 +555,7 @@ p.menu-drawer-desktop__shop-all {
   text-transform: uppercase;
 }
 
-/* base.css's 1099px rule drops the grid to two columns; three cards need three */
+/* The 1099px rule above drops the grid to two columns; three cards need three */
 .menu-drawer-desktop__page--featured .menu-drawer-desktop__related-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
