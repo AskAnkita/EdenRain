@@ -21071,6 +21071,7 @@ footer.section-footer .email-signup__input {
    label's own colour, and the label keeps its colour. !important on the position
    because the theme's dropdown hover rules pin it to the left. */
 .list-menu-desktop .header__menu-item .text {
+  letter-spacing: 0.06em;
   background-image: linear-gradient(currentColor, currentColor);
   background-position-x: center !important;
 }
