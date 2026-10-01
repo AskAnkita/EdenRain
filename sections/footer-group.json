@@ -99,7 +99,8 @@
         "padding-block-end-mb": 0,
         "padding-inline-start-mb": 0,
         "padding-inline-end-mb": 0
-      }
+      },
+      "disabled": true
     },
     "footer": {
       "type": "footer",
