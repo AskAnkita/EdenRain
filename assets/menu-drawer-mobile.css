@@ -1,0 +1,189 @@
+/* Mobile menu drawer: the desktop nav's items (main-menu) as an accordion list.
+   Markup: sections/header_mobile.liquid */
+
+.mnav__header {
+  padding: 1.6rem 2rem;
+  border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 0.1);
+}
+
+.mnav__logo img {
+  display: block;
+  width: 14rem;
+  height: auto;
+}
+
+.drawer__header .mnav__close {
+  position: static;
+  margin: 0 -0.8rem 0 0;
+  padding: 0.8rem;
+  border: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+.drawer__header .mnav__close:focus-visible {
+  outline: 1px solid var(--color-foreground);
+  outline-offset: 0.2rem;
+}
+
+.mnav {
+  padding: 0.8rem 2rem 0;
+}
+
+.mnav__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mnav__item {
+  border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 0.1);
+}
+
+.mnav__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  padding: 1.9rem 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--color-foreground);
+  font-family: var(--font-body--family);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.mnav__top::-webkit-details-marker {
+  display: none;
+}
+
+.mnav__top:hover,
+.mnav__top:focus {
+  color: var(--color-foreground);
+}
+
+/* Thin plus that turns into a minus, like the FAQ */
+.mnav__icon {
+  flex: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  background:
+    linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat;
+  transition: background-size 0.3s ease;
+}
+
+.mnav__group[open] .mnav__icon {
+  background-size: 100% 1.5px, 1.5px 0;
+}
+
+.mnav__panel {
+  padding: 0 0 2.4rem;
+}
+
+.mnav__sub {
+  display: grid;
+  gap: 1.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mnav__sub a {
+  color: rgb(var(--color-foreground-rgb) / 0.75);
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+
+.mnav__sub a:hover {
+  color: var(--color-foreground);
+}
+
+.mnav__sub--nested {
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-left: 1.4rem;
+  border-left: 1px solid rgb(var(--color-foreground-rgb) / 0.12);
+}
+
+.mnav__sub--nested a {
+  font-size: 1.4rem;
+}
+
+.mnav__products {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.2rem;
+  margin: 2.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mnav__products:empty {
+  display: none;
+}
+
+.mnav__products a {
+  display: grid;
+  gap: 0.6rem;
+  color: var(--color-foreground);
+  text-decoration: none;
+}
+
+.mnav__product-media {
+  display: block;
+  aspect-ratio: 1;
+  background: #f4f4f0;
+  overflow: hidden;
+}
+
+.mnav__product-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 10%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.mnav__product-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 1.2rem;
+  line-height: 1.35;
+}
+
+.mnav__product-price {
+  font-size: 1.2rem;
+  color: rgb(var(--color-foreground-rgb) / 0.65);
+}
+
+.mnav__all {
+  display: inline-block;
+  margin-top: 2.2rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid currentColor;
+  color: var(--color-foreground);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.mnav__utility {
+  padding: 1.6rem 2rem 3.2rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mnav__icon {
+    transition: none;
+  }
+}
