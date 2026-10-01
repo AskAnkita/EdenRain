@@ -15,6 +15,9 @@
 
 {{ 'component-show-more.css' | asset_url | stylesheet_tag }}
 {{ 'component-swatch-input.css' | asset_url | stylesheet_tag }}
+{%- if filter_type == 'drawer' -%}
+  {{ 'component-facets-drawer.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 
 {%- liquid
   assign sort_by = results.sort_by | default: results.default_sort_by
@@ -935,12 +938,26 @@
         {%- endif -%}
       </form>
     </facet-filters-form>
+  {%- endif -%}
 
-    {% comment %}  Drawer and mobile filter {% endcomment %}
+  {% comment %}  Drawer and mobile filter. Rendered for every filter type: the drawer type has no inline bar, so this is its only way in {% endcomment %}
     <menu-drawer
-      class="mobile-facets__wrapper flex{% if filter_type == 'horizontal' or filter_type == 'vertical' %} large-up-hide{% endif %}"
+      class="mobile-facets__wrapper flex{% if filter_type == 'horizontal' or filter_type == 'vertical' %} large-up-hide{% endif %}{% if filter_type == 'drawer' %} collection-filter-toolbar{% endif %}"
       data-breakpoint="mobile"
     >
+      {%- if filter_type == 'drawer' and enable_count -%}
+        <p class="collection-filter-toolbar__count" role="status">
+          <span id="ProductCount">
+            {%- if results.results_count -%}
+              {{ 'content.results_with_count' | t: terms: results.terms, count: results.results_count }}
+            {%- elsif results.products_count == results.all_products_count -%}
+              {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
+            {%- else -%}
+              {{ 'products.facets.product_count' | t: product_count: results.products_count, count: results.all_products_count }}
+            {%- endif -%}
+          </span>
+        </p>
+      {%- endif -%}
       <details class="mobile-facets__disclosure{% if filter_type == 'drawer' %} facets__disclosure-drawer{% endif %} disclosure-has-popup relative flex justify-end">
         <summary class="mobile-facets__open-wrapper focus-offset">
           <side-drawer-opener
@@ -948,7 +965,11 @@
             data-toggle-drawer="Drawer-Facets"
           >
             <span class="svg-wrapper">
-              {{- 'icon-filter.svg' | inline_asset_content -}}
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+                <path d="M2 6h16M2 14h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="6" cy="6" r="2" fill="var(--color-background)" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="14" cy="14" r="2" fill="var(--color-background)" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
             </span>
             <span class="mobile-facets__open-label button-label small-hide large-up-hide">
               {%- if enable_filtering and enable_sorting -%}
@@ -1009,10 +1030,54 @@
                 </div>
               </div>
 
-              {%- if enable_sorting -%}
+              {%- if enable_sorting and filter_type == 'drawer' -%}
+                <accordion-custom open-by-default-on-mobile open-by-default-on-desktop>
+                  <details
+                    id="Details-Mobile-SortBy-{{ section.id }}"
+                    class="mobile-facets__details mobile-facets__details--sort js-filter"
+                    open
+                  >
+                    <summary class="mobile-facets__summary focus-inset">
+                      <div class="flex items-center justify-between w-full">
+                        <span>{{ 'products.facets.sort_by_label' | t | remove: ':' }}</span>
+                        <span class="mobile-facets__arrow svg-wrapper">
+                          {{- 'icon-caret.svg' | inline_asset_content -}}
+                        </span>
+                      </div>
+                    </summary>
+                    <div class="mobile-facets__submenu details-content">
+                      <ul class="mobile-facets__list mobile-facets__sort-list list-unstyled" role="list">
+                        {%- comment -%} Same short list as the reference design; the active sort always stays visible {%- endcomment -%}
+                        {%- assign drawer_sort_values = 'best-selling,price-ascending,price-descending,created-descending' | split: ',' -%}
+                        {%- for option in results.sort_options -%}
+                          {%- unless drawer_sort_values contains option.value or option.value == sort_by -%}
+                            {%- continue -%}
+                          {%- endunless -%}
+                          <li class="mobile-facets__item list-menu__item">
+                            <label for="SortBy-drawer-{{ forloop.index }}" class="facets__label mobile-facets__label mobile-facets__radio-label">
+                              <input
+                                class="mobile-facets__radio"
+                                type="radio"
+                                name="sort_by"
+                                value="{{ option.value | escape }}"
+                                id="SortBy-drawer-{{ forloop.index }}"
+                                {% if option.value == sort_by %}
+                                  checked
+                                {% endif %}
+                              >
+                              <span class="mobile-facets__radio-mark" aria-hidden="true"></span>
+                              <span>{{ option.name | escape }}</span>
+                            </label>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                  </details>
+                </accordion-custom>
+              {%- elsif enable_sorting -%}
                 <div
                   id="Details-Mobile-SortBy-{{ section.id }}"
-                  class="mobile-facets__details js-filter{% if filter_type == 'drawer' %} large-up-hide{% endif %}"
+                  class="mobile-facets__details js-filter"
                   data-index="mobile-{{ forloop.index }}"
                 >
                   <div class="mobile-facets__summary">
@@ -1344,7 +1409,12 @@
                                 --font-size: {{ heading_label_font_size }};
                                 "
                               >
-                                <span>{{ filter.label | escape }}</span>
+                                <span>
+                                  {{- filter.label | escape -}}
+                                  {%- if filter.active_values.size > 0 %}
+                                    <span class="mobile-facets__active-count">({{ filter.active_values.size }})</span>
+                                  {%- endif -%}
+                                </span>
                                 <span class="mobile-facets__arrow svg-wrapper">
                                   {{- 'icon-caret.svg' | inline_asset_content -}}
                                 </span>
@@ -1499,7 +1569,13 @@
                                 style="--font-heading--case: uppercase;"
                               {%- endif -%}
                               >
-                                <span>{{ filter.label | escape }}</span>
+                                <span>
+                                  {{- filter.label | escape -}}
+                                  {%- comment -%} The price inputs always submit, so a full range is not a choice {%- endcomment -%}
+                                  {%- if filter.min_value.value > 0 or filter.max_value.value != null and filter.max_value.value < filter.range_max %}
+                                    <span class="mobile-facets__active-count">(1)</span>
+                                  {%- endif -%}
+                                </span>
                                 <span class="mobile-facets__arrow svg-wrapper">
                                   {{- 'icon-caret.svg' | inline_asset_content -}}
                                 </span>
@@ -1567,7 +1643,6 @@
         </facet-filters-form>
       </details>
     </menu-drawer>
-  {%- endif -%}
 
   {%- if filter_type == 'horizontal' -%}
     <div class="active-facets flex flex-wrap w-full active-facets-mobile large-up-hide">
@@ -1631,47 +1706,7 @@
       </div>
     {%- endif -%}
 
-    {%- if enable_sorting -%}
-      <facet-filters-form class="facets facets--{{ filter_type }} small-hide medium-hide">
-        <form
-          id="FacetSortDrawerForm"
-          class="facets__form{% if filter_type == 'drawer' %} facets__disclosure-drawer{% endif %}"
-        >
-          {% render 'facets-sort-by',
-            results: results,
-            sort_by: sort_by,
-            selected_sort_by: selected_sort_by,
-            enable_hover_reveal: enable_hover_reveal,
-            style: style,
-            filter_type: filter_type,
-            heading_label_case: heading_label_case,
-            text_label_case: text_label_case,
-            heading_label_font_size: heading_label_font_size,
-            text_label_font_size: text_label_font_size
-          %}
-          {% if results.current_vendor or results.current_type %}
-            <input
-              type="hidden"
-              name="q"
-              value="{{ results.current_vendor }}{{ results.current_type }}"
-            >
-          {% endif %}
-
-          {%- if results.terms -%}
-            <input
-              type="hidden"
-              name="q"
-              value="{{ results.terms | escape }}"
-            >
-            <input
-              name="options[prefix]"
-              type="hidden"
-              value="last"
-            >
-          {%- endif -%}
-        </form>
-      </facet-filters-form>
-    {%- endif -%}
+    {% comment %} Sort By is part of the drawer for this filter type, see Details-Mobile-SortBy {% endcomment %}
 
     {%- if enable_grid_view -%}
       {% render 'switcher-grid',

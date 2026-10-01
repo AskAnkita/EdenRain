@@ -1,0 +1,60 @@
+{%- doc -%}
+  Outline icon for a diamond cut, drawn to read at ~22px on a product card.
+
+  @param {string} shape - one of round, oval, cushion, emerald, princess, radiant,
+    asscher, heart, marquise, pear
+{%- enddoc -%}
+
+<svg
+  class="icon-diamond-shape"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="0.9"
+  stroke-linejoin="round"
+  stroke-linecap="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {%- case shape -%}
+    {%- when 'round' -%}
+      <circle cx="12" cy="12" r="9.2"/>
+      <circle cx="12" cy="12" r="5.4"/>
+      <path d="M12 2.8V6.6M21.2 12h-3.8M12 21.2v-3.8M2.8 12h3.8M5.5 5.5 8.2 8.2M18.5 5.5 15.8 8.2M18.5 18.5 15.8 15.8M5.5 18.5 8.2 15.8"/>
+    {%- when 'oval' -%}
+      <ellipse cx="12" cy="12" rx="6.2" ry="9.4"/>
+      <ellipse cx="12" cy="12" rx="3.4" ry="5.6"/>
+      <path d="M12 2.6v3M12 21.4v-3M5.8 12h2.8M18.2 12h-2.8"/>
+    {%- when 'cushion' -%}
+      <rect x="3.6" y="3.6" width="16.8" height="16.8" rx="4.6"/>
+      <rect x="7" y="7" width="10" height="10" rx="2.4"/>
+      <path d="M5.2 5.2 7 7M18.8 5.2 17 7M18.8 18.8 17 17M5.2 18.8 7 17"/>
+    {%- when 'emerald' -%}
+      <path d="M8.4 3h7.2l3.9 3.9v10.2L15.6 21H8.4L4.5 17.1V6.9z"/>
+      <path d="M9.6 6.4h4.8l2.2 2.2v6.8l-2.2 2.2H9.6l-2.2-2.2V8.6z"/>
+      <path d="M10.7 8.8h2.6l1.3 1.3v3.8l-1.3 1.3h-2.6L9.4 13.9v-3.8z"/>
+    {%- when 'princess' -%}
+      <rect x="3.8" y="3.8" width="16.4" height="16.4"/>
+      <rect x="7.6" y="7.6" width="8.8" height="8.8"/>
+      <path d="m3.8 3.8 3.8 3.8M20.2 3.8l-3.8 3.8M20.2 20.2l-3.8-3.8M3.8 20.2l3.8-3.8"/>
+    {%- when 'radiant' -%}
+      <path d="M8.8 3h6.4l4.2 4.2v9.6L15.2 21H8.8l-4.2-4.2V7.2z"/>
+      <path d="M10.2 6.6h3.6l2.8 2.8v5.2l-2.8 2.8h-3.6l-2.8-2.8V9.4z"/>
+      <path d="m7.4 9.4 2.8-2.8M16.6 9.4l-2.8-2.8M16.6 14.6l-2.8 2.8M7.4 14.6l2.8 2.8"/>
+    {%- when 'asscher' -%}
+      <path d="M8.4 3.4h7.2l5 5v7.2l-5 5H8.4l-5-5V8.4z"/>
+      <path d="M9.8 6.8h4.4l3 3v4.4l-3 3H9.8l-3-3V9.8z"/>
+      <path d="M11 9.4h2l1.6 1.6v2l-1.6 1.6h-2l-1.6-1.6v-2z"/>
+    {%- when 'heart' -%}
+      <path d="M12 21C7.4 17.4 3.4 14.2 3.4 10.1 3.4 6.8 5.8 4.5 8.6 4.5c1.5 0 2.7.7 3.4 1.8.7-1.1 1.9-1.8 3.4-1.8 2.8 0 5.2 2.3 5.2 5.6 0 4.1-4 7.3-8.6 10.9z"/>
+      <path d="M12 17.4c-3-2.4-5.6-4.5-5.6-7.2M12 17.4c3-2.4 5.6-4.5 5.6-7.2"/>
+    {%- when 'marquise' -%}
+      <path d="M12 2.4c3.6 4 5.4 7.2 5.4 9.6s-1.8 5.6-5.4 9.6C8.4 17.6 6.6 14.4 6.6 12s1.8-5.6 5.4-9.6z"/>
+      <path d="M12 6.4c1.9 2.3 2.8 4.1 2.8 5.6s-.9 3.3-2.8 5.6c-1.9-2.3-2.8-4.1-2.8-5.6s.9-3.3 2.8-5.6z"/>
+      <path d="M6.6 12h10.8"/>
+    {%- when 'pear' -%}
+      <path d="M12 2.4c2.8 3.2 6.6 6.4 6.6 10.6a6.6 6.6 0 0 1-13.2 0C5.4 8.8 9.2 5.6 12 2.4z"/>
+      <path d="M12 6.8c1.8 2.1 3.8 4.2 3.8 6.4a3.8 3.8 0 0 1-7.6 0c0-2.2 2-4.3 3.8-6.4z"/>
+      <path d="M5.4 13h3M18.6 13h-3"/>
+  {%- endcase -%}
+</svg>

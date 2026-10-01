@@ -1,0 +1,91 @@
+{%- doc -%}
+  A promotional tile inside the collection product grid. It takes the place of two
+  product cards and stretches to the height of the row, like MiaDonna's PLP: the
+  image (or video) fills the tile and the heading and link sit on it, near the bottom.
+
+  @param {number} index - 1-3; only used for the data attribute
+  @param {object} [image] - merchant-picked image from the section settings
+  @param {string} [fallback] - theme asset filename to show until an image is picked
+  @param {string} [url] - optional link for the whole tile
+  @param {string} [heading] - optional overlay heading
+  @param {string} [subheading] - optional overlay line under the heading
+  @param {object} [video] - merchant-picked video; plays muted on a loop instead of the image
+  @param {string} [text_color] - 'light' (default) or 'dark' heading and link
+{%- enddoc -%}
+
+{%- liquid
+  assign alt_text = heading | default: shop.name
+  if image != blank and image.alt != blank
+    assign alt_text = image.alt
+  endif
+-%}
+
+<li
+  class="product-grid__item product-grid__item--banner{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+  data-product-banner="{{ index }}"
+>
+  <div class="product-grid__item--banner-image">
+    <a
+      class="collection-banner collection-banner--{{ text_color | default: 'light' }}"
+      {% if url == blank %}
+        role="link" aria-disabled="true"
+      {% else %}
+        href="{{ url }}"
+      {% endif %}
+    >
+      <span class="collection-banner__media">
+      {%- if video != blank -%}
+        {%- comment -%} The picked image, if any, is the poster while the video loads {%- endcomment -%}
+        {%- if image != blank -%}
+          {%- assign video_poster = image | image_url: width: 1600 -%}
+        {%- else -%}
+          {%- assign video_poster = video.preview_image | image_url: width: 1600 -%}
+        {%- endif -%}
+        {{
+          video
+          | video_tag:
+            autoplay: true,
+            loop: true,
+            muted: true,
+            playsinline: true,
+            controls: false,
+            preload: 'metadata',
+            poster: video_poster,
+            class: 'collection-banner__image',
+            aria-label: alt_text
+        }}
+      {%- elsif image != blank -%}
+        <img
+          src="{{ image | image_url: width: 1600 }}"
+          srcset="{{ image | image_url: width: 800 }} 800w, {{ image | image_url: width: 1600 }} 1600w"
+          sizes="(min-width: 750px) 50vw, 100vw"
+          alt="{{ alt_text | escape }}"
+          width="{{ image.width }}"
+          height="{{ image.width | divided_by: image.aspect_ratio | round }}"
+          loading="lazy"
+          class="collection-banner__image"
+        >
+      {%- else -%}
+        {%- comment -%} No image picked yet: fall back to a theme asset so the slot is never empty {%- endcomment -%}
+        <img
+          src="{{ fallback | asset_img_url: '1600x' }}"
+          alt="{{ alt_text | escape }}"
+          loading="lazy"
+          class="collection-banner__image"
+        >
+      {%- endif -%}
+      </span>
+
+      {%- if heading != blank or subheading != blank -%}
+        <span class="collection-banner__text">
+          {%- if heading != blank -%}
+            <span class="collection-banner__heading">{{ heading | escape }}</span>
+          {%- endif -%}
+          {%- if subheading != blank -%}
+            <span class="collection-banner__subheading">{{ subheading | escape }}</span>
+          {%- endif -%}
+        </span>
+      {%- endif -%}
+    </a>
+  </div>
+</li>

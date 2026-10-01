@@ -106,8 +106,16 @@
     </nav>
 
     {% if sec_stts.pagination_type == 'infinite' %}
-      <!-- Infinite Scrolling Button -->
-      <infinite-scrolling class="infinite-scrolling-wrapper block center">
+      {%- liquid
+        # 'button' waits for a click; 'auto' keeps loading as the button scrolls into view
+        assign load_mode = sec_stts.pagination_load_mode | default: 'auto'
+        assign load_more_label = sec_stts.load_more_label
+        if load_more_label == blank
+          assign load_more_label = 'content.show_more' | t
+        endif
+      -%}
+      {{ 'pagination-load-more.css' | asset_url | stylesheet_tag }}
+      <infinite-scrolling class="infinite-scrolling-wrapper block center" data-load-mode="{{ load_mode }}">
         <div class="pagination-page-item pagination-page-total flex-center flex-wrap gap-2xs">
           <span>{{ 'content.start_count' | t }}</span>
           <span data-total-start>{{ paginate.current_offset | plus: 1 }}</span>
@@ -142,13 +150,20 @@
         >
           <span class="text">
             {%- if paginate.next -%}
-              {{ 'content.show_more' | t }}
+              {{ load_more_label }}
             {%- else -%}
               {{ 'content.no_more' | t }}
             {%- endif -%}
           </span>
           {% render 'loading-spinner' %}
         </button>
+
+        {%- if sec_stts.show_back_to_top_link -%}
+          <a class="pagination-back-to-top" href="#top" data-pagination-back-to-top>
+            <span class="svg-wrapper" aria-hidden="true">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+            <span>{{ 'content.back_to_top' | t }}</span>
+          </a>
+        {%- endif -%}
       </infinite-scrolling>
     {%- endif -%}
   </div>

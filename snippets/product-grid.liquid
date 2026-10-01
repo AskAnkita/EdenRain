@@ -28,6 +28,10 @@
 
 {%- style -%}
   @media (min-width: 750px) {
+    .template-collection .product-grid.product-grid--grid.product-grid--{{ section.id }}[data-view] {
+      --product-grid-columns-desktop: repeat(4, minmax(0, 1fr)) !important;
+    }
+
     {% case section.settings.layout_type %}
       {% when 'grid' %}
         .template-collection:not(:has(.switcher-grid)) .product-grid:is(.product-grid--grid) {

@@ -5,6 +5,126 @@
   {{ 'mask-blobs.css' | asset_url | stylesheet_tag }}
 {% endif %}
 
+{%- style -%}
+  /* Promo banners inside the product grid: see snippets/collection-grid-banner.liquid.
+     Like MiaDonna's PLP: the image fills the whole tile and the copy sits on it,
+     near the bottom, with no band of its own. */
+  .product-grid--{{ section.id }} .collection-banner {
+    position: relative;
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    background: var(--card-media-tile, #f4f4f1);
+    text-decoration: none;
+    color: var(--color-foreground, #000);
+  }
+
+  .product-grid--{{ section.id }} .collection-banner__media {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  /* Out of the flow: a tall photo must not make the row taller than the product cards */
+  .product-grid--{{ section.id }} .collection-banner__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Keep faces in frame when the tile crops a portrait photo */
+    object-position: center top;
+  }
+
+  .product-grid--{{ section.id }} .collection-banner__text {
+    position: absolute;
+    inset: auto 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.6rem;
+    padding: 0 2.4rem 4.8rem;
+    text-align: center;
+  }
+
+  .product-grid--{{ section.id }} .collection-banner--light {
+    color: #fff;
+  }
+
+  .product-grid--{{ section.id }} .collection-banner--light .collection-banner__text {
+    text-shadow: 0 0.1rem 1.2rem rgb(0 0 0 / 0.45);
+  }
+
+  .product-grid--{{ section.id }} .collection-banner__heading {
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(2.4rem, 2.2vw, 3.6rem);
+    line-height: 1.15;
+  }
+
+  .product-grid--{{ section.id }} .collection-banner__subheading {
+    font-size: 1.3rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    /* Reads as the call to action it is */
+    text-decoration: underline;
+    text-underline-offset: 0.8rem;
+    text-decoration-thickness: 1px;
+  }
+
+  /* Product shots sit on a tile instead of bleeding into the page, so the cards line
+     up as a grid of panels the way MiaDonna's do. */
+  .product-grid--{{ section.id }} .card--block-media {
+    background: var(--card-media-tile, #f4f4f1);
+  }
+
+  .product-grid--{{ section.id }} .card--block-media .media img {
+    padding: 8%;
+    object-fit: contain;
+    /* The product photos are shot on white; multiply drops that into the tile */
+    mix-blend-mode: multiply;
+  }
+
+  @media screen and (min-width: 750px) {
+    /* Four products per row. The [data-view] part is what beats base.css's
+       density rules, which are always live because the grid-density switcher
+       stays in the DOM (the template only hides it with CSS). */
+    .product-grid.product-grid--grid.product-grid--{{ section.id }}[data-view] {
+      --product-grid-columns-desktop: repeat(4, minmax(0, 1fr));
+    }
+
+    /* Row and column gap. The theme computes --product-grid-gap from the section's
+       gap settings but never applies it: .grid-layout's `gap` shorthand (global theme
+       spacing) wins, so those settings had no effect on their own. This wires them up. */
+    .product-grid.product-grid--{{ section.id }} {
+      row-gap: {{ section.settings.columns_gap_vertical | default: 50 }}px;
+      column-gap: {{ section.settings.columns_gap_horizontal | default: 16 }}px;
+    }
+
+    /* A banner takes the space of two product cards, so a row stays 4 cells wide */
+    .product-grid--{{ section.id }} [data-product-banner] {
+      grid-column: span 2;
+      min-width: 0;
+    }
+
+    /* and it runs the full height of the row, past the cards' title and price */
+    .product-grid--{{ section.id }} .product-grid__item--banner-image {
+      height: 100%;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-grid--{{ section.id }} [data-product-banner] {
+      grid-column: 1 / -1;
+    }
+
+    /* Full-bleed on mobile, so the tile needs a height of its own */
+    .product-grid--{{ section.id }} .collection-banner {
+      height: auto;
+      aspect-ratio: 4 / 5;
+    }
+  }
+{%- endstyle -%}
+
 {% liquid
   if cart.attributes.pagination != blank and cart.attributes.pagination
     assign paginate_by = cart.attributes.pagination
@@ -81,108 +201,76 @@
               assign img_banner1 = section.settings.img_banner1
               assign img_banner2 = section.settings.img_banner2
               assign img_banner3 = section.settings.img_banner3
-              assign banner_position_1 = section.settings.banner_position_1 | round | default: 4
-              assign banner_position_2 = section.settings.banner_position_2 | round | default: 5
+
+              # A banner is inserted *before* the product at its position and spans 2 of the 4
+              # columns, so these defaults give: [2 products + banner] / 4 / 4 / [banner + 2
+              # products] / 4 per row from there on.
+              assign banner_position_1 = section.settings.banner_position_1 | round | default: 3
+              assign banner_position_2 = section.settings.banner_position_2 | round | default: 11
               assign banner_position_3 = section.settings.banner_position_3 | round | default: 12
+
+              # Banners belong to the first page only: later pages are appended to the same grid
+              # by infinite scroll, and re-inserting at the same index would repeat them.
+              assign banners_allowed = false
+              if paginate.current_page == 1
+                assign banners_allowed = true
+              endif
+
+              # No image picked is fine: the snippet falls back to a theme asset, so an
+              # enabled banner always fills its two cells and the rows stay aligned.
+              assign render_banner_1 = false
+              if banners_allowed and section.settings.show_banner_1
+                assign render_banner_1 = true
+              endif
+
+              assign render_banner_2 = false
+              if banners_allowed and section.settings.show_banner_2
+                assign render_banner_2 = true
+              endif
+
+              assign render_banner_3 = false
+              if banners_allowed and section.settings.show_banner_3
+                assign render_banner_3 = true
+              endif
             %}
-
-            {% capture class_banner %}
-              product-grid__item product-grid__item--banner product-grid__item--{{ forloop.index0 }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}
-            {% endcapture %}
-
-            {% capture class_banner_img %}
-              product-grid__item--banner-image
-            {% endcapture %}
-
-            {% capture class_tag_a %}
-              media media--adapt
-            {% endcapture %}
-
-            {% capture attr_tag_a_1 %}
-              {% if section.settings.link_banner_1 == blank %}
-                role="link" aria-disabled="true"
-              {% else %}
-                href="{{ section.settings.link_banner_1 }}"
-              {% endif %}
-              style="{% if img_banner1 != blank %}--media-adapt-ratio: {{ img_banner1.aspect_ratio }};{% endif %}"
-            {% endcapture %}
-
-            {% capture attr_tag_a_2 %}
-              {% if section.settings.link_banner_2 == blank %}
-                role="link" aria-disabled="true"
-              {% else %}
-                href="{{ section.settings.link_banner_2 }}"
-              {% endif %}
-              style="{% if img_banner2 != blank %}--media-adapt-ratio: {{ img_banner2.aspect_ratio }};{% endif %}"
-            {% endcapture %}
-
-            {% capture attr_tag_a_3 %}
-              {% if section.settings.link_banner_3 == blank %}
-                role="link" aria-disabled="true"
-              {% else %}
-                href="{{ section.settings.link_banner_3 }}"
-              {% endif %}
-              style="{% if img_banner3 != blank %}--media-adapt-ratio: {{ img_banner3.aspect_ratio }};{% endif %}"
-            {% endcapture %}
 
             {% capture children %}
               {% for product in collection.products %}
-                {% if forloop.index == banner_position_1 and section.settings.show_banner_1 %}
-                  <li class="{{ class_banner }}" data-product-banner="1" data-first-position="{{ banner_position_1 }}">
-                    <div class="{{ class_banner_img }}">
-                      <a
-                        class="{{ class_tag_a }}"
-                        {{ attr_tag_a_1 }}
-                      >
-                        {% if img_banner1 != blank %}
-                          {% assign height = img_banner1.width | divided_by: img_banner1.aspect_ratio | round %}
-                          <img {% if settings.enable_lazyload %}data-{% endif %}srcset="{{ img_banner1 | image_url: width: 2048 }}" src="{{ img_banner1 | image_url: width: 2048 }}" alt="{{ img_banner1.alt | default: shop.name | escape }}"{% if settings.enable_lazyload %} loading="lazy"{% endif %} width="{{img_banner1.width}}" height="{{height}}">
-                        {% else %}
-                          <div class="placeholder" style="--height_placeholder: clamp(270px, calc(560 / 1920 * 100vw), 560px);">
-                            {{ 'blog-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
-                          </div>
-                        {% endif %}
-                      </a>
-                    </div>
-                  </li>
+                {% if forloop.index == banner_position_1 and render_banner_1 %}
+                  {% render 'collection-grid-banner',
+                    index: 1,
+                    image: img_banner1,
+                    fallback: 'lifestyle-earring.jpg',
+                    url: section.settings.link_banner_1,
+                    heading: section.settings.banner_heading_1,
+                    subheading: section.settings.banner_text_1,
+                    video: section.settings.video_banner_1,
+                    text_color: section.settings.banner_text_color_1
+                  %}
                 {% endif %}
-                {% if forloop.index == banner_position_2 and section.settings.show_banner_2 %}
-                  <li class="{{ class_banner }}" data-product-banner="2" data-first-position="{{ banner_position_2 }}">
-                    <div class="{{ class_banner_img }}">
-                      <a
-                        class="{{ class_tag_a }}"
-                        {{ attr_tag_a_2 }}
-                      >
-                        {% if img_banner2 != blank %}
-                          {% assign height = img_banner2.width | divided_by: img_banner2.aspect_ratio | round %}
-                          <img {% if settings.enable_lazyload %}data-{% endif %}srcset="{{ img_banner2 | image_url: width: 2048 }}" src="{{ img_banner2 | image_url: width: 2048 }}" alt="{{ img_banner2.alt | default: shop.name | escape }}"{% if settings.enable_lazyload %} loading="lazy"{% endif %} width="{{img_banner2.width}}" height="{{height}}">
-                        {% else %}
-                          <div class="placeholder" style="--height_placeholder: clamp(270px, calc(560 / 1920 * 100vw), 560px);">
-                            {{ 'blog-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
-                          </div>
-                        {% endif %}
-                      </a>
-                    </div>
-                  </li>
+                {% if forloop.index == banner_position_2 and render_banner_2 %}
+                  {% render 'collection-grid-banner',
+                    index: 2,
+                    image: img_banner2,
+                    fallback: 'lifestyle-necklace.jpg',
+                    url: section.settings.link_banner_2,
+                    heading: section.settings.banner_heading_2,
+                    subheading: section.settings.banner_text_2,
+                    video: section.settings.video_banner_2,
+                    text_color: section.settings.banner_text_color_2
+                  %}
                 {% endif %}
-                {% if forloop.index == banner_position_3 and section.settings.show_banner_3 %}
-                  <li class="{{ class_banner }}" data-product-banner="3" data-first-position="{{ banner_position_3 | plus: 2 }}">
-                    <div class="{{ class_banner_img }}">
-                      <a
-                        class="{{ class_tag_a }}"
-                        {{ attr_tag_a_3 }}
-                      >
-                        {% if img_banner3 != blank %}
-                          {% assign height = img_banner3.width | divided_by: img_banner3.aspect_ratio | round %}
-                          <img {% if settings.enable_lazyload %}data-{% endif %}srcset="{{ img_banner3 | image_url: width: 2048 }}" src="{{ img_banner3 | image_url: width: 2048 }}" alt="{{ img_banner3.alt | default: shop.name | escape }}"{% if settings.enable_lazyload %} loading="lazy"{% endif %} width="{{img_banner3.width}}" height="{{height}}">
-                        {% else %}
-                          <div class="placeholder" style="--height_placeholder: clamp(270px, calc(560 / 1920 * 100vw), 560px);">
-                            {{ 'blog-apparel-3' | placeholder_svg_tag: 'placeholder-svg' }}
-                          </div>
-                        {% endif %}
-                      </a>
-                    </div>
-                  </li>
+                {% if forloop.index == banner_position_3 and render_banner_3 %}
+                  {% render 'collection-grid-banner',
+                    index: 3,
+                    image: img_banner3,
+                    fallback: 'lifestyle-bracelet.jpg',
+                    url: section.settings.link_banner_3,
+                    heading: section.settings.banner_heading_3,
+                    subheading: section.settings.banner_text_3,
+                    video: section.settings.video_banner_3,
+                    text_color: section.settings.banner_text_color_3
+                  %}
                 {% endif %}
                 <li
                   id="{{ section.id }}-{{ product.id }}"
@@ -350,7 +438,7 @@
       "id": "columns_gap_vertical",
       "label": "t:settings.vertical_gap",
       "min": 0,
-      "max": 50,
+      "max": 100,
       "step": 1,
       "unit": "px",
       "default": 16
@@ -390,7 +478,7 @@
       "type": "text",
       "id": "banner_position_1",
       "label": "t:settings.banner_position_1",
-      "default": "4",
+      "default": "3",
       "info": "t:info.banner_position_default_1"
     },
     {
@@ -399,9 +487,39 @@
       "label": "t:settings.image"
     },
     {
+      "type": "video",
+      "id": "video_banner_1",
+      "label": "Banner 1 video",
+      "info": "Plays muted on a loop in place of the image. The image is still used as the poster while it loads."
+    },
+    {
       "type": "url",
       "id": "link_banner_1",
       "label": "t:settings.link"
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_1",
+      "label": "Banner 1 heading",
+      "info": "Shown over the image. Leave blank for an image-only banner.",
+      "default": "Confidence—Guaranteed"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_1",
+      "label": "Banner 1 text",
+      "default": "FREE SHIPPING & 60-DAY RETURNS"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_1",
+      "label": "Banner 1 text color",
+      "info": "Dark for light product shots, light for photos and videos.",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
+      ],
+      "default": "light"
     },
     {
       "type": "checkbox",
@@ -413,7 +531,7 @@
       "type": "text",
       "id": "banner_position_2",
       "label": "t:settings.banner_position_2",
-      "default": "5",
+      "default": "11",
       "info": "t:info.banner_position_default_2"
     },
     {
@@ -422,9 +540,39 @@
       "label": "t:settings.image"
     },
     {
+      "type": "video",
+      "id": "video_banner_2",
+      "label": "Banner 2 video",
+      "info": "Plays muted on a loop in place of the image. The image is still used as the poster while it loads."
+    },
+    {
       "type": "url",
       "id": "link_banner_2",
       "label": "t:settings.link"
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_2",
+      "label": "Banner 2 heading",
+      "info": "Shown over the image. Leave blank for an image-only banner.",
+      "default": "Where Your Moment Begins"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_2",
+      "label": "Banner 2 text",
+      "default": "START YOUR CUSTOM DESIGN"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_2",
+      "label": "Banner 2 text color",
+      "info": "Dark for light product shots, light for photos and videos.",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
+      ],
+      "default": "light"
     },
     {
       "type": "checkbox",
@@ -445,9 +593,39 @@
       "label": "t:settings.image"
     },
     {
+      "type": "video",
+      "id": "video_banner_3",
+      "label": "Banner 3 video",
+      "info": "Plays muted on a loop in place of the image. The image is still used as the poster while it loads."
+    },
+    {
       "type": "url",
       "id": "link_banner_3",
       "label": "t:settings.link"
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_3",
+      "label": "Banner 3 heading",
+      "info": "Shown over the image. Leave blank for an image-only banner.",
+      "default": "Crafted to Last"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_3",
+      "label": "Banner 3 text",
+      "default": "SHOP BEST SELLERS"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_3",
+      "label": "Banner 3 text color",
+      "info": "Dark for light product shots, light for photos and videos.",
+      "options": [
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
+      ],
+      "default": "light"
     },
     {
       "type": "header",
@@ -468,6 +646,30 @@
         }
       ],
       "default": "pagination"
+    },
+    {
+      "type": "select",
+      "id": "pagination_load_mode",
+      "label": "Load more behaviour",
+      "info": "Only applies when the type above is set to infinite.",
+      "default": "button",
+      "options": [
+        { "value": "button", "label": "Wait for a click" },
+        { "value": "auto", "label": "Load while scrolling" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "load_more_label",
+      "label": "Load more button label",
+      "info": "Leave blank to use the theme translation.",
+      "default": "View more"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_back_to_top_link",
+      "label": "Show \"Back to top\" link",
+      "default": true
     },
     {
       "type": "range",

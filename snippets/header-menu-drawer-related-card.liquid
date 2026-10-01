@@ -1,0 +1,14 @@
+{%- assign card_title = title | default: product.title -%}
+<li class="menu-drawer-desktop__related-item">
+  <a class="menu-drawer-desktop__related-card" href="{{ product.url }}">
+    <span class="menu-drawer-desktop__related-media">
+      {%- if product.featured_image != blank -%}
+        {{ product.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 24vw, 80vw', alt: card_title }}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </span>
+    <span class="menu-drawer-desktop__related-title">{{ card_title | escape }}</span>
+    <span class="menu-drawer-desktop__related-price">{{ product.price | money }}</span>
+  </a>
+</li>

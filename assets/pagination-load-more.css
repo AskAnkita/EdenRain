@@ -1,0 +1,76 @@
+/* "Showing X - Y of Z" + a click-to-load button, in place of numbered pagination.
+   Markup: snippets/pagination.liquid */
+
+.infinite-scrolling-wrapper[data-load-mode='button'] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.4rem;
+  margin-top: 4rem;
+}
+
+.infinite-scrolling-wrapper[data-load-mode='button'] .pagination-page-total {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
+}
+
+/* The running progress bar belongs to the auto-loading variant */
+.infinite-scrolling-wrapper[data-load-mode='button'] .progress-wrapper {
+  display: none;
+}
+
+.infinite-scrolling-wrapper[data-load-mode='button'] .infinite-scrolling-btn {
+  width: 100%;
+  max-width: 60rem;
+  min-height: 5.6rem;
+  padding: 1.6rem 2.4rem;
+  background: transparent;
+  color: var(--color-foreground, #000);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 0;
+  font-size: 1.3rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.infinite-scrolling-wrapper[data-load-mode='button'] .infinite-scrolling-btn:hover {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.45);
+}
+
+.pagination-back-to-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 1.6rem;
+  color: var(--color-foreground, #000);
+  font-size: 1.3rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.pagination-back-to-top .svg-wrapper,
+.pagination-back-to-top svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.pagination-back-to-top .svg-wrapper {
+  /* icon-arrow.svg points right */
+  transform: rotate(-90deg);
+}
+
+.pagination-back-to-top:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.4rem;
+}
+
+@media screen and (max-width: 749px) {
+  .infinite-scrolling-wrapper[data-load-mode='button'] .infinite-scrolling-btn {
+    min-height: 4.8rem;
+    font-size: 1.2rem;
+  }
+}

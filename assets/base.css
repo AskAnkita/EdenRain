@@ -19510,6 +19510,14 @@ details-disclosure > details {
   mix-blend-mode: difference;
 }
 
+/* Avoid browser/theme outline rings on pointer hover across the storefront.
+   Keep :focus-visible rings so keyboard users can still see their position. */
+@media (hover: hover) {
+  :where(body *) :hover:not(:focus-visible) {
+    outline: none !important;
+  }
+}
+
 .current-show-sticky .sticky-text * {
   color: var(--sticky-text-color) !important;
 }
@@ -20892,10 +20900,14 @@ product-price.text-block.custom-typography.custom-font-size.custom-color {
 }
 
 
-.ai-collection-carousel-link-{{ ai_gen_id }}:hover {
-  border: 2px solid #fff;
-
-}
+/* Removed: a Liquid tag ({{ ai_gen_id }}) had been left in this plain .css file.
+   .css is not rendered through Liquid, so the browser saw the literal text. The
+   "{" in "{{" ended the selector early, the parser discarded "{ ai_gen_id }" as a
+   junk block, and the remainder parsed as a valid rule with the bare selector
+   ":hover" -- i.e. *:hover { border: 2px solid #fff }. That put a white border on
+   every hovered element AND all of its ancestors, site-wide, and the extra 2px per
+   level inflated layout (visibly shoving the header down on hover). The real
+   per-block hover styles are emitted inline by the ai_gen blocks themselves. */
 
 .email-signup__input {
 border-radius:50px !important;

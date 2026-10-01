@@ -1,4 +1,4 @@
-/* Desktop menu drawer (MiaDonna-style). Markup: snippets/header-menu-drawer-panel.liquid */
+/* Desktop mega menu: opens full-width under the header. Markup: snippets/header-menu-drawer-panel.liquid */
 (function () {
   if (window.__edenMenuDrawer) return;
   window.__edenMenuDrawer = true;
@@ -13,7 +13,7 @@
   let closeTimer = null;
 
   function init() {
-    // Fixed-position drawers must not live inside the (transformed, sticky) header
+    // Fixed-position panels must not live inside the (transformed, sticky) header
     document.querySelectorAll('[data-menu-drawer-root]').forEach((root) => {
       if (root.parentElement !== document.body) document.body.appendChild(root);
       root.addEventListener('click', (event) => {
@@ -24,6 +24,13 @@
 
       root.querySelectorAll('[data-menu-drawer-category]').forEach((button) => {
         const activate = () => showGroup(button);
+        button.addEventListener('mouseenter', activate);
+        button.addEventListener('click', activate);
+        button.addEventListener('focus', activate);
+      });
+
+      root.querySelectorAll('[data-menu-drawer-product]').forEach((button) => {
+        const activate = () => showProduct(button);
         button.addEventListener('mouseenter', activate);
         button.addEventListener('click', activate);
         button.addEventListener('focus', activate);
@@ -58,8 +65,14 @@
         trigger?.focus();
       }
     });
-    window.addEventListener('resize', () => activeRoot && positionRoot(activeRoot, activeTrigger));
+    // The header is sticky, so the panel's top edge moves while the page scrolls
+    window.addEventListener('resize', reposition);
+    window.addEventListener('scroll', reposition, { passive: true });
     desktop.addEventListener('change', () => !desktop.matches && close());
+  }
+
+  function reposition() {
+    if (activeRoot) positionRoot(activeRoot, activeTrigger);
   }
 
   function positionRoot(root, trigger) {
@@ -78,8 +91,10 @@
     cancelClose();
 
     root.querySelectorAll('[data-menu-drawer-page]').forEach((p) => (p.hidden = p !== page));
+    const firstProduct = page.querySelector('button[data-menu-drawer-product]');
     const firstCategory = page.querySelector('button[data-menu-drawer-category]');
-    if (firstCategory) showGroup(firstCategory);
+    if (firstProduct) showProduct(firstProduct);
+    else if (firstCategory) showGroup(firstCategory);
 
     document.querySelectorAll('[data-menu-drawer-trigger]').forEach((t) => t.setAttribute('aria-expanded', String(t === trigger)));
 
@@ -87,7 +102,6 @@
     if (root.hidden) {
       root.hidden = false;
       requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('is-open')));
-      document.documentElement.style.overflow = 'hidden';
     }
     activeRoot = root;
     activeTrigger = trigger;
@@ -100,6 +114,19 @@
     page.querySelectorAll('[data-menu-drawer-group]').forEach((g) => (g.hidden = g.dataset.menuDrawerGroup !== groupId));
   }
 
+  function showProduct(button) {
+    const page = button.closest('[data-menu-drawer-page]');
+    const groupId = button.dataset.menuDrawerProduct;
+    page.querySelectorAll('[data-menu-drawer-product]').forEach((item) => {
+      const isActive = item === button;
+      item.classList.toggle('is-active', isActive);
+      item.setAttribute('aria-pressed', String(isActive));
+    });
+    page.querySelectorAll('[data-menu-drawer-product-group]').forEach((group) => {
+      group.hidden = group.dataset.menuDrawerProductGroup !== groupId;
+    });
+  }
+
   function close(immediate = false) {
     clearTimeout(openTimer);
     cancelClose();
@@ -107,7 +134,6 @@
     if (!root) return;
     document.querySelectorAll('[data-menu-drawer-trigger]').forEach((t) => t.setAttribute('aria-expanded', 'false'));
     root.classList.remove('is-open');
-    document.documentElement.style.overflow = '';
     activeRoot = null;
     activeTrigger = null;
     if (immediate) {

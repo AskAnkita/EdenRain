@@ -1,0 +1,45 @@
+{%- liquid
+  assign display_title = title | default: product.title
+-%}
+
+{%- if placement == 'list' -%}
+  <li>
+    <button
+      type="button"
+      class="menu-drawer-desktop__product-name{% if active %} is-active{% endif %}"
+      data-menu-drawer-product="{{ group_id }}"
+      aria-controls="{{ group_id }}-preview"
+      aria-pressed="{{ active }}"
+    >
+      {{ display_title | escape }}
+    </button>
+  </li>
+{%- else -%}
+  <div class="menu-drawer-desktop__product-set" data-menu-drawer-product-group="{{ group_id }}" id="{{ group_id }}-preview"{% unless active %} hidden{% endunless %}>
+    <ul class="menu-drawer-desktop__related-grid" role="list">
+      {%- if collection != blank and collection.products_count > 0 -%}
+        {%- for related_product in collection.products limit: 6 -%}
+          {%- render 'header-menu-drawer-related-card', product: related_product -%}
+        {%- endfor -%}
+      {%- elsif menu_link.links != blank -%}
+        {%- assign rendered_product_count = 0 -%}
+        {%- for menu_item in menu_link.links -%}
+          {%- if menu_item.type == 'product_link' -%}
+            {%- assign rendered_product_count = rendered_product_count | plus: 1 -%}
+            {%- render 'header-menu-drawer-related-card', product: menu_item.object, title: menu_item.title -%}
+            {%- if rendered_product_count == 6 -%}{%- break -%}{%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- if rendered_product_count == 0 -%}
+          {%- for related_product in collections.all.products limit: 6 -%}
+            {%- render 'header-menu-drawer-related-card', product: related_product -%}
+          {%- endfor -%}
+        {%- endif -%}
+      {%- else -%}
+        {%- for related_product in collections.all.products limit: 6 -%}
+          {%- render 'header-menu-drawer-related-card', product: related_product -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+  </div>
+{%- endif -%}

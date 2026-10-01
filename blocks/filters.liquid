@@ -86,7 +86,7 @@
   "
   style="
     --grid-column--desktop:
-      {%- if filter_type == 'horizontal' -%}
+      {%- if filter_type == 'horizontal' or filter_type == 'drawer' -%}
         var(--{{ bl_stts.filter_width }})
       {%- else -%}
         {%- if filter_position == 'left' -%}
@@ -256,6 +256,10 @@
         {
           "value": "horizontal",
           "label": "t:options.horizontal"
+        },
+        {
+          "value": "drawer",
+          "label": "t:options.drawer"
         },
         {
           "value": "vertical",

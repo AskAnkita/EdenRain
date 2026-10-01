@@ -2107,7 +2107,13 @@ class SwiperComponent extends HTMLElement {
     if (this.items.length > 0) {
       this.swiperEl = this.querySelector(".swiper");
       if (!this.swiperEl) return;
-      
+
+      // Motion.inView fires again every time the element re-enters the viewport.
+      // Without this guard, scrolling past a slider repeatedly stacks Swiper
+      // instances (and autoplay timers) on the same element.
+      if (this.swiperEl._swiperInitialized) return;
+      this.swiperEl._swiperInitialized = true;
+
       // Debug: Check if swiper elements exist
       const nextButton = this.swiperEl.querySelector(".swiper-button-next");
       const prevButton = this.swiperEl.querySelector(".swiper-button-prev");
@@ -4094,11 +4100,16 @@ class InfiniteScrolling extends HTMLElement {
   }
 
   bindEvents() {
-    const infiniteButton = document.querySelector('[data-infinite-scrolling]');
-    if (infiniteButton) {
+    const infiniteButton = this.querySelector('[data-infinite-scrolling]');
 
-      this.setupIntersectionObserver(infiniteButton);
-    }
+    // The button had no click handler at all: it only ever fired from the observer
+    // below, so in button mode it would have been inert.
+    if (infiniteButton) infiniteButton.addEventListener('click', () => this.loadNextPage());
+
+    // data-load-mode="button" waits for that click instead of loading on scroll.
+    if (this.dataset.loadMode === 'button') return;
+
+    if (infiniteButton) this.setupIntersectionObserver(infiniteButton);
 
     window.addEventListener('scroll', theme.utils.rafThrottle(this.handleScroll.bind(this)));
   }
@@ -4174,9 +4185,10 @@ class InfiniteScrolling extends HTMLElement {
 
         this.updatePaginationProgress();
 
-        if (this.hasNextPage) {
-          window.history.replaceState({}, '', currentUrl.toString());
-        } else {
+        // The address bar deliberately keeps pointing at page 1. Rewriting it to
+        // ?page=2 made a reload or a shared link return only that page's products,
+        // dropping everything already loaded along with the page-1 promo banners.
+        if (!this.hasNextPage) {
           const infiniteButton = this.querySelector('[data-infinite-scrolling]');
           if (infiniteButton) {
             infiniteButton.style.display = 'none';

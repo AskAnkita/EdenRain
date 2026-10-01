@@ -1,5 +1,5 @@
 {% comment %}
-  Image tiles for one category of the desktop menu drawer.
+  Image tiles for one category of the desktop mega menu.
 
   Accepts:
   - group_id: {String}
@@ -19,7 +19,7 @@
 
   <ul class="menu-drawer-desktop__tiles" role="list">
     {%- if collection != blank -%}
-      {%- for product in collection.products limit: 9 -%}
+      {%- for product in collection.products limit: 12 -%}
         <li>
           <a class="menu-drawer-desktop__tile" href="{{ product.url }}">
             <span class="menu-drawer-desktop__tile-media">
@@ -32,32 +32,34 @@
         </li>
       {%- endfor -%}
     {%- endif -%}
-    {%- for item in parent.links -%}
-      {%- comment -%} Skip "All …" links that duplicate the Shop All link {%- endcomment -%}
-      {%- if item.url == parent.url -%}
-        {%- continue -%}
-      {%- endif -%}
-      {%- liquid
-        assign tile_image = blank
-        case item.type
-          when 'collection_link'
-            assign tile_image = item.object.featured_image
-          when 'product_link'
-            assign tile_image = item.object.featured_image
-          when 'catalog_link'
-            assign tile_image = collections.all.featured_image
-        endcase
-      -%}
-      <li>
-        <a class="menu-drawer-desktop__tile" href="{{ item.url }}">
-          <span class="menu-drawer-desktop__tile-media">
-            {%- if tile_image != blank -%}
-              {{ tile_image | image_url: width: 400 | image_tag: loading: 'lazy', sizes: '180px', alt: item.title }}
-            {%- endif -%}
-          </span>
-          <span class="menu-drawer-desktop__tile-title">{{ item.title | escape }}</span>
-        </a>
-      </li>
-    {%- endfor -%}
+    {%- unless collection != blank -%}
+      {%- for item in parent.links -%}
+        {%- comment -%} Skip "All …" links that duplicate the Shop All link {%- endcomment -%}
+        {%- if item.url == parent.url -%}
+          {%- continue -%}
+        {%- endif -%}
+        {%- liquid
+          assign tile_image = blank
+          case item.type
+            when 'collection_link'
+              assign tile_image = item.object.featured_image
+            when 'product_link'
+              assign tile_image = item.object.featured_image
+            when 'catalog_link'
+              assign tile_image = collections.all.featured_image
+          endcase
+        -%}
+        <li>
+          <a class="menu-drawer-desktop__tile" href="{{ item.url }}">
+            <span class="menu-drawer-desktop__tile-media">
+              {%- if tile_image != blank -%}
+                {{ tile_image | image_url: width: 400 | image_tag: loading: 'lazy', sizes: '180px', alt: item.title }}
+              {%- endif -%}
+            </span>
+            <span class="menu-drawer-desktop__tile-title">{{ item.title | escape }}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    {%- endunless -%}
   </ul>
 </div>

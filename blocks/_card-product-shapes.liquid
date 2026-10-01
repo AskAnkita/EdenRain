@@ -1,0 +1,136 @@
+{%- doc -%}
+  Diamond-shape icons for a product card.
+
+  Values come from the first product option whose name contains "shape", else the
+  `custom.diamond_shapes` metafield (a list of single-line text values, or one
+  comma-separated value), else the block's "Default shapes" setting. The default is
+  what makes the row show across a catalogue that carries no per-product shape data
+  yet; clear it to show the row only for products that do. Only shapes the theme
+  ships an icon for are drawn.
+{%- enddoc -%}
+
+{%- liquid
+  assign card_product = block.settings.product
+  assign icon_shapes = 'round,oval,cushion,emerald,princess,radiant,asscher,heart,marquise,pear' | split: ','
+
+  assign shape_source = ''
+  for option in card_product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name contains 'shape'
+      assign shape_source = option.values | join: '||'
+      break
+    endif
+  endfor
+
+  if shape_source == blank
+    assign meta_shapes = card_product.metafields.custom.diamond_shapes.value
+    if meta_shapes != blank
+      assign shape_source = meta_shapes | join: '||'
+    endif
+  endif
+
+  if shape_source == blank
+    assign shape_source = block.settings.default_shapes
+  endif
+
+  if shape_source contains '||'
+    assign shape_values = shape_source | split: '||'
+  else
+    assign shape_values = shape_source | split: ','
+  endif
+-%}
+
+{%- if shape_values.size > 0 -%}
+  {%- liquid
+    assign align = 'flex-start'
+    if block.settings.alignment == 'center'
+      assign align = 'center'
+    elsif block.settings.alignment == 'right'
+      assign align = 'flex-end'
+    endif
+  -%}
+  <div
+    class="card--block-shapes spacing-style"
+    style="--options-align: {{ align }};{%- render 'spacing-style', settings: block.settings -%}"
+  >
+    <ul class="card-shapes list-unstyled" role="list">
+      {%- assign drawn = 0 -%}
+      {%- for value in shape_values -%}
+        {%- liquid
+          assign value_text = value | strip
+          assign value_compare = value_text | downcase
+          assign matched_shape = ''
+          for shape in icon_shapes
+            if value_compare contains shape
+              assign matched_shape = shape
+              break
+            endif
+          endfor
+        -%}
+        {%- if matched_shape != blank -%}
+          <li class="card-shapes__item{% if drawn == 0 %} is-active{% endif %}">
+            {%- render 'icon-diamond-shape', shape: matched_shape -%}
+            <span class="visually-hidden">{{ value_text | escape }}</span>
+          </li>
+          {%- assign drawn = drawn | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product shapes",
+  "tag": null,
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product"
+    },
+    {
+      "type": "text",
+      "id": "default_shapes",
+      "label": "Default shapes",
+      "info": "Comma separated. Used for products that carry no Shape option or custom.diamond_shapes metafield. Leave blank to hide the row for those products.",
+      "default": "Round, Oval, Cushion, Emerald, Princess, Radiant"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:settings.alignment",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "t:options.left" },
+        { "value": "center", "label": "t:options.center" },
+        { "value": "right", "label": "t:options.right" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

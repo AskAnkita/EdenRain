@@ -1,0 +1,294 @@
+/*
+  Filter drawer for the "Drawer" filter style (filters block > Direction > Drawer).
+  Right-hand panel: centred title, one accordion per filter (Sort By first),
+  image tiles for image filters, and a sticky Apply bar.
+  Everything is scoped to .collection-filter-toolbar so the mobile drawer of the
+  horizontal/vertical styles keeps its own look.
+*/
+
+.collection-filter-toolbar {
+  --drawer-padding-inline: 6rem;
+  --drawer-tile-background: #f7f7f5;
+  --drawer-divider: rgb(var(--color-foreground-rgb) / 0.1);
+}
+
+/* The category row above already draws the dividing line; a second one left an empty band */
+.collection-filter-toolbar {
+  border-top: 0;
+}
+
+.collection-filter-toolbar__count {
+  white-space: nowrap;
+}
+
+/* The toolbar only needs room for the trigger, not a full-width disclosure */
+.collection-filter-toolbar > .mobile-facets__disclosure {
+  width: auto;
+}
+
+.collection-filter-toolbar .mobile-facets__open .svg-wrapper {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+/* Panel. Width goes through the drawer's own variable (base.css [data-drawer-content]) */
+.collection-filter-toolbar .mobile-facets {
+  --drawer-max-width: 60rem;
+}
+
+.collection-filter-toolbar .mobile-facets__inner {
+  max-width: none;
+  border: 0;
+}
+
+.collection-filter-toolbar .mobile-facets__header {
+  padding: 3.6rem var(--drawer-padding-inline) 3rem;
+  border-bottom: 0.1rem solid var(--drawer-divider);
+  background: var(--color-background);
+}
+
+.collection-filter-toolbar .mobile-facets__header-inner {
+  justify-content: center;
+}
+
+.collection-filter-toolbar .mobile-facets__heading {
+  font-family: var(--font-heading--family);
+  font-weight: var(--font-heading--weight);
+  font-size: 2.4rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* ID: base.css parks the close button outside the panel with a long :not() chain */
+.collection-filter-toolbar #FacetFiltersFormMobile .drawer__close {
+  position: absolute;
+  top: -1.6rem;
+  left: auto;
+  right: calc(2.4rem - var(--drawer-padding-inline));
+  padding: 0.8rem;
+  background: none;
+}
+
+.collection-filter-toolbar .drawer__close .svg-wrapper {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.collection-filter-toolbar .mobile-facets__main {
+  padding: 0;
+  overflow: visible;
+}
+
+/* One accordion per filter */
+.collection-filter-toolbar .mobile-facets__details {
+  padding-inline: var(--drawer-padding-inline);
+  border-bottom: 0.1rem solid var(--drawer-divider);
+}
+
+.collection-filter-toolbar .mobile-facets__summary {
+  padding: 2.4rem 0;
+  margin: 0;
+  font-family: var(--font-body--family);
+  font-size: 1.7rem;
+  font-weight: 400;
+  cursor: pointer;
+  list-style: none;
+}
+
+.collection-filter-toolbar .mobile-facets__summary::-webkit-details-marker {
+  display: none;
+}
+
+.collection-filter-toolbar .mobile-facets__summary > * {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  font-size: inherit;
+  /* Title case like "Sort By" / "Style", whatever the label case setting says */
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.collection-filter-toolbar .mobile-facets__active-count {
+  margin-left: 0.4rem;
+  color: rgb(var(--color-foreground-rgb) / 0.4);
+}
+
+.collection-filter-toolbar .mobile-facets__summary .svg-wrapper {
+  width: 1.2rem;
+  height: 1.2rem;
+  transition: transform var(--duration-short) ease;
+}
+
+.collection-filter-toolbar .mobile-facets__submenu {
+  padding-bottom: 3.2rem;
+}
+
+.collection-filter-toolbar .mobile-facets__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  padding: 0;
+  max-height: none;
+}
+
+.collection-filter-toolbar .mobile-facets__label {
+  font-size: 1.4rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.collection-filter-toolbar .facet-checkbox__text-label {
+  text-transform: none;
+}
+
+.collection-filter-toolbar .mobile-facets__highlight {
+  display: none;
+}
+
+/* Sort By: round radio buttons */
+.collection-filter-toolbar .mobile-facets__radio-label {
+  position: relative;
+  align-items: center;
+  gap: 1.4rem;
+  padding: 0;
+  cursor: pointer;
+}
+
+.collection-filter-toolbar .mobile-facets__radio {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+.collection-filter-toolbar .mobile-facets__radio-mark {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border: 0.15rem solid var(--color-foreground);
+  border-radius: 50%;
+  background: var(--color-background);
+}
+
+.collection-filter-toolbar .mobile-facets__radio:checked + .mobile-facets__radio-mark {
+  background: radial-gradient(circle, var(--color-foreground) 0 0.5rem, var(--color-background) 0.55rem);
+}
+
+.collection-filter-toolbar .mobile-facets__radio:focus-visible + .mobile-facets__radio-mark {
+  outline: 0.1rem solid var(--color-foreground);
+  outline-offset: 0.3rem;
+}
+
+/* Image filters (e.g. Style): three tiles per row with the label underneath */
+.collection-filter-toolbar .facets-layout-grid--image.mobile-facets__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.4rem 1.4rem;
+}
+
+.collection-filter-toolbar .facets-layout-grid--image .facets__label {
+  gap: 1.6rem;
+  outline: 0;
+  font-size: 1.6rem;
+}
+
+.collection-filter-toolbar .facets-layout-grid--image .facets__image-wrapper {
+  padding: 1.2rem;
+  background: var(--drawer-tile-background);
+  outline: 0.1rem solid transparent;
+  outline-offset: -0.1rem;
+  transition: outline-color var(--duration-short) ease;
+}
+
+.collection-filter-toolbar .facets-layout-grid--image .facets__label.active .facets__image-wrapper,
+.collection-filter-toolbar .facets-layout-grid--image .facets__label:has(:checked) .facets__image-wrapper {
+  outline-color: var(--color-foreground);
+}
+
+@media (hover: hover) {
+  .collection-filter-toolbar .facets-layout-grid--image .facets__label:hover .facets__image-wrapper {
+    outline-color: rgb(var(--color-foreground-rgb) / 0.4);
+  }
+}
+
+.collection-filter-toolbar .facets-layout-grid--image .facet-checkbox__text {
+  padding: 0;
+}
+
+/* Apply bar */
+.collection-filter-toolbar .mobile-facets__footer {
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
+  gap: 2.4rem;
+  padding: 3.6rem var(--drawer-padding-inline);
+  border: 0;
+  background: var(--drawer-tile-background);
+}
+
+.collection-filter-toolbar .mobile-facets__footer > * {
+  width: auto;
+  margin: 0;
+}
+
+.collection-filter-toolbar .mobile-facets__footer .button {
+  min-width: 28rem;
+  min-height: 5.8rem;
+  border: 0;
+  border-radius: 99rem;
+  background: var(--color-foreground);
+  color: var(--color-background);
+  font-size: 1.4rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.collection-filter-toolbar .mobile-facets__clear {
+  font-size: 1.4rem;
+}
+
+/* "Clear all" only once something is selected */
+.collection-filter-toolbar .mobile-facets__inner:not(:has(.mobile-facets__checkbox:checked, .mobile-facets__active-count)) .mobile-facets__clear-wrapper {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .collection-filter-toolbar {
+    --drawer-padding-inline: 2.4rem;
+  }
+
+  .collection-filter-toolbar .mobile-facets__header {
+    padding-block: 2.4rem;
+  }
+
+  /* Room for the close button beside the longer "Filter and sort" title */
+  .collection-filter-toolbar .mobile-facets__header-inner {
+    padding-inline: 3.2rem;
+  }
+
+  .collection-filter-toolbar .mobile-facets__heading {
+    font-size: 2rem;
+  }
+
+  .collection-filter-toolbar #FacetFiltersFormMobile .drawer__close {
+    top: -0.8rem;
+  }
+
+  .collection-filter-toolbar .mobile-facets__summary {
+    padding-block: 2rem;
+    font-size: 1.6rem;
+  }
+
+  .collection-filter-toolbar .mobile-facets__footer {
+    padding-block: 2rem;
+  }
+
+  .collection-filter-toolbar .mobile-facets__footer .button {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+}

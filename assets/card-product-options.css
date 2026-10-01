@@ -1,0 +1,92 @@
+/* Shape icons and metal swatches on product cards.
+   Markup: blocks/_card-product-shapes.liquid, blocks/_card-product-metals.liquid */
+
+.card-shapes,
+.card-metals {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: var(--options-align, flex-start);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Shapes */
+.card-shapes {
+  gap: 0.4rem 1rem;
+}
+
+.card-shapes__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid transparent;
+}
+
+.card-shapes__item .icon-diamond-shape {
+  display: block;
+  width: 2.2rem;
+  height: 2.2rem;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.card-shapes__item.is-active {
+  border-bottom-color: currentColor;
+}
+
+/* Metals */
+.card-metals {
+  gap: 0.6rem 0.8rem;
+}
+
+.card-metals__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid transparent;
+}
+
+.card-metals__item.is-active {
+  border-bottom-color: currentColor;
+}
+
+.card-metals__dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.6);
+  /* Off-centre highlight reads as a metal bead rather than a flat dot */
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 55%),
+    var(--metal-dot-color, #dcdcdc);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.card-metals__dot--wg {
+  --metal-dot-color: #e2e2e2;
+}
+
+.card-metals__dot--yg {
+  --metal-dot-color: #f0dca5;
+}
+
+.card-metals__dot--rg {
+  --metal-dot-color: #e6b6a2;
+}
+
+.card-metals__dot--pl {
+  --metal-dot-color: #eceae7;
+}
+
+.card-metals__dot--ss {
+  --metal-dot-color: #d8d8d8;
+}

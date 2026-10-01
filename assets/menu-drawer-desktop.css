@@ -1,10 +1,13 @@
-/* Desktop menu drawer (MiaDonna-style). Opened from header menu items; see menu-drawer-desktop.js */
+/* Desktop mega menu. Opens full-width directly under the header; see menu-drawer-desktop.js
+   (class names keep the historic "menu-drawer-desktop" prefix used by the Liquid snippets). */
 
 .menu-drawer-desktop {
   position: fixed;
   inset: var(--menu-drawer-top, 0px) 0 0 0;
   z-index: 100;
   display: block;
+  /* The dimmed area is click-through-proof via the overlay itself, not this wrapper */
+  pointer-events: none;
 }
 
 .menu-drawer-desktop[hidden] {
@@ -14,22 +17,28 @@
 .menu-drawer-desktop__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.35);
   opacity: 0;
   transition: opacity 0.25s ease;
+  pointer-events: auto;
 }
 
 .menu-drawer-desktop__sheet {
   position: absolute;
   top: 0;
-  bottom: 0;
   left: 0;
-  width: min(730px, 64vw);
+  right: 0;
+  width: 100%;
   background: var(--color-background, #fff);
   border-top: 1px solid rgba(0, 0, 0, 0.08);
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
+  box-shadow: 0 1.2rem 2.4rem rgba(0, 0, 0, 0.08);
+  /* Panel height follows its content, capped to the space under the header */
+  max-height: calc(100vh - var(--menu-drawer-top, 0px) - 2rem);
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(-1rem);
+  transition: opacity 0.22s ease, transform 0.26s ease;
+  pointer-events: auto;
 }
 
 .menu-drawer-desktop.is-open .menu-drawer-desktop__overlay {
@@ -37,23 +46,40 @@
 }
 
 .menu-drawer-desktop.is-open .menu-drawer-desktop__sheet {
+  opacity: 1;
   transform: none;
 }
 
 .menu-drawer-desktop__page {
+  position: relative;
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  height: 100%;
+  grid-template-columns: 24rem minmax(0, 1fr);
+  gap: 0 4rem;
+  width: 100%;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 3.2rem var(--page-margin, 4rem) 4rem;
+  max-height: inherit;
 }
 
 .menu-drawer-desktop__page[hidden] {
   display: none;
 }
 
+.menu-drawer-desktop__page--products {
+  grid-template-columns: minmax(36rem, 0.85fr) minmax(0, 1.7fr);
+  gap: 0 5rem;
+  height: min(68vh, 64rem);
+  min-height: 38rem;
+  max-height: calc(100vh - var(--menu-drawer-top, 0px) - 2rem);
+}
+
 /* Left column: categories */
 .menu-drawer-desktop__categories {
   border-right: 1px solid rgba(0, 0, 0, 0.08);
-  padding: 4rem 3.2rem 4rem 4.6rem;
+  padding-right: 3.2rem;
+  /* min-height:0 lets a grid item scroll instead of growing past the panel */
+  min-height: 0;
   overflow-y: auto;
 }
 
@@ -63,30 +89,79 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 2.4rem;
+  gap: 2rem;
 }
 
 .menu-drawer-desktop__category {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   width: 100%;
   padding: 0;
   border: 0;
   background: none;
   cursor: pointer;
   font-family: var(--font-body--family);
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-align: left;
   text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: rgba(0, 0, 0, 0.5);
   transition: color 0.2s ease;
 }
 
 .menu-drawer-desktop__category:hover,
 .menu-drawer-desktop__category.is-active {
+  color: #000;
+}
+
+.menu-drawer-desktop__product-list ul {
+  gap: 0.25rem;
+}
+
+.menu-drawer-desktop__list-heading {
+  margin: 0 0 1.5rem;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.menu-drawer-desktop__product-name {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 0;
+  border: 0;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.62);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(1.2rem, 1.1vw, 1.5rem);
+  letter-spacing: 0.015em;
+  line-height: 1.3;
+  text-align: left;
+  white-space: nowrap;
+  overflow: visible;
+  transition: color 0.2s ease;
+}
+
+.menu-drawer-desktop__product-name::before {
+  content: '›';
+  display: inline-block;
+  width: 1.2rem;
+  color: rgba(0, 0, 0, 0.38);
+  font-size: 1.8rem;
+  line-height: 0.8;
+  vertical-align: -0.08em;
+}
+
+.menu-drawer-desktop__product-name:hover,
+.menu-drawer-desktop__product-name.is-active {
   color: #000;
 }
 
@@ -103,15 +178,17 @@
 
 /* Right column: tiles */
 .menu-drawer-desktop__content {
-  position: relative;
-  padding: 4rem 2.8rem 4rem 2rem;
+  padding-right: 4rem;
+  min-height: 0;
   overflow-y: auto;
 }
 
+/* Close anchors to the panel (not the scrolling column) so it stays put */
 .menu-drawer-desktop__close {
   position: absolute;
-  top: 3.6rem;
-  right: 2.4rem;
+  top: 1.6rem;
+  right: 1.6rem;
+  z-index: 1;
   width: 2.4rem;
   height: 2.4rem;
   padding: 0.4rem;
@@ -135,6 +212,74 @@
   display: none;
 }
 
+.menu-drawer-desktop__product-preview {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-right: 4rem;
+  padding-top: 0.5rem;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.menu-drawer-desktop__product-set[hidden] {
+  display: none;
+}
+
+.menu-drawer-desktop__related-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.4rem 1.8rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-drawer-desktop__related-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.7rem;
+  color: #111;
+  text-decoration: none;
+}
+
+.menu-drawer-desktop__related-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 0.68;
+  overflow: hidden;
+  background: #f4f4f0;
+}
+
+.menu-drawer-desktop__related-media img,
+.menu-drawer-desktop__related-media svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 8%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  transition: transform 0.35s ease;
+}
+
+.menu-drawer-desktop__related-card:hover .menu-drawer-desktop__related-media img {
+  transform: scale(1.03);
+}
+
+.menu-drawer-desktop__related-title {
+  color: #111;
+  font-size: 1.45rem;
+  line-height: 1.35;
+}
+
+.menu-drawer-desktop__related-price {
+  color: #111;
+  font-size: 1.4rem;
+}
+
 .menu-drawer-desktop__shop-all {
   display: inline-block;
   margin: 0 0 2.4rem;
@@ -156,8 +301,9 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2.4rem 1rem;
+  /* Wider panel: as many tiles per row as fit, instead of a fixed 3 */
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 2.4rem 1.6rem;
 }
 
 .menu-drawer-desktop__tile {
@@ -206,10 +352,47 @@
   overflow: hidden;
 }
 
-/* Keep the header item underlined while its drawer is open */
+/* Keep the header item underlined while its panel is open */
 [data-menu-drawer-trigger][aria-expanded='true'] > .text {
   text-decoration: underline;
   text-underline-offset: 0.6rem;
+}
+
+@media screen and (max-width: 1199px) {
+  .menu-drawer-desktop__page {
+    grid-template-columns: 20rem minmax(0, 1fr);
+    gap: 0 2.4rem;
+  }
+
+  .menu-drawer-desktop__categories {
+    padding-right: 2.4rem;
+  }
+
+  .menu-drawer-desktop__content {
+    padding-right: 2.4rem;
+  }
+
+  .menu-drawer-desktop__page--products {
+    grid-template-columns: minmax(32rem, 0.95fr) minmax(0, 1.5fr);
+    gap: 0 2.4rem;
+  }
+
+  .menu-drawer-desktop__related-grid {
+    gap: 1.8rem 1.2rem;
+  }
+}
+
+@media screen and (max-width: 1099px) {
+  .menu-drawer-desktop__related-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 989px) {
+  .menu-drawer-desktop__page--products {
+    height: auto;
+    min-height: 0;
+  }
 }
 
 @media screen and (max-width: 989px) {

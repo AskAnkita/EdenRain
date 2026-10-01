@@ -1,76 +1,103 @@
 {% comment %}
-  One page of the desktop menu drawer (MiaDonna-style): categories on the left, image tiles on the right.
-
-  Accepts:
-  - link: {Object} top-level menu link
-  - drawer_id: {String} unique id for this page
-
-  Works with 3-level menus (top > categories > links), 2-level menus (top > links, shown as one category)
-  and single collection links (shown as that collection's products).
+  Desktop mega menu panel. Product collections and product links render as a
+  text-only product list on the left with one selected product preview on right.
 {% endcomment %}
 
 {%- liquid
-  assign has_third_level = false
-  for child in link.links
-    if child.links != blank
-      assign has_third_level = true
-      break
-    endif
-  endfor
+  assign has_product_list = false
+  assign product_collection = blank
+
+  if link.type == 'collection_link' and link.object.products_count > 0
+    assign has_product_list = true
+    assign product_collection = link.object
+  else
+    for child in link.links
+      if child.type == 'product_link'
+        assign has_product_list = true
+        break
+      endif
+    endfor
+  endif
 -%}
 
-<div class="menu-drawer-desktop__page" id="{{ drawer_id }}" data-menu-drawer-page hidden>
-  <nav class="menu-drawer-desktop__categories" aria-label="{{ link.title | escape }}">
-    <ul role="list">
-      {%- if has_third_level -%}
-        {%- for child in link.links -%}
-          <li>
-            {%- if child.links != blank -%}
-              <button
-                type="button"
-                class="menu-drawer-desktop__category{% if forloop.first %} is-active{% endif %}"
-                data-menu-drawer-category="{{ drawer_id }}-{{ forloop.index }}"
-              >
-                <span>{{ child.title | escape }}</span>
-                <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
-              </button>
-            {%- else -%}
-              <a class="menu-drawer-desktop__category" href="{{ child.url }}">
-                <span>{{ child.title | escape }}</span>
-              </a>
+<div class="menu-drawer-desktop__page{% if has_product_list %} menu-drawer-desktop__page--products{% endif %}" id="{{ drawer_id }}" data-menu-drawer-page hidden>
+  {%- if has_product_list -%}
+    <nav class="menu-drawer-desktop__categories menu-drawer-desktop__product-list" aria-label="{{ link.title | escape }}">
+      <p class="menu-drawer-desktop__list-heading">Main Categories</p>
+      <ul role="list">
+        {%- if product_collection != blank -%}
+          {%- for product in product_collection.products limit: 50 -%}
+            {%- assign product_group_id = drawer_id | append: '-product-' | append: product.id -%}
+            {%- render 'header-menu-drawer-product', product: product, group_id: product_group_id, placement: 'list', active: forloop.first -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- assign product_index = 0 -%}
+          {%- for child in link.links -%}
+            {%- if child.type == 'product_link' -%}
+              {%- assign product_index = product_index | plus: 1 -%}
+              {%- assign product_group_id = drawer_id | append: '-product-' | append: product_index -%}
+              {%- assign is_first_product = false -%}
+              {%- if product_index == 1 -%}{%- assign is_first_product = true -%}{%- endif -%}
+              {%- render 'header-menu-drawer-product', product: child.object, title: child.title, group_id: product_group_id, placement: 'list', active: is_first_product -%}
             {%- endif -%}
-          </li>
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+    </nav>
+
+    <div class="menu-drawer-desktop__content menu-drawer-desktop__product-preview">
+      <button type="button" class="menu-drawer-desktop__close" data-menu-drawer-close aria-label="{{ 'accessibility.close' | t }}">
+        <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+      </button>
+      {%- if product_collection != blank -%}
+        {%- for product in product_collection.products limit: 50 -%}
+          {%- assign product_group_id = drawer_id | append: '-product-' | append: product.id -%}
+          {%- render 'header-menu-drawer-product', product: product, collection: product_collection, menu_link: link, group_id: product_group_id, placement: 'preview', active: forloop.first -%}
         {%- endfor -%}
       {%- else -%}
-        <li>
-          <button type="button" class="menu-drawer-desktop__category is-active" data-menu-drawer-category="{{ drawer_id }}-1">
-            <span>{{ link.title | escape }}</span>
-            <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
-          </button>
-        </li>
+        {%- assign product_index = 0 -%}
+        {%- for child in link.links -%}
+          {%- if child.type == 'product_link' -%}
+            {%- assign product_index = product_index | plus: 1 -%}
+            {%- assign product_group_id = drawer_id | append: '-product-' | append: product_index -%}
+            {%- assign is_first_product = false -%}
+            {%- if product_index == 1 -%}{%- assign is_first_product = true -%}{%- endif -%}
+            {%- assign related_collection = child.object.collections.first -%}
+            {%- render 'header-menu-drawer-product', product: child.object, title: child.title, collection: related_collection, menu_link: link, group_id: product_group_id, placement: 'preview', active: is_first_product -%}
+          {%- endif -%}
+        {%- endfor -%}
       {%- endif -%}
-    </ul>
-  </nav>
-
-  <div class="menu-drawer-desktop__content">
-    <button type="button" class="menu-drawer-desktop__close" data-menu-drawer-close aria-label="{{ 'accessibility.close' | t }}">
-      <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
-    </button>
-
-    {%- if has_third_level -%}
+    </div>
+  {%- else -%}
+    <nav class="menu-drawer-desktop__categories" aria-label="{{ link.title | escape }}">
+      <ul role="list">
+        {%- for child in link.links -%}
+          <li>
+            <button
+              type="button"
+              class="menu-drawer-desktop__category{% if forloop.first %} is-active{% endif %}"
+              data-menu-drawer-category="{{ drawer_id }}-{{ forloop.index }}"
+            >
+              <span>{{ child.title | escape }}</span>
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+    <div class="menu-drawer-desktop__content">
+      <button type="button" class="menu-drawer-desktop__close" data-menu-drawer-close aria-label="{{ 'accessibility.close' | t }}">
+        <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+      </button>
       {%- for child in link.links -%}
-        {%- if child.links != blank -%}
-          {%- assign group_id = drawer_id | append: '-' | append: forloop.index -%}
-          {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: child, active: forloop.first -%}
-        {%- endif -%}
+        {%- liquid
+          assign group_id = drawer_id | append: '-' | append: forloop.index
+          assign category_collection = blank
+          if child.type == 'collection_link'
+            assign category_collection = child.object
+          endif
+        -%}
+        {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: child, collection: category_collection, active: forloop.first -%}
       {%- endfor -%}
-    {%- elsif link.links != blank -%}
-      {%- assign group_id = drawer_id | append: '-1' -%}
-      {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: link, active: true -%}
-    {%- else -%}
-      {%- comment -%} Collection link without sub-links: show its products {%- endcomment -%}
-      {%- assign group_id = drawer_id | append: '-1' -%}
-      {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: link, collection: link.object, active: true -%}
-    {%- endif -%}
-  </div>
+    </div>
+  {%- endif -%}
 </div>

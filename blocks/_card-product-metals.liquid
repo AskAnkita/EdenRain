@@ -1,0 +1,145 @@
+{%- doc -%}
+  Metal swatches for a product card.
+
+  Values come from the first product option whose name reads as a metal ("Metal",
+  "Metal Type", "Color", "Finish"). Each value is matched to a tone by name, and the
+  first one carries its short code (WG, YG, RG, PL, SS) the way MiaDonna's cards do.
+  Products without such an option render nothing.
+{%- enddoc -%}
+
+{%- liquid
+  assign card_product = block.settings.product
+  assign option_keys = 'metal,color,colour,finish,gold' | split: ','
+
+  assign metal_source = ''
+  for option in card_product.options_with_values
+    assign option_name = option.name | downcase
+    assign is_metal_option = false
+    for key in option_keys
+      if option_name contains key
+        assign is_metal_option = true
+        break
+      endif
+    endfor
+    if is_metal_option
+      assign metal_source = option.values | join: '||'
+      break
+    endif
+  endfor
+
+  # Half the catalogue has no options at all ("Default Title"), but carries its metal
+  # as a tag ("18k Gold", "Sterling Silver"), so fall back to that.
+  if metal_source == blank
+    assign tag_metals = ''
+    for tag in card_product.tags
+      assign tag_compare = tag | downcase
+      if tag_compare contains 'gold' or tag_compare contains 'silver' or tag_compare contains 'platinum'
+        assign tag_metals = tag_metals | append: '||' | append: tag
+      endif
+    endfor
+    assign metal_source = tag_metals | remove_first: '||'
+  endif
+
+  assign metal_values = metal_source | split: '||'
+-%}
+
+{%- if metal_values.size > 0 -%}
+  {%- liquid
+    assign align = 'flex-start'
+    if block.settings.alignment == 'center'
+      assign align = 'center'
+    elsif block.settings.alignment == 'right'
+      assign align = 'flex-end'
+    endif
+  -%}
+  <div
+    class="card--block-metals spacing-style"
+    style="--options-align: {{ align }};{%- render 'spacing-style', settings: block.settings -%}"
+  >
+    <ul class="card-metals list-unstyled" role="list">
+      {%- for value in metal_values -%}
+        {%- liquid
+          assign value_text = value | strip
+          assign value_compare = value_text | downcase
+
+          assign tone = 'other'
+          assign code = ''
+          if value_compare contains 'rose' or value_compare contains 'pink'
+            assign tone = 'rg'
+            assign code = 'RG'
+          elsif value_compare contains 'white'
+            assign tone = 'wg'
+            assign code = 'WG'
+          elsif value_compare contains 'yellow'
+            assign tone = 'yg'
+            assign code = 'YG'
+          elsif value_compare contains 'platinum'
+            assign tone = 'pl'
+            assign code = 'PL'
+          elsif value_compare contains 'silver'
+            assign tone = 'ss'
+            assign code = 'SS'
+          elsif value_compare contains 'gold'
+            assign tone = 'yg'
+            assign code = 'YG'
+          endif
+        -%}
+        <li class="card-metals__item{% if forloop.first %} is-active{% endif %}">
+          <span class="card-metals__dot card-metals__dot--{{ tone }}" aria-hidden="true">
+            {%- if forloop.first -%}{{ code }}{%- endif -%}
+          </span>
+          <span class="visually-hidden">{{ value_text | escape }}</span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product metals",
+  "tag": null,
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:settings.alignment",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "t:options.left" },
+        { "value": "center", "label": "t:options.center" },
+        { "value": "right", "label": "t:options.right" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}
