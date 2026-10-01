@@ -194,3 +194,23 @@
     transition: none;
   }
 }
+
+/* Wish lists sits at the bottom of the drawer. The content column fills the drawer
+   (base.css sizes it for the old tab bar), and the utility row takes the space left. */
+.mobile--multi-tab .section-resource-list__content:has(> .mnav) {
+  height: auto;
+  min-height: 100%;
+  align-items: stretch;
+  gap: 0;
+}
+
+.mnav__utility {
+  margin-top: auto;
+  border-top: 1px solid rgb(var(--color-foreground-rgb) / 0.1);
+}
+
+.mnav__utility .menu-drawer__utility-links,
+.mnav__utility .menu-drawer__utility-links a {
+  padding-inline: 0;
+  margin-inline: 0;
+}
