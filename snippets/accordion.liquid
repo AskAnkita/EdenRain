@@ -17,6 +17,7 @@
 <div
   class="
     accordion accordion--{{ block.id }} accordion--{{ bl_stts.icon }} border-style spacing-style
+    {% if bl_stts.style == 'editorial' %} accordion--editorial{% endif %}
     {% if bl_stts.inherit_color_scheme == false %}color-scheme-custom{% endif %}
     {% if bl_stts.dividers %} accordion--dividers{% endif %}
     {% if fallback_title != blank %} filter-faqs-item{% endif %}

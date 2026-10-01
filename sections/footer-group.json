@@ -4245,79 +4245,9 @@
         "padding_top": 30,
         "padding_bottom": 36
       }
-    },
-    "faq_band": {
-      "type": "faq-band",
-      "blocks": {
-        "question_1": {
-          "type": "question",
-          "settings": {
-            "question": "Your Purchase, Your Moment",
-            "answer": "<p>At MiaDonna, every lab-grown diamond engagement ring is designed to celebrate your unique love story. Since 2005, we have been committed to offering a thoughtful, modern alternative to traditional diamond jewelry – one that combines timeless beauty with exceptional craftsmanship and lasting value.<br/></p><p>Our friendly, non-commissioned jewelry experts are available for free consultations to help you explore designs or create a custom ring. Every MiaDonna lab-grown diamond engagement ring includes free shipping within the USA, free 60-day returns, and one complimentary resizing.<br/><br/>Celebrate your once-in-a-lifetime moment with a lab-grown diamond engagement ring crafted to last, made to be loved, and designed to reflect the beauty of your commitment.<br/><br/></p>",
-            "open": false
-          }
-        },
-        "question_2": {
-          "type": "question",
-          "settings": {
-            "question": "How to Choose the Perfect Lab-Grown Diamond Engagement Ring",
-            "answer": "<p>Finding the right lab-grown diamond engagement ring comes down to a few important considerations:<br/><br/><strong>Understand the Four Cs. </strong><br/>Cut, color, clarity, and carat weight are the primary characteristics that determine a diamond's beauty and value. Of these, cut has the greatest impact on brilliance and sparkle.<br/><br/><strong>Set a budget. </strong><br/>Lab-grown diamond engagement rings typically cost 40% less than comparable mined-diamond rings, which means your budget goes further — whether that means a larger stone, a more intricate setting, or both.<br/><br/><strong>Know your partner's style. </strong><br/>Pay attention to the jewelry they already wear. Do they gravitate toward classic pieces, vintage designs, or modern minimalism? If you're unsure, MiaDonna's non-commissioned jewelry experts offer free consultations to help you decide.<br/><br/><strong>Choose the right metal. </strong><br/>Consider your partner's skin tone, lifestyle, and existing jewelry when selecting between platinum, white gold, yellow gold, or rose gold.<br/><br/><strong>Think about lifestyle. </strong><br/>An active partner may prefer a lower-profile setting like a bezel or flush mount, while someone who loves glamour may prefer a halo or side-stone design.<br/><br/><strong>Verify ring size. </strong><br/>Use MiaDonna's Ring Sizing Guide or borrow a ring your partner already wears on their ring finger. Every MiaDonna engagement ring includes one complimentary resizing within 60 days.<br/><br/><strong>Look for certification. </strong><br/>MiaDonna lab-grown diamonds are certified by recognized grading organizations, ensuring verified quality and authenticity.</p>",
-            "open": false
-          }
-        },
-        "question_3": {
-          "type": "question",
-          "settings": {
-            "question": "Shop Lab-Grown Diamond Engagement Rings by Shape",
-            "answer": "<p>The shape of your lab-grown diamond dramatically affects the ring's character. MiaDonna offers engagement rings in all of the most popular diamond shapes:<br/><br/><strong>Round</strong><br/>The most classic and brilliant diamond shape, ideal for maximum light return<br/><br/><strong>Oval</strong><br/>Elongated and modern, creating the illusion of a larger stone on the finger<br/><br/><strong>Cushion</strong><br/>A soft, romantic cut that blends vintage charm with contemporary sparkle<br/><br/><strong>Emerald</strong><br/>Elegant step-cut faceting that emphasizes clarity and geometric beauty<br/><br/><strong>Princess</strong><br/>A square brilliant cut that delivers bold sparkle in a modern silhouette<br/><br/><strong>Pear</strong><br/>A teardrop shape that is distinctive, flattering, and eye-catching<br/><br/><strong>Marquise</strong> <br/>An elongated shape with pointed ends that maximizes carat weight</p>",
-            "open": false
-          }
-        },
-        "question_4": {
-          "type": "question",
-          "settings": {
-            "question": "Frequently Asked Questions",
-            "answer": "<p><strong>What is a lab-grown diamond engagement ring?</strong><br/>A lab-grown diamond engagement ring features a diamond created in a controlled laboratory environment using advanced technology that replicates the natural diamond-forming process. Lab-grown diamonds are optically, physically, and chemically identical to mined diamonds.<br/><br/><strong>Are lab-grown diamonds real diamonds?</strong><br/>Yes. Lab-grown diamonds have the same crystal structure, chemical composition, hardness (10 on the Mohs scale), and optical properties as earth-mined diamonds. They are certified by the same grading organizations and are indistinguishable to the naked eye.<br/><br/><strong>What are conflict-free engagement rings?</strong><br/>Conflict-free engagement rings use diamonds and materials sourced through ethical, ecologically responsible, and socially conscious practices. Because all MiaDonna diamonds are lab-grown and our metals are recycled, every MiaDonna engagement ring is conflict-free.<br/><br/><strong>Can I design a custom lab-grown diamond engagement ring with MiaDonna?</strong><br/>Absolutely. MiaDonna offers a custom design service where you can choose from a range of settings, metals, and lab-grown diamonds or gemstones to create a ring that is uniquely yours. Our team guides you through every step of the process.<br/><br/><strong>What metals are available for MiaDonna lab-grown diamond engagement rings?</strong><br/>MiaDonna offers platinum, 14K and 18K white gold, yellow gold, and rose gold. All metals are recycled and responsibly sourced.<br/><br/><strong>How do I find the right ring size?</strong><br/>Use MiaDonna's online Ring Sizing Guide , or visit a local jeweler for a professional measurement. If the fit isn't perfect, every MiaDonna engagement ring includes one free resizing within 60 days of purchase.<br/><br/><strong>What are the most popular lab-grown diamond engagement ring settings?</strong><br/>The most popular settings at MiaDonna include classic solitaires, halo designs, three-stone rings, and vintage-inspired settings. Each style highlights the center diamond in a unique way.<br/><br/><strong>Can MiaDonna engagement rings be resized?</strong><br/>Yes. MiaDonna offers one complimentary resizing (up or down one full size) within 60 days of when your ring ships, including return shipping.<br/><br/><strong>Does MiaDonna have a physical store?</strong><br/>Yes. MiaDonna's flagship boutique is located in Portland, Oregon. You can visit the store to browse the collection, try on rings, and work with our jewelry experts in person.</p>",
-            "open": false
-          }
-        },
-        "question_5": {
-          "type": "question",
-          "settings": {
-            "question": "Shop Lab-Grown Diamond Engagement Rings by Metal",
-            "answer": "<p>The metal you choose influences your ring's durability, color, and overall aesthetic. MiaDonna crafts lab-grown diamond engagement rings in the following recycled and responsibly sourced metals:<br/><br/><strong>Platinum</strong><br/>The most durable precious metal, naturally hypoallergenic with a cool white finish<br/><br/><strong>14K & 18K White Gold</strong><br/>A classic, versatile choice that complements every diamond shape<br/><br/><strong>14K & 18K Yellow Gold</strong><br/>Warm and traditional, with a rich tone that pairs beautifully with any stone<br/><br/><strong>14K & 18K Rose Gold</strong><br/>Romantic and contemporary, with a distinctive blush hue</p>",
-            "open": false
-          }
-        },
-        "question_6": {
-          "type": "question",
-          "settings": {
-            "question": "Popular Searches",
-            "answer": "<p>Solitaire Engagement Rings  |  Three Stone Engagement Rings  |  Vintage Engagement Rings  |  Halo Diamond Engagement Ring  |  Two Toned Engagement Rings  |  Promise Rings  |  Side Stone Engagement Rings  |  Custom Designed Engagement Rings  </p>",
-            "open": false
-          }
-        }
-      },
-      "block_order": [
-        "question_1",
-        "question_2",
-        "question_3",
-        "question_4",
-        "question_5",
-        "question_6"
-      ],
-      "settings": {
-        "kicker": "Questions, answered",
-        "heading": "Explore the finest lab-grown diamonds",
-        "footer_text": "<p>Still have a question? <a href=\"/pages/contact\" title=\"Contact\">Talk to our team</a></p>",
-        "color_scheme": "scheme-3",
-        "padding_top": 80,
-        "padding_bottom": 80
-      }
     }
   },
   "order": [
-    "faq_band",
     "section_KHqNEp",
     "footer",
     "footer_xynjaw",
