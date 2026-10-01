@@ -20154,7 +20154,7 @@ ul.items-same-height > li {
 
 /* font chaznge of styledetails and primary stone */
 .details .details__header {
-  font-family: 'Source Sans 3', sans-serif !important;
+  font-family: var(--font-body--family), sans-serif !important;
   color: var(--color) !important;
   font-size: 16px;
   font-weight: 700;
@@ -20250,7 +20250,7 @@ ul.items-same-height > li {
 /* footer font */
 .footer__copyright,
 .footer__copyright .policies a {
-    font-family: "Source Sans 3", sans-serif;
+    font-family: var(--font-body--family), sans-serif;
     font-weight: 700;
     font-size:14px;
 }
@@ -20308,7 +20308,7 @@ Specificity: (0,6,0)
 
 .productView-dlvr .productView-dlvr__text p,
 .productView-dlvr .productView-dlvr__text .productView-dlvr__date-start {
-  font-family: "Source Sans 3", sans-serif !important;
+  font-family: var(--font-body--family), sans-serif !important;
   font-weight: 500 !important;
   font-size: 14px !important;
   color: #001514 !important;
@@ -20559,7 +20559,7 @@ accordion-custom
 }
 
 accordion-custom.block.spacing-style .details .details-content p {
-  font-family: "Source Sans 3", sans-serif;
+  font-family: var(--font-body--family), sans-serif;
   font-weight: 400;
   font-size: 14px;
 }
@@ -20635,7 +20635,7 @@ accordion-custom.block.spacing-style .details .details-content p {
 @media (max-width: 768px) {
   .facets-container .mobile-facets__wrapper .mobile-facets__open {
     color: #000000 !important;
-    font-family: "Source Sans 3", sans-serif;
+    font-family: var(--font-body--family), sans-serif;
     font-weight: 400;
     font-size:14px;
     text-transform:uppercase;
@@ -20652,7 +20652,7 @@ accordion-custom.block.spacing-style .details .details-content p {
 
 .product-info-list .product-info-name,
 .product-info-list .product-info-value {
-  font-family: "Source Sans 3", sans-serif;
+  font-family: var(--font-body--family), sans-serif;
   font-weight: 400;
   font-size: 14px;
 }
@@ -20663,7 +20663,7 @@ accordion-custom.block.spacing-style .details .details-content p {
   font-size: 12px;
 }
 fieldset.variant-option .form__label {
-  font-family: "Source Sans 3", sans-serif !important;
+  font-family: var(--font-body--family), sans-serif !important;
   font-size: 12px !important;
   font-weight: 300 !important;
 }
@@ -20671,7 +20671,7 @@ fieldset.variant-option .form__label {
 .oke-sr-rating,
 .oke-sr-count-number,
 .oke-sr-label-text {
-  font-family: "Source Sans 3", sans-serif;
+  font-family: var(--font-body--family), sans-serif;
   font-weight: 400;
   font-size: 14px;
 }
@@ -20685,7 +20685,7 @@ fieldset.variant-option .form__label {
   
 }
 product-price.text-block.custom-typography.custom-font-size.custom-color .price-item {
-  font-family: "Source Sans", sans-serif !important;
+  font-family: var(--font-body--family), sans-serif !important;
   font-size: 16px !important;
   font-weight: 500 !important;
 }
@@ -20699,7 +20699,7 @@ product-price.text-block.custom-typography.custom-font-size.custom-color {
 /* delivery date font change */
 .group-block.delivery-time .text-block.custom-typography delivery-time.productView-dlvr .productView-dlvr__text,
 .group-block.delivery-time .text-block.custom-typography delivery-time.productView-dlvr .productView-dlvr__text p {
-  font-family: "Source Sans 3", sans-serif !important;
+  font-family: var(--font-body--family), sans-serif !important;
   font-size: 13px !important;
   font-weight: 400 !important;
 }
@@ -21007,7 +21007,7 @@ footer.section-footer .email-signup__input {
 /* Editorial accordion (Accordion block > Style > Editorial): a narrow centred column,
    serif questions between thin rules, and a plus that turns into a minus when open */
 .accordion.accordion--editorial {
-  max-width: 86rem;
+  max-width: 76rem;
   margin-inline: auto;
 }
 
@@ -21027,11 +21027,11 @@ footer.section-footer .email-signup__input {
   align-items: center;
   justify-content: space-between;
   gap: 2.4rem;
-  padding: 2.4rem 0 !important;
-  font-family: var(--font-heading--family);
-  font-size: clamp(1.9rem, 1.7vw, 2.3rem);
-  font-weight: 500;
-  line-height: 1.3;
+  padding: 1.8rem 0 !important;
+  font-family: var(--font-body--family) !important;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.4;
   letter-spacing: 0;
   text-transform: none;
   color: var(--color-foreground);
@@ -21044,8 +21044,8 @@ footer.section-footer .email-signup__input {
 .accordion.accordion--editorial .details__header::after {
   content: '';
   flex: none;
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1.2rem;
+  height: 1.2rem;
   background:
     linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat,
     linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat;
@@ -21058,20 +21058,21 @@ footer.section-footer .email-signup__input {
 
 .accordion.accordion--editorial .details-content {
   max-width: 68ch;
-  padding: 0 0 2.6rem !important;
+  padding: 0 0 2rem !important;
   color: rgb(var(--color-foreground-rgb) / 0.75);
 }
 
 /* Beats the 14px answer rule further up (accordion-custom.block.spacing-style ... p) */
 .accordion.accordion--editorial accordion-custom.block .details .details-content p {
   font-family: var(--font-body--family);
-  font-size: 1.55rem;
-  line-height: 1.7;
+  font-size: 1.4rem;
+  line-height: 1.65;
 }
 
 @media screen and (max-width: 749px) {
   .accordion.accordion--editorial .details__header {
-    padding: 1.8rem 0 !important;
+    padding: 1.5rem 0 !important;
+    font-size: 1.5rem;
   }
 }
 

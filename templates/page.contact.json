@@ -5366,7 +5366,7 @@
             "alignment_mobile": "center",
             "type_preset": "custom",
             "font": "var(--font-heading--family)",
-            "font_size": "3.6rem",
+            "font_size": "2.8rem",
             "font_weight": "500",
             "line_height": "normal",
             "letter_spacing": "normal",
