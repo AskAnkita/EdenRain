@@ -28,7 +28,7 @@
   background: transparent;
   color: var(--color-foreground, #000);
   border: 1px solid rgba(0, 0, 0, 0.18);
-  border-radius: 0;
+  border-radius: 999px;
   font-size: 1.3rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
