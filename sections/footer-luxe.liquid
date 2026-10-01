@@ -1,0 +1,506 @@
+{% comment %}
+  Luxury footer. Top band: monogram, brand line and newsletter. Then up to five
+  columns (menus or text), then a base bar with the wordmark, copyright,
+  policies and payment icons. Colours are section settings so the footer can
+  run dark (default) or light.
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign monogram_url = 'eden-raine-monogram.png' | asset_url
+  if s.monogram != blank
+    assign monogram_url = s.monogram | image_url: width: 300
+  endif
+  assign wordmark_url = 'eden-raine-logo-white.png' | asset_url
+  if s.wordmark_style == 'dark'
+    assign wordmark_url = 'eden-raine-logo.png' | asset_url
+  endif
+  if s.wordmark != blank
+    assign wordmark_url = s.wordmark | image_url: width: 600
+  endif
+-%}
+
+{%- style -%}
+  #footer-luxe-{{ section.id }} {
+    --fl-bg: {{ s.color_background }};
+    --fl-text: {{ s.color_text }};
+    --fl-muted: {{ s.color_muted }};
+    --fl-accent: {{ s.color_accent }};
+    --fl-rule: {{ s.color_rule }};
+    background: var(--fl-bg);
+    color: var(--fl-text);
+    font-family: var(--font-body--family);
+  }
+
+  #footer-luxe-{{ section.id }} a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-inner {
+    max-width: var(--page-width, 160rem);
+    margin: 0 auto;
+    padding-inline: 7.2rem;
+  }
+
+  /* Top band */
+  #footer-luxe-{{ section.id }} .fl-top {
+    border-bottom: 1px solid var(--fl-rule);
+  }
+
+  #footer-luxe-{{ section.id }} .fl-top .fl-inner {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    padding-block: 5.6rem;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-monogram {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 7.6rem;
+    height: 7.6rem;
+    border: 1px solid var(--fl-accent);
+    border-radius: 50%;
+  }
+
+  /* The monogram file is dark; the mask lets it take the accent colour */
+  #footer-luxe-{{ section.id }} .fl-monogram span {
+    display: block;
+    width: 3.4rem;
+    height: 3rem;
+    background: var(--fl-accent);
+    -webkit-mask: url('{{ monogram_url }}') center / contain no-repeat;
+    mask: url('{{ monogram_url }}') center / contain no-repeat;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-line {
+    flex: 1;
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-size: clamp(2.2rem, 2.1vw, 3rem);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-news {
+    flex: none;
+    width: 34rem;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-form {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--fl-accent);
+  }
+
+  #footer-luxe-{{ section.id }} .fl-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 1rem 0;
+    border: 0;
+    background: transparent;
+    color: var(--fl-text);
+    font: inherit;
+    font-size: 1.45rem;
+    box-shadow: none;
+    outline: none;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-form input::placeholder {
+    color: var(--fl-muted);
+  }
+
+  #footer-luxe-{{ section.id }} .fl-form button {
+    padding: 0 0 0 1.6rem;
+    border: 0;
+    background: none;
+    color: var(--fl-accent);
+    cursor: pointer;
+    font: inherit;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-form:focus-within {
+    border-bottom-color: var(--fl-text);
+  }
+
+  #footer-luxe-{{ section.id }} .fl-note {
+    margin: 1rem 0 0;
+    font-size: 1.3rem;
+    color: var(--fl-muted);
+  }
+
+  /* Columns */
+  #footer-luxe-{{ section.id }} .fl-cols {
+    display: grid;
+    grid-template-columns: repeat({{ section.blocks.size | at_least: 1 }}, minmax(0, 1fr));
+    gap: 4rem;
+    padding-block: 5.2rem 4.8rem;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-col-h {
+    margin: 0 0 1.8rem;
+    color: var(--fl-accent);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-col ul {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-col,
+  #footer-luxe-{{ section.id }} .fl-col p {
+    color: var(--fl-muted);
+    font-size: 1.45rem;
+    line-height: 1.6;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-col p {
+    margin: 0 0 0.6rem;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-col a:hover,
+  #footer-luxe-{{ section.id }} .fl-base a:hover {
+    color: var(--fl-text);
+  }
+
+  /* Base bar */
+  #footer-luxe-{{ section.id }} .fl-base {
+    border-top: 1px solid var(--fl-rule);
+  }
+
+  #footer-luxe-{{ section.id }} .fl-base .fl-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2.4rem;
+    padding-block: 2rem 2.6rem;
+    font-size: 1.2rem;
+    color: var(--fl-muted);
+  }
+
+  #footer-luxe-{{ section.id }} .fl-wordmark img {
+    display: block;
+    width: {{ s.wordmark_width }}px;
+    height: auto;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 2rem;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-pay {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #footer-luxe-{{ section.id }} .fl-pay svg {
+    display: block;
+    width: 3.4rem;
+    height: 2.2rem;
+  }
+
+  @media screen and (max-width: 989px) {
+    #footer-luxe-{{ section.id }} .fl-inner {
+      padding-inline: 2.4rem;
+    }
+
+    #footer-luxe-{{ section.id }} .fl-top .fl-inner {
+      flex-wrap: wrap;
+      gap: 2.4rem;
+      padding-block: 4.4rem;
+    }
+
+    #footer-luxe-{{ section.id }} .fl-news {
+      width: 100%;
+    }
+
+    #footer-luxe-{{ section.id }} .fl-cols {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 3.2rem 2.4rem;
+      padding-block: 4rem;
+    }
+
+    #footer-luxe-{{ section.id }} .fl-base .fl-inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #footer-luxe-{{ section.id }} .fl-inner {
+      padding-inline: 1.6rem;
+    }
+
+    #footer-luxe-{{ section.id }} .fl-monogram {
+      width: 6rem;
+      height: 6rem;
+    }
+
+    #footer-luxe-{{ section.id }} .fl-monogram span {
+      width: 2.7rem;
+      height: 2.4rem;
+    }
+  }
+{%- endstyle -%}
+
+<footer id="footer-luxe-{{ section.id }}" class="footer-luxe">
+  <div class="fl-top">
+    <div class="fl-inner">
+      <a class="fl-monogram" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+        <span aria-hidden="true"></span>
+      </a>
+
+      {%- if s.brand_line != blank -%}
+        <p class="fl-line">{{ s.brand_line | escape }}</p>
+      {%- endif -%}
+
+      {%- if s.show_newsletter -%}
+        <div class="fl-news">
+          {%- form 'customer', id: 'FooterLuxeNewsletter', class: 'fl-newsletter' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <div class="fl-form">
+              <label class="visually-hidden" for="FooterLuxeEmail-{{ section.id }}">Email</label>
+              <input
+                id="FooterLuxeEmail-{{ section.id }}"
+                type="email"
+                name="contact[email]"
+                autocomplete="email"
+                placeholder="{{ s.newsletter_placeholder | escape }}"
+                required
+              >
+              <button type="submit">{{ s.newsletter_button | escape }}</button>
+            </div>
+            {%- if form.posted_successfully? -%}
+              <p class="fl-note" role="status">{{ s.newsletter_success | escape }}</p>
+            {%- elsif form.errors -%}
+              <div class="fl-note" role="alert">{{ form.errors | default_errors }}</div>
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if section.blocks.size > 0 -%}
+    <div class="fl-inner">
+      <div class="fl-cols">
+        {%- for block in section.blocks -%}
+          <div class="fl-col" {{ block.shopify_attributes }}>
+            {%- if block.settings.heading != blank -%}
+              <p class="fl-col-h">{{ block.settings.heading | escape }}</p>
+            {%- endif -%}
+            {%- case block.type -%}
+              {%- when 'menu' -%}
+                {%- if block.settings.menu != blank -%}
+                  <ul role="list">
+                    {%- for link in block.settings.menu.links -%}
+                      <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+              {%- when 'text' -%}
+                {{ block.settings.text }}
+            {%- endcase -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="fl-base">
+    <div class="fl-inner">
+      <a class="fl-wordmark" href="{{ routes.root_url }}">
+        <img src="{{ wordmark_url }}" alt="{{ shop.name | escape }}" width="{{ s.wordmark_width }}" height="{{ s.wordmark_width | divided_by: 7.5 | round }}" loading="lazy">
+      </a>
+
+      <div class="fl-legal">
+        <span>&copy; {{ 'now' | date: '%Y' }} {{ shop.name | escape }}</span>
+        {%- for policy in shop.policies -%}
+          {%- if policy != blank -%}
+            <a href="{{ policy.url }}">{{ policy.title | escape }}</a>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if s.show_payment_icons -%}
+        <ul class="fl-pay" role="list" aria-label="{{ 'content.payment' | t }}">
+          {%- for type in shop.enabled_payment_types -%}
+            <li>{{ type | payment_type_svg_tag }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Luxury footer",
+  "class": "section-wrapper",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Top band"
+    },
+    {
+      "type": "image_picker",
+      "id": "monogram",
+      "label": "Monogram",
+      "info": "Leave empty to use the Eden Raine ER monogram. It is tinted with the accent colour."
+    },
+    {
+      "type": "text",
+      "id": "brand_line",
+      "label": "Brand line",
+      "default": "Diamonds grown with care, set by hand, made to last a lifetime."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show newsletter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Newsletter placeholder",
+      "default": "Email for new arrivals"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_button",
+      "label": "Newsletter button",
+      "default": "Join"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_success",
+      "label": "Newsletter thank-you message",
+      "default": "Thank you. You're on the list."
+    },
+    {
+      "type": "header",
+      "content": "Base bar"
+    },
+    {
+      "type": "image_picker",
+      "id": "wordmark",
+      "label": "Wordmark",
+      "info": "Leave empty to use the Eden Raine logo."
+    },
+    {
+      "type": "select",
+      "id": "wordmark_style",
+      "label": "Built-in wordmark colour",
+      "options": [
+        { "value": "light", "label": "White (for dark backgrounds)" },
+        { "value": "dark", "label": "Black (for light backgrounds)" }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "range",
+      "id": "wordmark_width",
+      "label": "Wordmark width",
+      "min": 80,
+      "max": 240,
+      "step": 10,
+      "unit": "px",
+      "default": 140
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "color_background",
+      "label": "Background",
+      "default": "#141312"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text",
+      "default": "#f4f4f0"
+    },
+    {
+      "type": "color",
+      "id": "color_muted",
+      "label": "Links and secondary text",
+      "default": "#b9b2ab"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent (monogram, headings, newsletter line)",
+      "default": "#e3d4cf"
+    },
+    {
+      "type": "color",
+      "id": "color_rule",
+      "label": "Divider lines",
+      "default": "#2c2a28"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Category" },
+        { "type": "link_list", "id": "menu", "label": "Menu" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Visit" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Add your address or contact details.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxury footer",
+      "blocks": [
+        { "type": "menu" },
+        { "type": "text" }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "groups": ["footer"]
+  }
+}
+{% endschema %}
