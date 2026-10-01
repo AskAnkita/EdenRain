@@ -21066,3 +21066,17 @@ footer.section-footer .email-signup__input {
   outline: 1px solid var(--color-foreground, #000);
   outline-offset: -1px;
 }
+
+/* Desktop nav: on hover the underline grows out from the middle of the label, in the
+   label's own colour, and the label keeps its colour. !important on the position
+   because the theme's dropdown hover rules pin it to the left. */
+.list-menu-desktop .header__menu-item .text {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position-x: center !important;
+}
+
+.list-menu-desktop .header__menu-item,
+.list-menu-desktop .header__menu-item:hover,
+.list-menu-desktop .details--dropdown:hover > .header__menu-item {
+  color: rgb(var(--color-primary-rgb) / var(--opacity-100));
+}
