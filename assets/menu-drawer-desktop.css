@@ -412,3 +412,164 @@ p.menu-drawer-desktop__shop-all {
   text-decoration: none;
   color: #000;
 }
+
+/* ---------- Featured layout: categories | best sellers | campaign ---------- */
+
+.menu-drawer-desktop__page--featured {
+  grid-template-columns: 22rem minmax(0, 1fr) minmax(24rem, 30rem);
+  gap: 0 4.8rem;
+  align-items: start;
+  padding-top: 4rem;
+  padding-bottom: 4.8rem;
+  overflow-y: auto;
+}
+
+.menu-drawer-desktop__page--featured .menu-drawer-desktop__list-heading {
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.18em;
+}
+
+.menu-drawer-desktop__nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.menu-drawer-desktop__nav-link {
+  color: #111;
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  text-decoration: none;
+  /* Same drawn underline as the nav bar, growing from the middle */
+  background: linear-gradient(currentColor, currentColor) center bottom / 0 1px no-repeat;
+  padding-bottom: 0.2rem;
+  transition: background-size 0.35s ease;
+}
+
+.menu-drawer-desktop__page--featured .menu-drawer-desktop__nav-link:hover {
+  color: #111;
+  background-size: 100% 1px;
+}
+
+.menu-drawer-desktop__view-all {
+  display: inline-block;
+  margin-top: 2.8rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid currentColor;
+  color: #111;
+  font-size: 1.15rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.menu-drawer-desktop__page--featured .menu-drawer-desktop__view-all:hover {
+  color: #111;
+  opacity: 0.7;
+}
+
+.menu-drawer-desktop__featured .menu-drawer-desktop__related-media {
+  aspect-ratio: 1 / 1;
+}
+
+.menu-drawer-desktop__featured .menu-drawer-desktop__related-title {
+  font-size: 1.35rem;
+}
+
+.menu-drawer-desktop__featured .menu-drawer-desktop__related-price {
+  font-size: 1.3rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.menu-drawer-desktop__campaign {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  max-height: 46rem;
+  overflow: hidden;
+  background: #e5d9d1;
+  color: #fff;
+  text-decoration: none;
+}
+
+.menu-drawer-desktop__page--featured .menu-drawer-desktop__campaign:hover {
+  color: #fff;
+}
+
+.menu-drawer-desktop__campaign-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.menu-drawer-desktop__campaign:hover .menu-drawer-desktop__campaign-media img {
+  transform: scale(1.04);
+}
+
+/* Shade the bottom so the copy reads on any photo */
+.menu-drawer-desktop__campaign::after {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
+}
+
+.menu-drawer-desktop__campaign-copy {
+  position: absolute;
+  left: 2.4rem;
+  right: 2.4rem;
+  bottom: 2.4rem;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.menu-drawer-desktop__campaign-kicker {
+  font-size: 1.05rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.menu-drawer-desktop__campaign-title {
+  font-family: var(--font-heading--family);
+  font-size: 2.8rem;
+  line-height: 1.1;
+}
+
+.menu-drawer-desktop__campaign-cta {
+  margin-top: 0.6rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid currentColor;
+  font-size: 1.1rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* base.css's 1099px rule drops the grid to two columns; three cards need three */
+.menu-drawer-desktop__page--featured .menu-drawer-desktop__related-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media screen and (max-width: 1199px) {
+  .menu-drawer-desktop__page--featured {
+    grid-template-columns: 18rem minmax(0, 1fr) 22rem;
+    gap: 0 2.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-drawer-desktop__nav-link,
+  .menu-drawer-desktop__campaign-media img {
+    transition: none;
+  }
+}
