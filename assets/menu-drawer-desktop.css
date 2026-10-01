@@ -352,10 +352,10 @@
   overflow: hidden;
 }
 
-/* Keep the header item underlined while its panel is open */
-[data-menu-drawer-trigger][aria-expanded='true'] > .text {
-  text-decoration: underline;
-  text-underline-offset: 0.6rem;
+/* Keep the header item underlined while its panel is open. Uses the same drawn line
+   as the nav's hover underline (base.css), so the two never show at once. */
+.list-menu-desktop [data-menu-drawer-trigger][aria-expanded='true'] > .text {
+  background-size: 100% var(--link-underline-width, 1px);
 }
 
 @media screen and (max-width: 1199px) {
