@@ -1,7 +1,14 @@
 /* Mobile menu drawer: the desktop nav's items (main-menu) as an accordion list.
    Markup: sections/header_mobile.liquid */
 
-.mnav__header {
+/* base.css floats the multi-tab drawer header in the top-right corner (it used to hold
+   only the close button); this one holds the logo too, so it sits in the flow, full width */
+.drawer--menu-multi-tab .drawer__header.mnav__header {
+  position: relative;
+  left: auto;
+  right: auto;
+  width: 100%;
+  flex: none;
   padding: 1.6rem 2rem;
   border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 0.1);
 }
@@ -12,7 +19,7 @@
   height: auto;
 }
 
-.drawer__header .mnav__close {
+.drawer--menu-multi-tab .drawer__header .mnav__close {
   position: static;
   margin: 0 -0.8rem 0 0;
   padding: 0.8rem;
@@ -21,7 +28,7 @@
   outline: none;
 }
 
-.drawer__header .mnav__close:focus-visible {
+.drawer--menu-multi-tab .drawer__header .mnav__close:focus-visible {
   outline: 1px solid var(--color-foreground);
   outline-offset: 0.2rem;
 }
