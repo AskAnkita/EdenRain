@@ -45,6 +45,17 @@
     assign custom_badge = false
     assign custom_badge_text = card_product.metafields.custom.custom_badge
 
+    # A product tag like "badge:Exceptional Value" also sets the badge text
+    unless custom_badge_text
+      for tag in card_product.tags
+        assign tag_prefix = tag | slice: 0, 6 | downcase
+        if tag_prefix == 'badge:'
+          assign custom_badge_text = tag | slice: 6, 200 | strip
+          break
+        endif
+      endfor
+    endunless
+
     if custom_badge_text
       assign custom_badge = true
     endif

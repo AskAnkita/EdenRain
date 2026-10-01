@@ -19,6 +19,11 @@
     color: var(--color-foreground, #000);
   }
 
+  /* Keep the copy's colour on hover; base.css recolours every hovered link */
+  .product-grid--{{ section.id }} .collection-banner:hover {
+    color: var(--color-foreground, #000);
+  }
+
   .product-grid--{{ section.id }} .collection-banner__media {
     position: absolute;
     inset: 0;
@@ -47,7 +52,8 @@
     text-align: center;
   }
 
-  .product-grid--{{ section.id }} .collection-banner--light {
+  .product-grid--{{ section.id }} .collection-banner--light,
+  .product-grid--{{ section.id }} .collection-banner--light:hover {
     color: #fff;
   }
 
@@ -65,10 +71,27 @@
     font-size: 1.3rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    /* Reads as the call to action it is */
-    text-decoration: underline;
-    text-underline-offset: 0.8rem;
-    text-decoration-thickness: 1px;
+    /* Reads as the call to action it is. The underline is drawn, not a text-decoration,
+       so it can shrink into its middle on hover and grow back out of it after. */
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.8rem;
+  }
+
+  .product-grid--{{ section.id }} .collection-banner__subheading::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform-origin: center;
+    transition: transform 0.6s ease;
+  }
+
+  .product-grid--{{ section.id }} .collection-banner:hover .collection-banner__subheading::after {
+    transform: scaleX(0);
   }
 
   /* Product shots sit on a tile instead of bleeding into the page, so the cards line
@@ -82,6 +105,109 @@
     object-fit: contain;
     /* The product photos are shot on white; multiply drops that into the tile */
     mix-blend-mode: multiply;
+  }
+
+  /* Only the main shot sits inset on the tile; the hover photo is a lifestyle shot
+     and fills the card edge to edge */
+  .product-grid--{{ section.id }} .card--block-media .media img + img {
+    padding: 0;
+    object-fit: cover;
+    mix-blend-mode: normal;
+  }
+
+  /* Card overlay: a plain wishlist heart top-left, badges top-right.
+     Quick view and compare are not offered on these cards. */
+  .product-grid--{{ section.id }} .card-quickview,
+  .product-grid--{{ section.id }} .card-compare {
+    display: none;
+  }
+
+  /* Also beats component-card.css, which hides the icons until the card is hovered */
+  .product-grid--{{ section.id }} .card-product__group-wrapper:not(.quick-add-type-icon) .card-product__group {
+    left: 0;
+    right: auto;
+    padding: 1.2rem;
+    opacity: 1;
+    transform: none;
+  }
+
+  .product-grid--{{ section.id }} .card-wishlist .wishlist-button,
+  .product-grid--{{ section.id }} .card-wishlist .wishlist-button:hover,
+  .product-grid--{{ section.id }} .card-wishlist .wishlist-button.wishlist-added {
+    width: 3.6rem;
+    height: 3.6rem;
+    background: transparent;
+    color: #7a2333;
+    box-shadow: none;
+  }
+
+  .product-grid--{{ section.id }} .card-wishlist .wishlist-button::after,
+  .product-grid--{{ section.id }} .card-wishlist .wishlist-button .text {
+    display: none;
+  }
+
+  .product-grid--{{ section.id }} .card-wishlist .wishlist-button .svg-wrapper {
+    --icon-size: 2.4rem;
+  }
+
+  .product-grid--{{ section.id }} .card-wishlist .wishlist-button svg {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  /* Saved: the outline heart's icon has no filled variant, so fill it with a mask */
+  .product-grid--{{ section.id }} .card-wishlist .wishlist-added .svg-wrapper {
+    position: relative;
+  }
+
+  .product-grid--{{ section.id }} .card-wishlist .wishlist-added .svg-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 18.2L1.6 10.6C-.5 8.5-.5 5.1 1.6 3.1 3.7 1 7.1 1 9.2 3.1L10 3.8l.8-.7c2.1-2.1 5.5-2.1 7.6 0 2.1 2 2.1 5.4 0 7.5z'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 18.2L1.6 10.6C-.5 8.5-.5 5.1 1.6 3.1 3.7 1 7.1 1 9.2 3.1L10 3.8l.8-.7c2.1-2.1 5.5-2.1 7.6 0 2.1 2 2.1 5.4 0 7.5z'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+
+  .product-grid--{{ section.id }} .card--block-media .card__badge {
+    position: absolute;
+    top: 1.6rem;
+    right: 1.6rem;
+    bottom: auto;
+    left: auto;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.6rem;
+    /* Leave room for the heart on narrow cards */
+    max-width: calc(100% - 7rem);
+  }
+
+  .product-grid--{{ section.id }} .card--block-media .card__badge .badge {
+    margin: 0;
+    padding: 0.9rem 1.6rem;
+    border-radius: 999px;
+    font-size: 1.2rem;
+    letter-spacing: 0.06em;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-grid--{{ section.id }} .card--block-media .card__badge {
+      top: 0.8rem;
+      right: 0.8rem;
+    }
+
+    .product-grid--{{ section.id }} .card--block-media .card__badge .badge {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+    }
+
+    .product-grid--{{ section.id }} .card-product__group-wrapper:not(.quick-add-type-icon) .card-product__group {
+      padding: 0.4rem;
+    }
   }
 
   @media screen and (min-width: 750px) {
