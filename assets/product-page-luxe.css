@@ -1,0 +1,115 @@
+/* Product page, MiaDonna-style. Loaded by sections/main-product.liquid. */
+
+/* ---------- Gallery: two images side by side, then one wide, repeating ---------- */
+.template-product .media-gallery__grid-item {
+  background: #f6f6f4;
+}
+
+/* Product shots are on white; multiply sinks the white into the grey tile */
+.template-product .media-gallery__grid-item img {
+  mix-blend-mode: multiply;
+}
+
+@media screen and (min-width: 750px) {
+  .template-product .media-gallery--two-column .media-gallery__grid {
+    gap: 1rem;
+  }
+
+  .template-product .media-gallery--two-column .media-gallery__grid-item:nth-child(3n),
+  .template-product .media-gallery--two-column .media-gallery__grid-item:last-child:nth-child(3n + 1) {
+    grid-column: span 2;
+    /* A wide tile at the image's own ratio would be as tall as it is wide; crop it to 4:3 */
+    --ratio: 1.3333 !important;
+    --preview-ratio: 1.3333 !important;
+    --media-preview-ratio: 1.3333 !important;
+  }
+
+  .template-product .media-gallery--two-column .media-gallery__grid-item:nth-child(3n) img,
+  .template-product .media-gallery--two-column .media-gallery__grid-item:last-child:nth-child(3n + 1) img {
+    object-fit: cover;
+  }
+}
+
+/* ---------- Price: a divider under it, as on MiaDonna ---------- */
+.template-product .product-details product-price.text-block {
+  padding-bottom: 2.4rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 0.12);
+}
+
+/* ---------- Option labels: "Color: 18k Yellow Gold" ---------- */
+.template-product .variant-option .form__label {
+  margin-bottom: 1rem;
+  font-family: var(--font-body--family);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.template-product .variant-option .form__label [data-selected-value] {
+  font-weight: 400;
+  margin-left: 0.4rem;
+}
+
+/* Text pills (carat, size, quality): softer outline, black when chosen */
+.template-product .product-form__input--pill input[type="radio"] + label:not(.metal-swatch) {
+  height: 4.8rem !important;
+  min-width: 9rem !important;
+  padding: 0 2.2rem !important;
+  border-color: rgb(var(--color-foreground-rgb) / 0.2) !important;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.template-product .product-form__input--pill input[type="radio"]:checked + label:not(.metal-swatch) {
+  border-color: #001514 !important;
+}
+
+/* ---------- Metal swatches: circles in the metal's colour with the karat ---------- */
+.product-form__input--pill input[type="radio"] + label.metal-swatch {
+  --metal: linear-gradient(135deg, #f1f1f1, #cfcfcf);
+  width: 4.8rem !important;
+  height: 4.8rem !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0.6rem 1.2rem 0.6rem 0;
+  border-radius: 50% !important;
+  border: 1px solid transparent !important;
+  background: var(--metal) !important;
+  color: #1c1c1c !important;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  /* the ring around the chosen metal */
+  box-shadow: 0 0 0 0 transparent !important;
+  transition: box-shadow 0.2s ease;
+}
+
+.product-form__input--pill input[type="radio"] + label.metal-swatch::before {
+  display: none;
+}
+
+.product-form__input--pill input[type="radio"]:checked + label.metal-swatch,
+.product-form__input--pill input[type="radio"] + label.metal-swatch.checked {
+  background: var(--metal) !important;
+  color: #1c1c1c !important;
+  border-color: #fff !important;
+  box-shadow: 0 0 0 1px #1c1c1c !important;
+}
+
+.product-form__input--pill input[type="radio"]:not(:checked) + label.metal-swatch:hover {
+  background: var(--metal) !important;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.25) !important;
+}
+
+.product-form__input--pill input[type="radio"]:focus-visible + label.metal-swatch {
+  outline: 2px solid #1c1c1c !important;
+  outline-offset: 3px;
+}
+
+.metal-swatch--yellow { --metal: linear-gradient(135deg, #f6e3a8, #e2c26e) !important; }
+.metal-swatch--white { --metal: linear-gradient(135deg, #f4f4f4, #d6d7d9) !important; }
+.metal-swatch--rose { --metal: linear-gradient(135deg, #f3cdbf, #e0a893) !important; }
+.metal-swatch--platinum { --metal: linear-gradient(135deg, #ececec, #c9cacd) !important; }
+.metal-swatch--silver { --metal: linear-gradient(135deg, #f2f3f5, #c4c8ce) !important; }

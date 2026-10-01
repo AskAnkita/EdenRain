@@ -245,10 +245,10 @@
                     "alignment_mobile": "left",
                     "type_preset": "custom",
                     "font": "var(--font-heading--family)",
-                    "font_size": "2.4rem",
-                    "font_weight": "600",
+                    "font_size": "3.2rem",
+                    "font_weight": "500",
                     "line_height": "normal",
-                    "letter_spacing": "loose",
+                    "letter_spacing": "normal",
                     "case": "none",
                     "wrap": "pretty",
                     "color": "var(--color-foreground-heading)",
@@ -318,7 +318,8 @@
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
-              "blocks": {}
+              "blocks": {},
+              "disabled": true
             },
             "variant_picker_4bEjyW": {
               "type": "variant-picker",

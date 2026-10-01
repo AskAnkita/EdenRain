@@ -60,6 +60,7 @@
     style="{% render 'spacing-style', settings: section.settings %} --gap: {{ section.settings.gap }}px;"
   >
     {{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+    {{ 'product-page-luxe.css' | asset_url | stylesheet_tag }}
     {{ 'component-rating.css' | asset_url | stylesheet_tag }}
     {%- if closest.product.quantity_price_breaks_configured? -%}
       {{ 'component-volume-pricing.css' | asset_url | stylesheet_tag }}
