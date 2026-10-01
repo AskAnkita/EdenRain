@@ -2747,6 +2747,7 @@
           "settings": {
             "heading": "FIND YOUR STYLE",
             "use_placeholder_images": true,
+            "use_diamond_shape_placeholders": true,
             "heading_alignment": "center",
             "heading_font": "josefin_sans_n4",
             "heading_font_size": 30,
@@ -4534,7 +4535,7 @@
         "image_ATmiEx": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/SECTION_1.png",
+            "image": "",
             "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/My_MiaDonna_Rewards_Desktop_2000x.png",
             "placeholder_image_ratio": "1348 / 1130",
             "link": "",
@@ -4624,9 +4625,9 @@
         "image_3agYtm": {
           "type": "image",
           "settings": {
-            "fallback_asset": "lifestyle-bracelet.jpg",
-            "fallback_asset_ratio": "1086 / 1448",
-            "image": "shopify://shop_images/image1.png",
+            "placeholder_image_url": "https://cdn.miadonna.com/products/website/7ctw-lab-grown-diamond-tennis-necklace-whitegold-16inch-001-web.png",
+            "placeholder_image_ratio": "1 / 1",
+            "image": "",
             "link": "",
             "hide_on_mobile": false,
             "image_ratio": "adapt",
@@ -5357,7 +5358,7 @@
           "settings": {
             "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/Exceptional_Value_Edit_Desktop_2000x.png",
             "placeholder_image_ratio": "2000 / 1677",
-            "image": "shopify://shop_images/image2.png",
+            "image": "",
             "link": "",
             "hide_on_mobile": false,
             "image_ratio": "adapt",
@@ -5451,7 +5452,7 @@
           "settings": {
             "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/MiaDonna_Boutique_Bridgeport_Village_Oregon_2000x.png",
             "placeholder_image_ratio": "1348 / 1130",
-            "image": "shopify://shop_images/SECTION_3.png",
+            "image": "",
             "link": "",
             "hide_on_mobile": false,
             "image_ratio": "adapt",
@@ -6335,7 +6336,7 @@
           "settings": {
             "placeholder_image_url": "https://www.miadonna.com/cdn/shop/files/Why_Make_it_MiaDonna_Desktop_2000x.png",
             "placeholder_image_ratio": "2000 / 1677",
-            "image": "shopify://shop_images/SECTION_4.png",
+            "image": "",
             "link": "",
             "hide_on_mobile": false,
             "image_ratio": "adapt",
@@ -7312,7 +7313,7 @@
               "type": "_accordion-row",
               "settings": {
                 "heading": "Can I Create a Custom Engagement Ring?",
-                "open_by_default": false,
+                "open_by_default": true,
                 "inherit_color_scheme": true,
                 "scheme_background": "#ffffff",
                 "scheme_background_gradient": "",

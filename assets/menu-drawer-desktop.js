@@ -19,8 +19,8 @@
       root.addEventListener('click', (event) => {
         if (event.target.closest('[data-menu-drawer-close]')) close();
       });
-      root.querySelector('.menu-drawer-desktop__overlay')?.addEventListener('mouseenter', scheduleClose);
       root.querySelector('.menu-drawer-desktop__sheet')?.addEventListener('mouseenter', cancelClose);
+      root.querySelector('.menu-drawer-desktop__sheet')?.addEventListener('mouseleave', scheduleClose);
 
       root.querySelectorAll('[data-menu-drawer-category]').forEach((button) => {
         const activate = () => showGroup(button);

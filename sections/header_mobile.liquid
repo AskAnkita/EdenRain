@@ -56,6 +56,39 @@
                     {%- content_for 'block', type: '_menu_tab_headings', id: 'static-menu-tab-heading' -%}
                   </div>
                   <div class="section-resource-list__content">
+                    {%- assign mobile_shop_menu = linklists['main-menu'] -%}
+                    {%- assign finish_menu = mobile_shop_menu.links | where: 'handle', 'shop-by-finish' | first -%}
+                    {%- assign new_in_link = mobile_shop_menu.links | where: 'handle', 'new-in' | first -%}
+                    {%- assign best_sellers_link = mobile_shop_menu.links | where: 'handle', 'best-sellers' | first -%}
+                    <nav class="menu-drawer-feature-nav" aria-label="Shop categories">
+                      <details class="menu-drawer-feature-nav__group">
+                        <summary>BY STYLE <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span></summary>
+                        <ul class="list-unstyled">
+                          <li><a href="{{ routes.root_url }}#find-your-style">Explore ring styles</a></li>
+                        </ul>
+                      </details>
+                      <details class="menu-drawer-feature-nav__group">
+                        <summary>BY SHAPE <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span></summary>
+                        <ul class="list-unstyled">
+                          <li><a href="{{ routes.root_url }}#find-your-shape">Explore diamond shapes</a></li>
+                        </ul>
+                      </details>
+                      <details class="menu-drawer-feature-nav__group">
+                        <summary>BY METAL <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span></summary>
+                        <ul class="list-unstyled">
+                          {%- for finish_link in finish_menu.links -%}
+                            <li><a href="{{ finish_link.url }}">{{ finish_link.title | escape }}</a></li>
+                          {%- endfor -%}
+                        </ul>
+                      </details>
+                      <details class="menu-drawer-feature-nav__group">
+                        <summary>FEATURED <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span></summary>
+                        <ul class="list-unstyled">
+                          {%- if new_in_link != blank -%}<li><a href="{{ new_in_link.url }}">{{ new_in_link.title | escape }}</a></li>{%- endif -%}
+                          {%- if best_sellers_link != blank -%}<li><a href="{{ best_sellers_link.url }}">{{ best_sellers_link.title | escape }}</a></li>{%- endif -%}
+                        </ul>
+                      </details>
+                    </nav>
                     {%- content_for 'block', type: '_menu_tab_contents', id: 'static-menu-tab-content' -%}
                     {%- render 'menu-drawer-utility', sec_settings: section.settings -%}
                   </div>

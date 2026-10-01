@@ -1,14 +1,9 @@
 {% comment %}
   Signature collection grid: one large feature (video or image) on the left, up to four product cards in a 2x2 grid on the right.
-  Placeholder media/titles are used only when nothing is picked, and never on the published (live) theme.
+  Placeholder media/titles are used only when no Shopify media or product is selected.
 {% endcomment %}
 
 {%- liquid
-  assign show_placeholder = true
-  if theme.role == 'main' and request.design_mode == false
-    assign show_placeholder = false
-  endif
-
   assign feature_link = section.settings.feature_link
 -%}
 
@@ -152,10 +147,10 @@
     {%- liquid
       assign feature_video_src = section.settings.feature_video.sources[1].url
       assign feature_poster = section.settings.feature_image | image_url: width: 1600
-      if section.settings.feature_video == blank and show_placeholder and section.settings.placeholder_video_url != blank
+      if section.settings.feature_video == blank and section.settings.placeholder_video_url != blank
         assign feature_video_src = section.settings.placeholder_video_url
       endif
-      if section.settings.feature_image == blank and show_placeholder
+      if section.settings.feature_image == blank
         assign feature_poster = section.settings.placeholder_poster_url
       endif
     -%}
@@ -181,7 +176,7 @@
         assign card_title = block.settings.title | default: card_product.title
         assign card_link = block.settings.link | default: card_product.url
         assign card_placeholder = false
-        if card_image == blank and card_title == blank and show_placeholder
+        if card_image == blank and card_title == blank
           assign card_placeholder = true
           assign card_title = block.settings.placeholder_title
         endif
@@ -245,13 +240,13 @@
       "type": "url",
       "id": "placeholder_video_url",
       "label": "Placeholder video URL",
-      "info": "Used while no video is picked. Hidden on the published (live) theme."
+      "info": "Used only when no video is picked."
     },
     {
       "type": "url",
       "id": "placeholder_poster_url",
       "label": "Placeholder poster image URL",
-      "info": "Hidden on the published (live) theme."
+      "info": "Used only when no image is picked."
     },
     {
       "type": "header",
@@ -340,13 +335,13 @@
           "type": "url",
           "id": "placeholder_image_url",
           "label": "Placeholder image URL",
-          "info": "Used while nothing above is set. Hidden on the published (live) theme."
+          "info": "Used only when no product, collection or image is selected."
         },
         {
           "type": "text",
           "id": "placeholder_title",
           "label": "Placeholder title",
-          "info": "Hidden on the published (live) theme."
+          "info": "Used only when no product or title is selected."
         }
       ]
     }

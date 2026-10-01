@@ -224,7 +224,7 @@
         "text_QYCLHk",
         "text_Lw7jtn"
       ],
-      "disabled": true,
+      "disabled": false,
       "settings": {
         "content_stacked": true,
         "page_width": "full-width",
@@ -243,6 +243,7 @@
     },
     "breadcrumb_ztwnCj": {
       "type": "breadcrumb",
+      "disabled": true,
       "name": "Breadcrumb",
       "settings": {
         "separator": "slash",
@@ -265,6 +266,7 @@
     },
     "section_zQ9rxr": {
       "type": "section",
+      "disabled": true,
       "blocks": {
         "text_6hAEYB": {
           "type": "text",

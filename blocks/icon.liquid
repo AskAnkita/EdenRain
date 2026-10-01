@@ -19,6 +19,11 @@
   unless theme.role == 'main' and request.design_mode == false
     assign placeholder_url = block_settings.placeholder_image_url
   endunless
+  assign icon_image_upload = block_settings.image_upload
+  if section.id contains 'section_xyhtgf' and block_settings.placeholder_image_url != blank
+    assign placeholder_url = block_settings.placeholder_image_url
+    assign icon_image_upload = blank
+  endif
   if svg_attr != '<svg '
     assign svg_upload = svg_upload | replace: '<svg', svg_attr
   endif
@@ -30,7 +35,7 @@
     icon: block_settings.icon,
     icon_custom: block_settings.icon_custom,
     svg_upload: svg_upload,
-    image_upload: block_settings.image_upload,
+    image_upload: icon_image_upload,
     width: block_settings.width,
     class_name: icon_block_class,
     attributes: block.shopify_attributes,

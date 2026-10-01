@@ -518,6 +518,26 @@
       display: none;
     }
 
+    .ai-collection-carousel-{{ ai_gen_id }}.is-shape-grid .ai-collection-carousel-track-{{ ai_gen_id }} {
+      display: grid;
+      width: max-content;
+      grid-template-columns: repeat(6, calc((var(--shape-page-width, 100vw) - 12px) / 2));
+      grid-template-rows: repeat(2, auto);
+      gap: 12px;
+      align-items: stretch;
+      touch-action: pan-y;
+    }
+
+    .ai-collection-carousel-{{ ai_gen_id }}.is-shape-grid .ai-collection-carousel-item-{{ ai_gen_id }} {
+      flex: initial;
+      width: auto;
+      max-width: none;
+    }
+
+    .ai-collection-carousel-{{ ai_gen_id }}.is-shape-grid .ai-collection-carousel-link-{{ ai_gen_id }} {
+      aspect-ratio: 3 / 4;
+    }
+
     .ai-collection-carousel-link-{{ ai_gen_id }} {
       height: clamp(360px, 50vh, 560px);
       height: clamp(360px, 50svh, 560px);
@@ -549,6 +569,36 @@
     }
   }
 
+  {% if block.settings.heading == 'FIND YOUR STYLE' %}
+    @media screen and (max-width: 749px) {
+      .ai-collection-carousel-{{ ai_gen_id }} {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-heading-{{ ai_gen_id }} {
+        color: #00211c;
+        font-family: var(--font-heading--family);
+        font-size: 26px;
+        text-align: left;
+        margin-bottom: 24px;
+      }
+
+      .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-track-{{ ai_gen_id }} {
+        gap: 24px;
+      }
+
+      .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-item-{{ ai_gen_id }} {
+        flex: 0 0 70%;
+        max-width: 70%;
+      }
+
+      .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }} {
+        aspect-ratio: 2 / 3;
+      }
+    }
+  {% endif %}
+
   .ai-collection-carousel-item-{{ ai_gen_id }}.hide-tablet {
     display: block;
   }
@@ -570,7 +620,7 @@
   }
 {% endstyle %}
 
-<collection-carousel-{{ ai_gen_id }} class="ai-collection-carousel-{{ ai_gen_id }}{% if block.settings.use_diamond_shape_placeholders %} is-diamond-shape{% endif %}" {{ block.shopify_attributes }}>
+<collection-carousel-{{ ai_gen_id }} class="ai-collection-carousel-{{ ai_gen_id }}{% if block.settings.use_diamond_shape_placeholders %} is-diamond-shape{% endif %}{% if block.settings.heading == 'Find Your Shape' %} is-shape-grid{% endif %}"{% if block.settings.heading == 'FIND YOUR STYLE' %} id="find-your-style"{% elsif block.settings.heading == 'Find Your Shape' %} id="find-your-shape"{% endif %} {{ block.shopify_attributes }}>
   <div class="ai-collection-carousel-container-{{ ai_gen_id }}">
     {% if block.settings.heading != blank %}
       <h2 class="ai-collection-carousel-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
@@ -600,6 +650,14 @@
             assign placeholder_hover_image = blank
             assign model_hover_image = blank
             assign model_hover_alt = blank
+            assign shape_grid_column = blank
+            assign shape_grid_row = blank
+            if block.settings.heading == 'Find Your Shape'
+              assign shape_page = forloop.index0 | divided_by: 4
+              assign shape_column = forloop.index0 | modulo: 2 | plus: 1
+              assign shape_grid_column = shape_page | times: 2 | plus: shape_column
+              assign shape_grid_row = forloop.index0 | modulo: 4 | divided_by: 2 | plus: 1
+            endif
             assign placeholder_width = 684
             assign placeholder_height = 1014
             assign placeholder_hover_width = 416
@@ -708,6 +766,7 @@
               class="ai-collection-carousel-item-{{ ai_gen_id }}{% if hide_tablet %} hide-tablet{% endif %}{% if hide_mobile %} hide-mobile{% endif %}"
               data-hide-tablet="{{ hide_tablet }}"
               data-hide-mobile="{{ hide_mobile }}"
+              {% if block.settings.heading == 'Find Your Shape' %}style="grid-column: {{ shape_grid_column }}; grid-row: {{ shape_grid_row }};"{% endif %}
             >
               <a 
                 href="{% if url != blank %}{{ url }}{% elsif collection != blank %}{{ collection.url }}{% else %}#{% endif %}"
@@ -813,6 +872,7 @@
         this.nextBtn = this.querySelector('.ai-collection-carousel-nav-{{ ai_gen_id }}.next');
         this.pagination = this.querySelector('.ai-collection-carousel-pagination-{{ ai_gen_id }}');
         this.wrapper = this.querySelector('.ai-collection-carousel-wrapper-{{ ai_gen_id }}');
+        this.isShapeGrid = this.classList.contains('is-shape-grid');
 
         this.settings = {
           autoplay: {{ block.settings.enable_autoplay }},
@@ -821,7 +881,7 @@
           pauseOnHover: {{ block.settings.pause_on_hover }},
           desktopColumns: {{ block.settings.columns_desktop }},
           tabletColumns: {{ block.settings.columns_tablet }},
-          mobileColumns: {{ block.settings.columns_mobile }}
+          mobileColumns: {% if block.settings.heading == 'FIND YOUR STYLE' %}1.4{% else %}{{ block.settings.columns_mobile }}{% endif %}
         };
 
         if (this.items.length === 0) return;
@@ -863,10 +923,10 @@
         });
 
         const columnsPerView = this.getColumnsPerView();
-        if (this.visibleItems.length <= columnsPerView) {
+        if (width <= 749 || this.visibleItems.length <= columnsPerView) {
           if (this.prevBtn) this.prevBtn.style.display = 'none';
           if (this.nextBtn) this.nextBtn.style.display = 'none';
-          if (this.pagination) this.pagination.style.display = 'none';
+          if (this.pagination) this.pagination.style.display = this.visibleItems.length <= (this.isShapeGrid ? 4 : columnsPerView) ? 'none' : 'block';
         } else {
           if (this.prevBtn) this.prevBtn.style.display = 'flex';
           if (this.nextBtn) this.nextBtn.style.display = 'flex';
@@ -875,6 +935,9 @@
       }
 
       getTotalSlides() {
+        if (this.isShapeGrid && window.innerWidth <= 749) {
+          return Math.max(1, Math.ceil(this.visibleItems.length / 4));
+        }
         const columnsPerView = this.getColumnsPerView();
         const visibleCount = this.visibleItems.length;
         
@@ -934,6 +997,15 @@
 
       updateSlidePosition() {
         if (!this.visibleItems.length) return;
+
+        if (this.isShapeGrid && window.innerWidth <= 749) {
+          this.track.style.setProperty('--shape-page-width', `${this.wrapper.clientWidth}px`);
+          const offset = this.currentIndex * (this.wrapper.clientWidth + 12);
+          this.track.style.transform = `translateX(-${offset}px)`;
+          this.updatePaginationProgress();
+          this.updateControls();
+          return;
+        }
 
         const firstVisibleItem = this.visibleItems[0];
         if (!firstVisibleItem) return;

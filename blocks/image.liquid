@@ -19,13 +19,10 @@
     endif
   endif
 
-  # Dev-only placeholder image: used while no image is picked, never on the published (live) theme
+  # Use the configured placeholder while no image is picked.
   assign use_placeholder_image = false
   if block.settings.image == blank and fallback_asset_url == blank and block.settings.placeholder_image_url != blank
     assign use_placeholder_image = true
-    if theme.role == 'main' and request.design_mode == false
-      assign use_placeholder_image = false
-    endif
     if use_placeholder_image and block.settings.image_ratio == 'adapt' and block.settings.placeholder_image_ratio != blank
       assign ratio = block.settings.placeholder_image_ratio
     endif
@@ -198,7 +195,7 @@
       "type": "url",
       "id": "placeholder_image_url",
       "label": "Placeholder image URL",
-      "info": "Used while no image is picked. Hidden on the published (live) theme."
+      "info": "Used temporarily when no image is selected."
     },
     {
       "type": "text",

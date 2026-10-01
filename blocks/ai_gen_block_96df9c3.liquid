@@ -470,51 +470,9 @@
     display: none;
   }
 
-  {% if block.settings.enable_full_height %}
-  /* Full height on mobile too: video fills the screen and the text sits on top of it */
-  @media screen and (max-width: 749px) {
-    /* Visible screen = viewport minus header and the fixed bottom toolbar */
-    .ai-luxury-video-hero-container-{{ ai_gen_id }} {
-      height: calc({{ block.settings.desktop_height }}vh - var(--header-group-height, 0px) - var(--toolbar-mobile-height, 0px));
-      height: calc({{ block.settings.desktop_height }}svh - var(--header-group-height, 0px) - var(--toolbar-mobile-height, 0px));
-    }
-
-    .ai-luxury-video-hero-content-{{ ai_gen_id }} {
-      padding: 24px 20px 56px;
-    }
-
-    .ai-luxury-video-hero-heading-{{ ai_gen_id }} {
-      font-size: {{ block.settings.mobile_heading_font_size }}px;
-      font-weight: {{ block.settings.mobile_heading_font_weight }};
-      letter-spacing: {{ block.settings.mobile_heading_letter_spacing }}px;
-      line-height: {{ block.settings.mobile_heading_line_height }};
-    }
-
-    .ai-luxury-video-hero-description-{{ ai_gen_id }} {
-      font-size: {{ block.settings.mobile_description_font_size }}px;
-      letter-spacing: {{ block.settings.mobile_description_letter_spacing }}px;
-      margin-top: {{ block.settings.mobile_heading_description_gap }}px;
-    }
-
-    .ai-luxury-video-hero-buttons-{{ ai_gen_id }} {
-      gap: 12px;
-      justify-content: center;
-      margin-top: {{ block.settings.mobile_description_buttons_gap }}px;
-    }
-
-    .ai-luxury-video-hero-button-{{ ai_gen_id }} {
-      width: {{ block.settings.mobile_button_width }}px;
-      height: {{ block.settings.mobile_button_height }}px;
-      padding: {{ block.settings.mobile_button_padding_vertical }}px {{ block.settings.mobile_button_padding_horizontal }}px;
-      font-size: {{ block.settings.mobile_button_font_size }}px;
-      font-weight: {{ block.settings.mobile_button_font_weight }};
-      letter-spacing: {{ block.settings.mobile_button_letter_spacing }}px;
-    }
-  }
-  {% else %}
   @media screen and (max-width: 749px) {
     .ai-luxury-video-hero-container-{{ ai_gen_id }} {
-      height: {{ block.settings.mobile_height }}vh;
+      height: min(93vw, {{ block.settings.mobile_height }}svh);
     }
 
     .ai-luxury-video-hero-content-{{ ai_gen_id }} {
@@ -524,7 +482,11 @@
     .ai-luxury-video-hero-mobile-content-{{ ai_gen_id }} {
       display: block;
       background-color: {{ block.settings.mobile_content_background }};
-      padding: 40px 20px;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 36px 18px 48px;
       {% if block.settings.mobile_content_alignment == 'left' %}
         text-align: left;
       {% elsif block.settings.mobile_content_alignment == 'center' %}
@@ -559,18 +521,13 @@
 
     .ai-luxury-video-hero-mobile-buttons-{{ ai_gen_id }} {
       display: flex;
+      flex-direction: column;
+      align-items: stretch;
       gap: 12px;
       padding-top: {{ block.settings.mobile_buttons_padding_top }}px;
       padding-bottom: {{ block.settings.mobile_buttons_padding_bottom }}px;
       margin-top: {{ block.settings.mobile_description_buttons_gap }}px;
-      flex-wrap: wrap;
-      {% if block.settings.mobile_content_alignment == 'left' %}
-        justify-content: flex-start;
-      {% elsif block.settings.mobile_content_alignment == 'center' %}
-        justify-content: center;
-      {% else %}
-        justify-content: flex-end;
-      {% endif %}
+      width: 100%;
     }
 
     .ai-luxury-video-hero-mobile-button-{{ ai_gen_id }} {
@@ -580,8 +537,9 @@
       text-decoration: none;
       cursor: pointer;
       transition: all 0.3s ease;
-      width: {{ block.settings.mobile_button_width }}px;
-      height: {{ block.settings.mobile_button_height }}px;
+      box-sizing: border-box;
+      width: 100%;
+      min-height: max(48px, {{ block.settings.mobile_button_height }}px);
       padding: {{ block.settings.mobile_button_padding_vertical }}px {{ block.settings.mobile_button_padding_horizontal }}px;
       border-radius: {{ block.settings.button_border_radius }}px;
       font-size: {{ block.settings.mobile_button_font_size }}px;
@@ -609,26 +567,21 @@
       {% endif %}
     }
   }
-  {% endif %}
 {% endstyle %}
 
 <luxury-video-hero-{{ ai_gen_id }} class="ai-luxury-video-hero-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-luxury-video-hero-container-{{ ai_gen_id }}">
     {% liquid
-      # Dev-only placeholder videos: used when no Shopify video is picked, never on the published (live) theme
-      assign show_placeholder = true
-      if theme.role == 'main' and request.design_mode == false
-        assign show_placeholder = false
-      endif
+      # Use fallback clips only when no Shopify-hosted video is selected.
       assign desktop_video_src = block.settings.desktop_video.sources[1].url
       assign desktop_video_type = block.settings.desktop_video.sources[1].mime_type
-      if block.settings.desktop_video == blank and show_placeholder and block.settings.placeholder_desktop_video_url != blank
+      if block.settings.desktop_video == blank and block.settings.placeholder_desktop_video_url != blank
         assign desktop_video_src = block.settings.placeholder_desktop_video_url
         assign desktop_video_type = 'video/mp4'
       endif
       assign mobile_video_src = block.settings.mobile_video.sources[1].url
       assign mobile_video_type = block.settings.mobile_video.sources[1].mime_type
-      if block.settings.mobile_video == blank and show_placeholder and block.settings.placeholder_mobile_video_url != blank
+      if block.settings.mobile_video == blank and block.settings.placeholder_mobile_video_url != blank
         assign mobile_video_src = block.settings.placeholder_mobile_video_url
         assign mobile_video_type = 'video/mp4'
       endif

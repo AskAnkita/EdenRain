@@ -224,6 +224,60 @@ details[open].menu-opening > .menu-drawer__submenu {
   overflow: hidden !important;
 }
 
+.drawer--menu-multi-tab .menu-drawer-feature-nav {
+  margin: 0 2rem 1.2rem;
+  border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 0.14);
+}
+
+.menu-drawer-feature-nav__group {
+  border-top: 1px solid rgb(var(--color-foreground-rgb) / 0.14);
+}
+
+.menu-drawer-feature-nav__group summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 4.8rem;
+  padding: 0 0.4rem;
+  color: var(--color-foreground);
+  cursor: pointer;
+  font-family: var(--font-body--family);
+  font-size: 1.4rem;
+  letter-spacing: 0.06em;
+  list-style: none;
+}
+
+.menu-drawer-feature-nav__group summary::-webkit-details-marker {
+  display: none;
+}
+
+.menu-drawer-feature-nav__group summary .svg-wrapper {
+  width: 1.2rem;
+  height: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+.menu-drawer-feature-nav__group[open] summary .svg-wrapper {
+  transform: rotate(180deg);
+}
+
+.menu-drawer-feature-nav__group ul {
+  margin: 0;
+  padding: 0 0.4rem 1rem 1.2rem;
+}
+
+.menu-drawer-feature-nav__group li + li {
+  margin-top: 0.2rem;
+}
+
+.menu-drawer-feature-nav__group a {
+  display: block;
+  padding: 0.8rem 0;
+  color: inherit;
+  font-size: 1.4rem;
+  text-decoration: none;
+}
+
 @media screen and (max-width: 550px) {
   .drawer--menu .drawer__inner {
     width: 100%;
