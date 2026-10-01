@@ -21081,3 +21081,23 @@ footer.section-footer .email-signup__input {
     transition: none;
   }
 }
+
+/* Mobile/tablet header: smaller icons. Tap areas stay 40px. */
+@media screen and (max-width: 989px) {
+  .header .header__icon .svg-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .header .header__icon .svg-wrapper > svg,
+  .header .header__icon .icon:not(.icon-hamburger-custom) {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .header .header__icon .icon-hamburger-custom:not(.icon-flag) .icon-hamburger-custom__line {
+    width: 1.8rem;
+    height: 1.5px;
+    margin: 0.45rem auto;
+  }
+}
