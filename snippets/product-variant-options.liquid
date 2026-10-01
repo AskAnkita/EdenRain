@@ -325,8 +325,45 @@
           {% endif %}
           {{ input_dataset }}
         >
-        <label for="{{ input_id }}">
-          {{ value | escape -}}
+        {%- liquid
+          # Metal options (Color / Metal / Finish) show as metal-coloured circles with the karat
+          assign metal = blank
+          assign metal_option_name = option.name | downcase
+          if metal_option_name contains 'color' or metal_option_name contains 'colour' or metal_option_name contains 'metal' or metal_option_name contains 'finish'
+            assign metal_value = value | downcase
+            if metal_value contains 'rose'
+              assign metal = 'rose'
+            elsif metal_value contains 'yellow'
+              assign metal = 'yellow'
+            elsif metal_value contains 'white'
+              assign metal = 'white'
+            elsif metal_value contains 'platinum'
+              assign metal = 'platinum'
+            elsif metal_value contains 'silver' or metal_value contains 'sterling'
+              assign metal = 'silver'
+            endif
+          endif
+          if metal != blank
+            assign metal_short = value | split: ' ' | first | upcase
+            unless metal_short contains 'K'
+              case metal
+                when 'platinum'
+                  assign metal_short = 'PL'
+                when 'silver'
+                  assign metal_short = '925'
+                else
+                  assign metal_short = metal | slice: 0, 1 | upcase
+              endcase
+            endunless
+          endif
+        -%}
+        <label for="{{ input_id }}"{% if metal != blank %} class="metal-swatch metal-swatch--{{ metal }}" title="{{ value | escape }}"{% endif %}>
+          {%- if metal != blank -%}
+            <span aria-hidden="true">{{ metal_short }}</span>
+            <span class="visually-hidden">{{ value | escape }}</span>
+          {%- else -%}
+            {{ value | escape -}}
+          {%- endif -%}
           {%- if option_disabled -%}
             {{ label_unavailable }}
           {%- endif -%}

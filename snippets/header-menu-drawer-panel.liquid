@@ -1,103 +1,113 @@
 {% comment %}
-  Desktop mega menu panel. Product collections and product links render as a
-  text-only product list on the left with one selected product preview on right.
+  Desktop mega menu panel, three columns:
+  - a short list of categories, then "Shop all"
+  - three featured products
+  - one campaign image linking to the menu item
+
+  Categories come from the menu item's sub-links (Online Store > Navigation). A
+  collection link without sub-links lists the product types in that collection.
+  Featured products are the first three in the collection, so setting that
+  collection's sort order to "Best selling" makes them the best sellers.
 {% endcomment %}
 
 {%- liquid
-  assign has_product_list = false
-  assign product_collection = blank
-
-  if link.type == 'collection_link' and link.object.products_count > 0
-    assign has_product_list = true
-    assign product_collection = link.object
+  assign source_collection = blank
+  if link.type == 'collection_link'
+    assign source_collection = link.object
   else
     for child in link.links
-      if child.type == 'product_link'
-        assign has_product_list = true
+      if child.type == 'collection_link' and child.object.products_count > 0
+        assign source_collection = child.object
         break
       endif
     endfor
   endif
+
+  assign has_category_links = false
+  for child in link.links
+    if child.type != 'product_link'
+      assign has_category_links = true
+      break
+    endif
+  endfor
+
+  assign has_product_links = false
+  for child in link.links
+    if child.type == 'product_link'
+      assign has_product_links = true
+      break
+    endif
+  endfor
+
+  assign campaign_image = blank
+  if source_collection != blank and source_collection.image != blank
+    assign campaign_image = source_collection.image
+  elsif source_collection != blank
+    for product in source_collection.products limit: 1
+      assign campaign_image = product.media[1].preview_image | default: product.featured_image
+    endfor
+  endif
 -%}
 
-<div class="menu-drawer-desktop__page{% if has_product_list %} menu-drawer-desktop__page--products{% endif %}" id="{{ drawer_id }}" data-menu-drawer-page hidden>
-  {%- if has_product_list -%}
-    <nav class="menu-drawer-desktop__categories menu-drawer-desktop__product-list" aria-label="{{ link.title | escape }}">
-      <p class="menu-drawer-desktop__list-heading">Main Categories</p>
-      <ul role="list">
-        {%- if product_collection != blank -%}
-          {%- for product in product_collection.products limit: 50 -%}
-            {%- assign product_group_id = drawer_id | append: '-product-' | append: product.id -%}
-            {%- render 'header-menu-drawer-product', product: product, group_id: product_group_id, placement: 'list', active: forloop.first -%}
-          {%- endfor -%}
-        {%- else -%}
-          {%- assign product_index = 0 -%}
-          {%- for child in link.links -%}
-            {%- if child.type == 'product_link' -%}
-              {%- assign product_index = product_index | plus: 1 -%}
-              {%- assign product_group_id = drawer_id | append: '-product-' | append: product_index -%}
-              {%- assign is_first_product = false -%}
-              {%- if product_index == 1 -%}{%- assign is_first_product = true -%}{%- endif -%}
-              {%- render 'header-menu-drawer-product', product: child.object, title: child.title, group_id: product_group_id, placement: 'list', active: is_first_product -%}
-            {%- endif -%}
-          {%- endfor -%}
-        {%- endif -%}
-      </ul>
-    </nav>
+<div class="menu-drawer-desktop__page menu-drawer-desktop__page--featured" id="{{ drawer_id }}" data-menu-drawer-page hidden>
+  <button type="button" class="menu-drawer-desktop__close" data-menu-drawer-close aria-label="{{ 'accessibility.close' | t }}">
+    <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+  </button>
 
-    <div class="menu-drawer-desktop__content menu-drawer-desktop__product-preview">
-      <button type="button" class="menu-drawer-desktop__close" data-menu-drawer-close aria-label="{{ 'accessibility.close' | t }}">
-        <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
-      </button>
-      {%- if product_collection != blank -%}
-        {%- for product in product_collection.products limit: 50 -%}
-          {%- assign product_group_id = drawer_id | append: '-product-' | append: product.id -%}
-          {%- render 'header-menu-drawer-product', product: product, collection: product_collection, menu_link: link, group_id: product_group_id, placement: 'preview', active: forloop.first -%}
-        {%- endfor -%}
-      {%- else -%}
-        {%- assign product_index = 0 -%}
+  <nav class="menu-drawer-desktop__nav" aria-label="{{ link.title | escape }}">
+    <p class="menu-drawer-desktop__list-heading">{{ link.title | escape }}</p>
+    <ul class="menu-drawer-desktop__nav-list" role="list">
+      {%- if has_category_links -%}
         {%- for child in link.links -%}
-          {%- if child.type == 'product_link' -%}
-            {%- assign product_index = product_index | plus: 1 -%}
-            {%- assign product_group_id = drawer_id | append: '-product-' | append: product_index -%}
-            {%- assign is_first_product = false -%}
-            {%- if product_index == 1 -%}{%- assign is_first_product = true -%}{%- endif -%}
-            {%- assign related_collection = child.object.collections.first -%}
-            {%- render 'header-menu-drawer-product', product: child.object, title: child.title, collection: related_collection, menu_link: link, group_id: product_group_id, placement: 'preview', active: is_first_product -%}
+          {%- unless child.type == 'product_link' -%}
+            <li><a class="menu-drawer-desktop__nav-link" href="{{ child.url }}">{{ child.title | escape }}</a></li>
+          {%- endunless -%}
+        {%- endfor -%}
+      {%- elsif source_collection != blank -%}
+        {%- for type in source_collection.all_types limit: 6 -%}
+          {%- if type != blank -%}
+            <li><a class="menu-drawer-desktop__nav-link" href="{{ source_collection.url }}?filter.p.product_type={{ type | url_encode }}">{{ type | escape }}</a></li>
           {%- endif -%}
         {%- endfor -%}
       {%- endif -%}
-    </div>
-  {%- else -%}
-    <nav class="menu-drawer-desktop__categories" aria-label="{{ link.title | escape }}">
-      <ul role="list">
-        {%- for child in link.links -%}
-          <li>
-            <button
-              type="button"
-              class="menu-drawer-desktop__category{% if forloop.first %} is-active{% endif %}"
-              data-menu-drawer-category="{{ drawer_id }}-{{ forloop.index }}"
-            >
-              <span>{{ child.title | escape }}</span>
-            </button>
-          </li>
+    </ul>
+    <a class="menu-drawer-desktop__view-all" href="{{ link.url }}">Shop all {{ link.title | downcase | escape }}</a>
+  </nav>
+
+  <div class="menu-drawer-desktop__featured">
+    <p class="menu-drawer-desktop__list-heading">Best sellers</p>
+    <ul class="menu-drawer-desktop__related-grid" role="list">
+      {%- if source_collection != blank -%}
+        {%- for product in source_collection.products limit: 3 -%}
+          {%- render 'header-menu-drawer-related-card', product: product -%}
         {%- endfor -%}
-      </ul>
-    </nav>
-    <div class="menu-drawer-desktop__content">
-      <button type="button" class="menu-drawer-desktop__close" data-menu-drawer-close aria-label="{{ 'accessibility.close' | t }}">
-        <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
-      </button>
-      {%- for child in link.links -%}
-        {%- liquid
-          assign group_id = drawer_id | append: '-' | append: forloop.index
-          assign category_collection = blank
-          if child.type == 'collection_link'
-            assign category_collection = child.object
-          endif
-        -%}
-        {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: child, collection: category_collection, active: forloop.first -%}
-      {%- endfor -%}
-    </div>
-  {%- endif -%}
+      {%- elsif has_product_links -%}
+        {%- assign shown = 0 -%}
+        {%- for child in link.links -%}
+          {%- if child.type == 'product_link' -%}
+            {%- render 'header-menu-drawer-related-card', product: child.object, title: child.title -%}
+            {%- assign shown = shown | plus: 1 -%}
+            {%- if shown == 3 -%}{%- break -%}{%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for product in collections.all.products limit: 3 -%}
+          {%- render 'header-menu-drawer-related-card', product: product -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+  </div>
+
+  <a class="menu-drawer-desktop__campaign" href="{{ link.url }}">
+    <span class="menu-drawer-desktop__campaign-media">
+      {%- if campaign_image != blank -%}
+        {{ campaign_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 26vw, 80vw', alt: link.title }}
+      {%- endif -%}
+    </span>
+    <span class="menu-drawer-desktop__campaign-copy">
+      <span class="menu-drawer-desktop__campaign-kicker">Explore</span>
+      <span class="menu-drawer-desktop__campaign-title">{{ link.title | escape }}</span>
+      <span class="menu-drawer-desktop__campaign-cta">Shop now</span>
+    </span>
+  </a>
 </div>

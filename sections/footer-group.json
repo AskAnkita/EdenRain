@@ -99,7 +99,8 @@
         "padding-block-end-mb": 0,
         "padding-inline-start-mb": 0,
         "padding-inline-end-mb": 0
-      }
+      },
+      "disabled": true
     },
     "footer": {
       "type": "footer",
@@ -2165,7 +2166,8 @@
         "background_image_position": "cover",
         "padding-block-start": 0,
         "padding-block-end": 24
-      }
+      },
+      "disabled": true
     },
     "footer_xynjaw": {
       "type": "footer",
@@ -4245,10 +4247,73 @@
         "padding_top": 30,
         "padding_bottom": 36
       }
+    },
+    "footer_luxe": {
+      "type": "footer-luxe",
+      "blocks": {
+        "menu_category": {
+          "type": "menu",
+          "settings": {
+            "heading": "Category",
+            "menu": "category"
+          }
+        },
+        "menu_about": {
+          "type": "menu",
+          "settings": {
+            "heading": "About",
+            "menu": "about"
+          }
+        },
+        "menu_care": {
+          "type": "menu",
+          "settings": {
+            "heading": "Care",
+            "menu": "care"
+          }
+        },
+        "text_visit": {
+          "type": "text",
+          "settings": {
+            "heading": "Visit",
+            "text": "<p>Unit 5C, Chelston Business Park<br/>Wellington TA21 9JQ<br/>United Kingdom</p>"
+          }
+        },
+        "text_write": {
+          "type": "text",
+          "settings": {
+            "heading": "Write to us",
+            "text": "<p><a href=\"mailto:info@heatherneedhamsilver.com\" title=\"mailto:info@heatherneedhamsilver.com\">info@heatherneedhamsilver.com</a></p><p><a href=\"https://www.instagram.com/heatherneedhamsilver/\" target=\"_blank\" title=\"Instagram\">Instagram</a></p>"
+          }
+        }
+      },
+      "block_order": [
+        "menu_category",
+        "menu_about",
+        "menu_care",
+        "text_visit",
+        "text_write"
+      ],
+      "settings": {
+        "brand_line": "Diamonds grown with care, set by hand, made to last a lifetime.",
+        "show_newsletter": true,
+        "newsletter_placeholder": "Email for new arrivals",
+        "newsletter_button": "Join",
+        "newsletter_success": "Thank you. You're on the list.",
+        "wordmark_style": "dark",
+        "wordmark_width": 140,
+        "show_payment_icons": true,
+        "color_background": "#e3d4cf",
+        "color_text": "#1c1a19",
+        "color_muted": "#4f4541",
+        "color_accent": "#1c1a19",
+        "color_rule": "#cfbcb5"
+      }
     }
   },
   "order": [
     "section_KHqNEp",
+    "footer_luxe",
     "footer",
     "footer_xynjaw",
     "footer_bottom"

@@ -1,6 +1,7 @@
 {% if settings.enable_multi_tab_layout_mobile %}
 
   <link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
+  {{ 'menu-drawer-mobile.css' | asset_url | stylesheet_tag }}
 
   {%- liquid
     if localization.available_countries.size > 1 and section.settings.show_country or section.settings.show_language and localization.available_languages.size > 1
@@ -27,9 +28,16 @@
         aria-label="{{ 'accessibility.menu' | t }}"
         tabindex="-1"
       >
-        <div class="drawer__header flex justify-between items-center relative" style="--p: var(--padding-xs) var(--padding-lg);">
+        <div class="drawer__header mnav__header flex justify-between items-center relative">
+          <a class="mnav__logo" href="{{ routes.root_url }}">
+            {%- if settings.logo != blank -%}
+              {{ settings.logo | image_url: width: 400 | image_tag: alt: shop.name, loading: 'lazy' }}
+            {%- else -%}
+              <img src="{{ 'eden-raine-logo.png' | asset_url }}" alt="{{ shop.name | escape }}" width="1188" height="158" loading="lazy">
+            {%- endif -%}
+          </a>
           <button
-            class="drawer__close block t-button bor-none cursor-pointer"
+            class="drawer__close mnav__close block t-button bor-none cursor-pointer"
             type="button"
             onclick="this.closest('side-drawer').close()"
             aria-label="{{ 'accessibility.close_dialog' | t }}"
@@ -51,48 +59,83 @@
               </div>
             {%- else -%}
               <div class="section-resource-list" id="SiteNavMobile-Content-{{ section.id }}">
-                <header-mobile-tabs>
-                  <div class="section-resource-list__header">
-                    {%- content_for 'block', type: '_menu_tab_headings', id: 'static-menu-tab-heading' -%}
-                  </div>
-                  <div class="section-resource-list__content">
-                    {%- assign mobile_shop_menu = linklists['main-menu'] -%}
-                    {%- assign finish_menu = mobile_shop_menu.links | where: 'handle', 'shop-by-finish' | first -%}
-                    {%- assign new_in_link = mobile_shop_menu.links | where: 'handle', 'new-in' | first -%}
-                    {%- assign best_sellers_link = mobile_shop_menu.links | where: 'handle', 'best-sellers' | first -%}
-                    <nav class="menu-drawer-feature-nav" aria-label="Shop categories">
-                      <details class="menu-drawer-feature-nav__group">
-                        <summary>BY STYLE <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span></summary>
-                        <ul class="list-unstyled">
-                          <li><a href="{{ routes.root_url }}#find-your-style">Explore ring styles</a></li>
-                        </ul>
-                      </details>
-                      <details class="menu-drawer-feature-nav__group">
-                        <summary>BY SHAPE <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span></summary>
-                        <ul class="list-unstyled">
-                          <li><a href="{{ routes.root_url }}#find-your-shape">Explore diamond shapes</a></li>
-                        </ul>
-                      </details>
-                      <details class="menu-drawer-feature-nav__group">
-                        <summary>BY METAL <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span></summary>
-                        <ul class="list-unstyled">
-                          {%- for finish_link in finish_menu.links -%}
-                            <li><a href="{{ finish_link.url }}">{{ finish_link.title | escape }}</a></li>
-                          {%- endfor -%}
-                        </ul>
-                      </details>
-                      <details class="menu-drawer-feature-nav__group">
-                        <summary>FEATURED <span class="svg-wrapper" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span></summary>
-                        <ul class="list-unstyled">
-                          {%- if new_in_link != blank -%}<li><a href="{{ new_in_link.url }}">{{ new_in_link.title | escape }}</a></li>{%- endif -%}
-                          {%- if best_sellers_link != blank -%}<li><a href="{{ best_sellers_link.url }}">{{ best_sellers_link.title | escape }}</a></li>{%- endif -%}
-                        </ul>
-                      </details>
-                    </nav>
-                    {%- content_for 'block', type: '_menu_tab_contents', id: 'static-menu-tab-content' -%}
-                    {%- render 'menu-drawer-utility', sec_settings: section.settings -%}
-                  </div>
-                </header-mobile-tabs>
+                {%- comment -%}
+                  Same items as the desktop nav (main-menu). Items with sub-links open to
+                  show them; a collection link without sub-links opens to show the product
+                  types in that collection and three of its products, like the desktop panel.
+                {%- endcomment -%}
+                {%- assign mobile_menu = linklists['main-menu'] -%}
+                <nav class="mnav" aria-label="{{ 'accessibility.menu' | t }}">
+                  <ul class="mnav__list" role="list">
+                    {%- for link in mobile_menu.links -%}
+                      {%- liquid
+                        assign link_collection = blank
+                        if link.type == 'collection_link' and link.object.products_count > 0
+                          assign link_collection = link.object
+                        endif
+                      -%}
+                      <li class="mnav__item">
+                        {%- if link.links != blank or link_collection != blank -%}
+                          <details class="mnav__group">
+                            <summary class="mnav__top">
+                              <span>{{ link.title | escape }}</span>
+                              <span class="mnav__icon" aria-hidden="true"></span>
+                            </summary>
+                            <div class="mnav__panel">
+                              {%- if link.links != blank -%}
+                                <ul class="mnav__sub" role="list">
+                                  {%- for child in link.links -%}
+                                    <li>
+                                      <a href="{{ child.url }}">{{ child.title | escape }}</a>
+                                      {%- if child.links != blank -%}
+                                        <ul class="mnav__sub mnav__sub--nested" role="list">
+                                          {%- for grandchild in child.links -%}
+                                            <li><a href="{{ grandchild.url }}">{{ grandchild.title | escape }}</a></li>
+                                          {%- endfor -%}
+                                        </ul>
+                                      {%- endif -%}
+                                    </li>
+                                  {%- endfor -%}
+                                </ul>
+                              {%- else -%}
+                                <ul class="mnav__sub" role="list">
+                                  {%- for type in link_collection.all_types limit: 6 -%}
+                                    {%- if type != blank -%}
+                                      <li><a href="{{ link_collection.url }}?filter.p.product_type={{ type | url_encode }}">{{ type | escape }}</a></li>
+                                    {%- endif -%}
+                                  {%- endfor -%}
+                                </ul>
+                                <ul class="mnav__products" role="list">
+                                  {%- for product in link_collection.products limit: 3 -%}
+                                    <li>
+                                      <a href="{{ product.url }}">
+                                        <span class="mnav__product-media">
+                                          {%- if product.featured_image != blank -%}
+                                            {{ product.featured_image | image_url: width: 300 | image_tag: loading: 'lazy', sizes: '30vw', alt: product.title }}
+                                          {%- endif -%}
+                                        </span>
+                                        <span class="mnav__product-title">{{ product.title | escape }}</span>
+                                        <span class="mnav__product-price">{{ product.price | money }}</span>
+                                      </a>
+                                    </li>
+                                  {%- endfor -%}
+                                </ul>
+                              {%- endif -%}
+                              <a class="mnav__all" href="{{ link.url }}">Shop all {{ link.title | downcase | escape }}</a>
+                            </div>
+                          </details>
+                        {%- else -%}
+                          <a class="mnav__top" href="{{ link.url }}">
+                            <span>{{ link.title | escape }}</span>
+                          </a>
+                        {%- endif -%}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </nav>
+                <div class="mnav__utility">
+                  {%- render 'menu-drawer-utility', sec_settings: section.settings -%}
+                </div>
               </div>
             {%- endunless -%}
           </div>

@@ -98,6 +98,30 @@
           </div>
         </div>
       {%- else -%}
+        {%- style -%}
+          /* No image: the copy sits on a tinted band, padded inside the colour,
+             with a small breadcrumb on the left above a centred title and intro */
+          #collection-hero-{{ section.id }} .collection-hero__inner {
+            padding: 2.4rem 5.2rem 5.6rem;
+          }
+
+          #collection-hero-{{ section.id }} .breadcrumbs {
+            opacity: 0.75;
+          }
+
+          /* base.css indents every breadcrumb list by 30px; line it up with the band instead */
+          #collection-hero-{{ section.id }} .breadcrumbs__list {
+            display: flex;
+            justify-content: flex-start;
+            margin-left: 0;
+          }
+
+          @media screen and (max-width: 749px) {
+            #collection-hero-{{ section.id }} .collection-hero__inner {
+              padding: 1.6rem 1.6rem 3.2rem;
+            }
+          }
+        {%- endstyle -%}
         <div class="collection-hero__inner{% if scroll_reveal %} scroll-trigger animate--fade-in{% endif %}">
           <div
             class="collection-hero__text-wrapper"
