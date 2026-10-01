@@ -4299,14 +4299,14 @@
         "newsletter_placeholder": "Email for new arrivals",
         "newsletter_button": "Join",
         "newsletter_success": "Thank you. You're on the list.",
-        "wordmark_style": "light",
+        "wordmark_style": "dark",
         "wordmark_width": 140,
         "show_payment_icons": true,
-        "color_background": "#141312",
-        "color_text": "#f4f4f0",
-        "color_muted": "#b9b2ab",
-        "color_accent": "#e3d4cf",
-        "color_rule": "#2c2a28"
+        "color_background": "#e3d4cf",
+        "color_text": "#1c1a19",
+        "color_muted": "#4f4541",
+        "color_accent": "#1c1a19",
+        "color_rule": "#cfbcb5"
       }
     }
   },

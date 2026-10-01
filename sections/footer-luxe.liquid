@@ -2,7 +2,7 @@
   Luxury footer. Top band: monogram, brand line and newsletter. Then up to five
   columns (menus or text), then a base bar with the wordmark, copyright,
   policies and payment icons. Colours are section settings so the footer can
-  run dark (default) or light.
+  run light (default, blush) or dark.
 {% endcomment %}
 
 {%- liquid
@@ -419,7 +419,7 @@
         { "value": "light", "label": "White (for dark backgrounds)" },
         { "value": "dark", "label": "Black (for light backgrounds)" }
       ],
-      "default": "light"
+      "default": "dark"
     },
     {
       "type": "range",
@@ -445,31 +445,31 @@
       "type": "color",
       "id": "color_background",
       "label": "Background",
-      "default": "#141312"
+      "default": "#e3d4cf"
     },
     {
       "type": "color",
       "id": "color_text",
       "label": "Text",
-      "default": "#f4f4f0"
+      "default": "#1c1a19"
     },
     {
       "type": "color",
       "id": "color_muted",
       "label": "Links and secondary text",
-      "default": "#b9b2ab"
+      "default": "#4f4541"
     },
     {
       "type": "color",
       "id": "color_accent",
       "label": "Accent (monogram, headings, newsletter line)",
-      "default": "#e3d4cf"
+      "default": "#1c1a19"
     },
     {
       "type": "color",
       "id": "color_rule",
       "label": "Divider lines",
-      "default": "#2c2a28"
+      "default": "#cfbcb5"
     }
   ],
   "blocks": [
