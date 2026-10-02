@@ -10,6 +10,12 @@
   pointer-events: none;
 }
 
+/* The wrapper carries a colour-scheme class (for the sheet's colours), and the theme gives every
+   colour-scheme element a solid background, which hid the whole page. Keep the wrapper see-through. */
+.menu-drawer-desktop[data-menu-drawer-root] {
+  background: transparent;
+}
+
 .menu-drawer-desktop[hidden] {
   display: none;
 }
