@@ -17,7 +17,8 @@
 .menu-drawer-desktop__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  /* A light tint: the page stays visible behind the open menu */
+  background: rgba(20, 18, 16, 0.12);
   opacity: 0;
   transition: opacity 0.25s ease;
   pointer-events: auto;
