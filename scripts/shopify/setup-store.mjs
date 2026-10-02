@@ -1,0 +1,207 @@
+#!/usr/bin/env node
+// Creates the collections and main menu described in store-config.mjs.
+//
+//   node scripts/shopify/setup-store.mjs                     preview only, changes nothing
+//   node scripts/shopify/setup-store.mjs --apply             create missing collections and write the menu
+//   node scripts/shopify/setup-store.mjs --apply --only=collections
+//   node scripts/shopify/setup-store.mjs --apply --only=menu
+//
+// Existing collections are left untouched. Before the menu is replaced, the current one is saved
+// to scripts/shopify/backups/ (git-ignored).
+
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { config, gql } from './lib.mjs';
+import { collections, menu } from './store-config.mjs';
+
+const args = process.argv.slice(2);
+const apply = args.includes('--apply');
+const only = (args.find((a) => a.startsWith('--only=')) || '').split('=')[1];
+const doCollections = !only || only === 'collections';
+const doMenu = !only || only === 'menu';
+
+const cfg = config();
+const log = (...m) => console.log(...m);
+
+// ---------- lookups ----------
+
+async function findCollection(handle) {
+  const data = await gql(cfg, `query($h: String!) { collectionByIdentifier(identifier: { handle: $h }) { id handle title } }`, { h: handle });
+  return data.collectionByIdentifier;
+}
+
+async function findPage(handle) {
+  const data = await gql(cfg, `query($q: String!) { pages(first: 1, query: $q) { nodes { id handle } } }`, { q: `handle:${handle}` });
+  return data.pages.nodes.find((p) => p.handle === handle) || null;
+}
+
+async function findBlog(handle) {
+  const data = await gql(cfg, `query($q: String!) { blogs(first: 1, query: $q) { nodes { id handle } } }`, { q: `handle:${handle}` });
+  return data.blogs.nodes.find((b) => b.handle === handle) || null;
+}
+
+async function onlineStorePublicationId() {
+  const data = await gql(cfg, `{ publications(first: 50) { nodes { id name } } }`);
+  return data.publications.nodes.find((p) => p.name === 'Online Store')?.id || null;
+}
+
+// ---------- collections ----------
+
+const collectionIds = new Map();
+
+async function syncCollections() {
+  log('\nCollections');
+  const publicationId = apply ? await onlineStorePublicationId() : null;
+  if (apply && !publicationId) log('  ! No "Online Store" sales channel found; new collections will not be published.');
+
+  let created = 0;
+  for (const c of collections) {
+    const existing = await findCollection(c.handle);
+    if (existing) {
+      collectionIds.set(c.handle, existing.id);
+      log(`  = ${c.handle} (exists)`);
+      continue;
+    }
+
+    const kind = c.rule ? `automated: products tagged "${c.rule.condition}"` : 'manual';
+    if (!apply) {
+      log(`  + ${c.handle}  "${c.title}"  (${kind})`);
+      continue;
+    }
+
+    const input = { title: c.title, handle: c.handle };
+    if (c.rule) input.ruleSet = { appliedDisjunctively: false, rules: [c.rule] };
+    const data = await gql(
+      cfg,
+      `mutation($input: CollectionInput!) { collectionCreate(input: $input) { collection { id handle } userErrors { field message } } }`,
+      { input },
+      'collectionCreate'
+    );
+    const id = data.collectionCreate.collection.id;
+    collectionIds.set(c.handle, id);
+
+    if (publicationId) {
+      await gql(
+        cfg,
+        `mutation($id: ID!, $input: [PublicationInput!]!) { publishablePublish(id: $id, input: $input) { userErrors { field message } } }`,
+        { id, input: [{ publicationId }] },
+        'publishablePublish'
+      );
+    }
+    created++;
+    log(`  + ${c.handle}  created${publicationId ? ' and published' : ''} (${kind})`);
+  }
+  if (apply) log(`  ${created} created`);
+}
+
+// ---------- menu ----------
+
+const MENU_ITEM_FIELDS = 'id title type url resourceId';
+const MENU_QUERY = `{ menus(first: 50) { nodes { id handle title items { ${MENU_ITEM_FIELDS} items { ${MENU_ITEM_FIELDS} items { ${MENU_ITEM_FIELDS} } } } } } }`;
+
+// Turns a config item into a MenuItemCreateInput (also valid for menuUpdate, where items without an id are new).
+async function toMenuInput(item, warnings) {
+  const out = { title: item.title };
+
+  if (item.collection) {
+    let id = collectionIds.get(item.collection);
+    if (!id) {
+      const found = await findCollection(item.collection);
+      id = found?.id;
+      if (id) collectionIds.set(item.collection, id);
+    }
+    if (id) Object.assign(out, { type: 'COLLECTION', resourceId: id });
+    else {
+      Object.assign(out, { type: 'HTTP', url: `/collections/${item.collection}` });
+      warnings.push(`"${item.title}" links to collection "${item.collection}", which does not exist yet`);
+    }
+  } else if (item.url === '/collections/all') {
+    out.type = 'CATALOG';
+  } else if (item.url?.startsWith('/pages/')) {
+    const page = await findPage(item.url.slice('/pages/'.length));
+    if (page) Object.assign(out, { type: 'PAGE', resourceId: page.id });
+    else {
+      Object.assign(out, { type: 'HTTP', url: item.url });
+      warnings.push(`"${item.title}" links to ${item.url}, which does not exist yet (create the page)`);
+    }
+  } else if (item.url?.startsWith('/blogs/')) {
+    const blog = await findBlog(item.url.slice('/blogs/'.length).split('/')[0]);
+    if (blog) Object.assign(out, { type: 'BLOG', resourceId: blog.id });
+    else {
+      Object.assign(out, { type: 'HTTP', url: item.url });
+      warnings.push(`"${item.title}" links to ${item.url}, which does not exist yet (create the blog)`);
+    }
+  } else {
+    Object.assign(out, { type: 'HTTP', url: item.url || '#' });
+  }
+
+  out.items = [];
+  for (const child of item.items || []) out.items.push(await toMenuInput(child, warnings));
+  return out;
+}
+
+function printTree(items, depth = 1) {
+  for (const i of items) {
+    const target = i.resourceId ? i.type.toLowerCase() : i.url || i.type.toLowerCase();
+    log(`${'  '.repeat(depth)}- ${i.title}  →  ${target}`);
+    printTree(i.items || [], depth + 1);
+  }
+}
+
+async function syncMenu() {
+  log(`\nMenu "${menu.handle}"`);
+  const data = await gql(cfg, MENU_QUERY);
+  const current = data.menus.nodes.find((m) => m.handle === menu.handle);
+
+  const warnings = [];
+  const items = [];
+  for (const item of menu.items) items.push(await toMenuInput(item, warnings));
+
+  printTree(items);
+  for (const w of warnings) log(`  ! ${w}`);
+
+  if (!apply) {
+    log(current ? `  (would replace the current ${current.items.length}-item menu)` : '  (would create this menu)');
+    return;
+  }
+
+  if (current) {
+    const dir = resolve(cfg.repoRoot, 'scripts/shopify/backups');
+    mkdirSync(dir, { recursive: true });
+    const file = resolve(dir, `${menu.handle}-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+    writeFileSync(file, JSON.stringify(current, null, 2));
+    log(`  Saved the current menu to ${file}`);
+
+    await gql(
+      cfg,
+      `mutation($id: ID!, $title: String!, $handle: String, $items: [MenuItemUpdateInput!]!) {
+        menuUpdate(id: $id, title: $title, handle: $handle, items: $items) { menu { id } userErrors { field message } }
+      }`,
+      { id: current.id, title: menu.title, handle: menu.handle, items },
+      'menuUpdate'
+    );
+    log('  Menu updated');
+  } else {
+    await gql(
+      cfg,
+      `mutation($title: String!, $handle: String!, $items: [MenuItemCreateInput!]!) {
+        menuCreate(title: $title, handle: $handle, items: $items) { menu { id } userErrors { field message } }
+      }`,
+      { title: menu.title, handle: menu.handle, items },
+      'menuCreate'
+    );
+    log('  Menu created');
+  }
+}
+
+// ---------- run ----------
+
+try {
+  log(`${apply ? 'Applying to' : 'Preview for'} ${cfg.domain} (API ${cfg.version})${apply ? '' : '. Nothing will change; add --apply to write.'}`);
+  if (doCollections) await syncCollections();
+  if (doMenu) await syncMenu();
+  log('\nDone.');
+} catch (err) {
+  console.error(`\nStopped: ${err.message}`);
+  process.exit(1);
+}

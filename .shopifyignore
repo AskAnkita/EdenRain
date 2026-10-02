@@ -3,3 +3,9 @@ assets/logo/*
 .DS_Store
 assets/.DS_Store
 assets/environment-maps/*
+
+# Dev tooling and secrets: never upload to the Shopify theme
+.env
+.env.*
+scripts/*
+.gitignore
