@@ -55,9 +55,11 @@
   
   assign sorted_media = '' | split: ','
 
-  # A product that leads with a video keeps the video first, whichever variant is selected
+  # A product that leads with a video keeps a video first, whichever variant is selected
+  assign lead_is_video = false
   assign lead_media_type = selected_product.media.first.media_type
   if lead_media_type == 'video' or lead_media_type == 'external_video'
+    assign lead_is_video = true
     assign selected_variant_media = nil
   endif
 
@@ -77,6 +79,82 @@
   else
     assign sorted_media = selected_product.media
   endif
+
+  # One video per metal: show only the selected metal's video, first. A video belongs to a
+  # metal when its alt text names it ("Rose Gold", or just "rose"); failing that, videos are
+  # matched to the metal option's values in order (1st video = 1st metal, and so on).
+  if lead_is_video
+    assign video_media = '' | split: ','
+    for media in selected_product.media
+      if media.media_type == 'video' or media.media_type == 'external_video'
+        assign one_media = selected_product.media | where: 'id', media.id
+        assign video_media = video_media | concat: one_media
+      endif
+    endfor
+
+    assign metal_value = blank
+    assign metal_index = -1
+    for product_option in selected_product.options_with_values
+      assign option_name = product_option.name | downcase
+      if option_name contains 'metal' or option_name contains 'color' or option_name contains 'colour' or option_name contains 'finish' or option_name contains 'material'
+        assign metal_value = product_option.selected_value | downcase
+        for option_value in product_option.values
+          assign option_value_name = option_value.name | downcase
+          if option_value_name == metal_value
+            assign metal_index = forloop.index0
+          endif
+        endfor
+        break
+      endif
+    endfor
+
+    if metal_value != blank and video_media.size > 1
+      assign metal_word = blank
+      if metal_value contains 'rose'
+        assign metal_word = 'rose'
+      elsif metal_value contains 'yellow'
+        assign metal_word = 'yellow'
+      elsif metal_value contains 'white'
+        assign metal_word = 'white'
+      elsif metal_value contains 'platinum'
+        assign metal_word = 'platinum'
+      elsif metal_value contains 'silver' or metal_value contains 'sterling'
+        assign metal_word = 'silver'
+      endif
+
+      assign variant_video = nil
+      for video in video_media
+        assign video_alt = video.alt | downcase
+        if video_alt contains metal_value
+          assign variant_video = video
+          break
+        endif
+      endfor
+      if variant_video == nil and metal_word != blank
+        for video in video_media
+          assign video_alt = video.alt | downcase
+          if video_alt contains metal_word
+            assign variant_video = video
+            break
+          endif
+        endfor
+      endif
+      if variant_video == nil and metal_index >= 0 and metal_index < video_media.size
+        assign variant_video = video_media[metal_index]
+      endif
+
+      if variant_video
+        assign sorted_media = selected_product.media | where: 'id', variant_video.id
+        for media in selected_product.media
+          unless media.media_type == 'video' or media.media_type == 'external_video'
+            assign one_media = selected_product.media | where: 'id', media.id
+            assign sorted_media = sorted_media | concat: one_media
+          endunless
+        endfor
+      endif
+    endif
+  endif
+
   assign has_image_drop = sorted_media | has: 'media_type', 'image'
 
   # Determine if we're in single column mode (carousel or grid with one column)
