@@ -7,7 +7,9 @@ import { dirname, resolve } from 'node:path';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
-// Values already in the environment win over .env, so a CI or cloud secret can override it.
+// .env wins over variables already set in the terminal (an old `export SHOPIFY_ADMIN_TOKEN=...`
+// in ~/.zshrc would otherwise be used instead), and an empty line in .env clears that variable.
+// Without a .env file (e.g. in CI or a cloud session), the environment's own variables are used.
 export function loadEnv(file = resolve(repoRoot, '.env')) {
   if (!existsSync(file)) return;
   for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
@@ -15,7 +17,10 @@ export function loadEnv(file = resolve(repoRoot, '.env')) {
     if (!match || line.trim().startsWith('#')) continue;
     const [, key, raw] = match;
     const value = raw.replace(/^(['"])(.*)\1$/, '$2');
-    if (process.env[key] === undefined) process.env[key] = value;
+    if (process.env[key] !== undefined && process.env[key] !== value) {
+      console.log(`Using ${key} from .env instead of the one set in your terminal`);
+    }
+    process.env[key] = value;
   }
 }
 
