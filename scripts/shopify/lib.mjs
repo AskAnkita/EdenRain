@@ -42,8 +42,13 @@ export function config() {
 let cachedToken = null;
 
 async function accessToken(cfg) {
-  if (cfg.token) return cfg.token;
   if (cachedToken) return cachedToken;
+  if (cfg.token) {
+    console.log(`Signing in with SHOPIFY_ADMIN_TOKEN (${describeToken(cfg.token)})`);
+    cachedToken = cfg.token;
+    return cachedToken;
+  }
+  console.log('Signing in with SHOPIFY_CLIENT_ID and SHOPIFY_CLIENT_SECRET');
 
   const res = await fetch(`https://${cfg.domain}/admin/oauth/access_token`, {
     method: 'POST',
@@ -69,7 +74,14 @@ async function accessToken(cfg) {
     );
   }
   cachedToken = body.access_token;
+  console.log(`Got an access token (${describeToken(cachedToken)}; scopes: ${body.scope || 'not listed'})`);
   return cachedToken;
+}
+
+// Safe to print: the kind of token and its length, never the token itself
+function describeToken(token) {
+  const kind = token.startsWith('shpat_') ? 'shpat_ admin token' : token.startsWith('shpss_') ? 'shpss_ app SECRET, not a token' : `starts "${token.slice(0, 4)}…"`;
+  return `${kind}, ${token.length} characters`;
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -93,7 +105,8 @@ export async function gql(cfg, query, variables = {}, mutationField) {
     }
     if (!res.ok) {
       const hint = res.status === 401 ? ' (the token or app credentials were not accepted)' : res.status === 403 ? ' (the app is missing a scope)' : '';
-      throw new Error(`Shopify answered ${res.status} ${res.statusText}${hint}`);
+      const detail = (await res.text()).slice(0, 300);
+      throw new Error(`Shopify answered ${res.status} ${res.statusText}${hint}${detail ? `\n  Shopify said: ${detail}` : ''}`);
     }
 
     const body = await res.json();
