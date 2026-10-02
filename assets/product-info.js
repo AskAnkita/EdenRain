@@ -604,10 +604,19 @@ if (!customElements.get('product-info')) {
       updateMedia(html, variantFeaturedMediaId) {
         if (!variantFeaturedMediaId) return;
 
-        this.querySelector(`media-gallery`)?.setActiveMedia?.(
-          `${this.dataset.section}-${variantFeaturedMediaId}`,
-          true
-        );
+        const gallery = this.querySelector(`media-gallery`);
+        // A product that leads with a video shows that video on every variant change,
+        // rather than jumping to the variant's photo (a variant can only hold one image)
+        const leadMedia = gallery?.querySelector('[data-media-id]');
+        const leadContainer = leadMedia?.closest('.product-media-container');
+        const leadIsVideo = leadContainer?.matches('.product-media-container--video, .product-media-container--external_video');
+
+        if (leadIsVideo) {
+          gallery.setActiveMedia?.(leadMedia.dataset.mediaId, true);
+          leadContainer.querySelector('video')?.play?.().catch(() => {});
+        } else {
+          gallery?.setActiveMedia?.(`${this.dataset.section}-${variantFeaturedMediaId}`, true);
+        }
 
         const mediaGallerySelector = `.media-gallery--hide-variants[data-section="${this.sectionId}"], .media-gallery--hide-variants[data-section-id="${this.sectionId}"]`;
         const currentMediaGallery = document.querySelector(mediaGallerySelector);

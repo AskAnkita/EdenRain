@@ -54,6 +54,13 @@
   endif
   
   assign sorted_media = '' | split: ','
+
+  # A product that leads with a video keeps the video first, whichever variant is selected
+  assign lead_media_type = selected_product.media.first.media_type
+  if lead_media_type == 'video' or lead_media_type == 'external_video'
+    assign selected_variant_media = nil
+  endif
+
   if selected_variant_media
     assign sorted_media = sorted_media | concat: selected_product.media | where: 'id', selected_variant_media.id
 
