@@ -7,8 +7,10 @@ sections, snippets, templates).
 
 ## Setup (once)
 
-1. `cp .env.example .env` and paste your Admin API token into `SHOPIFY_ADMIN_TOKEN`.
-   `.env` is git-ignored, so the token is never committed.
+1. `cp .env.example .env` and fill in `SHOPIFY_CLIENT_ID` and `SHOPIFY_CLIENT_SECRET` from your
+   dev app (the app must be installed on the store). The script swaps them for a short-lived
+   Admin API token on each run. If you have an `shpat_` token instead, put it in
+   `SHOPIFY_ADMIN_TOKEN`. `.env` is git-ignored, so none of this is ever committed.
 2. Needs Node 18 or newer (`node --version`).
 
 ## Use

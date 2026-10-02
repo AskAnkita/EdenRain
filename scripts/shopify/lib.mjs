@@ -23,22 +23,62 @@ export function config() {
   loadEnv();
   const domain = (process.env.SHOPIFY_STORE_DOMAIN || '').replace(/^https?:\/\//, '').replace(/\/$/, '');
   const token = process.env.SHOPIFY_ADMIN_TOKEN || '';
+  const clientId = process.env.SHOPIFY_CLIENT_ID || '';
+  const clientSecret = process.env.SHOPIFY_CLIENT_SECRET || '';
   const version = process.env.SHOPIFY_API_VERSION || '2026-07';
   const missing = [];
   if (!domain) missing.push('SHOPIFY_STORE_DOMAIN');
-  if (!token) missing.push('SHOPIFY_ADMIN_TOKEN');
+  if (!token && !(clientId && clientSecret)) missing.push('SHOPIFY_CLIENT_ID and SHOPIFY_CLIENT_SECRET (or SHOPIFY_ADMIN_TOKEN)');
   if (missing.length) {
-    console.error(`Missing ${missing.join(' and ')}. Copy .env.example to .env and fill it in.`);
+    console.error(`Missing ${missing.join(', ')}. Copy .env.example to .env and fill it in.`);
     process.exit(1);
   }
-  return { domain, token, version, repoRoot };
+  return { domain, token, clientId, clientSecret, version, repoRoot };
+}
+
+// Dev Dashboard apps give a client ID and secret rather than a token. For an app installed on a
+// store in the same organization, Shopify swaps them for an Admin API token (valid about 24 hours)
+// through the client credentials grant. Fetched once per run and reused.
+let cachedToken = null;
+
+async function accessToken(cfg) {
+  if (cfg.token) return cfg.token;
+  if (cachedToken) return cachedToken;
+
+  const res = await fetch(`https://${cfg.domain}/admin/oauth/access_token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: cfg.clientId,
+      client_secret: cfg.clientSecret,
+    }),
+  });
+  const text = await res.text();
+  let body = {};
+  try {
+    body = JSON.parse(text);
+  } catch {
+    // not JSON; reported below
+  }
+  if (!res.ok || !body.access_token) {
+    const reason = body.error_description || body.error || text.slice(0, 200) || res.statusText;
+    throw new Error(
+      `Could not get an access token from the client ID and secret (${res.status}): ${reason}. ` +
+        'Check that the app is installed on this store and the ID and secret are copied exactly.'
+    );
+  }
+  cachedToken = body.access_token;
+  return cachedToken;
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Runs a GraphQL query. Retries when Shopify throttles; throws on any other error,
 // including userErrors returned by a mutation (pass the mutation's field name as `mutationField`).
-export async function gql({ domain, token, version }, query, variables = {}, mutationField) {
+export async function gql(cfg, query, variables = {}, mutationField) {
+  const { domain, version } = cfg;
+  const token = await accessToken(cfg);
   const url = `https://${domain}/admin/api/${version}/graphql.json`;
   for (let attempt = 1; attempt <= 5; attempt++) {
     const res = await fetch(url, {
@@ -52,7 +92,7 @@ export async function gql({ domain, token, version }, query, variables = {}, mut
       continue;
     }
     if (!res.ok) {
-      const hint = res.status === 401 ? ' (check SHOPIFY_ADMIN_TOKEN)' : res.status === 403 ? ' (the app is missing a scope)' : '';
+      const hint = res.status === 401 ? ' (the token or app credentials were not accepted)' : res.status === 403 ? ' (the app is missing a scope)' : '';
       throw new Error(`Shopify answered ${res.status} ${res.statusText}${hint}`);
     }
 
