@@ -20,6 +20,7 @@ node scripts/shopify/setup-store.mjs                          # preview: shows w
 node scripts/shopify/setup-store.mjs --apply                  # create missing collections + write the menu
 node scripts/shopify/setup-store.mjs --apply --only=collections
 node scripts/shopify/setup-store.mjs --apply --only=menu
+node scripts/shopify/setup-store.mjs --apply --menu-handle=miadonna-menu   # new menu beside the live one
 ```
 
 - Edit `store-config.mjs` to change the collections or the menu.

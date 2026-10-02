@@ -5,6 +5,9 @@
 //   node scripts/shopify/setup-store.mjs --apply             create missing collections and write the menu
 //   node scripts/shopify/setup-store.mjs --apply --only=collections
 //   node scripts/shopify/setup-store.mjs --apply --only=menu
+//   node scripts/shopify/setup-store.mjs --apply --menu-handle=miadonna-menu
+//       writes the menu under another handle instead of replacing main-menu, so the live menu
+//       stays as it is until you pick the new one in the theme editor (Header > Menu)
 //
 // Existing collections are left untouched. Before the menu is replaced, the current one is saved
 // to scripts/shopify/backups/ (git-ignored).
@@ -19,6 +22,8 @@ const apply = args.includes('--apply');
 const only = (args.find((a) => a.startsWith('--only=')) || '').split('=')[1];
 const doCollections = !only || only === 'collections';
 const doMenu = !only || only === 'menu';
+const menuHandle = (args.find((a) => a.startsWith('--menu-handle=')) || '').split('=')[1] || menu.handle;
+const menuTitle = menuHandle === menu.handle ? menu.title : `${menu.title} (${menuHandle})`;
 
 const cfg = config();
 const log = (...m) => console.log(...m);
@@ -149,9 +154,9 @@ function printTree(items, depth = 1) {
 }
 
 async function syncMenu() {
-  log(`\nMenu "${menu.handle}"`);
+  log(`\nMenu "${menuHandle}"`);
   const data = await gql(cfg, MENU_QUERY);
-  const current = data.menus.nodes.find((m) => m.handle === menu.handle);
+  const current = data.menus.nodes.find((m) => m.handle === menuHandle);
 
   const warnings = [];
   const items = [];
@@ -168,7 +173,7 @@ async function syncMenu() {
   if (current) {
     const dir = resolve(cfg.repoRoot, 'scripts/shopify/backups');
     mkdirSync(dir, { recursive: true });
-    const file = resolve(dir, `${menu.handle}-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+    const file = resolve(dir, `${menuHandle}-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
     writeFileSync(file, JSON.stringify(current, null, 2));
     log(`  Saved the current menu to ${file}`);
 
@@ -177,7 +182,7 @@ async function syncMenu() {
       `mutation($id: ID!, $title: String!, $handle: String, $items: [MenuItemUpdateInput!]!) {
         menuUpdate(id: $id, title: $title, handle: $handle, items: $items) { menu { id } userErrors { field message } }
       }`,
-      { id: current.id, title: menu.title, handle: menu.handle, items },
+      { id: current.id, title: menuTitle, handle: menuHandle, items },
       'menuUpdate'
     );
     log('  Menu updated');
@@ -187,10 +192,10 @@ async function syncMenu() {
       `mutation($title: String!, $handle: String!, $items: [MenuItemCreateInput!]!) {
         menuCreate(title: $title, handle: $handle, items: $items) { menu { id } userErrors { field message } }
       }`,
-      { title: menu.title, handle: menu.handle, items },
+      { title: menuTitle, handle: menuHandle, items },
       'menuCreate'
     );
-    log('  Menu created');
+    log(`  Menu created. Pick "${menuTitle}" in the theme editor under Header > Menu to use it.`);
   }
 }
 
