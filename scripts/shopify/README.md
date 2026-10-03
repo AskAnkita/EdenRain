@@ -29,3 +29,12 @@ node scripts/shopify/setup-store.mjs --apply --menu-handle=miadonna-menu   # new
 - Automated collections fill themselves from product tags, e.g. tag a product `shape:oval` or
   `metal:rose-gold`.
 - Before the menu is replaced, the current one is saved to `scripts/shopify/backups/` (git-ignored).
+
+## Undo the menu / match collection pictures to the homepage
+
+```bash
+node scripts/shopify/restore-menu.mjs                  # preview: the menu from before the first setup run
+node scripts/shopify/restore-menu.mjs --apply          # put it back (the current menu is backed up first)
+node scripts/shopify/set-collection-images.mjs         # preview: homepage category pictures -> collection images
+node scripts/shopify/set-collection-images.mjs --apply # set them (add --force to replace existing images)
+```
