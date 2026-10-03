@@ -190,31 +190,6 @@
   overflow-y: auto;
 }
 
-/* Close anchors to the panel (not the scrolling column) so it stays put */
-.menu-drawer-desktop__close {
-  position: absolute;
-  top: 1.6rem;
-  right: 1.6rem;
-  z-index: 1;
-  width: 2.4rem;
-  height: 2.4rem;
-  padding: 0.4rem;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.menu-drawer-desktop__close:hover {
-  color: #000;
-}
-
-.menu-drawer-desktop__close .svg-wrapper,
-.menu-drawer-desktop__close svg {
-  width: 100%;
-  height: 100%;
-}
-
 .menu-drawer-desktop__group[hidden] {
   display: none;
 }

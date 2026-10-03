@@ -224,7 +224,6 @@
         "text_QYCLHk",
         "text_Lw7jtn"
       ],
-      "disabled": false,
       "settings": {
         "content_stacked": true,
         "page_width": "full-width",
@@ -266,7 +265,6 @@
     },
     "section_zQ9rxr": {
       "type": "section",
-      "disabled": true,
       "blocks": {
         "text_6hAEYB": {
           "type": "text",
@@ -435,6 +433,7 @@
         "text_6hAEYB",
         "text_HxRdAn"
       ],
+      "disabled": true,
       "name": "t:names.rich_text",
       "settings": {
         "content_direction": "column",
@@ -4306,6 +4305,12 @@
         "columns_gap_vertical": 60,
         "padding-inline-start": 40,
         "padding-inline-end": 40,
+        "show_banner_1": true,
+        "banner_position_1": "3",
+        "show_banner_2": true,
+        "banner_position_2": "11",
+        "show_banner_3": false,
+        "banner_position_3": "12",
         "pagination_type": "infinite",
         "pagination_load_mode": "button",
         "load_more_label": "View more",
@@ -4313,13 +4318,7 @@
         "padding-block-start-pagination": 50,
         "padding-block-end-pagination": 0,
         "padding_top": 36,
-        "padding_bottom": 60,
-        "show_banner_1": true,
-        "banner_position_1": "3",
-        "show_banner_2": true,
-        "banner_position_2": "11",
-        "show_banner_3": false,
-        "banner_position_3": "12"
+        "padding_bottom": 60
       }
     },
     "recently_viewed_products_PjBQye": {
@@ -4670,8 +4669,8 @@
           "type": "accordion",
           "name": "t:names.accordion",
           "settings": {
-            "icon": "plus",
             "style": "editorial",
+            "icon": "plus",
             "dividers": true,
             "type_preset_heading": "paragraph",
             "inherit_color_scheme": true,

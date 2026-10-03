@@ -8,6 +8,17 @@
   border-bottom: 1px solid #ddd;
 }
 
+/* Keep the card edge in the middle of each navigation button. */
+.shopify-section[id$='__section_xyhtgf'] .swiper:has(.swiper-button) {
+  --style-row-arrow-size: 56px;
+  padding-inline: calc(var(--style-row-arrow-size) * 0.5);
+  margin-inline: calc(var(--style-row-arrow-size) * -0.5);
+}
+
+.shopify-section[id$='__section_xyhtgf'] .swiper .swiper-button {
+  --swiper-navigation-sides-offset: 0;
+}
+
 /* Cards */
 .shopify-section[id$='__section_xyhtgf'] .swiper-slide > .group-block {
   border: 1px solid #eee !important;
@@ -56,6 +67,10 @@
 
 /* 1025–1399px shows exactly four cards, so keep the arrow small to cover less of the last label */
 @media screen and (max-width: 1399px) {
+  .shopify-section[id$='__section_xyhtgf'] .swiper:has(.swiper-button) {
+    --style-row-arrow-size: 40px;
+  }
+
   .shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-prev,
   .shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-next {
     --button-width: 40px;

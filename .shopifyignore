@@ -9,3 +9,11 @@ assets/environment-maps/*
 .env.*
 scripts/*
 .gitignore
+
+# Half-written temp files an editor or `sed -i` leaves beside the real one. They appear for a
+# moment during a save and break an upload that happens to scan the folder right then.
+.!*!*
+*.tmp
+*.swp
+*~
+sed??????

@@ -1,0 +1,49 @@
+{%- comment -%}
+  Faceted outline icons used by the Shape filter tiles.
+  @param {string} shape - round, oval, emerald, marquise, radiant, princess, asscher, baguette
+{%- endcomment -%}
+<svg class="icon-diamond-filter-shape" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  {%- case shape -%}
+    {%- when 'round' -%}
+      <circle cx="50" cy="50" r="42"/>
+      <path d="M22 22h56M14 50h72M22 78h56M50 8v84M22 22l56 56M78 22 22 78M50 8 22 22 8 50l14 28 28 14 28-14 14-28-14-28L50 8Z"/>
+      <path d="m22 22 14 14h28l14-14M8 50l28 14 14 28 14-28 28-14M22 78l14-14h28l14 14M50 8 36 36 8 50l28 14 14 28 14-28 28-14-28-14L50 8Z"/>
+    {%- when 'oval' -%}
+      <path d="M50 8c21 8 36 24 36 42S71 84 50 92C29 84 14 68 14 50S29 16 50 8Z"/>
+      <path d="M50 8v84M14 50h72M27 20l23 16 23-16M18 35l18 15-18 15M82 35 64 50l18 15M27 80l23-16 23 16M27 20l9 30-9 30M73 20l-9 30 9 30M18 35l18 15 14-42 14 42 18-15M18 65l18-15 14 42 14-42 18 15"/>
+    {%- when 'emerald' -%}
+      <path d="m30 8 40 0 16 17v50L70 92H30L14 75V25L30 8Z"/>
+      <path d="M30 8 36 20h28l6-12M14 25l12 8v34l-12 8M86 25l-12 8v34l12 8M30 92l6-12h28l6 12M26 33l10-13h28l10 13v34L64 80H36L26 67V33Z"/>
+      <path d="M36 20v13h28V20M26 33h10v34H26M64 33h10v34H64M36 67v13h28V67"/>
+    {%- when 'marquise' -%}
+      <path d="M50 8c20 18 34 33 34 42S70 74 50 92C30 74 16 59 16 50S30 26 50 8Z"/>
+      <path d="M50 8v84M16 50h68M29 23l21 18 21-18M22 37l28 13 28-13M22 63l28-13 28 13M29 77l21-18 21 18M16 50l13-27 21 27 21-27 13 27-13 27-21-27-21 27-13-27Z"/>
+    {%- when 'radiant' -%}
+      <path d="m29 9 42 0 19 18v46L71 91H29L10 73V27L29 9Z"/>
+      <path d="M29 9 35 22h30l6-13M10 27l14 8v30l-14 8M90 27l-14 8v30l14 8M29 91l6-13h30l6 13M24 35l11-13h30l11 13v30L65 78H35L24 65V35Z"/>
+      <path d="M35 22v13h30V22M24 35h11v30H24M65 35h11v30H65M35 65v13h30V65M10 27l25 8 15-27 15 27 25-8-14 38 14 8-25-8-15 26-15-26-25 8 14-8-14-38Z"/>
+    {%- when 'princess' -%}
+      <rect x="9" y="9" width="82" height="82"/>
+      <rect x="25" y="25" width="50" height="50"/>
+      <path d="m9 9 16 16M91 9 75 25M91 91 75 75M9 91l16-16M50 9v16M91 50H75M50 91V75M9 50h16M9 9l16 41L9 91M91 9 75 50l16 41M9 9l41 16 41-16M9 91l41-16 41 16"/>
+    {%- when 'asscher' -%}
+      <path d="m30 8 40 0 22 22v40L70 92H30L8 70V30L30 8Z"/>
+      <path d="m34 20 32 0 14 14v32L66 80H34L20 66V34L34 20Z"/>
+      <path d="m38 30 24 0 8 8v24l-8 8H38l-8-8V38l8-8ZM30 8l4 12M70 8l-4 12M92 30l-12 4M92 70l-12-4M70 92l-4-12M30 92l4-12M8 70l12-4M8 30l12 4M20 34l14-14M80 34 66 20M80 66 66 80M20 66l14 14"/>
+    {%- when 'baguette' -%}
+      <rect x="25" y="8" width="50" height="84"/>
+      <rect x="31" y="14" width="38" height="72"/>
+      <rect x="36" y="19" width="28" height="62"/>
+      <path d="M25 8 31 14M75 8l-6 6M75 92l-6-6M25 92l6-6M31 14v72M69 14v72"/>
+    {%- when 'cushion' -%}
+      <rect x="10" y="10" width="80" height="80" rx="18"/>
+      <rect x="25" y="25" width="50" height="50" rx="10"/>
+      <path d="m10 10 15 15M90 10 75 25M90 90 75 75M10 90l15-15M10 50h15M90 50H75M50 10v15M50 90V75M25 25l25 25 25-25M25 75l25-25 25 25"/>
+    {%- when 'heart' -%}
+      <path d="M50 88C31 72 14 58 14 38c0-14 10-24 23-24 6 0 11 3 13 9 3-6 8-9 14-9 13 0 23 10 23 24 0 20-17 34-37 50Z"/>
+      <path d="M50 76 28 40l22 7 22-7-22 36ZM14 38l36 9 36-9M28 40l22-26 22 26M50 47v29"/>
+    {%- when 'pear' -%}
+      <path d="M50 10c8 13 31 29 31 52a31 31 0 0 1-62 0c0-23 23-39 31-52Z"/>
+      <path d="M50 10v78M19 62h62M30 37l20 14 20-14M22 48l28 14 28-14M30 75l20-13 20 13"/>
+  {%- endcase -%}
+</svg>

@@ -18,9 +18,10 @@
           "type": "image",
           "name": "t:names.image",
           "settings": {
-            "image": "",
             "fallback_asset": "eden-raine-logo.png",
             "fallback_asset_ratio": "1188 / 158",
+            "placeholder_image_url": "",
+            "placeholder_image_ratio": "",
             "link": "",
             "hide_on_mobile": false,
             "image_ratio": "adapt",
@@ -56,6 +57,7 @@
       "block_order": [
         "image_eLwyrH"
       ],
+      "disabled": true,
       "name": "t:names.rich_text",
       "settings": {
         "content_direction": "column",
@@ -99,6 +101,68 @@
         "padding-block-end-mb": 0,
         "padding-inline-start-mb": 0,
         "padding-inline-end-mb": 0
+      }
+    },
+    "footer_luxe": {
+      "type": "footer-luxe",
+      "blocks": {
+        "menu_category": {
+          "type": "menu",
+          "settings": {
+            "heading": "Category",
+            "menu": "category"
+          }
+        },
+        "menu_about": {
+          "type": "menu",
+          "settings": {
+            "heading": "About",
+            "menu": ""
+          }
+        },
+        "menu_care": {
+          "type": "menu",
+          "settings": {
+            "heading": "Care",
+            "menu": ""
+          }
+        },
+        "text_visit": {
+          "type": "text",
+          "settings": {
+            "heading": "Visit",
+            "text": "<p>Unit 5C, Chelston Business Park<br/>Wellington TA21 9JQ<br/>United Kingdom</p>"
+          }
+        },
+        "text_write": {
+          "type": "text",
+          "settings": {
+            "heading": "Write to us",
+            "text": "<p><a href=\"mailto:info@heatherneedhamsilver.com\" title=\"mailto:info@heatherneedhamsilver.com\">info@heatherneedhamsilver.com</a></p><p><a href=\"https://www.instagram.com/heatherneedhamsilver/\" target=\"_blank\" title=\"Instagram\">Instagram</a></p>"
+          }
+        }
+      },
+      "block_order": [
+        "menu_category",
+        "menu_about",
+        "menu_care",
+        "text_visit",
+        "text_write"
+      ],
+      "settings": {
+        "brand_line": "Diamonds grown with care, set by hand, made to last a lifetime.",
+        "show_newsletter": true,
+        "newsletter_placeholder": "Email for new arrivals",
+        "newsletter_button": "Join",
+        "newsletter_success": "Thank you. You're on the list.",
+        "wordmark_style": "dark",
+        "wordmark_width": 140,
+        "show_payment_icons": true,
+        "color_background": "#FFFFFF",
+        "color_text": "#1c1a19",
+        "color_muted": "#4f4541",
+        "color_accent": "#1c1a19",
+        "color_rule": "#cfbcb5"
       },
       "disabled": true
     },
@@ -689,10 +753,10 @@
               "blocks": {
                 "menu_VeyxGm": {
                   "type": "menu",
-                  "disabled": true,
                   "name": "Menu",
+                  "disabled": true,
                   "settings": {
-                    "menu": "about",
+                    "menu": "",
                     "heading": "ABOUT",
                     "margin-block-end": 4,
                     "content_direction": "column",
@@ -740,10 +804,10 @@
                 },
                 "menu_YNbgQe": {
                   "type": "menu",
-                  "disabled": true,
                   "name": "Menu",
+                  "disabled": true,
                   "settings": {
-                    "menu": "care",
+                    "menu": "",
                     "heading": "CARE",
                     "margin-block-end": 4,
                     "content_direction": "column",
@@ -791,8 +855,8 @@
                 },
                 "menu_JKgFkA": {
                   "type": "menu",
-                  "disabled": true,
                   "name": "Menu",
+                  "disabled": true,
                   "settings": {
                     "menu": "category",
                     "heading": "CATEGORY",
@@ -1087,7 +1151,7 @@
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "",
+                            "placeholder_image_url": "",
                             "link": "",
                             "open_in_new_tab": false,
                             "width": 24,
@@ -1272,7 +1336,7 @@
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "",
+                            "placeholder_image_url": "",
                             "link": "",
                             "open_in_new_tab": false,
                             "width": 24,
@@ -1457,7 +1521,7 @@
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "",
+                            "placeholder_image_url": "",
                             "link": "",
                             "open_in_new_tab": false,
                             "width": 24,
@@ -1655,12 +1719,13 @@
           "blocks": {
             "image_TPwfCy": {
               "type": "image",
-              "disabled": true,
               "name": "t:names.image",
+              "disabled": true,
               "settings": {
-                "image": "",
                 "fallback_asset": "eden-raine-monogram.png",
                 "fallback_asset_ratio": "281 / 240",
+                "placeholder_image_url": "",
+                "placeholder_image_ratio": "",
                 "link": "",
                 "hide_on_mobile": false,
                 "image_ratio": "adapt",
@@ -2146,6 +2211,7 @@
         "footer_group_GQfP9p",
         "group_7TgywR"
       ],
+      "disabled": true,
       "name": "Footer - Home default",
       "settings": {
         "content_direction": "column",
@@ -2166,8 +2232,7 @@
         "background_image_position": "cover",
         "padding-block-start": 0,
         "padding-block-end": 24
-      },
-      "disabled": true
+      }
     },
     "footer_xynjaw": {
       "type": "footer",
@@ -2758,7 +2823,7 @@
                   "type": "menu",
                   "name": "Menu",
                   "settings": {
-                    "menu": "about",
+                    "menu": "",
                     "heading": "ABOUT",
                     "margin-block-end": 4,
                     "content_direction": "column",
@@ -2808,7 +2873,7 @@
                   "type": "menu",
                   "name": "Menu",
                   "settings": {
-                    "menu": "care",
+                    "menu": "",
                     "heading": "CARE",
                     "margin-block-end": 4,
                     "content_direction": "column",
@@ -3151,7 +3216,7 @@
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "",
+                            "placeholder_image_url": "",
                             "link": "",
                             "open_in_new_tab": false,
                             "width": 24,
@@ -3336,7 +3401,7 @@
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "",
+                            "placeholder_image_url": "",
                             "link": "",
                             "open_in_new_tab": false,
                             "width": 24,
@@ -3521,7 +3586,7 @@
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "",
+                            "placeholder_image_url": "",
                             "link": "",
                             "open_in_new_tab": false,
                             "width": 24,
@@ -3721,9 +3786,10 @@
               "type": "image",
               "name": "t:names.image",
               "settings": {
-                "image": "",
                 "fallback_asset": "eden-raine-logo.png",
                 "fallback_asset_ratio": "1188 / 158",
+                "placeholder_image_url": "",
+                "placeholder_image_ratio": "",
                 "link": "",
                 "hide_on_mobile": false,
                 "image_ratio": "adapt",
@@ -4248,70 +4314,126 @@
         "padding_bottom": 36
       }
     },
-    "footer_luxe": {
-      "type": "footer-luxe",
+    "footer_icon_bar": {
+      "type": "footer-icon-bar",
       "blocks": {
-        "menu_category": {
-          "type": "menu",
+        "item_ethical": {
+          "type": "item",
           "settings": {
-            "heading": "Category",
-            "menu": "category"
+            "icon": "leaf",
+            "text": "Ethical choice",
+            "link": ""
           }
         },
-        "menu_about": {
-          "type": "menu",
+        "item_value": {
+          "type": "item",
           "settings": {
-            "heading": "About",
-            "menu": "about"
+            "icon": "tag",
+            "text": "Great value",
+            "link": ""
           }
         },
-        "menu_care": {
-          "type": "menu",
+        "item_shipping": {
+          "type": "item",
           "settings": {
-            "heading": "Care",
-            "menu": "care"
-          }
-        },
-        "text_visit": {
-          "type": "text",
-          "settings": {
-            "heading": "Visit",
-            "text": "<p>Unit 5C, Chelston Business Park<br/>Wellington TA21 9JQ<br/>United Kingdom</p>"
-          }
-        },
-        "text_write": {
-          "type": "text",
-          "settings": {
-            "heading": "Write to us",
-            "text": "<p><a href=\"mailto:info@heatherneedhamsilver.com\" title=\"mailto:info@heatherneedhamsilver.com\">info@heatherneedhamsilver.com</a></p><p><a href=\"https://www.instagram.com/heatherneedhamsilver/\" target=\"_blank\" title=\"Instagram\">Instagram</a></p>"
+            "icon": "globe",
+            "text": "Worldwide shipping",
+            "link": ""
           }
         }
       },
       "block_order": [
-        "menu_category",
-        "menu_about",
-        "menu_care",
-        "text_visit",
-        "text_write"
+        "item_ethical",
+        "item_value",
+        "item_shipping"
       ],
       "settings": {
-        "brand_line": "Diamonds grown with care, set by hand, made to last a lifetime.",
-        "show_newsletter": true,
-        "newsletter_placeholder": "Email for new arrivals",
-        "newsletter_button": "Join",
-        "newsletter_success": "Thank you. You're on the list.",
-        "wordmark_style": "dark",
-        "wordmark_width": 140,
-        "show_payment_icons": true,
-        "color_background": "#e3d4cf",
-        "color_text": "#1c1a19",
-        "color_muted": "#4f4541",
-        "color_accent": "#1c1a19",
-        "color_rule": "#cfbcb5"
+        "show_bar": true,
+        "background": "#ead9d1",
+        "text_color": "#161616",
+        "alignment": "center",
+        "text_size": 15,
+        "icon_size": 18,
+        "padding_top": 28,
+        "padding_bottom": 28,
+        "content_width": 1400,
+        "side_padding": 64
+      }
+    },
+    "footer_classic": {
+      "type": "footer-classic",
+      "blocks": {
+        "fc_logo": {
+          "type": "logo",
+          "settings": {
+            "logo": "shopify://shop_images/Eden_Raine_Icon_black.png",
+            "text": "<p>Eden Raine for Precious Metal Gemstone Jewellery with Elegance &amp; Style.</p>",
+            "show_social": true
+          }
+        },
+        "fc_information": {
+          "type": "link_list",
+          "settings": {
+            "menu": "footer",
+            "show_social": false
+          }
+        },
+        "fc_eden_raine": {
+          "type": "link_list",
+          "settings": {
+            "menu": "eden-raine",
+            "show_social": false
+          }
+        },
+        "fc_help": {
+          "type": "link_list",
+          "settings": {
+            "menu": "help",
+            "show_social": false
+          }
+        },
+        "fc_newsletter": {
+          "type": "newsletter",
+          "settings": {
+            "heading": "Subscribe",
+            "text": "<p>Sign up to get the latest on sales, new releases and more …</p>",
+            "field_label": "Email*",
+            "button_label": "Sign up"
+          }
+        }
+      },
+      "block_order": [
+        "fc_logo",
+        "fc_information",
+        "fc_eden_raine",
+        "fc_help",
+        "fc_newsletter"
+      ],
+      "settings": {
+        "background": "#ffffff",
+        "text_color": "#1d1d1b",
+        "link_color": "#1d1d1b",
+        "link_hover_color": "#6f6f6f",
+        "border_color": "#ededed",
+        "text_size": 13,
+        "heading_size": 16,
+        "logo_width": 160,
+        "button_background": "#000000",
+        "button_text_color": "#ffffff",
+        "show_payment_methods": true,
+        "credit_text": "Website by",
+        "credit_name": "Lionsorbet",
+        "credit_url": "https://www.lionsorbet.com/",
+        "padding_top": 160,
+        "padding_bottom": 160,
+        "content_width": 1400,
+        "side_padding": 64
       }
     }
   },
   "order": [
+    "footer_icon_bar",
+    "footer_classic",
     "section_KHqNEp",
     "footer_luxe",
     "footer",

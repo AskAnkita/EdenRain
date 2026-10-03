@@ -363,6 +363,12 @@
   .ai-shape-carousel__container-{{ ai_gen_id }} {
     position: relative;
     width: 100%;
+  }
+
+  /* The clipping lives here so the arrows, which sit half outside the
+     container, are not cut off. */
+  .ai-shape-carousel__viewport-{{ ai_gen_id }} {
+    width: 100%;
     overflow: hidden;
   }
 
@@ -443,11 +449,11 @@
   }
 
   .ai-shape-carousel__nav-{{ ai_gen_id }}.prev {
-    left: 10px;
+    left: -20px;
   }
 
   .ai-shape-carousel__nav-{{ ai_gen_id }}.next {
-    right: 10px;
+    right: -20px;
   }
 
   .ai-shape-carousel__pagination-{{ ai_gen_id }} {
@@ -519,7 +525,8 @@
       </button>
     {% endif %}
 
-    <div class="ai-shape-carousel__track-{{ ai_gen_id }}">
+    <div class="ai-shape-carousel__viewport-{{ ai_gen_id }}">
+      <div class="ai-shape-carousel__track-{{ ai_gen_id }}">
       {% for i in (1..12) %}
         {% assign image_key = 'card_' | append: i | append: '_image' %}
         {% assign hover_image_key = 'card_' | append: i | append: '_hover_image' %}
@@ -568,6 +575,7 @@
           </div>
         {% endif %}
       {% endfor %}
+      </div>
     </div>
   </div>
 

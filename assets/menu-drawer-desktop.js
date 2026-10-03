@@ -16,6 +16,7 @@
     // Fixed-position panels must not live inside the (transformed, sticky) header
     document.querySelectorAll('[data-menu-drawer-root]').forEach((root) => {
       if (root.parentElement !== document.body) document.body.appendChild(root);
+      // Clicking the dimmed area behind the panel closes it
       root.addEventListener('click', (event) => {
         if (event.target.closest('[data-menu-drawer-close]')) close();
       });
@@ -38,12 +39,7 @@
     });
 
     document.querySelectorAll('[data-menu-drawer-trigger]').forEach((trigger) => {
-      trigger.addEventListener('click', (event) => {
-        if (!desktop.matches) return;
-        event.preventDefault();
-        if (activeTrigger === trigger) close();
-        else open(trigger);
-      });
+      // The panel opens on hover, so a click is left to follow the link to the menu item's page.
       trigger.addEventListener('mouseenter', () => {
         if (!desktop.matches) return;
         cancelClose();

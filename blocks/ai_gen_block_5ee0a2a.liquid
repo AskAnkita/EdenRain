@@ -239,6 +239,12 @@
 
   .ai-collection-carousel-wrapper-{{ ai_gen_id }} {
     position: relative;
+    width: 100%;
+  }
+
+  /* The clipping lives here so the arrows, which sit half outside the
+     wrapper, are not cut off. */
+  .ai-collection-carousel-viewport-{{ ai_gen_id }} {
     overflow: hidden;
     width: 100%;
   }
@@ -418,11 +424,11 @@
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }}.prev {
-    left: {{ block.settings.arrow_offset }}px;
+    left: calc(var(--arrow-width, {{ block.settings.arrow_size }}px) / -2 + {{ block.settings.arrow_offset }}px);
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }}.next {
-    right: {{ block.settings.arrow_offset }}px;
+    right: calc(var(--arrow-width, {{ block.settings.arrow_size }}px) / -2 + {{ block.settings.arrow_offset }}px);
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }} svg {
@@ -627,7 +633,8 @@
     {% endif %}
 
     <div class="ai-collection-carousel-wrapper-{{ ai_gen_id }}">
-      <div class="ai-collection-carousel-track-{{ ai_gen_id }}">
+      <div class="ai-collection-carousel-viewport-{{ ai_gen_id }}">
+        <div class="ai-collection-carousel-track-{{ ai_gen_id }}">
         {% for i in (1..12) %}
           {% liquid
             assign collection_key = 'collection_' | append: i
@@ -830,17 +837,18 @@
             </div>
           {% endif %}
         {% endfor %}
+        </div>
       </div>
 
       {% if block.settings.show_arrows %}
         <button class="ai-collection-carousel-nav-{{ ai_gen_id }} prev" aria-label="Previous slide">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10" aria-hidden="true">
-            <path fill="currentColor" fill-rule="evenodd" d="M8.537.808a.5.5 0 0 1 .817-.162l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 1 1-.708-.708L11.793 5.5H1a.5.5 0 0 1 0-1h10.793L8.646 1.354a.5.5 0 0 1-.109-.546" clip-rule="evenodd"/>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
         </button>
         <button class="ai-collection-carousel-nav-{{ ai_gen_id }} next" aria-label="Next slide">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10" aria-hidden="true">
-            <path fill="currentColor" fill-rule="evenodd" d="M8.537.808a.5.5 0 0 1 .817-.162l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 1 1-.708-.708L11.793 5.5H1a.5.5 0 0 1 0-1h10.793L8.646 1.354a.5.5 0 0 1-.109-.546" clip-rule="evenodd"/>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
         </button>
       {% endif %}
@@ -1470,12 +1478,12 @@
     {
       "type": "range",
       "id": "arrow_offset",
-      "label": "Offset from edge",
+      "label": "Nudge arrows inward (0 = half on, half off the card)",
       "min": 0,
       "max": 50,
       "step": 2,
       "unit": "px",
-      "default": 10
+      "default": 0
     },
     {
       "type": "header",

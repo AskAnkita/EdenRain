@@ -1,0 +1,195 @@
+{%- doc -%}
+  Always-visible filter groups for the collection filter drawer.
+
+  Shopify's `collection.filters` only contain values that exist in the current result
+  set, so an empty collection (or one whose products are not tagged yet) shows no
+  filters at all. These groups are rendered from the fixed lists below so the drawer
+  always offers the full set of options, modelled on MiaDonna's engagement ring
+  filters (Shape, Metal, Price).
+
+  A group here is skipped as soon as Shopify returns a real filter with the same
+  heading or parameter, so live filters — with their counts and working URLs — always
+  win once the products carry the tags and the filter is switched on in Search &
+  Discovery.
+
+  Editing the lists
+    Each option is "Label" or "Label|filter-value". Without the second part the value
+    is the handleized label with `value_prefix` in front, so "Oval" becomes
+    "shape:oval". Use the second part to point a label at a different tag, e.g.
+    "14K Rose Gold|metal:rose-gold" to reuse the metal:<colour> tags that
+    scripts/shopify/store-config.mjs creates the collections from.
+
+  @param {object} results - Collection or Search object
+  @param {string} [section_id] - Section id, for unique element ids
+  @param {string} [heading_label_case]
+  @param {string} [heading_label_font_size]
+  @param {string} [text_label_case]
+  @param {string} [text_label_font_size]
+{%- enddoc -%}
+
+{%- liquid
+  assign shape_values = 'Round,Oval,Emerald,Marquise,Radiant,Princess,Asscher,Baguette'
+  assign metal_values = '14K Rose Gold,18K Rose Gold,14K White Gold,18K White Gold,14K Yellow Gold,18K Yellow Gold,Platinum,Two-Toned Gold'
+
+  # Ceiling for the static price slider, in the shop's currency. Only used until a real
+  # price filter exists, which brings its own range from the products.
+  assign static_price_max = 10000
+  assign static_price_max_display = static_price_max | times: 100 | money
+
+  # Which groups Shopify is already providing
+  assign live_labels = ','
+  assign has_live_price = false
+
+  for live_filter in results.filters
+    assign live_label = live_filter.label | downcase | handle
+    assign live_labels = live_labels | append: live_label | append: ','
+    if live_filter.type == 'price_range'
+      assign has_live_price = true
+    endif
+  endfor
+-%}
+
+{%- unless live_labels contains ',shape,' -%}
+  {% render 'static-filter-group',
+    label: 'Shape',
+    values: shape_values,
+    param_name: 'filter.p.tag',
+    section_id: section_id,
+    value_prefix: 'shape:',
+    index: '1',
+    heading_label_case: heading_label_case,
+    heading_label_font_size: heading_label_font_size,
+    text_label_case: text_label_case,
+    text_label_font_size: text_label_font_size
+  %}
+{%- endunless -%}
+
+{%- unless live_labels contains ',metal,' -%}
+  {% render 'static-filter-group',
+    label: 'Metal',
+    values: metal_values,
+    param_name: 'filter.p.tag',
+    section_id: section_id,
+    value_prefix: 'metal:',
+    index: '2',
+    heading_label_case: heading_label_case,
+    heading_label_font_size: heading_label_font_size,
+    text_label_case: text_label_case,
+    text_label_font_size: text_label_font_size
+  %}
+{%- endunless -%}
+
+{%- unless has_live_price or live_labels contains ',price,' -%}
+  <accordion-custom>
+    <details
+      id="Details-Mobile-static-price-{{ section_id }}"
+      class="mobile-facets__details js-filter"
+      data-index="mobile-static-3"
+    >
+      <summary class="mobile-facets__summary focus-inset">
+        <div
+          class="flex items-center justify-between w-full"
+          {%- if heading_label_case == 'uppercase' -%}
+            style="--font-heading--case: uppercase;"
+          {%- endif -%}
+        >
+          <span>Price</span>
+          <span class="mobile-facets__arrow svg-wrapper">
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </span>
+        </div>
+      </summary>
+      <div
+        id="FacetMobile-static-price-{{ section_id }}"
+        class="mobile-facets__submenu details-content"
+      >
+        <p class="mobile-facets__info">
+          {{ 'products.facets.max_price' | t: price: static_price_max_display }}
+        </p>
+
+        {%- comment -%}
+          Same structure as snippets/price-facet.liquid: <price-range> expects two range
+          inputs and two number inputs, in that order.
+        {%- endcomment -%}
+        <price-range class="facets__priceblock">
+          <div class="facets-price__range relative" style="--lg-m: 0 0 3rem; --m: 0 0 1rem;">
+            <input
+              class="filter__price_change filter__price_min"
+              min="0"
+              step="1"
+              type="range"
+              max="{{ static_price_max }}"
+              value="0"
+              aria-label="Min"
+            >
+            <input
+              class="filter__price_change filter__price_max"
+              min="0"
+              step="1"
+              type="range"
+              max="{{ static_price_max }}"
+              value="{{ static_price_max }}"
+              aria-label="Max"
+            >
+          </div>
+
+          <div class="facets-price__input flex items-center gap-sm">
+            <div class="field">
+              <span class="field-currency absolute-c-y z-1 left-0_5">{{ cart.currency.symbol }}</span>
+              <input
+                class="field__input filter__price_number"
+                name="filter.v.price.gte"
+                id="Mobile-Filter-static-price-GTE"
+                max="{{ static_price_max }}"
+                value="0"
+                placeholder="0"
+                type="text"
+                inputmode="decimal"
+                data-pattern="\d| |,|\."
+                data-min="0"
+                data-max="{{ static_price_max }}"
+              >
+              <label class="field__label visually-hidden" for="Mobile-Filter-static-price-GTE">
+                {{- 'products.facets.from' | t -}}
+              </label>
+            </div>
+            <div class="field-to-price">
+              <span class="field-to-price__text">
+                {{- 'products.facets.to' | t -}}
+              </span>
+            </div>
+            <div class="field">
+              <span class="field-currency absolute-c-y z-1 left-0_5">{{ cart.currency.symbol }}</span>
+              <input
+                class="field__input filter__price_number"
+                name="filter.v.price.lte"
+                id="Mobile-Filter-static-price-LTE"
+                max="{{ static_price_max }}"
+                value="{{ static_price_max }}"
+                placeholder="{{ static_price_max }}"
+                type="text"
+                inputmode="decimal"
+                data-pattern="\d| |,|\."
+                data-min="0"
+                data-max="{{ static_price_max }}"
+              >
+              <label class="field__label visually-hidden" for="Mobile-Filter-static-price-LTE">
+                {{- 'products.facets.to' | t -}}
+              </label>
+            </div>
+          </div>
+
+          <div class="facets-price__apply">
+            <button class="button button--primary button--full-width button--outline">
+              <span class="button-overflow relative overflow-hidden" data-button-text="{{ 'products.facets.apply' | t }}">
+                <span class="button-text-main inline-block relative z-1">
+                  {{- 'products.facets.apply' | t -}}
+                </span>
+              </span>
+            </button>
+          </div>
+        </price-range>
+      </div>
+    </details>
+  </accordion-custom>
+{%- endunless -%}

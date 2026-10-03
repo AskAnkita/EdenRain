@@ -346,10 +346,8 @@
                                   {%- for value in sorted_values -%}
                                     {% liquid
                                       assign input_id = 'Filter-' | append: filter.param_name | escape | append: '-' | append: forloop.index
+                                      # Values with no products stay selectable, so the whole set of options always shows
                                       assign is_disabled = false
-                                      if value.count == 0 and value.active == false
-                                        assign is_disabled = true
-                                      endif
 
                                       assign item = value.value | append: ','
                                     %}
@@ -593,10 +591,8 @@
                             {%- for value in sorted_values -%}
                               {% liquid
                                 assign input_id = 'Filter-' | append: filter.param_name | escape | append: '-' | append: forloop.index
+                                # Values with no products stay selectable, so the whole set of options always shows
                                 assign is_disabled = false
-                                if value.count == 0 and value.active == false
-                                  assign is_disabled = true
-                                endif
 
                                 assign item = value.value | append: ','
                               %}
@@ -1189,6 +1185,10 @@
                       if filter_swatch contains filter_label_downcase
                         assign is_swatch = true
                       endif
+                      assign is_shape_filter = false
+                      if filter_label_downcase == 'shape'
+                        assign is_shape_filter = true
+                      endif
                     %}
 
                     {% case filter.type %}
@@ -1267,10 +1267,8 @@
                                       {%- for value in sorted_values -%}
                                         {% liquid
                                           assign input_id = 'Filter-' | append: filter.param_name | escape | append: '-mobile-' | append: forloop.index
+                                          # Values with no products stay selectable, so the whole set of options always shows
                                           assign is_disabled = false
-                                          if value.count == 0 and value.active == false
-                                            assign is_disabled = true
-                                          endif
                                           assign item = value.value | escape | append: ','
                                         %}
 
@@ -1397,7 +1395,7 @@
                         <accordion-custom>
                           <details
                             id="Details-Mobile-{{ filter.param_name | escape }}-{{ section.id }}"
-                            class="mobile-facets__details js-filter"
+                            class="mobile-facets__details js-filter{% if is_shape_filter %} mobile-facets__details--shape{% endif %}"
                             data-index="mobile-{{ forloop.index }}"
                           >
                             <summary class="mobile-facets__summary focus-inset">
@@ -1425,7 +1423,7 @@
                               class="mobile-facets__submenu details-content"
                             >
                               <ul
-                                class="{{ visual_layout_class }} mobile-facets__list list-unstyled cus-scrollbar{% if is_swatch %} facets-layout-list--swatch flex flex-wrap gap-xs{% endif %}"
+                                class="{{ visual_layout_class }} mobile-facets__list list-unstyled cus-scrollbar{% if is_swatch %} facets-layout-list--swatch flex flex-wrap gap-xs{% endif %}{% if is_shape_filter %} mobile-facets__list--shape{% endif %}"
                                 role="list"
                               >
                                 {%- liquid
@@ -1439,14 +1437,12 @@
                                 {%- for value in sorted_values -%}
                                   {% liquid
                                     assign input_id = 'Filter-' | append: filter.param_name | escape | append: '-mobile-' | append: forloop.index
+                                    # Values with no products stay selectable, so the whole set of options always shows
                                     assign is_disabled = false
-                                    if value.count == 0 and value.active == false
-                                      assign is_disabled = true
-                                    endif
                                   %}
 
                                   {%- capture label_class -%}
-                                  facets__label mobile-facets__label{% if presentation == 'swatch' or has_variant_pill %} input--primary{% endif %}{% if is_disabled %} disabled{% endif %}{% if value.active %} active{% endif %}
+                                  facets__label mobile-facets__label{% if presentation == 'swatch' or has_variant_pill %} input--primary{% endif %}{% if is_disabled %} disabled{% endif %}{% if value.active %} active{% endif %}{% if is_shape_filter %} mobile-facets__label--shape{% endif %}
                                   {%- endcapture -%}
 
                                   {%- capture text_value -%}
@@ -1529,7 +1525,12 @@
                                           {% endif %}
                                         >
 
-                                        {%- if presentation == 'image' -%}
+                                        {%- if is_shape_filter -%}
+                                          {%- assign shape_icon = value.label | downcase | remove: 'shape:' | strip | handle -%}
+                                          <span class="mobile-facets__shape-image">
+                                            {%- render 'icon-diamond-filter-shape', shape: shape_icon -%}
+                                          </span>
+                                        {%- elsif presentation == 'image' -%}
                                           <div class="facets__image-wrapper">
                                             {%- if value.image -%}
                                               {{
@@ -1598,6 +1599,19 @@
                         </accordion-custom>
                     {% endcase %}
                   {%- endfor -%}
+
+                  {%- comment -%}
+                    Groups Shopify cannot return yet (no products, or products not tagged),
+                    so the drawer always offers the full set of options
+                  {%- endcomment -%}
+                  {% render 'static-filters',
+                    results: results,
+                    section_id: section.id,
+                    heading_label_case: heading_label_case,
+                    heading_label_font_size: heading_label_font_size,
+                    text_label_case: text_label_case,
+                    text_label_font_size: text_label_font_size
+                  %}
                 {%- endif -%}
 
                 {{ children }}

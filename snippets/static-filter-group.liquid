@@ -1,0 +1,107 @@
+{%- doc -%}
+  Renders one filter group in the filter drawer from a fixed list of options, so the
+  group shows every option whether or not the collection currently has products for it.
+  Shopify's own `collection.filters` only return values that exist in the current
+  result set, which is why these are needed alongside them.
+
+  Markup mirrors the live (Shopify) list filters in `facets.liquid` so the two are
+  indistinguishable in the drawer.
+
+  @param {string} label - Group heading, e.g. "Shape"
+  @param {string} values - Comma-separated options. Each is either "Label" or
+                           "Label|filter-value"; without the second part the value is
+                           the handleized label, optionally prefixed by `value_prefix`.
+  @param {string} param_name - The filter query parameter, e.g. "filter.p.tag"
+  @param {string} [value_prefix] - Prepended to auto-generated values, e.g. "shape:"
+  @param {string} [index] - Suffix for element ids, to keep them unique
+  @param {string} [section_id] - Section id, for unique element ids
+  @param {string} [heading_label_case]
+  @param {string} [heading_label_font_size]
+  @param {string} [text_label_case]
+  @param {string} [text_label_font_size]
+{%- enddoc -%}
+
+{%- liquid
+  assign entries = values | split: ','
+  assign group_handle = label | handle
+-%}
+
+<accordion-custom>
+  {%- assign is_shape_group = false -%}
+  {%- if group_handle == 'shape' -%}{%- assign is_shape_group = true -%}{%- endif -%}
+  <details
+    id="Details-Mobile-static-{{ group_handle }}-{{ section_id }}"
+    class="mobile-facets__details js-filter{% if is_shape_group %} mobile-facets__details--shape{% endif %}"
+    data-index="mobile-static-{{ index }}"
+  >
+    <summary class="mobile-facets__summary focus-inset">
+      <div
+        class="flex items-center justify-between w-full"
+        style="
+          {%- if heading_label_case == 'uppercase' -%}
+            --facet-label-transform: uppercase;
+          {%- endif -%}
+          --font-size: {{ heading_label_font_size }};
+        "
+      >
+        <span>{{ label | escape }}</span>
+        <span class="mobile-facets__arrow svg-wrapper">
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+      </div>
+    </summary>
+    <div
+      id="FacetMobile-static-{{ group_handle }}-{{ section_id }}"
+      class="mobile-facets__submenu details-content"
+    >
+      <ul
+        class="facets-layout facets-layout-list facets-layout-list--text mobile-facets__list list-unstyled cus-scrollbar{% if is_shape_group %} mobile-facets__list--shape{% endif %}"
+        role="list"
+      >
+        {%- for entry in entries -%}
+          {%- liquid
+            assign parts = entry | strip | split: '|'
+            assign option_label = parts[0] | strip
+            if option_label == blank
+              continue
+            endif
+
+            assign option_value = parts[1] | strip
+            if option_value == blank
+              assign option_value = option_label | handle | prepend: value_prefix
+            endif
+
+            assign input_id = 'Filter-static-' | append: group_handle | append: '-' | append: forloop.index
+            assign shape_icon = option_label | handle
+          -%}
+          <li class="mobile-facets__item list-menu__item{% if is_shape_group %} mobile-facets__item--shape{% endif %}">
+            <label for="{{ input_id }}" class="facets__label mobile-facets__label{% if is_shape_group %} mobile-facets__label--shape{% endif %}" style="--font-size: {{ text_label_font_size }};">
+              <input
+                class="mobile-facets__checkbox"
+                type="checkbox"
+                name="{{ param_name }}"
+                value="{{ option_value | escape }}"
+                id="{{ input_id }}"
+              >
+
+              {%- if is_shape_group -%}
+                <span class="mobile-facets__shape-image">
+                  {%- render 'icon-diamond-filter-shape', shape: shape_icon -%}
+                </span>
+              {%- else -%}
+                <span class="mobile-facets__highlight"></span>
+                {{- 'square.svg' | inline_asset_content -}}
+                {{- 'icon-checkmark.svg' | inline_asset_content -}}
+              {%- endif -%}
+
+              <span class="facet-checkbox__text" aria-hidden="true">
+                <span class="facet-checkbox__text-label {{ text_label_case }}">{{- option_label | escape -}}</span>
+              </span>
+              <span class="visually-hidden">{{ option_label | escape }}</span>
+            </label>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </details>
+</accordion-custom>

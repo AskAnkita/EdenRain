@@ -23,6 +23,13 @@
     else 
       assign label_name = label | handleize
     endif
+
+    # Shopify puts contact[body] in the body of the notification email; every other field
+    # arrives as an extra line. Map the usual names for the message box onto it.
+    assign label_key = label_name | prepend: ',' | append: ','
+    if ',message,comment,comments,enquiry,inquiry,question,' contains label_key
+      assign label_name = 'body'
+    endif
 %}
 
 {%- capture attr -%}

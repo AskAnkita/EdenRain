@@ -18569,7 +18569,7 @@ summary.header__icon .svg-wrapper {
 
   #header-component .list-menu--inline > li > .header__menu-item,
   #header-component .list-menu--inline > li > details > .header__menu-item {
-    padding-inline: 0.8rem;
+    padding-inline: calc(var(--gap-x, 2.2rem) / 2);
     white-space: nowrap;
   }
 
@@ -21099,5 +21099,71 @@ footer.section-footer .email-signup__input {
     width: 1.8rem;
     height: 1.5px;
     margin: 0.45rem auto;
+  }
+}
+
+/* ==================================================================
+   Eden Raine: main-nav type
+   Appended at the end of the file so it wins over the rules above
+   without editing them in place.
+   ================================================================== */
+
+/* Main nav: light, widely tracked capitals with a warm hover colour drawn
+   from the brand blush rather than plain black. */
+@media screen and (min-width: 1025px) {
+  #header-component .list-menu--inline > li > .header__menu-item > .text,
+  #header-component .list-menu--inline > li > details > .header__menu-item .text,
+  #header-component .header-message--menu .header__menu-item .text {
+    letter-spacing: 0.2em;
+  }
+
+  /* The right-hand links (Learn, About, Contact Us) were title case with no
+     tracking; match them to the rest of the row. */
+  #header-component .header-message--menu .header__menu-item,
+  #header-component .header-message--menu .header__menu-item .text {
+    text-transform: uppercase;
+  }
+
+  /* The caret sits beside the label rather than crowding it */
+  #header-component .list-menu--inline > li > .header__menu-item .icon-caret {
+    margin-inline-start: 0.4rem;
+  }
+
+  #header-component .list-menu--inline > li > .header__menu-item,
+  #header-component .list-menu--inline > li > details > .header__menu-item,
+  #header-component .header-message--menu .header__menu-item {
+    transition: color 0.25s ease;
+  }
+
+  #header-component .list-menu--inline > li > .header__menu-item:hover,
+  #header-component .list-menu--inline > li > .header__menu-item:hover > .text,
+  #header-component .list-menu--inline > li > details > .header__menu-item:hover .text,
+  #header-component .header-message--menu .header__menu-item:hover,
+  #header-component .header-message--menu .header__menu-item:hover .text {
+    color: #8c6a57;
+  }
+}
+
+/* Header phone number (the "message" slot, top row, left column).
+   Matches the main nav's tracking and warm hover colour; the number itself is
+   editable in Theme editor > Header > Message. */
+@media screen and (min-width: 1025px) {
+  #header-component .header-message:not(.header-message--menu) {
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+  }
+
+  #header-component .header-message:not(.header-message--menu) p {
+    margin: 0;
+  }
+
+  #header-component .header-message:not(.header-message--menu) a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.25s ease;
+  }
+
+  #header-component .header-message:not(.header-message--menu) a:hover {
+    color: #8c6a57;
   }
 }

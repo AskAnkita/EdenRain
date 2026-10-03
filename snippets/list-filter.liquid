@@ -193,10 +193,8 @@
             {%- for value in filter.values -%}
               {% liquid
                 assign input_id = 'Filter-' | append: filter.param_name | escape | append: '-' | append: forloop.index | replace: '.', '-' | append: '-' | append: filter_style | append: '-' | append: in_drawer
+                # Values with no products stay selectable, so the whole set of options always shows
                 assign is_disabled = false
-                if value.count == 0 and value.active == false
-                  assign is_disabled = true
-                endif
                 assign hidden_class = null
                 if forloop.index > inital_visible_values and render_show_more
                   assign hidden_class = 'hidden'

@@ -59,10 +59,6 @@
 -%}
 
 <div class="menu-drawer-desktop__page menu-drawer-desktop__page--featured{% if has_groups %} menu-drawer-desktop__page--tabs{% endif %}{% if campaign_image == blank %} menu-drawer-desktop__page--no-campaign{% endif %}" id="{{ drawer_id }}" data-menu-drawer-page hidden>
-  <button type="button" class="menu-drawer-desktop__close" data-menu-drawer-close aria-label="{{ 'accessibility.close' | t }}">
-    <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
-  </button>
-
   {%- if has_groups -%}
   {%- comment -%} Tabs: groups on the left; pointing at one shows its items as picture tiles {%- endcomment -%}
   <nav class="menu-drawer-desktop__tabs" aria-label="{{ link.title | escape }}">

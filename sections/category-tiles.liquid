@@ -1,7 +1,7 @@
 {% comment %}
   Category tiles: one tall picture card per menu item, in a row you can scroll sideways.
-  Pictures come from each linked collection (its image, or its first product's photo), so no
-  separate uploads are needed. A tile's picture can be overridden with a block.
+  A tile's picture is, in order: one set on a block, then the theme's own
+  assets/category-<menu item>.png, then the linked collection's photo.
 {% endcomment %}
 
 {%- liquid
@@ -97,13 +97,14 @@
   }
 
   #category-tiles-{{ section.id }} .ct-arrow {
+    --ct-arrow-size: 56px;
     position: absolute;
     top: 50%;
     z-index: 1;
     display: grid;
     place-items: center;
-    width: 4.4rem;
-    height: 4.4rem;
+    width: var(--ct-arrow-size);
+    height: var(--ct-arrow-size);
     border: 0;
     border-radius: 50%;
     background: #fff;
@@ -119,18 +120,21 @@
     pointer-events: none;
   }
 
-  #category-tiles-{{ section.id }} .ct-arrow--prev { left: 1.2rem; }
-  #category-tiles-{{ section.id }} .ct-arrow--next { right: 1.2rem; }
+  #category-tiles-{{ section.id }} .ct-arrow--prev { left: calc(var(--ct-arrow-size) * -0.5); }
+  #category-tiles-{{ section.id }} .ct-arrow--next { right: calc(var(--ct-arrow-size) * -0.5); }
 
-  #category-tiles-{{ section.id }} .ct-arrow span {
-    width: 0.9rem;
-    height: 0.9rem;
-    border-top: 1.5px solid currentColor;
-    border-right: 1.5px solid currentColor;
+  #category-tiles-{{ section.id }} .ct-arrow .svg-wrapper {
+    width: auto;
+    height: auto;
   }
 
-  #category-tiles-{{ section.id }} .ct-arrow--next span { transform: translateX(-0.2rem) rotate(45deg); }
-  #category-tiles-{{ section.id }} .ct-arrow--prev span { transform: translateX(0.2rem) rotate(-135deg); }
+  #category-tiles-{{ section.id }} .ct-arrow .icon {
+    width: var(--arrow-icon-size);
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow--prev .icon-caret { transform: rotate(90deg); }
+  #category-tiles-{{ section.id }} .ct-arrow--next .icon-caret { transform: rotate(-90deg); }
+  #category-tiles-{{ section.id }} .ct-arrow--prev .icon-arrow { transform: rotate(180deg); }
 
   #category-tiles-{{ section.id }} .ct-progress {
     height: 2px;
@@ -144,6 +148,16 @@
     width: var(--ct-progress, 50%);
     background: #111;
     transition: width 0.2s ease;
+  }
+
+  @media screen and (max-width: 1399px) {
+    #category-tiles-{{ section.id }} .ct-arrow {
+      --ct-arrow-size: 40px;
+    }
+
+    #category-tiles-{{ section.id }} .ct-arrow .icon {
+      width: 1.4rem;
+    }
   }
 
   #category-tiles-{{ section.id }} .ct-empty {
@@ -189,30 +203,43 @@
       <p class="ct-empty">Choose a menu for this section in the theme editor.</p>
     {%- else -%}
       <div class="ct-viewport">
-        <button type="button" class="ct-arrow ct-arrow--prev" aria-label="Previous" disabled><span></span></button>
+        <button type="button" class="ct-arrow ct-arrow--prev" aria-label="Previous" disabled>
+          <span class="svg-wrapper">{%- render 'icon-arrow' -%}</span>
+        </button>
         <ul class="ct-track" role="list">
           {%- for link in menu.links -%}
             {%- liquid
+              # A picture set on a block wins over everything else.
               assign tile_image = blank
               for block in overrides
                 if block.settings.title == link.title and block.settings.image != blank
                   assign tile_image = block.settings.image
                 endif
               endfor
+
+              # Otherwise the theme's own picture for this menu item, e.g. assets/category-rings.png
+              # for a link titled "Rings". A menu item with no picture of either kind is hidden
+              # (the script below drops the tile), rather than falling back to the collection photo.
+              assign tile_asset = blank
               if tile_image == blank
-                case link.type
-                  when 'collection_link'
-                    assign tile_image = link.object.featured_image
-                  when 'product_link'
-                    assign tile_image = link.object.featured_image
-                  when 'catalog_link'
-                    assign tile_image = collections.all.featured_image
-                endcase
+                assign tile_asset = 'category-' | append: link.title | handleize | append: '.png'
               endif
             -%}
             <li class="ct-tile">
               <a class="ct-link" href="{{ link.url }}">
-                {%- if tile_image != blank -%}
+                {%- if tile_asset != blank -%}
+                  {%- comment -%} The shipped pictures are 1122x1402; the CDN resizes them here. {%- endcomment -%}
+                  <img
+                    src="{{ tile_asset | asset_img_url: '900x' }}"
+                    srcset="{{ tile_asset | asset_img_url: '450x' }} 450w, {{ tile_asset | asset_img_url: '700x' }} 700w, {{ tile_asset | asset_img_url: '900x' }} 900w, {{ tile_asset | asset_img_url: '1200x' }} 1200w"
+                    sizes="(min-width: 990px) 25vw, 72vw"
+                    alt="{{ link.title | escape }}"
+                    width="1122"
+                    height="1402"
+                    loading="lazy"
+                    data-ct-asset
+                  >
+                {%- elsif tile_image != blank -%}
                   {{ tile_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, 72vw', alt: link.title }}
                 {%- endif -%}
                 <span class="ct-label">{{ link.title | escape }}</span>
@@ -220,7 +247,9 @@
             </li>
           {%- endfor -%}
         </ul>
-        <button type="button" class="ct-arrow ct-arrow--next" aria-label="Next"><span></span></button>
+        <button type="button" class="ct-arrow ct-arrow--next" aria-label="Next">
+          <span class="svg-wrapper">{%- render 'icon-arrow' -%}</span>
+        </button>
       </div>
       <div class="ct-progress" aria-hidden="true"><span></span></div>
     {%- endif -%}
@@ -247,6 +276,15 @@
     };
     const step = () => track.clientWidth * 0.8;
 
+    // A tile asks for assets/category-<menu item>.png. Until the shop adds that picture, the
+    // whole tile is dropped rather than shown empty; adding the file brings the tile back.
+    root.querySelectorAll('.ct-link img[data-ct-asset]').forEach((img) => {
+      img.addEventListener('error', () => {
+        img.closest('.ct-tile')?.remove();
+        update();
+      });
+    });
+
     prev.addEventListener('click', () => track.scrollBy({ left: -step() }));
     next.addEventListener('click', () => track.scrollBy({ left: step() }));
     track.addEventListener('scroll', update, { passive: true });
@@ -264,7 +302,7 @@
       "type": "link_list",
       "id": "menu",
       "label": "Menu",
-      "info": "One tile per menu item. Pictures come from each collection (its image, or its first product)."
+      "info": "One tile per menu item. A tile uses assets/category-<menu item>.png, e.g. category-rings.png for a link titled Rings, and falls back to the collection's own picture."
     },
     {
       "type": "text",
