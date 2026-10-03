@@ -1,0 +1,344 @@
+{% comment %}
+  Category tiles: one tall picture card per menu item, in a row you can scroll sideways.
+  Pictures come from each linked collection (its image, or its first product's photo), so no
+  separate uploads are needed. A tile's picture can be overridden with a block.
+{% endcomment %}
+
+{%- liquid
+  assign menu = section.settings.menu
+  assign overrides = section.blocks
+-%}
+
+{%- style -%}
+  #category-tiles-{{ section.id }} {
+    padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
+  }
+
+  #category-tiles-{{ section.id }} .ct-inner {
+    max-width: var(--page-width, 160rem);
+    margin: 0 auto;
+    padding-inline: 2.4rem;
+  }
+
+  #category-tiles-{{ section.id }} .ct-heading {
+    margin: 0 0 3.2rem;
+    text-align: center;
+    font-family: var(--font-heading--family);
+    font-size: clamp(2.6rem, 2.4vw, 3.4rem);
+    font-weight: 500;
+    line-height: 1.15;
+  }
+
+  #category-tiles-{{ section.id }} .ct-viewport {
+    position: relative;
+  }
+
+  #category-tiles-{{ section.id }} .ct-track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - {{ section.settings.per_row | minus: 1 }} * 2rem) / {{ section.settings.per_row }});
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  #category-tiles-{{ section.id }} .ct-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  #category-tiles-{{ section.id }} .ct-tile {
+    scroll-snap-align: start;
+  }
+
+  #category-tiles-{{ section.id }} .ct-link {
+    position: relative;
+    display: block;
+    aspect-ratio: {{ section.settings.ratio }};
+    overflow: hidden;
+    background: #f4f4f0;
+    color: #111;
+    text-decoration: none;
+  }
+
+  #category-tiles-{{ section.id }} .ct-link img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  #category-tiles-{{ section.id }} .ct-link:hover img {
+    transform: scale(1.04);
+  }
+
+  #category-tiles-{{ section.id }} .ct-label {
+    position: absolute;
+    left: 50%;
+    bottom: 2.4rem;
+    transform: translateX(-50%);
+    padding: 0.8rem 1.6rem;
+    background: rgb(255 255 255 / 0.92);
+    font-family: var(--font-body--family);
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 4.4rem;
+    height: 4.4rem;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0.4rem 1.6rem rgb(0 0 0 / 0.12);
+    color: #111;
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: opacity 0.2s ease;
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow[disabled] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow--prev { left: 1.2rem; }
+  #category-tiles-{{ section.id }} .ct-arrow--next { right: 1.2rem; }
+
+  #category-tiles-{{ section.id }} .ct-arrow span {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-top: 1.5px solid currentColor;
+    border-right: 1.5px solid currentColor;
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow--next span { transform: translateX(-0.2rem) rotate(45deg); }
+  #category-tiles-{{ section.id }} .ct-arrow--prev span { transform: translateX(0.2rem) rotate(-135deg); }
+
+  #category-tiles-{{ section.id }} .ct-progress {
+    height: 2px;
+    margin-top: 2.8rem;
+    background: rgb(0 0 0 / 0.1);
+  }
+
+  #category-tiles-{{ section.id }} .ct-progress span {
+    display: block;
+    height: 100%;
+    width: var(--ct-progress, 50%);
+    background: #111;
+    transition: width 0.2s ease;
+  }
+
+  #category-tiles-{{ section.id }} .ct-empty {
+    padding: 4rem 0;
+    text-align: center;
+    color: rgb(0 0 0 / 0.55);
+  }
+
+  @media screen and (max-width: 989px) {
+    #category-tiles-{{ section.id }} .ct-track {
+      grid-auto-columns: calc((100% - 2rem) / 2.3);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #category-tiles-{{ section.id }} .ct-inner {
+      padding-inline: 1.6rem;
+    }
+
+    #category-tiles-{{ section.id }} .ct-track {
+      grid-auto-columns: 72%;
+      gap: 1.2rem;
+    }
+
+    #category-tiles-{{ section.id }} .ct-arrow {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #category-tiles-{{ section.id }} .ct-track { scroll-behavior: auto; }
+    #category-tiles-{{ section.id }} .ct-link img { transition: none; }
+  }
+{%- endstyle -%}
+
+<div id="category-tiles-{{ section.id }}" class="category-tiles color-{{ section.settings.color_scheme }}">
+  <div class="ct-inner">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="ct-heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+
+    {%- if menu == blank or menu.links.size == 0 -%}
+      <p class="ct-empty">Choose a menu for this section in the theme editor.</p>
+    {%- else -%}
+      <div class="ct-viewport">
+        <button type="button" class="ct-arrow ct-arrow--prev" aria-label="Previous" disabled><span></span></button>
+        <ul class="ct-track" role="list">
+          {%- for link in menu.links -%}
+            {%- liquid
+              assign tile_image = blank
+              for block in overrides
+                if block.settings.title == link.title and block.settings.image != blank
+                  assign tile_image = block.settings.image
+                endif
+              endfor
+              if tile_image == blank
+                case link.type
+                  when 'collection_link'
+                    assign tile_image = link.object.featured_image
+                  when 'product_link'
+                    assign tile_image = link.object.featured_image
+                  when 'catalog_link'
+                    assign tile_image = collections.all.featured_image
+                endcase
+              endif
+            -%}
+            <li class="ct-tile">
+              <a class="ct-link" href="{{ link.url }}">
+                {%- if tile_image != blank -%}
+                  {{ tile_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, 72vw', alt: link.title }}
+                {%- endif -%}
+                <span class="ct-label">{{ link.title | escape }}</span>
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+        <button type="button" class="ct-arrow ct-arrow--next" aria-label="Next"><span></span></button>
+      </div>
+      <div class="ct-progress" aria-hidden="true"><span></span></div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  (() => {
+    const root = document.getElementById('category-tiles-{{ section.id }}');
+    const track = root?.querySelector('.ct-track');
+    if (!track) return;
+    const prev = root.querySelector('.ct-arrow--prev');
+    const next = root.querySelector('.ct-arrow--next');
+    const bar = root.querySelector('.ct-progress');
+
+    const update = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      prev.disabled = track.scrollLeft <= 2;
+      next.disabled = track.scrollLeft >= max - 2;
+      const shown = track.clientWidth / track.scrollWidth;
+      const progress = max > 0 ? shown + (1 - shown) * (track.scrollLeft / max) : 1;
+      bar.style.setProperty('--ct-progress', `${Math.round(progress * 100)}%`);
+      bar.hidden = max <= 0;
+    };
+    const step = () => track.clientWidth * 0.8;
+
+    prev.addEventListener('click', () => track.scrollBy({ left: -step() }));
+    next.addEventListener('click', () => track.scrollBy({ left: step() }));
+    track.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Category tiles",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "category",
+      "info": "One tile per menu item. Pictures come from each collection (its image, or its first product)."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "range",
+      "id": "per_row",
+      "label": "Tiles across on desktop",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Tile shape",
+      "options": [
+        { "value": "3 / 4", "label": "Portrait" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "2 / 3", "label": "Tall" }
+      ],
+      "default": "3 / 4"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Picture for a tile",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Menu item title",
+          "info": "Exactly as in the menu, e.g. Earrings"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Picture"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category tiles"
+    }
+  ]
+}
+{% endschema %}
