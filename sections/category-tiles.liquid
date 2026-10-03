@@ -6,6 +6,9 @@
 
 {%- liquid
   assign menu = section.settings.menu
+  if menu == blank
+    assign menu = linklists['category']
+  endif
   assign overrides = section.blocks
 -%}
 
@@ -261,7 +264,7 @@
       "type": "link_list",
       "id": "menu",
       "label": "Menu",
-      "info": "One tile per menu item (e.g. the \"category\" menu). Pictures come from each collection: its image, or its first product."
+      "info": "One tile per menu item. Pictures come from each collection (its image, or its first product)."
     },
     {
       "type": "text",
