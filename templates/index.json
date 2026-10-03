@@ -111,8 +111,21 @@
       "type": "_blocks",
       "settings": {}
     },
+    "category_tiles": {
+      "type": "category-tiles",
+      "settings": {
+        "menu": "category",
+        "heading": "",
+        "per_row": 4,
+        "ratio": "3 / 4",
+        "color_scheme": "scheme-1",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
     "media_with_text_eLCFDd": {
       "type": "media-with-text",
+      "disabled": true,
       "blocks": {
         "static-header": {
           "type": "_product-list-content",
@@ -7695,6 +7708,7 @@
   "order": [
     "17834970463ab381ed",
     "17835081052bb8f290",
+    "category_tiles",
     "media_with_text_eLCFDd",
     "section_cdCbRn",
     "signature_grid_Er26Sg",

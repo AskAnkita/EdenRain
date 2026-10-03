@@ -10,11 +10,9 @@
 
 <div class="menu-drawer-desktop__group" data-menu-drawer-group="{{ group_id }}"{% unless active %} hidden{% endunless %}>
   {%- if parent.url != blank and parent.url != '#' -%}
-    <a class="menu-drawer-desktop__shop-all" href="{{ parent.url }}">
-      {{- 'Shop All ' | append: parent.title | escape -}}
-    </a>
+    <a class="menu-drawer-desktop__group-heading" href="{{ parent.url }}">{{ parent.title | escape }}</a>
   {%- else -%}
-    <p class="menu-drawer-desktop__shop-all">{{ parent.title | escape }}</p>
+    <p class="menu-drawer-desktop__group-heading">{{ parent.title | escape }}</p>
   {%- endif -%}
 
   <ul class="menu-drawer-desktop__tiles" role="list">
@@ -54,6 +52,8 @@
             <span class="menu-drawer-desktop__tile-media">
               {%- if tile_image != blank -%}
                 {{ tile_image | image_url: width: 400 | image_tag: loading: 'lazy', sizes: '180px', alt: item.title }}
+              {%- else -%}
+                {%- render 'menu-tile-fallback', title: item.title -%}
               {%- endif -%}
             </span>
             <span class="menu-drawer-desktop__tile-title">{{ item.title | escape }}</span>

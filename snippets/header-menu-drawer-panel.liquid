@@ -31,6 +31,15 @@
     endif
   endfor
 
+  # Three-level menus (Engagement > Shop by Style > Solitaire) show one column per group
+  assign has_groups = false
+  for child in link.links
+    if child.links.size > 0
+      assign has_groups = true
+      break
+    endif
+  endfor
+
   assign has_product_links = false
   for child in link.links
     if child.type == 'product_link'
@@ -49,11 +58,38 @@
   endif
 -%}
 
-<div class="menu-drawer-desktop__page menu-drawer-desktop__page--featured" id="{{ drawer_id }}" data-menu-drawer-page hidden>
+<div class="menu-drawer-desktop__page menu-drawer-desktop__page--featured{% if has_groups %} menu-drawer-desktop__page--tabs{% endif %}{% if campaign_image == blank %} menu-drawer-desktop__page--no-campaign{% endif %}" id="{{ drawer_id }}" data-menu-drawer-page hidden>
   <button type="button" class="menu-drawer-desktop__close" data-menu-drawer-close aria-label="{{ 'accessibility.close' | t }}">
     <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
   </button>
 
+  {%- if has_groups -%}
+  {%- comment -%} Tabs: groups on the left; pointing at one shows its items as picture tiles {%- endcomment -%}
+  <nav class="menu-drawer-desktop__tabs" aria-label="{{ link.title | escape }}">
+    <ul role="list">
+      {%- for child in link.links -%}
+        <li>
+          <button
+            type="button"
+            class="menu-drawer-desktop__tab{% if forloop.first %} is-active{% endif %}"
+            data-menu-drawer-category="{{ drawer_id }}-{{ forloop.index }}"
+          >
+            <span>{{ child.title | escape }}</span>
+            <span class="menu-drawer-desktop__tab-arrow" aria-hidden="true"></span>
+          </button>
+        </li>
+      {%- endfor -%}
+    </ul>
+    <a class="menu-drawer-desktop__view-all" href="{{ link.url }}">Shop all {{ link.title | downcase | escape }}</a>
+  </nav>
+
+  <div class="menu-drawer-desktop__tab-panels">
+    {%- for child in link.links -%}
+      {%- assign group_id = drawer_id | append: '-' | append: forloop.index -%}
+      {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: child, active: forloop.first -%}
+    {%- endfor -%}
+  </div>
+  {%- else -%}
   <nav class="menu-drawer-desktop__nav" aria-label="{{ link.title | escape }}">
     <p class="menu-drawer-desktop__list-heading">{{ link.title | escape }}</p>
     <ul class="menu-drawer-desktop__nav-list" role="list">
@@ -98,6 +134,9 @@
     </ul>
   </div>
 
+  {%- endif -%}
+
+  {%- if campaign_image != blank -%}
   <a class="menu-drawer-desktop__campaign" href="{{ link.url }}">
     <span class="menu-drawer-desktop__campaign-media">
       {%- if campaign_image != blank -%}
@@ -110,4 +149,5 @@
       <span class="menu-drawer-desktop__campaign-cta">Shop now</span>
     </span>
   </a>
+  {%- endif -%}
 </div>

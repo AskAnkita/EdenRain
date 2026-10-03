@@ -1,0 +1,52 @@
+{% comment %}
+  Stand-in for a menu tile whose collection has no image yet: a line drawing for diamond
+  shapes, a colour circle for metals, otherwise the item's initial.
+
+  Accepts:
+  - title: {String} the menu item's title, e.g. "Oval" or "Rose Gold"
+{% endcomment %}
+
+{%- liquid
+  assign key = title | downcase
+  assign shape = blank
+  assign shape_names = 'round,oval,cushion,emerald,pear,princess,radiant,marquise,asscher,heart' | split: ','
+  for shape_name in shape_names
+    if key contains shape_name
+      assign shape = shape_name
+      break
+    endif
+  endfor
+  assign metal = blank
+  if key contains 'rose'
+    assign metal = 'rose'
+  elsif key contains 'yellow'
+    assign metal = 'yellow'
+  elsif key contains 'white'
+    assign metal = 'white'
+  elsif key contains 'platinum'
+    assign metal = 'platinum'
+  elsif key contains 'silver'
+    assign metal = 'silver'
+  endif
+-%}
+
+{%- if shape != blank -%}
+  <svg class="menu-tile-fallback menu-tile-fallback--shape" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" aria-hidden="true">
+    {%- case shape -%}
+      {%- when 'round' -%}<circle cx="12" cy="12" r="9"/><path d="M12 3 7 12l5 9 5-9zM3 12h18" stroke-width="0.5"/>
+      {%- when 'oval' -%}<ellipse cx="12" cy="12" rx="7" ry="10"/><path d="M12 2v20M5 12h14" stroke-width="0.5"/>
+      {%- when 'cushion' -%}<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M7 7l10 10M17 7 7 17" stroke-width="0.5"/>
+      {%- when 'emerald' -%}<path d="M8 2h8l4 4v12l-4 4H8l-4-4V6z"/><rect x="8" y="6" width="8" height="12" stroke-width="0.5"/>
+      {%- when 'pear' -%}<path d="M12 2c4 6 7 9 7 13a7 7 0 0 1-14 0c0-4 3-7 7-13z"/>
+      {%- when 'princess' -%}<rect x="3.5" y="3.5" width="17" height="17"/><path d="M3.5 3.5l17 17M20.5 3.5l-17 17" stroke-width="0.5"/>
+      {%- when 'radiant' -%}<path d="M7 2h10l3 3v14l-3 3H7l-3-3V5z"/><path d="M7 2l10 20M17 2 7 22" stroke-width="0.5"/>
+      {%- when 'marquise' -%}<path d="M12 1c5 5 6 8 6 11s-1 6-6 11c-5-5-6-8-6-11s1-6 6-11z"/>
+      {%- when 'asscher' -%}<path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><rect x="8" y="8" width="8" height="8" stroke-width="0.5"/>
+      {%- when 'heart' -%}<path d="M12 20s-8-5-8-11a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6-8 11-8 11z"/>
+    {%- endcase -%}
+  </svg>
+{%- elsif metal != blank -%}
+  <span class="menu-tile-fallback menu-tile-fallback--metal menu-tile-fallback--{{ metal }}" aria-hidden="true"></span>
+{%- else -%}
+  <span class="menu-tile-fallback menu-tile-fallback--initial" aria-hidden="true">{{ title | slice: 0 }}</span>
+{%- endif -%}

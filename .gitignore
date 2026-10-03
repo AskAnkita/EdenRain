@@ -1,0 +1,10 @@
+# Secrets: Shopify Admin API token and store settings
+.env
+.env.*
+!.env.example
+
+# Local backups written by scripts/shopify (they contain live store data)
+scripts/shopify/backups/
+
+.DS_Store
+node_modules/
