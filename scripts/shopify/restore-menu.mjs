@@ -4,6 +4,9 @@
 //   node scripts/shopify/restore-menu.mjs                 preview the newest main-menu backup
 //   node scripts/shopify/restore-menu.mjs --apply         restore it
 //   node scripts/shopify/restore-menu.mjs path/to/backup.json --apply
+//   node scripts/shopify/restore-menu.mjs --to=category --apply
+//       copies the backed-up menu into another menu (here "category", used by the footer's
+//       Category column) and leaves main-menu as it is; the target menu is created if missing
 //
 // The menu as it is now is saved as a new backup first, so a restore can itself be undone.
 
@@ -13,6 +16,7 @@ import { config, gql } from './lib.mjs';
 
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');
+const target = (args.find((a) => a.startsWith('--to=')) || '').split('=')[1] || '';
 const cfg = config();
 const backupDir = resolve(cfg.repoRoot, 'scripts/shopify/backups');
 
@@ -51,32 +55,48 @@ try {
     process.exit(1);
   }
   const backup = JSON.parse(readFileSync(file, 'utf8'));
-  log(`${apply ? 'Restoring' : 'Preview of'} "${backup.handle}" from ${file}`);
+  const handle = target || backup.handle;
+  const title = target ? target.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase()) : backup.title;
+  log(`${apply ? 'Writing' : 'Preview of'} the "${backup.handle}" backup into menu "${handle}" (from ${file})`);
   printTree(backup.items);
 
   const data = await gql(cfg, `{ menus(first: 50) { nodes { id handle title items { id title type url resourceId items { id title type url resourceId items { id title type url resourceId } } } } } }`);
-  const current = data.menus.nodes.find((m) => m.handle === backup.handle);
-  if (!current) throw new Error(`The store has no menu with handle "${backup.handle}".`);
+  const current = data.menus.nodes.find((m) => m.handle === handle);
+  if (!current && !target) throw new Error(`The store has no menu with handle "${handle}".`);
 
   if (!apply) {
-    log(`\nWould replace the current ${current.items.length}-item menu with these ${backup.items.length} items. Add --apply to restore.`);
+    log(current
+      ? `\nWould replace the current ${current.items.length}-item "${handle}" menu with these ${backup.items.length} items. Add --apply to write.`
+      : `\nWould create a "${handle}" menu with these ${backup.items.length} items. Add --apply to write.`);
     process.exit(0);
   }
 
-  mkdirSync(backupDir, { recursive: true });
-  const before = resolve(backupDir, `${backup.handle}-before-restore-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
-  writeFileSync(before, JSON.stringify(current, null, 2));
-  log(`\nSaved the current menu to ${before}`);
-
-  await gql(
-    cfg,
-    `mutation($id: ID!, $title: String!, $handle: String, $items: [MenuItemUpdateInput!]!) {
-      menuUpdate(id: $id, title: $title, handle: $handle, items: $items) { menu { id } userErrors { field message } }
-    }`,
-    { id: current.id, title: backup.title, handle: backup.handle, items: backup.items.map(toInput) },
-    'menuUpdate'
-  );
-  log('Menu restored.');
+  const items = backup.items.map(toInput);
+  if (current) {
+    mkdirSync(backupDir, { recursive: true });
+    const before = resolve(backupDir, `${handle}-before-restore-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+    writeFileSync(before, JSON.stringify(current, null, 2));
+    log(`\nSaved the current "${handle}" menu to ${before}`);
+    await gql(
+      cfg,
+      `mutation($id: ID!, $title: String!, $handle: String, $items: [MenuItemUpdateInput!]!) {
+        menuUpdate(id: $id, title: $title, handle: $handle, items: $items) { menu { id } userErrors { field message } }
+      }`,
+      { id: current.id, title: current.title, handle, items },
+      'menuUpdate'
+    );
+    log(`Menu "${handle}" updated.`);
+  } else {
+    await gql(
+      cfg,
+      `mutation($title: String!, $handle: String!, $items: [MenuItemCreateInput!]!) {
+        menuCreate(title: $title, handle: $handle, items: $items) { menu { id } userErrors { field message } }
+      }`,
+      { title, handle, items },
+      'menuCreate'
+    );
+    log(`Menu "${handle}" created.`);
+  }
 } catch (err) {
   console.error(`\nStopped: ${err.message}`);
   process.exit(1);
