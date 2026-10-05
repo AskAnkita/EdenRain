@@ -283,7 +283,7 @@
       box-shadow: {{ block.settings.hover_shadow }};
     }
 
-    .ai-collection-carousel-link-{{ ai_gen_id }}:hover .ai-collection-carousel-image-{{ ai_gen_id }} {
+    .ai-collection-carousel-link-{{ ai_gen_id }}.has-hover-image:hover .ai-collection-carousel-image-{{ ai_gen_id }} {
       opacity: 0;
     }
 
@@ -373,8 +373,8 @@
       box-shadow: none;
     }
 
-    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:hover .ai-collection-carousel-image-{{ ai_gen_id }},
-    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:focus-visible .ai-collection-carousel-image-{{ ai_gen_id }} {
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}.has-hover-image:hover .ai-collection-carousel-image-{{ ai_gen_id }},
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}.has-hover-image:focus-visible .ai-collection-carousel-image-{{ ai_gen_id }} {
       opacity: 0;
     }
 
@@ -655,10 +655,6 @@
             assign hide_tablet = block.settings[hide_tablet_key]
             assign hide_mobile_key = 'hide_mobile_' | append: i
             assign hide_mobile = block.settings[hide_mobile_key]
-            assign placeholder_image = blank
-            assign placeholder_hover_image = blank
-            assign model_hover_image = blank
-            assign model_hover_alt = blank
             assign shape_grid_column = blank
             assign shape_grid_row = blank
             if block.settings.heading == 'Find Your Shape'
@@ -667,110 +663,55 @@
               assign shape_grid_column = shape_page | times: 2 | plus: shape_column
               assign shape_grid_row = forloop.index0 | modulo: 4 | divided_by: 2 | plus: 1
             endif
-            assign placeholder_width = 684
-            assign placeholder_height = 1014
-            assign placeholder_hover_width = 416
-            assign placeholder_hover_height = 617
+
+            comment
+              ----------------------------------------------------------------
+              BUILT-IN PICTURES - the one place to change a card's picture
+              in code. Each list below is card 1 to card 12, in order, as file
+              names under assets/. Swap a name to swap that card's picture.
+
+              These only fill a card whose picture is still empty in the theme
+              editor: a picture chosen in the editor always wins, so a card
+              never ignores the picture you pick. Leave a slot empty (two
+              commas in a row) to give a card no built-in picture at all.
+              ----------------------------------------------------------------
+            endcomment
+            assign preset_images = ''
+            assign preset_hover_images = ''
+            assign preset_hover_alts = ''
+            assign preset_width = 684
+            assign preset_height = 1014
+            assign preset_hover_width = 416
+            assign preset_hover_height = 617
 
             if block.settings.use_placeholder_images
-              case i
-                when 1
-                  assign placeholder_image = 'style-solitaire.png'
-                  assign placeholder_hover_image = 'style-solitaire-hover.jpg'
-                when 2
-                  assign placeholder_image = 'style-side-stone.png'
-                  assign placeholder_hover_image = 'style-side-stone-hover.jpg'
-                when 3
-                  assign placeholder_image = 'style-halo.png'
-                  assign placeholder_hover_image = 'style-halo-hover.jpg'
-                when 4
-                  assign placeholder_image = 'style-hidden-halo.png'
-                  assign placeholder_hover_image = 'style-hidden-halo-hover.jpg'
-                when 5
-                  assign placeholder_image = 'style-three-stone.png'
-                  assign placeholder_hover_image = 'style-three-stone-hover.jpg'
-                when 6
-                  assign placeholder_image = 'style-vintage.png'
-                  assign placeholder_hover_image = 'style-vintage-hover.jpg'
-                when 7
-                  assign placeholder_image = 'style-nature-inspired.png'
-                  assign placeholder_hover_image = 'style-nature-inspired-hover.jpg'
-                when 8
-                  assign placeholder_image = 'style-promise.png'
-                  assign placeholder_hover_image = 'style-promise-hover.jpg'
-              endcase
+              assign preset_images = 'style-solitaire.png,style-side-stone.png,style-halo.png,style-hidden-halo.png,style-three-stone.png,style-vintage.png,style-nature-inspired.png,style-promise.png'
+              assign preset_hover_images = 'style-solitaire-hover.jpg,style-side-stone-hover.jpg,style-halo-hover.jpg,style-hidden-halo-hover.jpg,style-three-stone-hover.jpg,style-vintage-hover.jpg,style-nature-inspired-hover.jpg,style-promise-hover.jpg'
             elsif block.settings.use_diamond_shape_placeholders
-              assign placeholder_width = 900
-              assign placeholder_height = 900
-              assign placeholder_hover_width = 900
-              assign placeholder_hover_height = 900
+              assign preset_width = 900
+              assign preset_height = 900
+              assign preset_hover_width = 816
+              assign preset_hover_height = 1088
+              assign preset_images = 'diamond-shape-round.png,diamond-shape-oval.png,diamond-shape-emerald.png,diamond-shape-cushion.png,diamond-shape-marquise.png,diamond-shape-radiant.png,diamond-shape-pear.png,diamond-shape-princess.png,diamond-shape-asscher.png,diamond-shape-heart.png'
+              assign preset_hover_images = 'lifestyle-round-necklace.jpg,lifestyle-necklace.jpg,lifestyle-emerald-earring.jpg,lifestyle-earring.jpg,lifestyle-marquise-bracelet.jpg,lifestyle-radiant-bracelet.jpg,lifestyle-pear-necklace.jpg,lifestyle-princess-ring.jpg,lifestyle-bracelet.jpg,lifestyle-heart-necklace.jpg'
+              assign preset_hover_alts = 'Round diamond pendant worn by a model,Oval diamond pendant worn by a model,Emerald cut diamond huggie earring worn by a model,Diamond stud earring worn by a model,Marquise diamond bracelet worn by a model,Diamond tennis bracelet worn by a model,Pear diamond pendant worn by a model,Princess cut diamond ring worn by a model,Square cut diamond bracelet worn by a model,Heart diamond pendant worn by a model'
+            endif
 
-              case i
-                when 1
-                  assign placeholder_image = 'diamond-shape-round.png'
-                when 2
-                  assign placeholder_image = 'diamond-shape-oval.png'
-                when 3
-                  assign placeholder_image = 'diamond-shape-emerald.png'
-                when 4
-                  assign placeholder_image = 'diamond-shape-cushion.png'
-                when 5
-                  assign placeholder_image = 'diamond-shape-marquise.png'
-                when 6
-                  assign placeholder_image = 'diamond-shape-radiant.png'
-                when 7
-                  assign placeholder_image = 'diamond-shape-pear.png'
-                when 8
-                  assign placeholder_image = 'diamond-shape-princess.png'
-                when 9
-                  assign placeholder_image = 'diamond-shape-asscher.png'
-                when 10
-                  assign placeholder_image = 'diamond-shape-heart.png'
-              endcase
+            assign preset_index = i | minus: 1
+            assign preset_image_list = preset_images | split: ','
+            assign preset_hover_image_list = preset_hover_images | split: ','
+            assign preset_hover_alt_list = preset_hover_alts | split: ','
+            assign preset_image = preset_image_list[preset_index]
+            assign preset_hover_image = preset_hover_image_list[preset_index]
+            assign preset_hover_alt = preset_hover_alt_list[preset_index]
 
-              comment
-                Hover photos: the store's own lifestyle shots, matched to each shape
-              endcomment
-              case i
-                when 1
-                  assign model_hover_image = 'lifestyle-round-necklace.jpg'
-                  assign model_hover_alt = 'Round diamond pendant worn by a model'
-                when 2
-                  assign model_hover_image = 'lifestyle-necklace.jpg'
-                  assign model_hover_alt = 'Oval diamond pendant worn by a model'
-                when 3
-                  assign model_hover_image = 'lifestyle-emerald-earring.jpg'
-                  assign model_hover_alt = 'Emerald cut diamond huggie earring worn by a model'
-                when 4
-                  assign model_hover_image = 'lifestyle-earring.jpg'
-                  assign model_hover_alt = 'Diamond stud earring worn by a model'
-                when 5
-                  assign model_hover_image = 'lifestyle-marquise-bracelet.jpg'
-                  assign model_hover_alt = 'Marquise diamond bracelet worn by a model'
-                when 6
-                  assign model_hover_image = 'lifestyle-radiant-bracelet.jpg'
-                  assign model_hover_alt = 'Diamond tennis bracelet worn by a model'
-                when 7
-                  assign model_hover_image = 'lifestyle-pear-necklace.jpg'
-                  assign model_hover_alt = 'Pear diamond pendant worn by a model'
-                when 8
-                  assign model_hover_image = 'lifestyle-princess-ring.jpg'
-                  assign model_hover_alt = 'Princess cut diamond ring worn by a model'
-                when 9
-                  assign model_hover_image = 'lifestyle-bracelet.jpg'
-                  assign model_hover_alt = 'Square cut diamond bracelet worn by a model'
-                when 10
-                  assign model_hover_image = 'lifestyle-heart-necklace.jpg'
-                  assign model_hover_alt = 'Heart diamond pendant worn by a model'
-              endcase
-
-              assign placeholder_hover_image = model_hover_image
-              assign placeholder_hover_width = 816
-              assign placeholder_hover_height = 1088
+            assign has_hover_image = false
+            if hover_image != blank or preset_hover_image != blank
+              assign has_hover_image = true
             endif
           %}
 
-          {% if image != blank or placeholder_image != blank %}
+          {% if image != blank or preset_image != blank %}
             <div 
               class="ai-collection-carousel-item-{{ ai_gen_id }}{% if hide_tablet %} hide-tablet{% endif %}{% if hide_mobile %} hide-mobile{% endif %}"
               data-hide-tablet="{{ hide_tablet }}"
@@ -779,10 +720,16 @@
             >
               <a 
                 href="{% if url != blank %}{{ url }}{% elsif collection != blank %}{{ collection.url }}{% else %}#{% endif %}"
-                class="ai-collection-carousel-link-{{ ai_gen_id }}"
+                class="ai-collection-carousel-link-{{ ai_gen_id }}{% if has_hover_image %} has-hover-image{% endif %}"
                 {% if open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
               >
                 <div class="ai-collection-carousel-image-wrapper-{{ ai_gen_id }}">
+                  {%- comment -%}
+                    One rule for every picture here: the theme editor's choice
+                    if there is one, otherwise the built-in file listed at the
+                    top of the loop. The main picture and the hover picture are
+                    decided separately, so picking one does not override the other.
+                  {%- endcomment -%}
                   {% if image != blank %}
                     <img
                       src="{{ image | image_url: width: 800 }}"
@@ -792,40 +739,33 @@
                       height="{{ image.height }}"
                       class="ai-collection-carousel-image-{{ ai_gen_id }}"
                     >
-                    {% if model_hover_image != blank %}
-                      <img
-                        src="{{ model_hover_image | asset_url }}"
-                        alt="{{ model_hover_alt | escape }}"
-                        loading="lazy"
-                        width="816"
-                        height="1088"
-                        class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
-                      >
-                    {% elsif hover_image != blank %}
-                      <img
-                        src="{{ hover_image | image_url: width: 800 }}"
-                        alt="{{ hover_image.alt | default: title | escape }}"
-                        loading="lazy"
-                        width="{{ hover_image.width }}"
-                        height="{{ hover_image.height }}"
-                        class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
-                      >
-                    {% endif %}
-                  {% elsif placeholder_image != blank %}
+                  {% elsif preset_image != blank %}
                     <img
-                      src="{{ placeholder_image | asset_url }}"
+                      src="{{ preset_image | asset_url }}"
                       alt="{{ title | escape }}"
                       loading="lazy"
-                      width="{{ placeholder_width }}"
-                      height="{{ placeholder_height }}"
+                      width="{{ preset_width }}"
+                      height="{{ preset_height }}"
                       class="ai-collection-carousel-image-{{ ai_gen_id }}"
                     >
+                  {% endif %}
+
+                  {% if hover_image != blank %}
                     <img
-                      src="{{ placeholder_hover_image | asset_url }}"
-                      alt="{{ model_hover_alt | default: title | escape }}"
+                      src="{{ hover_image | image_url: width: 800 }}"
+                      alt="{{ hover_image.alt | default: title | escape }}"
                       loading="lazy"
-                      width="{{ placeholder_hover_width }}"
-                      height="{{ placeholder_hover_height }}"
+                      width="{{ hover_image.width }}"
+                      height="{{ hover_image.height }}"
+                      class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
+                    >
+                  {% elsif preset_hover_image != blank %}
+                    <img
+                      src="{{ preset_hover_image | asset_url }}"
+                      alt="{{ preset_hover_alt | default: title | escape }}"
+                      loading="lazy"
+                      width="{{ preset_hover_width }}"
+                      height="{{ preset_hover_height }}"
                       class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
                     >
                   {% endif %}
@@ -1158,13 +1098,15 @@
     {
       "type": "checkbox",
       "id": "use_placeholder_images",
-      "label": "Use development placeholder images",
+      "label": "Fill empty cards with the built-in ring style pictures",
+      "info": "Only used for a card you have not given a picture to. Edit the file names in the block's Liquid to change them.",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "use_diamond_shape_placeholders",
-      "label": "Use loose diamond placeholders",
+      "label": "Fill empty cards with the built-in diamond shape pictures",
+      "info": "Only used for a card you have not given a picture to. Edit the file names in the block's Liquid to change them.",
       "default": false
     },
     {

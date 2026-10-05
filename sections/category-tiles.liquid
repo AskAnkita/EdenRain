@@ -1,7 +1,11 @@
 {% comment %}
   Category tiles: one tall picture card per menu item, in a row you can scroll sideways.
-  A tile's picture is, in order: one set on a block, then the theme's own
-  assets/category-<menu item>.png, then the linked collection's photo.
+
+  Where a tile's picture comes from, in order:
+    1. a "Picture for a tile" block in the theme editor, matched to the menu item;
+    2. the TILE PICTURES list below, which is the place to set pictures in code;
+    3. assets/category-<menu item>.png, e.g. category-rings.png for a link titled Rings.
+  A menu item with none of the three is dropped (the script below removes the tile).
 {% endcomment %}
 
 {%- liquid
@@ -10,6 +14,15 @@
     assign menu = linklists['category']
   endif
   assign overrides = section.blocks
+
+  # ------------------------------------------------------------------
+  # TILE PICTURES - the one place to change a tile's picture in code.
+  # One "menu item: file under assets/" pair per tile, comma separated.
+  # Swap a file name to swap that tile's picture. A picture chosen in the
+  # theme editor always wins over this list, so a tile never ignores it.
+  # ------------------------------------------------------------------
+  assign tile_pictures = 'Rings: category-rings.png, Earrings: category-earrings.png, Necklaces: category-necklaces.png, Bracelets: category-bracelets.png, Best Sellers: category-best-sellers.png'
+  assign tile_picture_pairs = tile_pictures | split: ','
 -%}
 
 {%- style -%}
@@ -260,20 +273,36 @@
         <ul class="ct-track" role="list">
           {%- for link in menu.links -%}
             {%- liquid
-              # A picture set on a block wins over everything else.
+              assign tile_handle = link.title | handleize
+
+              # A picture set on a block wins over everything else. Titles are compared
+              # loosely, so "Best Sellers" and "best sellers" both reach the same tile.
               assign tile_image = blank
               for block in overrides
-                if block.settings.title == link.title and block.settings.image != blank
-                  assign tile_image = block.settings.image
+                if block.settings.image != blank
+                  assign override_handle = block.settings.title | handleize
+                  if override_handle == tile_handle
+                    assign tile_image = block.settings.image
+                  endif
                 endif
               endfor
 
-              # Otherwise the theme's own picture for this menu item, e.g. assets/category-rings.png
-              # for a link titled "Rings". A menu item with no picture of either kind is hidden
-              # (the script below drops the tile), rather than falling back to the collection photo.
+              # Otherwise the TILE PICTURES list at the top of this file, and failing that
+              # the assets/category-<menu item>.png naming convention. A menu item with no
+              # picture of any kind is hidden (the script below drops the tile), rather
+              # than falling back to the collection photo.
               assign tile_asset = blank
               if tile_image == blank
-                assign tile_asset = 'category-' | append: link.title | handleize | append: '.png'
+                for pair in tile_picture_pairs
+                  assign pair_parts = pair | split: ':'
+                  assign pair_handle = pair_parts[0] | handleize
+                  if pair_handle == tile_handle
+                    assign tile_asset = pair_parts[1] | strip
+                  endif
+                endfor
+                if tile_asset == blank
+                  assign tile_asset = 'category-' | append: tile_handle | append: '.png'
+                endif
               endif
             -%}
             <li class="ct-tile">
@@ -365,7 +394,7 @@
       "type": "link_list",
       "id": "menu",
       "label": "Menu",
-      "info": "One tile per menu item. A tile uses assets/category-<menu item>.png, e.g. category-rings.png for a link titled Rings, and falls back to the collection's own picture."
+      "info": "One tile per menu item. A tile's picture comes from a \"Picture for a tile\" block below, or from the TILE PICTURES list at the top of sections/category-tiles.liquid, or from assets/category-<menu item>.png."
     },
     {
       "type": "text",
@@ -428,7 +457,7 @@
           "type": "text",
           "id": "title",
           "label": "Menu item title",
-          "info": "Exactly as in the menu, e.g. Earrings"
+          "info": "As in the menu, e.g. Earrings. Capitals and spacing do not have to match."
         },
         {
           "type": "image_picker",
