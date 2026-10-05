@@ -1285,18 +1285,18 @@
                   "type": "icon",
                   "static": true,
                   "settings": {
-                    "icon": "shopping-bag",
-                    "icon_custom": "image",
+                    "icon": "truck",
+                    "icon_custom": "none",
                     "svg_upload": "",
                     "svg_width": "fit-content",
                     "custom_width": 80,
                     "svg_height": "fit-content",
                     "custom_height": 80,
-                    "image_upload": "shopify://shop_images/calendar.png",
+                    "image_upload": "",
                     "link": "",
                     "open_in_new_tab": false,
-                    "width": 20,
-                    "width_mb": 20,
+                    "width": 18,
+                    "width_mb": 18,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -1669,18 +1669,18 @@
                         "icon_gctG8c": {
                           "type": "icon",
                           "settings": {
-                            "icon": "eye",
-                            "icon_custom": "image",
+                            "icon": "lock",
+                            "icon_custom": "none",
                             "svg_upload": "",
                             "svg_width": "fit-content",
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "shopify://shop_images/Tracked_Insured.svg",
+                            "image_upload": "",
                             "link": "",
                             "open_in_new_tab": false,
-                            "width": 34,
-                            "width_mb": 34,
+                            "width": 22,
+                            "width_mb": 22,
                             "animation_type": "none"
                           },
                           "blocks": {}
@@ -1851,18 +1851,18 @@
                         "icon_Jhdzxm": {
                           "type": "icon",
                           "settings": {
-                            "icon": "eye",
-                            "icon_custom": "image",
+                            "icon": "plane",
+                            "icon_custom": "none",
                             "svg_upload": "",
                             "svg_width": "fit-content",
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "shopify://shop_images/Worldwide_Delivery.svg",
+                            "image_upload": "",
                             "link": "",
                             "open_in_new_tab": false,
-                            "width": 34,
-                            "width_mb": 34,
+                            "width": 22,
+                            "width_mb": 22,
                             "animation_type": "none"
                           },
                           "blocks": {}
@@ -2033,18 +2033,18 @@
                         "icon_Lm79cD": {
                           "type": "icon",
                           "settings": {
-                            "icon": "eye",
-                            "icon_custom": "image",
+                            "icon": "return",
+                            "icon_custom": "none",
                             "svg_upload": "",
                             "svg_width": "fit-content",
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "shopify://shop_images/Easy_Returns.svg",
+                            "image_upload": "",
                             "link": "",
                             "open_in_new_tab": false,
-                            "width": 34,
-                            "width_mb": 34,
+                            "width": 22,
+                            "width_mb": 22,
                             "animation_type": "none"
                           },
                           "blocks": {}
@@ -2215,18 +2215,18 @@
                         "icon_yT6PtL": {
                           "type": "icon",
                           "settings": {
-                            "icon": "eye",
-                            "icon_custom": "image",
+                            "icon": "security",
+                            "icon_custom": "none",
                             "svg_upload": "",
                             "svg_width": "fit-content",
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "shopify://shop_images/5_Year_Warranty.svg",
+                            "image_upload": "",
                             "link": "",
                             "open_in_new_tab": false,
-                            "width": 34,
-                            "width_mb": 34,
+                            "width": 22,
+                            "width_mb": 22,
                             "animation_type": "none"
                           },
                           "blocks": {}
@@ -2397,18 +2397,18 @@
                         "icon_qpGxzM": {
                           "type": "icon",
                           "settings": {
-                            "icon": "eye",
-                            "icon_custom": "image",
+                            "icon": "box",
+                            "icon_custom": "none",
                             "svg_upload": "",
                             "svg_width": "fit-content",
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "shopify://shop_images/Luxury_Packaging.svg",
+                            "image_upload": "",
                             "link": "",
                             "open_in_new_tab": false,
-                            "width": 34,
-                            "width_mb": 34,
+                            "width": 22,
+                            "width_mb": 22,
                             "animation_type": "none"
                           },
                           "blocks": {}
@@ -2579,18 +2579,18 @@
                         "icon_z8B6F6": {
                           "type": "icon",
                           "settings": {
-                            "icon": "eye",
-                            "icon_custom": "image",
+                            "icon": "leaf",
+                            "icon_custom": "none",
                             "svg_upload": "",
                             "svg_width": "fit-content",
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "shopify://shop_images/Carbon_Offset.svg",
+                            "image_upload": "",
                             "link": "",
                             "open_in_new_tab": false,
-                            "width": 34,
-                            "width_mb": 34,
+                            "width": 22,
+                            "width_mb": 22,
                             "animation_type": "none"
                           },
                           "blocks": {}
@@ -2741,7 +2741,7 @@
                     "title": "Delivery & Returns",
                     "custom_content_type": "all",
                     "product_tab_key_metafield": "",
-                    "content": "<p><strong>COMPLIMENTARY SHIPPING</strong>Each MiaDonna piece is handcrafted to order in about 2–3 weeks. Every order ships insured and signature-required via FedEx 2Day within the U.S. or DHL Express Worldwide (2–5 days, 50+ countries). FedEx Overnight is available at checkout for U.S. customers.<br/><br/><strong>60-DAY RETURNS & EXCHANGES</strong>We're confident you'll love your MiaDonna jewelry, but if it isn't exactly as you imagined, you have 60 days from the shipment date to return or exchange it, complimentary. No restocking fees. Items must be unworn, in original condition, with the MiaDonna silver tag attached.<br/><br/></p>",
+                    "content": "<p><strong>COMPLIMENTARY SHIPPING</strong>Each Eden Raine piece is handcrafted to order in about 2–3 weeks. Every order ships insured and signature-required via FedEx 2Day within the U.S. or DHL Express Worldwide (2–5 days, 50+ countries). FedEx Overnight is available at checkout for U.S. customers.<br/><br/><strong>60-DAY RETURNS & EXCHANGES</strong>We're confident you'll love your Eden Raine jewellery, but if it isn't exactly as you imagined, you have 60 days from the shipment date to return or exchange it, complimentary. No restocking fees. Items must be unworn, in original condition, with the Eden Raine silver tag attached.<br/><br/></p>",
                     "page": "",
                     "view_content": "default",
                     "accordion_icon": "none",
@@ -3433,7 +3433,7 @@
             "open_by_default": false,
             "custom_content_type": "all",
             "product_tab_key_metafield": "",
-            "content": "<p><strong>COMPLIMENTARY SHIPPING</strong><br/>Each MiaDonna piece is handcrafted to order in approximately 2–3 weeks. Need it sooner? Shop Ready to Ship. All orders ship insured via FedEx 2Day (U.S.) or FedEx International Economy (2–5 days, 50+ countries) and require a signature on delivery. Expedited FedEx Overnight is available at checkout for U.S. customers.</p><p><strong>60-DAY RETURNS & EXCHANGES</strong><br/>We're confident you'll love your MiaDonna jewelry, but if it isn't exactly as you imagined, you have 60 days from the shipment date to return or exchange it, complimentary. No restocking fees. Items must be unworn, in original condition, with the MiaDonna silver tag attached.</p>",
+            "content": "<p><strong>COMPLIMENTARY SHIPPING</strong><br/>Each Eden Raine piece is handcrafted to order in approximately 2–3 weeks. Need it sooner? Shop Ready to Ship. All orders ship insured via FedEx 2Day (U.S.) or FedEx International Economy (2–5 days, 50+ countries) and require a signature on delivery. Expedited FedEx Overnight is available at checkout for U.S. customers.</p><p><strong>60-DAY RETURNS & EXCHANGES</strong><br/>We're confident you'll love your Eden Raine jewellery, but if it isn't exactly as you imagined, you have 60 days from the shipment date to return or exchange it, complimentary. No restocking fees. Items must be unworn, in original condition, with the Eden Raine silver tag attached.</p>",
             "page": ""
           }
         },
@@ -3444,7 +3444,7 @@
             "open_by_default": false,
             "custom_content_type": "all",
             "product_tab_key_metafield": "",
-            "content": "<p>We founded the lab-grown diamond industry in 2005 out of activism, making MiaDonna the world's first lab grown diamond and lab grown gemstone company. We are the experts in diamonds and gems created in a lab, so you don’t have to be!<br/><br/><strong>Sustainability:</strong>MiaDonna metals and lab grown diamond are certified sustainable by SCS Global and Carbon Neutral. Our company is also certified by B Corporation, so you can trust that we not only meet but exceed the highest social and environmental standards.<br/><br/><strong>Diamonds:</strong>We only offer Premium lab grown diamonds. This means our lab grown diamonds are harder and brighter than other diamonds (earth mind or lab grown) on the market. You will only find this at MiaDonna.<br/><br/><strong>Jewelry:</strong>MiaDonna jewelry is handcrafted just for you when you order it, unless noted otherwise. You build it online or with a MiaDonna jewelry specialist and our master jewelers will create it for you.</p>",
+            "content": "<p>We founded the lab-grown diamond industry in 2005 out of activism, making Eden Raine the world's first lab grown diamond and lab grown gemstone company. We are the experts in diamonds and gems created in a lab, so you don’t have to be!<br/><br/><strong>Sustainability:</strong>Eden Raine metals and lab grown diamond are certified sustainable by SCS Global and Carbon Neutral. Our company is also certified by B Corporation, so you can trust that we not only meet but exceed the highest social and environmental standards.<br/><br/><strong>Diamonds:</strong>We only offer Premium lab grown diamonds. This means our lab grown diamonds are harder and brighter than other diamonds (earth mind or lab grown) on the market. You will only find this at Eden Raine.<br/><br/><strong>Jewellery:</strong>Eden Raine jewellery is handcrafted just for you when you order it, unless noted otherwise. You build it online or with a Eden Raine jewellery specialist and our master jewelers will create it for you.</p>",
             "page": ""
           }
         }
@@ -3651,7 +3651,7 @@
             "text_cNArry": {
               "type": "text",
               "settings": {
-                "text": "<p>At MiaDonna, we create elegant engagement rings and stunning fine jewelry with high-quality lab-grown diamonds. Beautiful statements made to last.</p>",
+                "text": "<p>At Eden Raine, we create elegant engagement rings and stunning fine jewellery with high-quality lab-grown diamonds. Beautiful statements made to last.</p>",
                 "collection_description_only": false,
                 "collapse_text": false,
                 "typing_text": false,
@@ -3874,18 +3874,18 @@
                   "type": "icon",
                   "name": "t:names.icon",
                   "settings": {
-                    "icon": "price_tag",
-                    "icon_custom": "image",
+                    "icon": "security",
+                    "icon_custom": "none",
                     "svg_upload": "",
                     "svg_width": "fit-content",
                     "custom_width": 80,
                     "svg_height": "fit-content",
                     "custom_height": 80,
-                    "image_upload": "shopify://shop_images/1.1.png",
+                    "image_upload": "",
                     "link": "",
                     "open_in_new_tab": false,
-                    "width": 80,
-                    "width_mb": 30,
+                    "width": 22,
+                    "width_mb": 22,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -4058,18 +4058,18 @@
                   "type": "icon",
                   "name": "t:names.icon",
                   "settings": {
-                    "icon": "price_tag",
-                    "icon_custom": "image",
+                    "icon": "truck",
+                    "icon_custom": "none",
                     "svg_upload": "",
                     "svg_width": "fit-content",
                     "custom_width": 80,
                     "svg_height": "fit-content",
                     "custom_height": 80,
-                    "image_upload": "shopify://shop_images/1.2.png",
+                    "image_upload": "",
                     "link": "",
                     "open_in_new_tab": false,
-                    "width": 80,
-                    "width_mb": 30,
+                    "width": 22,
+                    "width_mb": 22,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -4242,18 +4242,18 @@
                   "type": "icon",
                   "name": "t:names.icon",
                   "settings": {
-                    "icon": "price_tag",
-                    "icon_custom": "image",
+                    "icon": "return",
+                    "icon_custom": "none",
                     "svg_upload": "",
                     "svg_width": "fit-content",
                     "custom_width": 80,
                     "svg_height": "fit-content",
                     "custom_height": 80,
-                    "image_upload": "shopify://shop_images/1.3.png",
+                    "image_upload": "",
                     "link": "",
                     "open_in_new_tab": false,
-                    "width": 80,
-                    "width_mb": 30,
+                    "width": 22,
+                    "width_mb": 22,
                     "animation_type": "none"
                   },
                   "blocks": {}
@@ -4426,18 +4426,18 @@
                   "type": "icon",
                   "name": "t:names.icon",
                   "settings": {
-                    "icon": "price_tag",
-                    "icon_custom": "image",
+                    "icon": "leaf",
+                    "icon_custom": "none",
                     "svg_upload": "",
                     "svg_width": "fit-content",
                     "custom_width": 80,
                     "svg_height": "fit-content",
                     "custom_height": 80,
-                    "image_upload": "shopify://shop_images/1.4.png",
+                    "image_upload": "",
                     "link": "",
                     "open_in_new_tab": false,
-                    "width": 80,
-                    "width_mb": 30,
+                    "width": 22,
+                    "width_mb": 22,
                     "animation_type": "none"
                   },
                   "blocks": {}

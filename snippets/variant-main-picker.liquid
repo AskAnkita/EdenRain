@@ -86,6 +86,15 @@
         if show_swatches and product_swatch_option contains option_name
           assign is_color = true
         endif
+        # The swatch setting is "Metal Type", so an option called Metal, Metal Type
+        # or Finish would fall through to the metaobject swatch renderer and lose
+        # the metal circles. Any option whose values are metals takes the pill
+        # path instead, so every product picks up the same UI whatever the
+        # option happens to be named.
+        assign option_values_probe = product_option.values | join: ' ' | downcase
+        if option_values_probe contains 'gold' or option_values_probe contains 'platinum' or option_values_probe contains 'silver'
+          assign is_color = false
+        endif
         assign skip_combined_color_option = false
         if show_combined_products_listing and product_swatch_option contains option_name
           assign skip_combined_color_option = true

@@ -70,6 +70,19 @@
         product: closest.product
     %}
 
+    {%- comment -%}
+      Which gallery photos belong to which metal. Product media carry Shopify's media-grouping
+      alt text ("#Jewelry material_Gold"), and each variant's own photo names the group it is in,
+      so the map is read off the data rather than guessed from the option's wording.
+    {%- endcomment -%}
+    <script type="application/json" data-metal-media-groups>
+      [{%- for variant in closest.product.variants -%}
+        {"id":{{ variant.id }},"group":{{ variant.featured_media.alt | default: '' | strip | json }}}
+        {%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}]
+    </script>
+    <script src="{{ 'product-metal-media.js' | asset_url }}" defer="defer"></script>
+
     <script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'product-recommendations.js' | asset_url }}" defer="defer" fetchpriority="low"></script>

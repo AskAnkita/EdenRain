@@ -329,18 +329,20 @@
     border-radius: 0;
     border: 0;
     box-shadow: none;
-    background: #f8f8f6;
+    background: #f6f6f4;
   }
 
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-wrapper-{{ ai_gen_id }} {
     position: absolute;
     inset: 0;
-    background: #f8f8f6;
+    background: #f6f6f4;
   }
 
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-{{ ai_gen_id }} {
     object-fit: contain;
     transform: scale(0.74);
+    -webkit-mask-image: radial-gradient(ellipse 88% 88% at 50% 50%, black 70%, transparent 100%);
+    mask-image: radial-gradient(ellipse 88% 88% at 50% 50%, black 70%, transparent 100%);
   }
 
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-hover-image-{{ ai_gen_id }} {
@@ -404,8 +406,8 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: var(--arrow-background, {{ block.settings.arrow_background }});
-    border: var(--arrow-border-thickness, {{ block.settings.arrow_border_width }}px) solid var(--arrow-border, {{ block.settings.arrow_border_color }});
+    background: {{ block.settings.arrow_background }};
+    border: {{ block.settings.arrow_border_width }}px solid {{ block.settings.arrow_border_color }};
     border-radius: var(--arrow-radius, {{ block.settings.arrow_border_radius }}px);
     width: var(--arrow-width, {{ block.settings.arrow_size }}px);
     height: var(--arrow-height, {{ block.settings.arrow_size }}px);
@@ -415,7 +417,7 @@
     cursor: pointer;
     z-index: 10;
     transition: all 0.3s ease;
-    color: var(--arrow-color, {{ block.settings.arrow_color }});
+    color: {{ block.settings.arrow_color }};
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }}:hover {
@@ -842,14 +844,10 @@
 
       {% if block.settings.show_arrows %}
         <button class="ai-collection-carousel-nav-{{ ai_gen_id }} prev" aria-label="Previous slide">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
+          {%- render 'icon-arrow' -%}
         </button>
         <button class="ai-collection-carousel-nav-{{ ai_gen_id }} next" aria-label="Next slide">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
+          {%- render 'icon-arrow' -%}
         </button>
       {% endif %}
     </div>

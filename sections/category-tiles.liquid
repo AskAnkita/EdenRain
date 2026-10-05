@@ -14,13 +14,14 @@
 
 {%- style -%}
   #category-tiles-{{ section.id }} {
+    --ct-arrow-size: 56px;
     padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
   }
 
   #category-tiles-{{ section.id }} .ct-inner {
     max-width: var(--page-width, 160rem);
     margin: 0 auto;
-    padding-inline: 2.4rem;
+    padding-inline: max(2.4rem, calc(var(--ct-arrow-size) / 2 + 0.8rem));
   }
 
   #category-tiles-{{ section.id }} .ct-heading {
@@ -63,9 +64,24 @@
     display: block;
     aspect-ratio: {{ section.settings.ratio }};
     overflow: hidden;
-    background: #f4f4f0;
+    background: #f8f8f8;
     color: #111;
     text-decoration: none;
+  }
+
+  #category-tiles-{{ section.id }} .ct-link::after {
+    position: absolute;
+    inset: 45% 0 0;
+    background: linear-gradient(transparent, rgb(0 0 0 / 0.16));
+    content: "";
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  #category-tiles-{{ section.id }} .ct-link:focus-visible {
+    outline: 3px solid #111;
+    outline-offset: 4px;
   }
 
   #category-tiles-{{ section.id }} .ct-link img {
@@ -77,27 +93,54 @@
     transition: transform 0.6s ease;
   }
 
-  #category-tiles-{{ section.id }} .ct-link:hover img {
-    transform: scale(1.04);
+  #category-tiles-{{ section.id }} .ct-link:hover img,
+  #category-tiles-{{ section.id }} .ct-link:focus-visible img {
+    transform: scale(1.06);
+  }
+
+  #category-tiles-{{ section.id }} .ct-link:hover::after,
+  #category-tiles-{{ section.id }} .ct-link:focus-visible::after {
+    opacity: 1;
   }
 
   #category-tiles-{{ section.id }} .ct-label {
     position: absolute;
     left: 50%;
     bottom: 2.4rem;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
     transform: translateX(-50%);
-    padding: 0.8rem 1.6rem;
-    background: rgb(255 255 255 / 0.92);
+    padding: 1rem 1.6rem;
+    border: 1px solid rgb(255 255 255 / 0.85);
+    background: rgb(255 255 255 / 0.96);
+    box-shadow: 0 0.4rem 1.6rem rgb(0 0 0 / 0.12);
+    color: #111;
     font-family: var(--font-body--family);
     font-size: 1.3rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     white-space: nowrap;
+    transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  #category-tiles-{{ section.id }} .ct-link:hover .ct-label,
+  #category-tiles-{{ section.id }} .ct-link:focus-visible .ct-label {
+    transform: translateX(-50%) translateY(-0.4rem);
+    border-color: #111;
+    background: #111;
+    box-shadow: 0 0.8rem 2.4rem rgb(0 0 0 / 0.24);
+    color: #fff;
+  }
+
+  #category-tiles-{{ section.id }} .ct-link:active .ct-label {
+    transform: translateX(-50%) translateY(-0.1rem) scale(0.97);
   }
 
   #category-tiles-{{ section.id }} .ct-arrow {
-    --ct-arrow-size: 56px;
     position: absolute;
     top: 50%;
     z-index: 1;
@@ -107,12 +150,18 @@
     height: var(--ct-arrow-size);
     border: 0;
     border-radius: 50%;
-    background: #fff;
+    background: #e4e2df;
     box-shadow: 0 0.4rem 1.6rem rgb(0 0 0 / 0.12);
-    color: #111;
+    color: #1a1a1a;
     cursor: pointer;
     transform: translateY(-50%);
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow:hover,
+  #category-tiles-{{ section.id }} .ct-arrow:focus-visible {
+    background: #000;
+    color: #fff;
   }
 
   #category-tiles-{{ section.id }} .ct-arrow[disabled] {
@@ -151,7 +200,7 @@
   }
 
   @media screen and (max-width: 1399px) {
-    #category-tiles-{{ section.id }} .ct-arrow {
+    #category-tiles-{{ section.id }} {
       --ct-arrow-size: 40px;
     }
 
@@ -189,7 +238,9 @@
 
   @media (prefers-reduced-motion: reduce) {
     #category-tiles-{{ section.id }} .ct-track { scroll-behavior: auto; }
-    #category-tiles-{{ section.id }} .ct-link img { transition: none; }
+    #category-tiles-{{ section.id }} .ct-link img,
+    #category-tiles-{{ section.id }} .ct-link::after,
+    #category-tiles-{{ section.id }} .ct-label { transition: none; }
   }
 {%- endstyle -%}
 
@@ -274,7 +325,16 @@
       bar.style.setProperty('--ct-progress', `${Math.round(progress * 100)}%`);
       bar.hidden = max <= 0;
     };
-    const step = () => track.clientWidth * 0.8;
+    // Scroll by whole tiles, so a click always lands on a tile edge rather than part way
+    // through one and letting scroll snapping decide where it ends up.
+    const step = () => {
+      const tile = track.querySelector('.ct-tile');
+      if (!tile) return track.clientWidth;
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+      const tileWidth = tile.getBoundingClientRect().width + gap;
+      if (!tileWidth) return track.clientWidth;
+      return tileWidth * Math.max(1, Math.floor(track.clientWidth / tileWidth));
+    };
 
     // A tile asks for assets/category-<menu item>.png. Until the shop adds that picture, the
     // whole tile is dropped rather than shown empty; adding the file brings the tile back.
@@ -283,10 +343,13 @@
         img.closest('.ct-tile')?.remove();
         update();
       });
+      // A tile that is still loading when the row is measured would leave the arrows in the
+      // wrong state, so each picture re-checks once it has arrived.
+      img.addEventListener('load', update);
     });
 
-    prev.addEventListener('click', () => track.scrollBy({ left: -step() }));
-    next.addEventListener('click', () => track.scrollBy({ left: step() }));
+    prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
     track.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     update();

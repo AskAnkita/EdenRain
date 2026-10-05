@@ -17,8 +17,12 @@
 {%- else -%}
   <div class="menu-drawer-desktop__product-set" data-menu-drawer-product-group="{{ group_id }}" id="{{ group_id }}-preview"{% unless active %} hidden{% endunless %}>
     <ul class="menu-drawer-desktop__related-grid" role="list">
-      {%- if collection != blank and collection.products_count > 0 -%}
-        {%- for related_product in collection.products limit: 6 -%}
+      {%- comment -%}
+        `menu_collection`, not `collection`: a bare `collection` would pick up the page's own
+        collection object, making the menu change from page to page.
+      {%- endcomment -%}
+      {%- if menu_collection != blank and menu_collection.products_count > 0 -%}
+        {%- for related_product in menu_collection.products limit: 6 -%}
           {%- render 'header-menu-drawer-related-card', product: related_product -%}
         {%- endfor -%}
       {%- elsif menu_link.links != blank -%}

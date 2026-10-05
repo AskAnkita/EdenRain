@@ -28,7 +28,9 @@
 
 <accordion-custom>
   {%- assign is_shape_group = false -%}
+  {%- assign is_metal_group = false -%}
   {%- if group_handle == 'shape' -%}{%- assign is_shape_group = true -%}{%- endif -%}
+  {%- if group_handle == 'metal' -%}{%- assign is_metal_group = true -%}{%- endif -%}
   <details
     id="Details-Mobile-static-{{ group_handle }}-{{ section_id }}"
     class="mobile-facets__details js-filter{% if is_shape_group %} mobile-facets__details--shape{% endif %}"
@@ -55,7 +57,7 @@
       class="mobile-facets__submenu details-content"
     >
       <ul
-        class="facets-layout facets-layout-list facets-layout-list--text mobile-facets__list list-unstyled cus-scrollbar{% if is_shape_group %} mobile-facets__list--shape{% endif %}"
+        class="facets-layout facets-layout-list facets-layout-list--text mobile-facets__list list-unstyled cus-scrollbar{% if is_shape_group %} mobile-facets__list--shape{% endif %}{% if is_metal_group %} mobile-facets__list--metal{% endif %}"
         role="list"
       >
         {%- for entry in entries -%}
@@ -73,9 +75,40 @@
 
             assign input_id = 'Filter-static-' | append: group_handle | append: '-' | append: forloop.index
             assign shape_icon = option_label | handle
+            assign metal_type = blank
+            assign metal_code = blank
+            if is_metal_group
+              assign metal_label = option_label | downcase
+              if metal_label contains 'rose'
+                assign metal_type = 'rose'
+                assign metal_code = 'RG'
+              elsif metal_label contains 'yellow'
+                assign metal_type = 'yellow'
+                assign metal_code = 'YG'
+              elsif metal_label contains 'white'
+                assign metal_type = 'white'
+                assign metal_code = 'WG'
+              elsif metal_label contains 'platinum'
+                assign metal_type = 'platinum'
+                assign metal_code = 'PL'
+              elsif metal_label contains 'silver' or metal_label contains 'sterling'
+                assign metal_type = 'silver'
+                assign metal_code = 'SS'
+              elsif metal_label contains 'two-toned'
+                assign metal_type = 'two-tone'
+                assign metal_code = '2T'
+              endif
+
+              assign first_metal_word = option_label | split: ' ' | first
+              assign first_metal_word_size = first_metal_word | size
+              assign first_metal_word_upper = first_metal_word | upcase
+              if first_metal_word_upper contains 'K' and first_metal_word_size < 4
+                assign metal_code = first_metal_word_upper
+              endif
+            endif
           -%}
-          <li class="mobile-facets__item list-menu__item{% if is_shape_group %} mobile-facets__item--shape{% endif %}">
-            <label for="{{ input_id }}" class="facets__label mobile-facets__label{% if is_shape_group %} mobile-facets__label--shape{% endif %}" style="--font-size: {{ text_label_font_size }};">
+          <li class="mobile-facets__item list-menu__item{% if is_shape_group %} mobile-facets__item--shape{% endif %}{% if is_metal_group %} mobile-facets__item--metal{% endif %}">
+            <label for="{{ input_id }}" class="facets__label mobile-facets__label{% if is_shape_group %} mobile-facets__label--shape{% endif %}{% if is_metal_group %} mobile-facets__label--metal{% endif %}" style="--font-size: {{ text_label_font_size }};">
               <input
                 class="mobile-facets__checkbox"
                 type="checkbox"
@@ -84,9 +117,20 @@
                 id="{{ input_id }}"
               >
 
-              {%- if is_shape_group -%}
+              {%- if is_metal_group and metal_type != blank -%}
+                <span class="mobile-facets__shape-image mobile-facets__metal-tile">
+                  <span class="mobile-facets__metal-circle mobile-facets__metal-circle--{{ metal_type }}" aria-hidden="true"></span>
+                </span>
+              {%- elsif is_shape_group -%}
+                {%- assign shape_asset = 'diamond-shape-' | append: shape_icon | append: '.png' -%}
                 <span class="mobile-facets__shape-image">
-                  {%- render 'icon-diamond-filter-shape', shape: shape_icon -%}
+                  <img
+                    src="{{ shape_asset | asset_url }}"
+                    alt="{{ option_label | escape }}"
+                    width="200"
+                    height="200"
+                    loading="lazy"
+                  >
                 </span>
               {%- else -%}
                 <span class="mobile-facets__highlight"></span>

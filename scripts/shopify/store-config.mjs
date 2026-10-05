@@ -57,9 +57,33 @@ export const collections = [
   { handle: 'rings', title: 'Rings' },
   { handle: 'new-in', title: 'New In' },
   { handle: 'best-sellers', title: 'Best Sellers' },
+  { handle: 'ready-to-ship', title: 'Ready to Ship' },
+
+  // Jewelry sub-categories, shown as the tiles under Jewellery in the mega menu
+  { handle: 'studs', title: 'Stud Earrings' },
+  { handle: 'hoops-huggies', title: 'Hoops & Huggies' },
+  { handle: 'dangles-drops', title: 'Dangles & Drops' },
+  { handle: 'climbers-jackets-cuffs', title: 'Climbers, Jackets & Cuffs' },
+  { handle: 'signature-earrings', title: 'Signature Earrings' },
+  { handle: 'tennis-necklaces', title: 'Tennis Necklaces' },
+  { handle: 'pendants', title: 'Pendants' },
+  { handle: 'fashion-necklaces', title: 'Fashion Necklaces' },
+  { handle: 'signature-necklaces', title: 'Signature Necklaces' },
+  { handle: 'tennis-bracelets', title: 'Tennis Bracelets' },
+  { handle: 'bangles-cuffs', title: 'Bangles & Cuffs' },
+  { handle: 'fashion-bracelets', title: 'Fashion Bracelets' },
+  { handle: 'signature-bracelets', title: 'Signature Bracelets' },
 
   // Loose lab-grown diamonds (automated, by tag)
   { handle: 'lab-grown-diamonds', title: 'Lab-Grown Diamonds', rule: tag('loose-diamond') },
+
+  // Loose diamonds by shape, shown as the tiles under Diamonds in the mega menu. Tagged
+  // "diamond-shape:round" rather than "shape:round" so engagement rings don't join them.
+  ...['round', 'oval', 'emerald', 'cushion', 'marquise', 'radiant', 'pear', 'princess', 'asscher', 'heart'].map((shape) => ({
+    handle: `${shape}-diamonds`,
+    title: `${shape[0].toUpperCase()}${shape.slice(1)} Diamonds`,
+    rule: tag(`diamond-shape:${shape}`),
+  })),
 ];
 
 const metalItems = [

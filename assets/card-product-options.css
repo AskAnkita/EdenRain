@@ -38,7 +38,7 @@
 
 /* Metals */
 .card-metals {
-  gap: 0.6rem 0.8rem;
+  gap: 0.6rem 1rem;
 }
 
 .card-metals__item {
@@ -57,10 +57,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 2.8rem;
+  height: 2.8rem;
   border-radius: 50%;
-  font-size: 1rem;
+  font-size: 1.1rem;
   letter-spacing: 0.04em;
   line-height: 1;
   color: rgba(0, 0, 0, 0.6);
@@ -90,3 +90,45 @@
 .card-metals__dot--ss {
   --metal-dot-color: #d8d8d8;
 }
+
+/* Clickable swatches: the <li> keeps the underline, the button is a bare hit
+   target around the dot or icon. */
+.card-swatch-button {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  line-height: 0;
+}
+
+.card-swatch-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 0.4rem;
+}
+
+.card-metals__button:focus-visible {
+  border-radius: 50%;
+}
+
+.card-metals__code {
+  display: none;
+}
+
+.card-metals__item.is-active .card-metals__code {
+  display: block;
+}
+
+/* With a swatch chosen, the card keeps that photo instead of swapping to the
+   default product's hover image. */
+.card__media .media.is-swatch-selected > img + img {
+  display: none;
+}
+
+/* No hover override is needed alongside the rule above: the chosen photo keeps
+   full opacity on hover by itself, and picks up the same slight zoom every other
+   card image gets. */

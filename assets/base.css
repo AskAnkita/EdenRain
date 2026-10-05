@@ -21167,3 +21167,91 @@ footer.section-footer .email-signup__input {
     color: #8c6a57;
   }
 }
+
+
+/* ==================================================================
+   Eden Raine: slider arrows
+   Every scroller gets the same button: a grey disc that turns black on
+   hover with the icon reversing to white. Without this each section
+   took its arrow colours from its colour scheme, which is why the rows
+   did not match one another.
+   ================================================================== */
+
+.swiper-button.swiper-button-prev,
+.swiper-button.swiper-button-next {
+  --arrow-background: #e4e2df;
+  --arrow-color: #1a1a1a;
+  --arrow-border: transparent;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    opacity var(--animation-speed-slow) var(--cubic-fast),
+    transform var(--animation-speed-slow) var(--cubic-fast);
+}
+
+@media (hover: hover) {
+  .swiper-button.swiper-button-prev:hover,
+  .swiper-button.swiper-button-next:hover {
+    --arrow-background: #000;
+    --arrow-color: #fff;
+  }
+}
+
+.swiper-button.swiper-button-prev:focus-visible,
+.swiper-button.swiper-button-next:focus-visible {
+  --arrow-background: #000;
+  --arrow-color: #fff;
+}
+
+/* The theme's own hover is a panel of --arrow-color sliding in from the side. These
+   buttons swap colour instead, so the panel would only show as a second colour. */
+.swiper-button .fill-bg {
+  display: none;
+}
+
+/* One disc for every scroller: a fixed-size circle with a soft shadow, always on screen
+   instead of fading in when the row is hovered, and gone once the row reaches that end.
+   This started as the collection "shop by style" row; it now applies to every slider so the
+   rows match. The announcement bar is put back below — its arrows are bare icons beside the
+   message, not discs. */
+.swiper-button.swiper-button-prev,
+.swiper-button.swiper-button-next {
+  --er-arrow-size: 40px;
+  --button-width: var(--er-arrow-size);
+  --button-height: var(--er-arrow-size);
+  --button-icon-size: 1.4rem;
+  --arrow-radius: 50%;
+  border-radius: 50%;
+  box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
+  opacity: 1;
+  transform: none;
+}
+
+@media screen and (min-width: 1400px) {
+  .swiper-button.swiper-button-prev,
+  .swiper-button.swiper-button-next {
+    --er-arrow-size: 56px;
+    --button-icon-size: 1.6rem;
+  }
+}
+
+/* Keep the theme's press effect, which the transform above would otherwise cancel */
+.swiper-button.swiper-button-prev:active,
+.swiper-button.swiper-button-next:active {
+  transform: scale(0.9);
+}
+
+/* At either end the button goes rather than sitting there greyed out. The second pair is for
+   arrows placed under a carousel, which the theme otherwise leaves half-faded; they hold their
+   space either way, so nothing shifts when they go. */
+.swiper-button.swiper-button-prev.swiper-button-disabled,
+.swiper-button.swiper-button-next.swiper-button-disabled,
+.swiper-btns-wrap--bottom .swiper-button.swiper-button-prev.swiper-button-disabled,
+.swiper-btns-wrap--bottom .swiper-button.swiper-button-next.swiper-button-disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The announcement bar's arrows are transparent, so a shadow would hang in mid-air */
+.announcement-bar-slider .swiper-button.swiper-button-prev,
+.announcement-bar-slider .swiper-button.swiper-button-next {
+  box-shadow: none;
+}

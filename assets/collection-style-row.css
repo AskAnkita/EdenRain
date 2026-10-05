@@ -8,11 +8,26 @@
   border-bottom: 1px solid #ddd;
 }
 
-/* Keep the card edge in the middle of each navigation button. */
+/* How far each navigation button hangs past the card edge, as a share of its own width:
+   0.5 centres it on the edge, 1 clears the cards entirely. The next button sits further out
+   than the previous one so it covers less of the last card's label.
+   The padding and the matching negative margin cancel out, so the cards keep their width and
+   the button stays inside the scroller rather than overflowing the section. */
 .shopify-section[id$='__section_xyhtgf'] .swiper:has(.swiper-button) {
   --style-row-arrow-size: 56px;
-  padding-inline: calc(var(--style-row-arrow-size) * 0.5);
-  margin-inline: calc(var(--style-row-arrow-size) * -0.5);
+  --style-row-overhang-start: 0.5;
+  --style-row-overhang-end: 0.5;
+  padding-inline-start: calc(var(--style-row-arrow-size) * var(--style-row-overhang-start));
+  padding-inline-end: calc(var(--style-row-arrow-size) * var(--style-row-overhang-end));
+  margin-inline-start: calc(var(--style-row-arrow-size) * var(--style-row-overhang-start) * -1);
+  margin-inline-end: calc(var(--style-row-arrow-size) * var(--style-row-overhang-end) * -1);
+}
+
+/* Only from tablet up: on a phone the section's gutter is too narrow to give the button more room */
+@media screen and (min-width: 750px) {
+  .shopify-section[id$='__section_xyhtgf'] .swiper:has(.swiper-button) {
+    --style-row-overhang-end: 0.85;
+  }
 }
 
 .shopify-section[id$='__section_xyhtgf'] .swiper .swiper-button {
@@ -47,34 +62,11 @@
   padding-inline: 6px;
 }
 
-/* Arrows: round white buttons, always visible, hidden at either end */
-.shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-prev,
-.shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-next {
-  --button-width: 56px;
-  --button-height: 56px;
-  border: 0;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
-  opacity: 1;
-  transform: none;
-}
-
-.shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-disabled {
-  opacity: 0 !important;
-  pointer-events: none;
-}
-
-/* 1025–1399px shows exactly four cards, so keep the arrow small to cover less of the last label */
+/* The disc itself — size, shape, shadow, always visible, hidden at either end — is set for
+   every scroller in base.css. Only the row's spacing is local, and it has to use the same
+   sizes so the arrows stay lined up with the card edges. */
 @media screen and (max-width: 1399px) {
   .shopify-section[id$='__section_xyhtgf'] .swiper:has(.swiper-button) {
     --style-row-arrow-size: 40px;
-  }
-
-  .shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-prev,
-  .shopify-section[id$='__section_xyhtgf'] .swiper-button.swiper-button-next {
-    --button-width: 40px;
-    --button-height: 40px;
-    --button-icon-size: 1.4rem;
   }
 }

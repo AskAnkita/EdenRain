@@ -4,7 +4,7 @@
     
     "Shape Carousel"
     
-    Build a premium minimal jewelry shape selector section similar to the provided reference image.
+    Build a premium minimal jewellery shape selector section similar to the provided reference image.
     
     The main priority is:
     
@@ -323,7 +323,7 @@
     
     FINAL OUTPUT
     
-    Create a clean luxury jewelry shape carousel:
+    Create a clean luxury jewellery shape carousel:
     
     ✅ Fully editable Shopify section
     ✅ No default text
@@ -334,7 +334,7 @@
     ✅ Correct mobile 2x2 grouped carousel
     ✅ Mobile moves 4 cards together
     ✅ Natural image ratio
-    ✅ Minimal premium jewelry UI
+    ✅ Minimal premium jewellery UI
     ✅ Matches the provided reference image style
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
@@ -448,6 +448,16 @@
     color: {{ block.settings.arrow_color_hover }};
   }
 
+  .ai-shape-carousel__nav-{{ ai_gen_id }} svg {
+    width: var(--arrow-icon-size, 14px);
+    height: auto;
+  }
+
+  /* One arrow icon serves both buttons; the back one is turned round. */
+  .ai-shape-carousel__nav-{{ ai_gen_id }}.prev svg {
+    transform: rotate(180deg);
+  }
+
   .ai-shape-carousel__nav-{{ ai_gen_id }}.prev {
     left: -20px;
   }
@@ -514,14 +524,10 @@
   <div class="ai-shape-carousel__container-{{ ai_gen_id }}">
     {% if block.settings.show_arrows %}
       <button class="ai-shape-carousel__nav-{{ ai_gen_id }} prev" aria-label="Previous">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
+        {%- render 'icon-arrow' -%}
       </button>
       <button class="ai-shape-carousel__nav-{{ ai_gen_id }} next" aria-label="Next">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
+        {%- render 'icon-arrow' -%}
       </button>
     {% endif %}
 
@@ -910,7 +916,7 @@
       "type": "color",
       "id": "card_background",
       "label": "Background",
-      "default": "#FFFFFF"
+      "default": "#F8F8F6"
     },
     {
       "type": "color",

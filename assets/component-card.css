@@ -285,14 +285,24 @@
     opacity: var(--opacity-100);
   }
 
-  .card__media:hover .media.media--hover-effect > img:first-child:not(:only-child) {
-    opacity: var(--opacity-0);
-    transform: scale(0.8);
+  /* Two-image card: the second photo dissolves in on top of the first, which
+     stays put. The two used to cross-fade — the first also shrinking to 0.8 —
+     so mid-hover you saw two half-transparent products at different sizes, which
+     is what made the swap jump. Both frames now hold the same scale throughout,
+     so nothing moves relative to anything else and there is no see-through
+     moment; only the shared, very slight zoom reads as motion. */
+  .card .media.media--hover-effect > img:not(:only-child),
+  .card-wrapper .media.media--hover-effect > img:not(:only-child) {
+    transition: opacity var(--duration-default) ease, transform var(--duration-long) var(--ease-out-slow);
+  }
+
+  .card__media:hover .media.media--hover-effect > img:first-child:not(:only-child),
+  .card__media:hover .media.media--hover-effect > img + img {
+    transform: scale(1.03);
   }
 
   .card__media:hover .media.media--hover-effect > img + img {
     opacity: var(--opacity-100);
-    transform: scale(1.03);
   }
 }
 

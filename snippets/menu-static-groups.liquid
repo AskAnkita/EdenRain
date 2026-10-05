@@ -1,0 +1,38 @@
+{% comment %}
+  Static tab groups for a top-level mega menu item: the left-hand column of the desktop panel.
+
+  Only for menus whose column should not mirror Online Store > Navigation. A top-level item
+  that isn't listed here keeps using its own sub-links.
+
+  Accepts:
+  - parent: {String} the top-level item's title, e.g. "Jewellery"
+
+  Outputs "Tab|collection-handle|source|Heading" entries separated by commas:
+  - Tab is the label in the left-hand column
+  - collection-handle is where the heading links; "-" leaves the heading as plain text
+  - source is "items" (tiles come from 'menu-static-items' for a group of this tab's name)
+    or "products" (tiles are that collection's products)
+  - Heading is the title above the tiles
+{% endcomment %}
+
+{%- liquid
+  assign parent_key = parent | handle
+
+  case parent_key
+    when 'engagement'
+      echo 'By Style|-|items|Shop All'
+      echo ',By Shape|-|items|Shop All'
+      echo ',By Metal|-|items|Shop All'
+    when 'wedding'
+      echo 'By Style|-|items|Shop All'
+      echo ',Featured|-|items|Featured'
+    when 'diamonds'
+      echo 'Lab-Grown Diamonds|lab-grown-diamonds|items|Shop All'
+      echo ',Learn|-|items|Learn'
+    when 'jewellery'
+      echo 'Earrings|earrings|items|Shop All Earrings'
+      echo ',Necklaces|necklaces|items|Shop All Necklaces'
+      echo ',Bracelets|bracelets|items|Shop All Bracelets'
+      echo ',Featured|-|items|Featured'
+  endcase
+-%}

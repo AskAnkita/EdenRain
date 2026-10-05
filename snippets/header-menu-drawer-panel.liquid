@@ -1,8 +1,7 @@
 {% comment %}
-  Desktop mega menu panel, three columns:
+  Desktop mega menu panel, two columns:
   - a short list of categories, then "Shop all"
   - three featured products
-  - one campaign image linking to the menu item
 
   Categories come from the menu item's sub-links (Online Store > Navigation). A
   collection link without sub-links lists the product types in that collection.
@@ -31,14 +30,38 @@
     endif
   endfor
 
-  # Three-level menus (Engagement > Shop by Style > Solitaire) show one column per group
+  # Some menus (Jewellery) set their own left-hand column rather than following the navigation
+  assign static_groups = ''
+  capture static_groups_source
+    render 'menu-static-groups', parent: link.title
+  endcapture
+  assign static_groups_source = static_groups_source | strip
+  if static_groups_source != ''
+    assign static_groups = static_groups_source | split: ','
+  endif
+
+  # Three-level menus (Engagement > Shop by Style > Solitaire) show one column per group.
+  # A group counts even when Liquid hands it no sub-links, as long as 'menu-static-items'
+  # has a static list for it.
   assign has_groups = false
-  for child in link.links
-    if child.links.size > 0
-      assign has_groups = true
-      break
-    endif
-  endfor
+  if static_groups != ''
+    assign has_groups = true
+  else
+    for child in link.links
+      if child.links.size > 0
+        assign has_groups = true
+        break
+      endif
+      capture static_probe
+        render 'menu-static-items', group: child.title, parent: link.title
+      endcapture
+      assign static_probe = static_probe | strip
+      if static_probe != ''
+        assign has_groups = true
+        break
+      endif
+    endfor
+  endif
 
   assign has_product_links = false
   for child in link.links
@@ -48,42 +71,89 @@
     endif
   endfor
 
-  assign campaign_image = blank
-  if source_collection != blank and source_collection.image != blank
-    assign campaign_image = source_collection.image
-  elsif source_collection != blank
-    for product in source_collection.products limit: 1
-      assign campaign_image = product.media[1].preview_image | default: product.featured_image
-    endfor
-  endif
 -%}
 
-<div class="menu-drawer-desktop__page menu-drawer-desktop__page--featured{% if has_groups %} menu-drawer-desktop__page--tabs{% endif %}{% if campaign_image == blank %} menu-drawer-desktop__page--no-campaign{% endif %}" id="{{ drawer_id }}" data-menu-drawer-page hidden>
+<div class="menu-drawer-desktop__page menu-drawer-desktop__page--featured menu-drawer-desktop__page--no-campaign{% if has_groups %} menu-drawer-desktop__page--tabs{% endif %}" id="{{ drawer_id }}" data-menu-drawer-page hidden>
   {%- if has_groups -%}
   {%- comment -%} Tabs: groups on the left; pointing at one shows its items as picture tiles {%- endcomment -%}
   <nav class="menu-drawer-desktop__tabs" aria-label="{{ link.title | escape }}">
     <ul role="list">
-      {%- for child in link.links -%}
-        <li>
-          <button
-            type="button"
-            class="menu-drawer-desktop__tab{% if forloop.first %} is-active{% endif %}"
-            data-menu-drawer-category="{{ drawer_id }}-{{ forloop.index }}"
-          >
-            <span>{{ child.title | escape }}</span>
-            <span class="menu-drawer-desktop__tab-arrow" aria-hidden="true"></span>
-          </button>
-        </li>
-      {%- endfor -%}
+      {%- if static_groups != '' -%}
+        {%- for entry in static_groups -%}
+          {%- assign entry_parts = entry | split: '|' -%}
+          <li>
+            <button
+              type="button"
+              class="menu-drawer-desktop__tab{% if forloop.first %} is-active{% endif %}"
+              data-menu-drawer-category="{{ drawer_id }}-{{ forloop.index }}"
+            >
+              <span>{{ entry_parts[0] | escape }}</span>
+              <span class="menu-drawer-desktop__tab-arrow" aria-hidden="true"></span>
+            </button>
+          </li>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for child in link.links -%}
+          <li>
+            <button
+              type="button"
+              class="menu-drawer-desktop__tab{% if forloop.first %} is-active{% endif %}"
+              data-menu-drawer-category="{{ drawer_id }}-{{ forloop.index }}"
+            >
+              <span>{{ child.title | escape }}</span>
+              <span class="menu-drawer-desktop__tab-arrow" aria-hidden="true"></span>
+            </button>
+          </li>
+        {%- endfor -%}
+      {%- endif -%}
     </ul>
-    <a class="menu-drawer-desktop__view-all" href="{{ link.url }}">Shop all {{ link.title | downcase | escape }}</a>
   </nav>
 
   <div class="menu-drawer-desktop__tab-panels">
-    {%- for child in link.links -%}
-      {%- assign group_id = drawer_id | append: '-' | append: forloop.index -%}
-      {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: child, active: forloop.first -%}
-    {%- endfor -%}
+    {%- if static_groups != '' -%}
+      {%- for entry in static_groups -%}
+        {%- liquid
+          assign entry_parts = entry | split: '|'
+          assign tab_title = entry_parts[0]
+          assign group_handle = entry_parts[1]
+          assign group_source = entry_parts[2]
+          assign group_heading = entry_parts[3] | default: tab_title
+          assign group_id = drawer_id | append: '-' | append: forloop.index
+
+          assign group_url = ''
+          if group_handle != '-'
+            assign group_url = group_handle | prepend: '/collections/'
+          endif
+
+          # The tiles are looked up under the tab's name, not the heading above them
+          assign group_collection = blank
+          assign group_sections = ''
+          if group_source == 'products'
+            assign group_collection = collections[group_handle]
+          else
+            capture group_sections_source
+              render 'menu-static-items', group: tab_title, parent: link.title
+            endcapture
+            assign group_sections = group_sections_source | strip
+          endif
+        -%}
+        {%- render 'header-menu-drawer-tiles',
+          group_id: group_id,
+          group_title: group_heading,
+          group_url: group_url,
+          tile_collection: group_collection,
+          static_sections: group_sections,
+          top_title: link.title,
+          top_url: link.url,
+          active: forloop.first
+        -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for child in link.links -%}
+        {%- assign group_id = drawer_id | append: '-' | append: forloop.index -%}
+        {%- render 'header-menu-drawer-tiles', group_id: group_id, parent: child, top_title: link.title, top_url: link.url, active: forloop.first -%}
+      {%- endfor -%}
+    {%- endif -%}
   </div>
   {%- else -%}
   <nav class="menu-drawer-desktop__nav" aria-label="{{ link.title | escape }}">
@@ -132,18 +202,4 @@
 
   {%- endif -%}
 
-  {%- if campaign_image != blank -%}
-  <a class="menu-drawer-desktop__campaign" href="{{ link.url }}">
-    <span class="menu-drawer-desktop__campaign-media">
-      {%- if campaign_image != blank -%}
-        {{ campaign_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 26vw, 80vw', alt: link.title }}
-      {%- endif -%}
-    </span>
-    <span class="menu-drawer-desktop__campaign-copy">
-      <span class="menu-drawer-desktop__campaign-kicker">Explore</span>
-      <span class="menu-drawer-desktop__campaign-title">{{ link.title | escape }}</span>
-      <span class="menu-drawer-desktop__campaign-cta">Shop now</span>
-    </span>
-  </a>
-  {%- endif -%}
 </div>

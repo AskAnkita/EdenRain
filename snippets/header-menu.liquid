@@ -69,13 +69,21 @@
             endif
           -%}
           {%- liquid
-            # Drawer: items with sub-links, or collection links (shown as product tiles)
+            # Drawer: items with sub-links, items with a static panel of their own, or
+            # collection links (shown as product tiles)
             assign drawer_eligible = false
             if header_settings.menu_drawer
               if link.links != blank
                 assign drawer_eligible = true
               elsif link.type == 'collection_link' and link.object.products_count > 0
                 assign drawer_eligible = true
+              else
+                capture static_groups_probe
+                  render 'menu-static-groups', parent: link.title
+                endcapture
+                if static_groups_probe != blank
+                  assign drawer_eligible = true
+                endif
               endif
             endif
           -%}

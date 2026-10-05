@@ -1,0 +1,61 @@
+{% comment %}
+  Static sub-items for one mega menu group, used when Liquid gives the group no sub-links.
+
+  The groups (Engagement > Shop by Style > Solitaire) exist in Online Store > Navigation, but
+  Liquid returns an empty `links` for the second level, so the panels came out blank. These
+  lists stand in for it; keep them in step with the menu until the links come through.
+
+  Accepts:
+  - group: {String} the group's title, e.g. "Shop by Style"
+  - parent: {String} the top-level item's title, e.g. "Engagement"
+
+  Outputs one or more sections, in this shape:
+
+      Heading::Title|collection-handle~Title|collection-handle;;Heading::…
+
+  Sections are split on ";;", a section's heading from its items on "::", items on "~" and an
+  item's label from its collection handle on "|". A handle starting with "/" is used as the
+  link exactly as written, for an item that is a page or a blog rather than a collection. A section with an empty heading prints none,
+  which is what the first section of every group does — the group's own heading covers it.
+  "~" and "::" are the separators rather than a comma because labels contain commas
+  ("Climbers, Jackets & Cuffs"). Nothing is output for a group that isn't listed.
+{% endcomment %}
+
+{%- liquid
+  assign group_key = group | handle
+  assign parent_key = parent | handle
+  assign key = parent_key | append: '/' | append: group_key
+
+  assign metals = '::Yellow Gold|yellow-gold-jewelry~White Gold|white-gold-jewelry~Rose Gold|rose-gold-jewelry~Platinum|platinum-jewelry'
+
+  case key
+    when 'engagement/by-style' or 'engagement/shop-by-style'
+      echo '::Solitaire|solitaire~Side Stone|side-stone~Halo|halo~Hidden Halo|hidden-halo~Three Stone|three-stone~Bridal Sets|bridal-sets~Vintage|vintage~Nature Inspired|nature-inspired~Toi et Moi|toi-et-moi~Promise|promise'
+    when 'engagement/by-shape' or 'engagement/shop-by-shape'
+      echo '::Round|round-engagement-rings~Oval|oval-engagement-rings~Cushion|cushion-engagement-rings~Emerald|emerald-engagement-rings~Pear|pear-engagement-rings~Princess|princess-engagement-rings~Radiant|radiant-engagement-rings~Marquise|marquise-engagement-rings~Asscher|asscher-engagement-rings'
+    when 'wedding/by-style' or 'wedding/womens'
+      echo '::Wedding|wedding-bands~Anniversary|anniversary-rings~Eternity|eternity-rings~Plain Metal|plain-metal-wedding-bands'
+      echo ";;Featured Collections::Curved|curved-wedding-bands~Stackable|stackable-rings~Men's|mens-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship"
+    when 'wedding/featured' or 'wedding/mens'
+      echo "::Curved|curved-wedding-bands~Stackable|stackable-rings~Men's|mens-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship"
+    when 'diamonds/lab-grown-diamonds'
+      echo '::Round|round-diamonds~Oval|oval-diamonds~Emerald|emerald-diamonds~Cushion|cushion-diamonds~Marquise|marquise-diamonds~Radiant|radiant-diamonds~Pear|pear-diamonds~Princess|princess-diamonds~Asscher|asscher-diamonds~Heart|heart-diamonds'
+    when 'diamonds/learn'
+      echo '::Education & Guides|/blogs/education-guides~Gemstones|/pages/gemstones~Ring Size Guide|/pages/er-sizing~Jewellery Care|/pages/jewellery-care'
+    when 'jewellery/earrings'
+      echo '::Studs|studs~Hoops & Huggies|hoops-huggies~Dangles & Drops|dangles-drops~Climbers, Jackets & Cuffs|climbers-jackets-cuffs'
+      echo ';;Featured Collections::Signature Earrings|signature-earrings~New Arrivals|new-in~Ready to Ship|ready-to-ship'
+    when 'jewellery/necklaces'
+      echo '::Tennis|tennis-necklaces~Pendants|pendants~Fashion|fashion-necklaces'
+      echo ';;Featured Collections::Signature Necklaces|signature-necklaces~New Arrivals|new-in~Ready to Ship|ready-to-ship'
+    when 'jewellery/bracelets'
+      echo '::Tennis|tennis-bracelets~Bangles & Cuffs|bangles-cuffs~Fashion|fashion-bracelets'
+      echo ';;Featured Collections::Signature Bracelets|signature-bracelets~New Arrivals|new-in~Ready to Ship|ready-to-ship'
+    when 'jewellery/featured'
+      echo '::New In|new-in~Best Sellers|best-sellers'
+    else
+      if group_key == 'by-metal' or group_key == 'shop-by-metal'
+        echo metals
+      endif
+  endcase
+-%}

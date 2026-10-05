@@ -2,16 +2,24 @@
   Metal swatches for a product card.
 
   Values come from the first product option whose name reads as a metal ("Metal",
-  "Metal Type", "Color", "Finish"). Each value is matched to a tone by name, and the
-  first one carries its short code (WG, YG, RG, PL, SS) the way MiaDonna's cards do.
-  Products without such an option render nothing.
+  "Metal Type", "Color", "Finish"), else from the product's metal tags, else from the
+  block's "Default metals" setting. Karats are collapsed, so "14k White Gold" and
+  "18k White Gold" share one dot labelled White Gold. Each value is matched to a tone
+  by name, and the active one carries its short code (WG, YG, RG, PL, SS).
+
+  When a value maps to a variant that has its own image, the swatch renders as a
+  button; card-option-swatches.js reads its metal key and option index, combines them
+  with whatever shape the card's shape row has selected, and swaps the card's photo for
+  the variant matching both. Values without a variant image stay as plain,
+  non-interactive dots.
 {%- enddoc -%}
 
 {%- liquid
   assign card_product = block.settings.product
-  assign option_keys = 'metal,color,colour,finish,gold' | split: ','
+  assign option_keys = 'metal,material,color,colour,finish,gold' | split: ','
 
   assign metal_source = ''
+  assign metal_index = -1
   for option in card_product.options_with_values
     assign option_name = option.name | downcase
     assign is_metal_option = false
@@ -23,12 +31,14 @@
     endfor
     if is_metal_option
       assign metal_source = option.values | join: '||'
+      assign metal_index = forloop.index0
       break
     endif
   endfor
 
   # Half the catalogue has no options at all ("Default Title"), but carries its metal
-  # as a tag ("18k Gold", "Sterling Silver"), so fall back to that.
+  # as a tag ("18k Gold", "Sterling Silver"), so fall back to that. Tag values have no
+  # variant behind them, so those swatches stay decorative.
   if metal_source == blank
     assign tag_metals = ''
     for tag in card_product.tags
@@ -40,7 +50,73 @@
     assign metal_source = tag_metals | remove_first: '||'
   endif
 
-  assign metal_values = metal_source | split: '||'
+  if metal_source == blank
+    assign metal_source = block.settings.default_metals
+  endif
+
+  if metal_source contains '||'
+    assign metal_values_raw = metal_source | split: '||'
+  else
+    assign metal_values_raw = metal_source | split: ','
+  endif
+
+  # "14k White Gold" and "18k White Gold" are the same metal as far as the card is
+  # concerned, so collapse the karats and show one dot per metal. The first value
+  # of each metal is kept, because that is the one that still matches a variant.
+  assign seen_tones = '|'
+  assign metal_unique = ''
+  for value in metal_values_raw
+    assign dedupe_text = value | strip | downcase
+    if dedupe_text contains 'rose' or dedupe_text contains 'pink'
+      assign dedupe_tone = 'rg'
+    elsif dedupe_text contains 'white'
+      assign dedupe_tone = 'wg'
+    elsif dedupe_text contains 'yellow'
+      assign dedupe_tone = 'yg'
+    elsif dedupe_text contains 'platinum'
+      assign dedupe_tone = 'pl'
+    elsif dedupe_text contains 'silver'
+      assign dedupe_tone = 'ss'
+    elsif dedupe_text contains 'gold'
+      assign dedupe_tone = 'yg'
+    else
+      assign dedupe_tone = dedupe_text | handle
+    endif
+    assign tone_key = '|' | append: dedupe_tone | append: '|'
+    unless seen_tones contains tone_key
+      assign seen_tones = seen_tones | append: dedupe_tone | append: '|'
+      assign metal_unique = metal_unique | append: '||' | append: value
+    endunless
+  endfor
+
+  assign metal_values = metal_unique | remove_first: '||' | split: '||'
+
+  # The card's photo belongs to one particular variant, so underline that metal
+  # rather than always the first -- the way the reference cards do it.
+  assign active_tone = ''
+  if metal_index >= 0 and card_product.featured_image != blank
+    for variant in card_product.variants
+      if variant.featured_image != blank and variant.featured_image.id == card_product.featured_image.id
+        assign active_text = variant.options[metal_index] | downcase
+        if active_text contains 'rose' or active_text contains 'pink'
+          assign active_tone = 'rg'
+        elsif active_text contains 'white'
+          assign active_tone = 'wg'
+        elsif active_text contains 'yellow'
+          assign active_tone = 'yg'
+        elsif active_text contains 'platinum'
+          assign active_tone = 'pl'
+        elsif active_text contains 'silver'
+          assign active_tone = 'ss'
+        elsif active_text contains 'gold'
+          assign active_tone = 'yg'
+        endif
+        break
+      endif
+    endfor
+  endif
+
+  assign srcset_widths = '240,352,650,832,1200' | split: ','
 -%}
 
 {%- if metal_values.size > 0 -%}
@@ -64,31 +140,97 @@
 
           assign tone = 'other'
           assign code = ''
+          assign metal_label = value_text
           if value_compare contains 'rose' or value_compare contains 'pink'
             assign tone = 'rg'
             assign code = 'RG'
+            assign metal_label = 'Rose Gold'
           elsif value_compare contains 'white'
             assign tone = 'wg'
             assign code = 'WG'
+            assign metal_label = 'White Gold'
           elsif value_compare contains 'yellow'
             assign tone = 'yg'
             assign code = 'YG'
+            assign metal_label = 'Yellow Gold'
           elsif value_compare contains 'platinum'
             assign tone = 'pl'
             assign code = 'PL'
+            assign metal_label = 'Platinum'
           elsif value_compare contains 'silver'
             assign tone = 'ss'
             assign code = 'SS'
+            assign metal_label = 'Silver'
           elsif value_compare contains 'gold'
             assign tone = 'yg'
             assign code = 'YG'
+            assign metal_label = 'Yellow Gold'
+          endif
+
+          # Unnamed metals fall back to their own handle so two "other" dots never
+          # collide on the same key.
+          assign swatch_key = tone
+          if tone == 'other'
+            assign swatch_key = value_compare | handle
+          endif
+
+          assign value_image = null
+          assign value_variant_id = ''
+          if metal_index >= 0
+            for variant in card_product.variants
+              if variant.options[metal_index] == value_text and variant.featured_image != blank
+                assign value_image = variant.featured_image
+                assign value_variant_id = variant.id
+                break
+              endif
+            endfor
           endif
         -%}
-        <li class="card-metals__item{% if forloop.first %} is-active{% endif %}">
+        {%- capture dot -%}
           <span class="card-metals__dot card-metals__dot--{{ tone }}" aria-hidden="true">
-            {%- if forloop.first -%}{{ code }}{%- endif -%}
+            <span class="card-metals__code">{{ code }}</span>
           </span>
-          <span class="visually-hidden">{{ value_text | escape }}</span>
+          <span class="visually-hidden">{{ metal_label | escape }}</span>
+        {%- endcapture -%}
+        {%- liquid
+          assign is_active_metal = false
+          if active_tone != blank
+            if tone == active_tone
+              assign is_active_metal = true
+            endif
+          elsif forloop.first
+            assign is_active_metal = true
+          endif
+        -%}
+        <li class="card-metals__item{% if is_active_metal %} is-active{% endif %}">
+          {%- if value_image -%}
+            {%- capture value_srcset -%}
+              {%- for width in srcset_widths -%}
+                {%- assign width_number = width | plus: 0 -%}
+                {%- if width_number < value_image.width -%}
+                  {{ value_image | image_url: width: width_number, format: 'webp' }} {{ width_number }}w,
+                {%- endif -%}
+              {%- endfor -%}
+              {{ value_image | image_url: width: value_image.width, format: 'webp' }} {{ value_image.width }}w
+            {%- endcapture -%}
+            <button
+              type="button"
+              class="card-metals__button card-swatch-button"
+              aria-pressed="{% if is_active_metal %}true{% else %}false{% endif %}"
+              data-card-swatch
+              data-swatch-role="metal"
+              data-swatch-key="{{ swatch_key }}"
+              data-swatch-option-index="{{ metal_index }}"
+              data-swatch-src="{{ value_image | image_url: width: 832, format: 'webp' | escape }}"
+              data-swatch-srcset="{{ value_srcset | strip | strip_newlines | escape }}"
+              data-swatch-alt="{{ card_product.title | append: ' - ' | append: metal_label | escape }}"
+              data-swatch-variant="{{ value_variant_id }}"
+            >
+              {{ dot }}
+            </button>
+          {%- else -%}
+            {{ dot }}
+          {%- endif -%}
         </li>
       {%- endfor -%}
     </ul>
@@ -104,6 +246,13 @@
       "type": "product",
       "id": "product",
       "label": "t:settings.product"
+    },
+    {
+      "type": "text",
+      "id": "default_metals",
+      "label": "Default metals",
+      "info": "Comma separated. Used for products that carry no metal option and no metal tag. Leave blank to hide the row for those products.",
+      "default": "White Gold, Yellow Gold, Rose Gold, Silver"
     },
     {
       "type": "select",

@@ -1,4 +1,17 @@
-/* Product page, MiaDonna-style. Loaded by sections/main-product.liquid. */
+/* Product page, MiaDonna-style. Loaded by sections/main-product.liquid.
+
+   Reference: miadonna.com PDP. The info column there is a narrow stack of
+   hairline-separated rows -- SKU, title, price, one row per option, buy
+   button, ship-by date, reassurance grid, accordions -- all sharing one
+   left edge and one small-caps label style. */
+
+.template-product {
+  --pdp-rule: rgb(var(--color-foreground-rgb) / 0.13);
+  --pdp-ink: rgb(var(--color-foreground-rgb) / 1);
+  --pdp-ink-soft: rgb(var(--color-foreground-rgb) / 0.62);
+  --pdp-label-size: 1.3rem;
+  --pdp-label-tracking: 0.1em;
+}
 
 /* ---------- Gallery: two images side by side, then one wide, repeating ---------- */
 .template-product .media-gallery__grid-item {
@@ -15,8 +28,12 @@
     gap: 1rem;
   }
 
-  .template-product .media-gallery--two-column .media-gallery__grid-item:nth-child(3n),
-  .template-product .media-gallery--two-column .media-gallery__grid-item:last-child:nth-child(3n + 1) {
+  /* Every third tile runs full width. While a metal filters the gallery the positional
+     rules would count hidden tiles, so product-metal-media.js marks the visible thirds
+     with --wide instead and :not(.is-metal-filtered) stands the positional rules down. */
+  .template-product .media-gallery--two-column .media-gallery__grid:not(.is-metal-filtered) .media-gallery__grid-item:nth-child(3n),
+  .template-product .media-gallery--two-column .media-gallery__grid:not(.is-metal-filtered) .media-gallery__grid-item:last-child:nth-child(3n + 1),
+  .template-product .media-gallery--two-column .media-gallery__grid-item--wide {
     grid-column: span 2;
     /* A wide tile at the image's own ratio would be as tall as it is wide; crop it to 4:3 */
     --ratio: 1.3333 !important;
@@ -24,92 +41,413 @@
     --media-preview-ratio: 1.3333 !important;
   }
 
-  .template-product .media-gallery--two-column .media-gallery__grid-item:nth-child(3n) img,
-  .template-product .media-gallery--two-column .media-gallery__grid-item:last-child:nth-child(3n + 1) img {
+  .template-product .media-gallery--two-column .media-gallery__grid:not(.is-metal-filtered) .media-gallery__grid-item:nth-child(3n) img,
+  .template-product .media-gallery--two-column .media-gallery__grid:not(.is-metal-filtered) .media-gallery__grid-item:last-child:nth-child(3n + 1) img,
+  .template-product .media-gallery--two-column .media-gallery__grid-item--wide img {
     object-fit: cover;
   }
 }
 
-/* ---------- Price: a divider under it, as on MiaDonna ---------- */
-.template-product .product-details product-price.text-block {
-  padding-bottom: 2.4rem;
-  margin-bottom: 0.8rem;
-  border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 0.12);
+/* ---------- Info column: narrow, like MiaDonna's two-fifths column ----------
+   Deliberately not sticky: with options, buy button, reassurance grid and two
+   accordions the column is taller than the viewport, so sticking it would put
+   its lower half out of reach. */
+@media screen and (min-width: 990px) {
+  .template-product .product-information__grid > .product-details {
+    max-width: 52rem;
+  }
 }
 
-/* ---------- Option labels: "Color: 18k Yellow Gold" ---------- */
+/* ---------- SKU, then the title ---------- */
+.template-product .product-details [data-sku] {
+  font-size: var(--pdp-label-size);
+  letter-spacing: var(--pdp-label-tracking);
+  text-transform: uppercase;
+  color: var(--pdp-ink-soft);
+}
+
+.template-product .product-details h1,
+.template-product .product-details .product-title {
+  margin: 0.6rem 0 1.2rem;
+  font-size: clamp(2.6rem, 2.2vw, 3.4rem);
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+/* ---------- Price: a divider under it, as on MiaDonna ---------- */
+.template-product .product-details product-price.text-block {
+  padding-bottom: 2rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--pdp-rule);
+}
+
+.template-product .product-details product-price .price {
+  font-size: 2.2rem;
+  letter-spacing: 0.01em;
+}
+
+/* ---------- One row per option, separated by space rather than rules ---------- */
+.template-product .variant-option {
+  padding: 0;
+  margin: 0 0 3.2rem;
+  border: 0;
+}
+
+/* "Metal:" in bold, then the chosen value in grey on the same line */
 .template-product .variant-option .form__label {
-  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 0.6rem;
+  margin-bottom: 1.6rem;
   font-family: var(--font-body--family);
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--pdp-ink);
 }
 
 .template-product .variant-option .form__label [data-selected-value] {
+  margin-left: 0;
   font-weight: 400;
-  margin-left: 0.4rem;
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 1.6rem;
+  color: var(--pdp-ink-soft);
 }
 
-/* Text pills (carat, size, quality): softer outline, black when chosen */
-.template-product .product-form__input--pill input[type="radio"] + label:not(.metal-swatch) {
-  height: 4.8rem !important;
-  min-width: 9rem !important;
-  padding: 0 2.2rem !important;
-  border-color: rgb(var(--color-foreground-rgb) / 0.2) !important;
-  font-size: 1.5rem;
+/* ---------- Text pills (carat, quality, size): rounded, solid black when chosen ---------- */
+.template-product .product-form__input--pill input[type='radio'] + label:not(.metal-swatch):not(.shape-swatch) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 5rem !important;
+  min-width: 9.4rem !important;
+  padding: 0 2.4rem !important;
+  margin: 0 1rem 1rem 0 !important;
+  border: 1px solid rgb(var(--color-foreground-rgb) / 0.18) !important;
+  border-radius: 999px !important;
+  background: var(--color-background) !important;
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+  transition: background var(--duration-short) ease, color var(--duration-short) ease,
+    border-color var(--duration-short) ease;
+}
+
+.template-product .product-form__input--pill input[type='radio']:checked + label:not(.metal-swatch):not(.shape-swatch),
+.template-product .product-form__input--pill input[type='radio'].checked + label:not(.metal-swatch):not(.shape-swatch),
+.template-product .product-form__input--pill input[type='radio'] + label.checked:not(.metal-swatch):not(.shape-swatch) {
+  border-color: var(--pdp-ink) !important;
+  background: var(--pdp-ink) !important;
+  color: var(--color-background) !important;
   font-weight: 600;
-  letter-spacing: 0.06em;
 }
 
-.template-product .product-form__input--pill input[type="radio"]:checked + label:not(.metal-swatch) {
-  border-color: #001514 !important;
+@media (hover: hover) {
+  .template-product
+    .product-form__input--pill
+    input[type='radio']:not(:checked)
+    + label:not(.metal-swatch):not(.shape-swatch):hover {
+    border-color: var(--pdp-ink) !important;
+  }
 }
 
-/* ---------- Metal swatches: circles in the metal's colour with the karat ---------- */
-.product-form__input--pill input[type="radio"] + label.metal-swatch {
+/* The theme draws a scaling outline ring on every pill; the fill carries the
+   selected state here instead. */
+.template-product .product-form__input--pill input[type='radio'] + label:not(.metal-swatch):not(.shape-swatch)::before {
+  display: none !important;
+}
+
+/* ---------- Metal swatches: a metal circle with the karat or metal code ---------- */
+.product-form__input--pill input[type='radio'] + label.metal-swatch {
   --metal: linear-gradient(135deg, #f1f1f1, #cfcfcf);
-  width: 4.8rem !important;
-  height: 4.8rem !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  vertical-align: top;
+  width: 5.6rem !important;
+  height: 5.6rem !important;
   min-width: 0 !important;
+  margin: 0 1.6rem 1.2rem 0 !important;
   padding: 0 !important;
-  margin: 0.6rem 1.2rem 0.6rem 0;
+  border: 0 !important;
   border-radius: 50% !important;
-  border: 1px solid transparent !important;
-  background: var(--metal) !important;
-  color: #1c1c1c !important;
-  font-size: 1.2rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  /* the ring around the chosen metal */
-  box-shadow: 0 0 0 0 transparent !important;
+  background: none !important;
+  color: var(--pdp-ink) !important;
+  cursor: pointer;
+}
+
+.product-form__input--pill input[type='radio'] + label.metal-swatch::before {
+  display: none !important;
+}
+
+.metal-swatch__dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--metal);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07);
+  font-size: 1.4rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  color: #2b2b2b;
   transition: box-shadow 0.2s ease;
 }
 
-.product-form__input--pill input[type="radio"] + label.metal-swatch::before {
-  display: none;
+/* The chosen metal gets a thin dark ring with a white gap inside it */
+.product-form__input--pill input[type='radio']:checked + label.metal-swatch .metal-swatch__dot,
+.product-form__input--pill input[type='radio'].checked + label.metal-swatch .metal-swatch__dot,
+.product-form__input--pill input[type='radio'] + label.metal-swatch.checked .metal-swatch__dot {
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07), 0 0 0 2px var(--color-background),
+    0 0 0 3px var(--pdp-ink);
 }
 
-.product-form__input--pill input[type="radio"]:checked + label.metal-swatch,
-.product-form__input--pill input[type="radio"] + label.metal-swatch.checked {
-  background: var(--metal) !important;
-  color: #1c1c1c !important;
-  border-color: #fff !important;
-  box-shadow: 0 0 0 1px #1c1c1c !important;
+@media (hover: hover) {
+  .product-form__input--pill input[type='radio']:not(:checked) + label.metal-swatch:hover .metal-swatch__dot {
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07), 0 0 0 2px var(--color-background),
+      0 0 0 3px rgb(var(--color-foreground-rgb) / 0.25);
+  }
 }
 
-.product-form__input--pill input[type="radio"]:not(:checked) + label.metal-swatch:hover {
-  background: var(--metal) !important;
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.25) !important;
+.product-form__input--pill input[type='radio']:focus-visible + label.metal-swatch .metal-swatch__dot {
+  outline: 2px solid var(--pdp-ink);
+  outline-offset: 4px;
 }
 
-.product-form__input--pill input[type="radio"]:focus-visible + label.metal-swatch {
-  outline: 2px solid #1c1c1c !important;
-  outline-offset: 3px;
+.metal-swatch--yellow { --metal: linear-gradient(140deg, #f3dfa6, #e7cd87) !important; }
+.metal-swatch--white { --metal: linear-gradient(140deg, #e9e9e9, #d9dadc) !important; }
+.metal-swatch--rose { --metal: linear-gradient(140deg, #e8c3b4, #dcae9c) !important; }
+.metal-swatch--platinum { --metal: linear-gradient(140deg, #ececec, #dedfe1) !important; }
+.metal-swatch--silver { --metal: linear-gradient(140deg, #eceef0, #d5d9dd) !important; }
+
+/* ---------- Shape swatches: the diamond-cut icons the product cards use ---------- */
+.product-form__input--pill input[type='radio'] + label.shape-swatch {
+  display: inline-flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  vertical-align: top;
+  width: auto !important;
+  min-width: 6.4rem !important;
+  height: auto !important;
+  margin: 0 1.2rem 1.2rem 0 !important;
+  padding: 0.8rem 0.4rem 0.6rem !important;
+  border: 0 !important;
+  border-bottom: 1px solid transparent !important;
+  border-radius: 0 !important;
+  background: none !important;
+  color: var(--pdp-ink) !important;
+  cursor: pointer;
+  transition: border-color var(--duration-short) ease, opacity var(--duration-short) ease;
 }
 
-.metal-swatch--yellow { --metal: linear-gradient(135deg, #f6e3a8, #e2c26e) !important; }
-.metal-swatch--white { --metal: linear-gradient(135deg, #f4f4f4, #d6d7d9) !important; }
-.metal-swatch--rose { --metal: linear-gradient(135deg, #f3cdbf, #e0a893) !important; }
-.metal-swatch--platinum { --metal: linear-gradient(135deg, #ececec, #c9cacd) !important; }
-.metal-swatch--silver { --metal: linear-gradient(135deg, #f2f3f5, #c4c8ce) !important; }
+.product-form__input--pill input[type='radio'] + label.shape-swatch::before {
+  display: none !important;
+}
+
+.product-form__input--pill input[type='radio'] + label.shape-swatch .icon-diamond-shape {
+  display: block;
+  width: 3.2rem;
+  height: 3.2rem;
+  opacity: 0.7;
+  transition: opacity var(--duration-short) ease;
+}
+
+.shape-swatch__name {
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--pdp-ink-soft);
+}
+
+.product-form__input--pill input[type='radio']:checked + label.shape-swatch,
+.product-form__input--pill input[type='radio'].checked + label.shape-swatch,
+.product-form__input--pill input[type='radio'] + label.shape-swatch.checked {
+  border-bottom-color: var(--pdp-ink) !important;
+}
+
+.product-form__input--pill input[type='radio']:checked + label.shape-swatch .icon-diamond-shape,
+.product-form__input--pill input[type='radio'].checked + label.shape-swatch .icon-diamond-shape,
+.product-form__input--pill input[type='radio'] + label.shape-swatch.checked .icon-diamond-shape {
+  opacity: 1;
+}
+
+.product-form__input--pill input[type='radio']:checked + label.shape-swatch .shape-swatch__name,
+.product-form__input--pill input[type='radio'].checked + label.shape-swatch .shape-swatch__name,
+.product-form__input--pill input[type='radio'] + label.shape-swatch.checked .shape-swatch__name {
+  font-weight: 500;
+  color: var(--pdp-ink);
+}
+
+@media (hover: hover) {
+  .product-form__input--pill input[type='radio']:not(:checked) + label.shape-swatch:hover .icon-diamond-shape {
+    opacity: 1;
+  }
+}
+
+.product-form__input--pill input[type='radio']:focus-visible + label.shape-swatch {
+  outline: 2px solid var(--pdp-ink);
+  outline-offset: 2px;
+}
+
+/* ---------- Dropdown options (ring size) ---------- */
+.template-product .variant-option--dropdowns .variant-option__select-wrapper,
+.template-product .variant-option--dropdowns .select {
+  position: relative;
+  max-width: 34rem;
+}
+
+.template-product .variant-option--dropdowns .select__select {
+  width: 100%;
+  height: 5.4rem;
+  padding: 0 4.4rem 0 2rem;
+  border: 1px solid rgb(var(--color-foreground-rgb) / 0.18);
+  border-radius: 999px;
+  background: var(--color-background);
+  font-size: 1.6rem;
+  color: var(--pdp-ink);
+  appearance: none;
+  cursor: pointer;
+}
+
+.template-product .variant-option--dropdowns .svg-wrapper {
+  position: absolute;
+  top: 50%;
+  right: 2rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+
+/* ---------- Add to bag ----------
+   Both the block wrapper and the button's own wrapper carry this class;
+   only the outer <span> takes the spacing. The radius is left to the theme
+   setting so the button matches the rounded option pills above it. */
+.template-product .product-details span.add-to-cart-button-container {
+  display: block;
+  margin-top: 2.4rem;
+}
+
+.template-product .product-details .add-to-cart-button-container .button,
+.template-product .product-details .add-to-cart-button-container button[type='submit'] {
+  width: 100%;
+  min-height: 5.4rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ---------- "Order now to ship by: ..." ---------- */
+.template-product .product-details .delivery-time .group-block-content {
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.template-product .product-details .delivery-time {
+  margin-top: 1.4rem;
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pdp-ink-soft);
+}
+
+.template-product .product-details .delivery-time .icon-block__media {
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: none;
+  color: var(--pdp-ink);
+}
+
+.template-product .product-details .delivery-time strong {
+  color: var(--pdp-ink);
+  font-weight: 600;
+}
+
+/* ---------- "We've Got You Covered": two columns of small icon + label ---------- */
+.template-product .product-details .multicolumn .grid-layout {
+  gap: 1.4rem 2.4rem;
+}
+
+.template-product .product-details .multicolumn .grid__item {
+  min-width: 0;
+}
+
+.template-product .product-details .multicolumn .group-block-content {
+  gap: 1rem;
+  align-items: center;
+}
+
+.template-product .product-details .multicolumn .icon-block__media {
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: none;
+  color: var(--pdp-ink);
+}
+
+/* ---------- Accordions: hairline rows with a +/- on the right ---------- */
+.template-product .product-details .details {
+  border-top: 1px solid var(--pdp-rule);
+  border-bottom: 0;
+}
+
+.template-product .product-details accordion-custom:last-of-type .details {
+  border-bottom: 1px solid var(--pdp-rule);
+}
+
+.template-product .product-details .details__header {
+  padding: 2rem 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.template-product .product-details .details-content {
+  padding-bottom: 2rem;
+  font-size: 1.5rem;
+  line-height: 1.7;
+  color: var(--pdp-ink-soft);
+}
+
+/* ---------- Contact row at the foot of the column ---------- */
+.template-product .product-details .group-block-content:has(> .button + .button) {
+  gap: 2.4rem;
+  justify-content: center;
+  padding-top: 2.4rem;
+}
+
+.template-product .product-details .button-unstyled,
+.template-product .product-details a.link {
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- Mobile: the column is the page, so give it page margins ---------- */
+@media screen and (max-width: 749px) {
+  .template-product .variant-option {
+    padding: 1.6rem 0 1.4rem;
+  }
+
+  .template-product .product-details .multicolumn .grid-layout {
+    gap: 1.2rem 1.6rem;
+  }
+}
+
+/* ---------- Gallery filtered to one metal ---------- */
+.template-product .media-gallery__grid-item[hidden],
+.template-product .product-media-container[hidden],
+.template-product .dialog-thumbnails-list__thumbnail[hidden],
+.template-product .swiper-slide[hidden] {
+  display: none !important;
+}
