@@ -11,6 +11,123 @@
   "name": "Footer group",
   "type": "footer",
   "sections": {
+    "footer_icon_bar": {
+      "type": "footer-icon-bar",
+      "blocks": {
+        "item_ethical": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "text": "Ethical choice",
+            "link": ""
+          }
+        },
+        "item_value": {
+          "type": "item",
+          "settings": {
+            "icon": "tag",
+            "text": "Great value",
+            "link": ""
+          }
+        },
+        "item_shipping": {
+          "type": "item",
+          "settings": {
+            "icon": "globe",
+            "text": "Worldwide shipping",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "item_ethical",
+        "item_value",
+        "item_shipping"
+      ],
+      "settings": {
+        "show_bar": true,
+        "background": "#ead9d1",
+        "text_color": "#161616",
+        "alignment": "center",
+        "text_size": 15,
+        "icon_size": 18,
+        "content_width": 1400,
+        "side_padding": 64,
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "footer_classic": {
+      "type": "footer-classic",
+      "blocks": {
+        "fc_logo": {
+          "type": "logo",
+          "settings": {
+            "logo": "shopify://shop_images/Eden_Raine_Icon_black.png",
+            "text": "<p>Eden Raine for Precious Metal Gemstone Jewellery with Elegance &amp; Style.</p>",
+            "show_social": true
+          }
+        },
+        "fc_information": {
+          "type": "link_list",
+          "settings": {
+            "menu": "footer",
+            "show_social": false
+          }
+        },
+        "fc_eden_raine": {
+          "type": "link_list",
+          "settings": {
+            "menu": "eden-raine",
+            "show_social": false
+          }
+        },
+        "fc_help": {
+          "type": "link_list",
+          "settings": {
+            "menu": "help",
+            "show_social": false
+          }
+        },
+        "fc_newsletter": {
+          "type": "newsletter",
+          "settings": {
+            "heading": "JOIN THE EDEN RAINE CIRCLE",
+            "text": "<p>Sign up to receive private previews, bridal guides, and exclusive releases.</p>",
+            "field_label": "Enter your email",
+            "button_label": "JOIN"
+          }
+        }
+      },
+      "block_order": [
+        "fc_logo",
+        "fc_information",
+        "fc_eden_raine",
+        "fc_help",
+        "fc_newsletter"
+      ],
+      "settings": {
+        "background": "#faf8f5",
+        "text_color": "#202020",
+        "link_color": "#202020",
+        "link_hover_color": "#8c7d6b",
+        "border_color": "#e8e5df",
+        "text_size": 13,
+        "heading_size": 14,
+        "logo_width": 110,
+        "button_background": "#051514",
+        "button_text_color": "#ffffff",
+        "show_payment_methods": true,
+        "credit_text": "Website by",
+        "credit_name": "Lionsorbet",
+        "credit_url": "https://www.lionsorbet.com/",
+        "extra_text": "",
+        "content_width": 1400,
+        "side_padding": 64,
+        "padding_top": 72,
+        "padding_bottom": 56
+      }
+    },
     "section_KHqNEp": {
       "type": "section",
       "blocks": {
@@ -149,6 +266,7 @@
         "text_visit",
         "text_write"
       ],
+      "disabled": true,
       "settings": {
         "brand_line": "Diamonds grown with care, set by hand, made to last a lifetime.",
         "show_newsletter": true,
@@ -158,13 +276,12 @@
         "wordmark_style": "dark",
         "wordmark_width": 140,
         "show_payment_icons": true,
-        "color_background": "#FFFFFF",
+        "color_background": "#ffffff",
         "color_text": "#1c1a19",
         "color_muted": "#4f4541",
         "color_accent": "#1c1a19",
         "color_rule": "#cfbcb5"
-      },
-      "disabled": true
+      }
     },
     "footer": {
       "type": "footer",
@@ -4312,122 +4429,6 @@
         "show_policy": true,
         "padding_top": 30,
         "padding_bottom": 36
-      }
-    },
-    "footer_icon_bar": {
-      "type": "footer-icon-bar",
-      "blocks": {
-        "item_ethical": {
-          "type": "item",
-          "settings": {
-            "icon": "leaf",
-            "text": "Ethical choice",
-            "link": ""
-          }
-        },
-        "item_value": {
-          "type": "item",
-          "settings": {
-            "icon": "tag",
-            "text": "Great value",
-            "link": ""
-          }
-        },
-        "item_shipping": {
-          "type": "item",
-          "settings": {
-            "icon": "globe",
-            "text": "Worldwide shipping",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "item_ethical",
-        "item_value",
-        "item_shipping"
-      ],
-      "settings": {
-        "show_bar": true,
-        "background": "#ead9d1",
-        "text_color": "#161616",
-        "alignment": "center",
-        "text_size": 15,
-        "icon_size": 18,
-        "padding_top": 28,
-        "padding_bottom": 28,
-        "content_width": 1400,
-        "side_padding": 64
-      }
-    },
-    "footer_classic": {
-      "type": "footer-classic",
-      "blocks": {
-        "fc_logo": {
-          "type": "logo",
-          "settings": {
-            "logo": "shopify://shop_images/Eden_Raine_Icon_black.png",
-            "text": "<p>Eden Raine for Precious Metal Gemstone Jewellery with Elegance &amp; Style.</p>",
-            "show_social": true
-          }
-        },
-        "fc_information": {
-          "type": "link_list",
-          "settings": {
-            "menu": "footer",
-            "show_social": false
-          }
-        },
-        "fc_eden_raine": {
-          "type": "link_list",
-          "settings": {
-            "menu": "eden-raine",
-            "show_social": false
-          }
-        },
-        "fc_help": {
-          "type": "link_list",
-          "settings": {
-            "menu": "help",
-            "show_social": false
-          }
-        },
-        "fc_newsletter": {
-          "type": "newsletter",
-          "settings": {
-            "heading": "JOIN THE EDEN RAINE CIRCLE",
-            "text": "<p>Sign up to receive private previews, bridal guides, and exclusive releases.</p>",
-            "field_label": "Enter your email",
-            "button_label": "JOIN"
-          }
-        }
-      },
-      "block_order": [
-        "fc_logo",
-        "fc_information",
-        "fc_eden_raine",
-        "fc_help",
-        "fc_newsletter"
-      ],
-      "settings": {
-        "background": "#faf8f5",
-        "text_color": "#202020",
-        "link_color": "#202020",
-        "link_hover_color": "#8c7d6b",
-        "border_color": "#e8e5df",
-        "text_size": 13,
-        "heading_size": 14,
-        "logo_width": 110,
-        "button_background": "#051514",
-        "button_text_color": "#ffffff",
-        "show_payment_methods": true,
-        "credit_text": "Website by",
-        "credit_name": "Lionsorbet",
-        "credit_url": "https://www.lionsorbet.com/",
-        "padding_top": 72,
-        "padding_bottom": 56,
-        "content_width": 1400,
-        "side_padding": 64
       }
     }
   },
