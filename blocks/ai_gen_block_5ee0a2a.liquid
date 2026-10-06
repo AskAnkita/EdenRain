@@ -608,6 +608,16 @@
   }
 
   {% if block.settings.heading == 'FIND YOUR STYLE' %}
+    /* The shared .is-diamond-shape scale (0.86) is tuned for the diamond photos in "Find Your
+       Shape", which carry almost no white margin of their own. The ring photos here do, so at
+       that scale the ring reads small inside its tile. Zoom them on desktop the way the mobile
+       rule below already does; the overflow is the photo's own white margin and the tile clips it. */
+    @media screen and (min-width: 750px) {
+      .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-{{ ai_gen_id }} {
+        transform: scale(1.15);
+      }
+    }
+
     @media screen and (max-width: 749px) {
       .ai-collection-carousel-{{ ai_gen_id }} {
         padding-top: 16px;
