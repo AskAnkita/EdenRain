@@ -1,0 +1,67 @@
+{% comment %}
+  Stand-in picture for a mega menu tile whose collection has no image of its own.
+
+  A menu tile normally shows `collection.featured_image` — the collection's Image in Shopify
+  admin, or failing that its first product's photo. A collection that is empty and has no
+  image set leaves the tile showing only its initial, which is what these pictures cover.
+
+  ---------------------------------------------------------------------------
+  PLACEHOLDERS - these are MiaDonna product photos, kept only until the store's
+  own collections have images. Set an Image on the collection in Shopify admin
+  (or give it products) and that wins automatically, so a handle can stay on
+  these lists after it has a real picture. Clear them to turn the pictures off.
+  ---------------------------------------------------------------------------
+
+  Three lists rather than one, because each names its file a different way:
+  - ENGAGEMENT STYLES ship as assets/style-<handle>.png. They are tall (684x1014), framed
+    for the homepage carousel, and the menu fits them whole rather than cropping.
+  - WEDDING AND JEWELLERY ship as assets/menu-tile-<handle>.png: squares that fill the tile.
+  - LOOSE DIAMONDS reuse the shape photographs the homepage already carries, so
+    "oval-diamonds" is served by assets/diamond-shape-oval.png and nothing is duplicated.
+
+  Diamond shapes (round-engagement-rings and so on) and metals are deliberately absent: they
+  draw the line art and the colour discs in 'menu-tile-fallback', which is what MiaDonna's own
+  menu shows for them too. The four Learn links are absent as well — they point at pages, and
+  a guide's artwork is lettering that nothing legible survives at tile size.
+
+  Accepts:
+  - handle: {String} the collection handle, e.g. "wedding-bands"
+
+  Outputs the asset file name, or nothing when we ship no picture for that handle.
+{% endcomment %}
+
+{%- liquid
+  assign style_handles = 'solitaire,side-stone,halo,hidden-halo,three-stone,bridal-sets,vintage,nature-inspired,toi-et-moi,promise' | split: ','
+  assign tile_handles = 'wedding-bands,anniversary-rings,eternity-rings,plain-metal-wedding-bands,curved-wedding-bands,stackable-rings,mens-rings,new-in,ready-to-ship,best-sellers,studs,hoops-huggies,dangles-drops,climbers-jackets-cuffs,signature-earrings,tennis-necklaces,pendants,fashion-necklaces,signature-necklaces,tennis-bracelets,bangles-cuffs,fashion-bracelets,signature-bracelets' | split: ','
+  assign diamond_shapes = 'round,oval,emerald,cushion,marquise,radiant,pear,princess,asscher,heart' | split: ','
+
+  assign placeholder = ''
+
+  for style_handle in style_handles
+    if style_handle == handle
+      assign placeholder = 'style-' | append: handle | append: '.png'
+      break
+    endif
+  endfor
+
+  if placeholder == ''
+    for tile_handle in tile_handles
+      if tile_handle == handle
+        assign placeholder = 'menu-tile-' | append: handle | append: '.png'
+        break
+      endif
+    endfor
+  endif
+
+  if placeholder == ''
+    for diamond_shape in diamond_shapes
+      assign diamond_handle = diamond_shape | append: '-diamonds'
+      if diamond_handle == handle
+        assign placeholder = 'diamond-shape-' | append: diamond_shape | append: '.png'
+        break
+      endif
+    endfor
+  endif
+
+  echo placeholder
+-%}

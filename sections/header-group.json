@@ -56,17 +56,6 @@
                 "scheme_shadow": "#000000"
               },
               "blocks": {
-                "announcement_text_BXhKCE": {
-                  "type": "_announcement-text",
-                  "settings": {
-                    "text": "Choose up to 36 monthly payments, from 0% APR financing. Terms apply.",
-                    "font": "body",
-                    "font_size": "1.4rem",
-                    "font_weight": "default",
-                    "text_align": "center"
-                  },
-                  "blocks": {}
-                },
                 "announcement_text_fUhgWe": {
                   "type": "_announcement-text",
                   "settings": {
@@ -74,6 +63,17 @@
                     "font": "body",
                     "font_size": "1.4rem",
                     "font_weight": "400",
+                    "text_align": "center"
+                  },
+                  "blocks": {}
+                },
+                "announcement_text_BXhKCE": {
+                  "type": "_announcement-text",
+                  "settings": {
+                    "text": "Choose up to 36 monthly payments, from 0% APR financing. Terms apply.",
+                    "font": "body",
+                    "font_size": "1.4rem",
+                    "font_weight": "default",
                     "text_align": "center"
                   },
                   "blocks": {}
@@ -107,14 +107,13 @@
         "mega_menu_1_hN4fR6": {
           "type": "mega_menu_1",
           "settings": {
-            "grid": "6",
+            "grid": "5",
             "menu_item": "Engagement",
             "width": "page-width",
             "show_promotion_banner": true,
             "promotion_banner_layout": "right",
             "image_border_thickness": 1,
             "image_corner_radius": 0,
-            "image_1": "shopify://shop_images/three-stone-hover_2.png",
             "link_url_1": "",
             "link_url_2": "",
             "link_url_3": ""
@@ -130,7 +129,6 @@
             "promotion_banner_layout": "right",
             "image_border_thickness": 1,
             "image_corner_radius": 0,
-            "image_1": "shopify://shop_images/three-stone-hover_2.png",
             "link_url_1": "",
             "link_url_2": "",
             "link_url_3": ""
@@ -146,7 +144,6 @@
             "promotion_banner_layout": "right",
             "image_border_thickness": 1,
             "image_corner_radius": 0,
-            "image_1": "shopify://shop_images/three-stone-hover_2.png",
             "link_url_1": "",
             "link_url_2": "",
             "link_url_3": ""
@@ -285,103 +282,6 @@
     },
     "header_mobile_MqfLk9": {
       "type": "header_mobile",
-      "blocks": {
-        "static-menu-tab-heading": {
-          "type": "_menu_tab_headings",
-          "disabled": true,
-          "static": true,
-          "settings": {
-            "color_scheme": "scheme-3"
-          },
-          "blocks": {
-            "menu_tab_heading_X7rqfc": {
-              "type": "_menu_tab_heading",
-              "name": "Heading",
-              "disabled": true,
-              "settings": {
-                "title": "Close"
-              },
-              "blocks": {}
-            },
-            "menu_tab_heading_nCEGbq": {
-              "type": "_menu_tab_heading",
-              "name": "Heading",
-              "disabled": true,
-              "settings": {
-                "title": "Close"
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "menu_tab_heading_X7rqfc",
-            "menu_tab_heading_nCEGbq"
-          ]
-        },
-        "static-menu-tab-content": {
-          "type": "_menu_tab_contents",
-          "static": true,
-          "settings": {},
-          "blocks": {
-            "menu_tab_list_JdVVGD": {
-              "type": "_menu-tab-list",
-              "name": "Menu tab list",
-              "settings": {
-                "tab_for": "Close",
-                "divider": true,
-                "scheme_border": "#e6e6e6"
-              },
-              "blocks": {
-                "menu_tab_item_r9NdJL": {
-                  "type": "_menu-tab-item",
-                  "name": "t:names.menu_item",
-                  "settings": {
-                    "title": "Close",
-                    "link": "#",
-                    "sub_menu": "",
-                    "image_type_level_1": "image",
-                    "svg_upload_level_1": ""
-                  },
-                  "blocks": {}
-                }
-              },
-              "block_order": [
-                "menu_tab_item_r9NdJL"
-              ]
-            },
-            "menu_tab_list_JpCa9Y": {
-              "type": "_menu-tab-list",
-              "name": "Menu tab list",
-              "settings": {
-                "tab_for": "Demo",
-                "divider": true,
-                "scheme_border": "#e6e6e6"
-              },
-              "blocks": {
-                "menu_tab_item_ya7mTy": {
-                  "type": "_menu-tab-item",
-                  "name": "t:names.menu_item",
-                  "settings": {
-                    "title": "Menu",
-                    "link": "",
-                    "sub_menu": "main-menu",
-                    "image_type_level_1": "image",
-                    "svg_upload_level_1": ""
-                  },
-                  "blocks": {}
-                }
-              },
-              "block_order": [
-                "menu_tab_item_ya7mTy"
-              ]
-            }
-          },
-          "block_order": [
-            "menu_tab_list_JdVVGD",
-            "menu_tab_list_JpCa9Y"
-          ]
-        }
-      },
       "name": "Header mobile multi-tab",
       "settings": {
         "show_image_level_1": false,

@@ -49,10 +49,36 @@
     }
 
     @media screen and (max-width: 749px) {
+      #{{ bar_id }} {
+        padding-block: 1.6rem;
+      }
+
       #{{ bar_id }} .fib-inner {
+        display: grid;
+        grid-template-columns: repeat({{ section.blocks.size | default: 3 }}, minmax(0, 1fr));
+        gap: 0;
+        padding-inline: 1rem;
+      }
+
+      #{{ bar_id }} .fib-item {
         flex-direction: column;
+        justify-content: flex-start;
         align-items: center;
-        gap: 1rem;
+        text-align: center;
+        gap: 0.6rem;
+        padding: 0 0.4rem;
+        font-size: 1.15rem;
+        font-weight: 500;
+        line-height: 1.25;
+      }
+
+      #{{ bar_id }} .fib-item + .fib-item {
+        border-left: 1px solid rgba(0, 0, 0, 0.08);
+      }
+
+      #{{ bar_id }} .fib-icon {
+        width: 1.8rem;
+        height: 1.8rem;
       }
     }
   {%- endstyle -%}

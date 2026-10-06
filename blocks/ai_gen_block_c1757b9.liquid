@@ -352,8 +352,8 @@
   .ai-shape-carousel__heading-{{ ai_gen_id }} {
     text-align: center;
     margin: 0 0 {{ block.settings.heading_margin_bottom }}px;
-    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
-    font-weight: {{ block.settings.heading_font.weight }};
+    font-family: var(--font-{{ block.settings.heading_font_family }}--family);
+    font-weight: var(--font-{{ block.settings.heading_font_family }}--weight);
     font-size: {{ block.settings.heading_font_size }}px;
     letter-spacing: {{ block.settings.heading_letter_spacing }}px;
     line-height: {{ block.settings.heading_line_height }};
@@ -429,8 +429,10 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
+    /* --er-arrow-size is the shared scroller arrow size (assets/base.css), so this
+       carousel's buttons match every other row. */
+    width: var(--er-arrow-size, 40px);
+    height: var(--er-arrow-size, 40px);
     border-radius: 50%;
     background-color: {{ block.settings.arrow_background }};
     border: 1px solid {{ block.settings.arrow_border }};
@@ -441,6 +443,7 @@
     justify-content: center;
     z-index: 10;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
   }
 
   .ai-shape-carousel__nav-{{ ai_gen_id }}:hover {
@@ -448,8 +451,28 @@
     color: {{ block.settings.arrow_color_hover }};
   }
 
+  /* Hover draws a ring in from the middle of the disc to its edge, as on every
+     other scroller in the theme (assets/base.css). */
+  .ai-shape-carousel__nav-{{ ai_gen_id }}::after {
+    position: absolute;
+    inset: 0;
+    border: 1.5px solid {{ block.settings.arrow_color }};
+    border-radius: 50%;
+    content: "";
+    opacity: 0;
+    transform: scale(0.7);
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.22s ease;
+    pointer-events: none;
+  }
+
+  .ai-shape-carousel__nav-{{ ai_gen_id }}:hover::after,
+  .ai-shape-carousel__nav-{{ ai_gen_id }}:focus-visible::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
   .ai-shape-carousel__nav-{{ ai_gen_id }} svg {
-    width: var(--arrow-icon-size, 14px);
+    width: var(--er-arrow-icon-size, 1.4rem);
     height: auto;
   }
 
@@ -458,12 +481,13 @@
     transform: rotate(180deg);
   }
 
+  /* Half the disc sits outside the viewport, as before, whatever its size */
   .ai-shape-carousel__nav-{{ ai_gen_id }}.prev {
-    left: -20px;
+    left: calc(var(--er-arrow-size, 40px) / -2);
   }
 
   .ai-shape-carousel__nav-{{ ai_gen_id }}.next {
-    right: -20px;
+    right: calc(var(--er-arrow-size, 40px) / -2);
   }
 
   .ai-shape-carousel__pagination-{{ ai_gen_id }} {
@@ -780,10 +804,16 @@
       "label": "Heading"
     },
     {
-      "type": "font_picker",
-      "id": "heading_font",
+      "type": "select",
+      "id": "heading_font_family",
       "label": "Font",
-      "default": "assistant_n4"
+      "info": "Uses the theme's typography so fonts stay consistent sitewide.",
+      "options": [
+        { "value": "heading", "label": "Heading" },
+        { "value": "subheading", "label": "Subheading" },
+        { "value": "body", "label": "Body" }
+      ],
+      "default": "heading"
     },
     {
       "type": "range",

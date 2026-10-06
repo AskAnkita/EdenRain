@@ -1,9 +1,7 @@
 {% comment %}
-  Five-column footer: logo and tagline, three menus, and a sign-up form, with a credits and
-  payment row beneath. Rebuilt natively for this theme from the "Copy of Copy of Eden Raine v1.1"
-  footer-classic section, so it carries no dependency on that theme's CSS framework.
-
-  A menu block takes its heading from the menu's own title in Online Store > Navigation.
+  Five-column luxury footer: logo and tagline, three menus (with interactive mobile accordions),
+  and a VIP newsletter sign-up form, with a credits and payment row beneath.
+  Concept 1: Modern Luxury Accordion (Light / Warm Oyster)
 {% endcomment %}
 
 {%- liquid
@@ -29,23 +27,30 @@
 
   #{{ footer_id }} .fc-columns {
     display: grid;
-    grid-template-columns: repeat({{ section.blocks.size }}, minmax(0, 1fr));
+    {% if section.blocks.size > 2 %}
+      grid-template-columns: 1.3fr repeat({{ section.blocks.size | minus: 2 }}, minmax(0, 1fr)) 1.4fr;
+    {% else %}
+      grid-template-columns: repeat({{ section.blocks.size }}, minmax(0, 1fr));
+    {% endif %}
     gap: 4rem;
     align-items: start;
   }
 
   #{{ footer_id }} .fc-heading {
-    margin: 0 0 1.2rem;
-    font-family: var(--font-body--family);
+    margin: 0 0 1.4rem;
+    font-family: var(--font-heading--family, var(--font-body--family));
     font-size: {{ stts.heading_size | divided_by: 10.0 }}rem;
     font-weight: 500;
     line-height: 1.4;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: {{ stts.text_color }};
   }
 
   #{{ footer_id }} a {
     color: {{ stts.link_color }};
     text-decoration: none;
+    transition: color 0.2s ease;
   }
 
   #{{ footer_id }} a:hover {
@@ -59,7 +64,7 @@
   }
 
   #{{ footer_id }} .fc-list li + li {
-    margin-top: 0.4rem;
+    margin-top: 0.6rem;
   }
 
   #{{ footer_id }} .fc-logo {
@@ -72,6 +77,12 @@
     width: auto;
     height: auto;
     max-width: {{ stts.logo_width }}px;
+  }
+
+  #{{ footer_id }} .fc-text {
+    color: #555555;
+    font-size: {{ stts.text_size | divided_by: 10.0 }}rem;
+    line-height: 1.6;
   }
 
   #{{ footer_id }} .fc-text p {
@@ -90,10 +101,19 @@
   }
 
   #{{ footer_id }} .fc-social a {
-    display: block;
-    width: 1.8rem;
-    height: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
     color: {{ stts.text_color }};
+    opacity: 0.8;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  #{{ footer_id }} .fc-social a:hover {
+    opacity: 1;
+    transform: translateY(-2px);
   }
 
   #{{ footer_id }} .fc-social svg {
@@ -101,48 +121,110 @@
     height: 100%;
   }
 
-  #{{ footer_id }} .fc-field-label {
-    display: block;
-    margin-bottom: 0.8rem;
+  /* Newsletter VIP styling */
+  #{{ footer_id }} .fc-newsletter-heading {
+    margin: 0 0 0.8rem;
+    font-family: var(--font-heading--family, var(--font-body--family));
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: {{ stts.text_color }};
+  }
+
+  #{{ footer_id }} .fc-newsletter-text {
+    margin-bottom: 1.4rem;
+    color: #666666;
+    font-size: 1.3rem;
+    line-height: 1.55;
+  }
+
+  #{{ footer_id }} .fc-form-fields {
+    display: flex;
+    gap: 0.8rem;
+    align-items: stretch;
+    width: 100%;
+    max-width: 36rem;
   }
 
   #{{ footer_id }} .fc-input {
-    width: 100%;
-    max-width: 28rem;
-    padding: 1rem 1.2rem;
+    flex: 1;
+    min-width: 0;
+    height: 4.4rem;
+    padding: 0 1.4rem;
     border: 1px solid {{ stts.border_color }};
     border-radius: 0;
-    background: #fff;
+    background: #ffffff;
     color: {{ stts.text_color }};
     font-family: inherit;
-    font-size: inherit;
+    font-size: 1.3rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  #{{ footer_id }} .fc-input:focus {
+    border-color: {{ stts.text_color }};
   }
 
   #{{ footer_id }} .fc-submit {
-    display: block;
-    width: 100%;
-    max-width: 28rem;
-    margin-top: 1.6rem;
-    padding: 1.2rem 2rem;
+    flex-shrink: 0;
+    height: 4.4rem;
+    margin-top: 0;
+    padding: 0 2.2rem;
     border: 0;
     background: {{ stts.button_background }};
     color: {{ stts.button_text_color }};
     font-family: inherit;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.25s ease, background 0.25s ease;
   }
 
   #{{ footer_id }} .fc-submit:hover {
-    opacity: 0.85;
+    opacity: 0.88;
   }
 
   #{{ footer_id }} .fc-form-message {
-    margin-top: 1rem;
+    margin-top: 0.8rem;
+    font-size: 1.2rem;
   }
 
+  #{{ footer_id }} .fc-form-error {
+    color: #ba0000;
+  }
+
+  #{{ footer_id }} .fc-form-success {
+    color: #0b7a42;
+  }
+
+  /* Accordion styles (Desktop = static column; Mobile = interactive accordion) */
+  #{{ footer_id }} .fc-accordion-btn {
+    all: unset;
+    display: block;
+    margin: 0 0 1.4rem;
+    font-family: var(--font-heading--family, var(--font-body--family));
+    font-size: {{ stts.heading_size | divided_by: 10.0 }}rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: {{ stts.text_color }};
+    cursor: default;
+  }
+
+  #{{ footer_id }} .fc-accordion-icon {
+    display: none;
+  }
+
+  #{{ footer_id }} .fc-accordion .fc-list {
+    display: block;
+  }
+
+  /* Bottom Row */
   #{{ footer_id }} .fc-bottom {
     border-top: 1px solid {{ stts.border_color }};
   }
@@ -150,7 +232,7 @@
   #{{ footer_id }} .fc-bottom-inner {
     max-width: {{ stts.content_width }}px;
     margin: 0 auto;
-    padding: 2.8rem {{ stts.side_padding }}px;
+    padding: 2.6rem {{ stts.side_padding }}px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -160,18 +242,35 @@
 
   #{{ footer_id }} .fc-credits p {
     margin: 0;
+    font-size: 1.25rem;
+    color: #777777;
+  }
+
+  #{{ footer_id }} .fc-credits a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  #{{ footer_id }} .fc-credits a:hover {
+    color: {{ stts.text_color }};
   }
 
   #{{ footer_id }} .fc-payment {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.8rem;
   }
 
   #{{ footer_id }} .fc-payment svg {
-    width: 3.8rem;
+    width: 3.6rem;
     height: auto;
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+  }
+
+  #{{ footer_id }} .fc-payment svg:hover {
+    opacity: 1;
   }
 
   @media screen and (max-width: 989px) {
@@ -182,13 +281,174 @@
   }
 
   @media screen and (max-width: 749px) {
+    #{{ footer_id }} .fc-inner {
+      padding: 3.6rem 2rem 0;
+    }
+
     #{{ footer_id }} .fc-columns {
       grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+
+    /* Mobile order */
+    #{{ footer_id }} .fc-column--logo {
+      order: 1;
+      text-align: center;
+      padding-bottom: 2.4rem;
+      border-bottom: 1px solid {{ stts.border_color }};
+      margin-bottom: 1.2rem;
+    }
+
+    #{{ footer_id }} .fc-column--newsletter {
+      order: 2;
+      text-align: center;
+      padding: 1.6rem 0 2.8rem;
+      border-bottom: 1px solid {{ stts.border_color }};
+      margin-bottom: 0.4rem;
+    }
+
+    #{{ footer_id }} .fc-column--link_list {
+      order: 3;
+      border-bottom: 1px solid {{ stts.border_color }};
+    }
+
+    #{{ footer_id }} .fc-column--text {
+      order: 4;
+      padding: 1.6rem 0;
+      border-bottom: 1px solid {{ stts.border_color }};
+    }
+
+    /* Logo scaling on mobile */
+    #{{ footer_id }} .fc-logo {
+      display: inline-block;
+      margin: 0 auto 1.4rem;
+    }
+
+    #{{ footer_id }} .fc-logo img {
+      margin: 0 auto;
+      max-width: 72px !important;
+      height: auto;
+    }
+
+    #{{ footer_id }} .fc-column--logo .fc-text {
+      max-width: 320px;
+      margin: 0 auto;
+      font-size: 1.3rem;
+      line-height: 1.6;
+    }
+
+    #{{ footer_id }} .fc-column--logo .fc-social {
+      justify-content: center;
+      margin: 1.6rem auto 0;
+      gap: 1.8rem;
+    }
+
+    /* Newsletter form on mobile */
+    #{{ footer_id }} .fc-column--newsletter .fc-form-fields {
+      margin: 1.4rem auto 0;
+      max-width: 100%;
+    }
+
+    /* Mobile Accordions */
+    #{{ footer_id }} .fc-accordion-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 1.6rem 0.4rem;
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #{{ footer_id }} .fc-accordion-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      color: {{ stts.text_color }};
+      flex-shrink: 0;
+    }
+
+    #{{ footer_id }} .fc-accordion-icon svg {
+      width: 1.4rem;
+      height: 1.4rem;
+      display: block;
+    }
+
+    #{{ footer_id }} .fc-accordion-icon :is(.horizontal, .vertical) {
+      transition: transform var(--animation-speed, 0.3s) var(--animation-easing, ease), opacity var(--animation-speed, 0.3s) var(--animation-easing, ease);
+      transform: rotate(0deg);
+      transform-origin: 50% 50%;
+      opacity: 1;
+    }
+
+    #{{ footer_id }} .fc-accordion.is-open .fc-accordion-icon .horizontal {
+      transform: rotate(90deg);
+    }
+
+    #{{ footer_id }} .fc-accordion.is-open .fc-accordion-icon .vertical {
+      transform: rotate(90deg);
+      opacity: 0;
+    }
+
+    #{{ footer_id }} .fc-accordion:not(.is-open) .fc-list {
+      display: none;
+    }
+
+    #{{ footer_id }} .fc-accordion.is-open .fc-list {
+      display: block;
+      padding: 0 0.4rem 1.6rem;
+      animation: fcFadeIn 0.22s ease-out;
+    }
+
+    #{{ footer_id }} .fc-accordion .fc-list li + li {
+      margin-top: 1rem;
+    }
+
+    #{{ footer_id }} .fc-accordion .fc-list a {
+      display: inline-block;
+      padding: 0.2rem 0;
+      font-size: 1.35rem;
+      color: #555555;
+    }
+
+    /* Mobile Bottom Row */
+    #{{ footer_id }} .fc-bottom {
+      border-top: none;
     }
 
     #{{ footer_id }} .fc-bottom-inner {
-      flex-direction: column;
-      align-items: flex-start;
+      flex-direction: column-reverse;
+      align-items: center;
+      text-align: center;
+      gap: 1.6rem;
+      padding: 2.2rem 2rem 2.8rem;
+    }
+
+    #{{ footer_id }} .fc-payment {
+      justify-content: center;
+      gap: 0.8rem;
+    }
+
+    #{{ footer_id }} .fc-credits p {
+      font-size: 1.2rem;
+    }
+  }
+
+  @keyframes fcFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 {%- endstyle -%}
@@ -217,12 +477,19 @@
             {%- when 'link_list' -%}
               {%- assign fc_menu = block.settings.menu -%}
               {%- if fc_menu != blank -%}
-                <p class="fc-heading">{{ fc_menu.title | escape }}</p>
-                <ul class="fc-list" role="list">
-                  {%- for item in fc_menu.links -%}
-                    <li><a href="{{ item.url }}">{{ item.title | escape }}</a></li>
-                  {%- endfor -%}
-                </ul>
+                <div class="fc-accordion">
+                  <button type="button" class="fc-heading fc-accordion-btn" aria-expanded="false">
+                    <span>{{ fc_menu.title | escape }}</span>
+                    <span class="svg-wrapper icon-plus-wrapper fc-accordion-icon" aria-hidden="true">
+                      {{- 'icon-plus.svg' | inline_asset_content -}}
+                    </span>
+                  </button>
+                  <ul class="fc-list" role="list">
+                    {%- for item in fc_menu.links -%}
+                      <li><a href="{{ item.url }}">{{ item.title | escape }}</a></li>
+                    {%- endfor -%}
+                  </ul>
+                </div>
               {%- endif -%}
               {%- if block.settings.show_social -%}
                 {%- render 'footer-classic-social', text_color: stts.text_color -%}
@@ -241,33 +508,34 @@
 
             {%- when 'newsletter' -%}
               {%- if block.settings.heading != blank -%}
-                <p class="fc-heading">{{ block.settings.heading | escape }}</p>
+                <p class="fc-heading fc-newsletter-heading">{{ block.settings.heading | escape }}</p>
               {%- endif -%}
               {%- if block.settings.text != blank -%}
-                <div class="fc-text">{{ block.settings.text }}</div>
+                <div class="fc-text fc-newsletter-text">{{ block.settings.text }}</div>
               {%- endif -%}
               {%- form 'customer', class: 'fc-form' -%}
                 <input type="hidden" name="contact[tags]" value="newsletter">
-                <label class="fc-field-label" for="FooterEmail-{{ block.id }}">
-                  {{ block.settings.field_label | default: 'Email*' | escape }}
-                </label>
-                <input
-                  id="FooterEmail-{{ block.id }}"
-                  class="fc-input"
-                  type="email"
-                  name="contact[email]"
-                  value="{{ form.email }}"
-                  autocorrect="off"
-                  autocapitalize="off"
-                  autocomplete="email"
-                  required
-                >
+                <div class="fc-form-fields">
+                  <input
+                    id="FooterEmail-{{ block.id }}"
+                    class="fc-input"
+                    type="email"
+                    name="contact[email]"
+                    value="{{ form.email }}"
+                    placeholder="{{ block.settings.field_label | default: 'Enter your email' | escape }}"
+                    aria-label="{{ block.settings.field_label | default: 'Email' | escape }}"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    autocomplete="email"
+                    required
+                  >
+                  <button class="fc-submit" type="submit">{{ block.settings.button_label | default: 'Sign up' | escape }}</button>
+                </div>
                 {%- if form.errors -%}
-                  <p class="fc-form-message">{{ form.errors.messages['email'] }}</p>
+                  <p class="fc-form-message fc-form-error">{{ form.errors.messages['email'] }}</p>
                 {%- elsif form.posted_successfully? -%}
-                  <p class="fc-form-message">Thanks for subscribing.</p>
+                  <p class="fc-form-message fc-form-success">Thank you for subscribing.</p>
                 {%- endif -%}
-                <button class="fc-submit" type="submit">{{ block.settings.button_label | default: 'Sign up' | escape }}</button>
               {%- endform -%}
           {%- endcase -%}
         </div>
@@ -305,6 +573,30 @@
   </div>
 </footer>
 
+<script>
+  (() => {
+    const root = document.getElementById('{{ footer_id }}');
+    if (!root) return;
+    const accordions = root.querySelectorAll('.fc-accordion-btn');
+    accordions.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (window.innerWidth > 749) return;
+        const accordion = btn.closest('.fc-accordion');
+        const isOpen = accordion.classList.contains('is-open');
+        accordions.forEach((otherBtn) => {
+          const otherAcc = otherBtn.closest('.fc-accordion');
+          if (otherAcc !== accordion) {
+            otherAcc.classList.remove('is-open');
+            otherBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+        accordion.classList.toggle('is-open', !isOpen);
+        btn.setAttribute('aria-expanded', (!isOpen).toString());
+      });
+    });
+  })();
+</script>
+
 {% schema %}
 {
   "name": "Classic footer",
@@ -313,31 +605,31 @@
       "type": "color",
       "id": "background",
       "label": "Background",
-      "default": "#ffffff"
+      "default": "#faf8f5"
     },
     {
       "type": "color",
       "id": "text_color",
       "label": "Text",
-      "default": "#1d1d1b"
+      "default": "#202020"
     },
     {
       "type": "color",
       "id": "link_color",
       "label": "Links",
-      "default": "#1d1d1b"
+      "default": "#202020"
     },
     {
       "type": "color",
       "id": "link_hover_color",
       "label": "Links on hover",
-      "default": "#6f6f6f"
+      "default": "#8c7d6b"
     },
     {
       "type": "color",
       "id": "border_color",
       "label": "Lines",
-      "default": "#ededed"
+      "default": "#e8e5df"
     },
     {
       "type": "range",
@@ -357,7 +649,7 @@
       "max": 24,
       "step": 1,
       "unit": "px",
-      "default": 16
+      "default": 14
     },
     {
       "type": "range",
@@ -367,7 +659,7 @@
       "max": 320,
       "step": 10,
       "unit": "px",
-      "default": 160
+      "default": 110
     },
     {
       "type": "header",
@@ -377,7 +669,7 @@
       "type": "color",
       "id": "button_background",
       "label": "Button background",
-      "default": "#000000"
+      "default": "#051514"
     },
     {
       "type": "color",
@@ -449,7 +741,7 @@
       "max": 200,
       "step": 4,
       "unit": "px",
-      "default": 56
+      "default": 72
     },
     {
       "type": "range",
@@ -465,7 +757,7 @@
   "blocks": [
     {
       "type": "logo",
-      "name": "Logo and text",
+      "name": "Logo",
       "limit": 1,
       "settings": [
         {
@@ -476,12 +768,13 @@
         {
           "type": "richtext",
           "id": "text",
-          "label": "Text"
+          "label": "Text",
+          "default": "<p>Eden Raine for Precious Metal Gemstone Jewellery with Elegance & Style.</p>"
         },
         {
           "type": "checkbox",
           "id": "show_social",
-          "label": "Show social icons",
+          "label": "Show social media icons",
           "default": true
         }
       ]
@@ -494,12 +787,12 @@
           "type": "link_list",
           "id": "menu",
           "label": "Menu",
-          "info": "The column heading is the menu's own title."
+          "default": "footer"
         },
         {
           "type": "checkbox",
           "id": "show_social",
-          "label": "Show social icons",
+          "label": "Show social media icons",
           "default": false
         }
       ]
@@ -511,7 +804,8 @@
         {
           "type": "text",
           "id": "title",
-          "label": "Heading"
+          "label": "Heading",
+          "default": "About us"
         },
         {
           "type": "richtext",
@@ -521,38 +815,39 @@
         {
           "type": "checkbox",
           "id": "show_social",
-          "label": "Show social icons",
+          "label": "Show social media icons",
           "default": false
         }
       ]
     },
     {
       "type": "newsletter",
-      "name": "Sign-up form",
+      "name": "Sign-up",
       "limit": 1,
       "settings": [
         {
           "type": "text",
           "id": "heading",
           "label": "Heading",
-          "default": "Subscribe"
+          "default": "JOIN THE EDEN RAINE CIRCLE"
         },
         {
           "type": "richtext",
           "id": "text",
-          "label": "Text"
+          "label": "Text",
+          "default": "<p>Receive private previews, bridal guides, and exclusive releases.</p>"
         },
         {
           "type": "text",
           "id": "field_label",
           "label": "Field label",
-          "default": "Email*"
+          "default": "Enter your email"
         },
         {
           "type": "text",
           "id": "button_label",
           "label": "Button label",
-          "default": "Sign up"
+          "default": "JOIN"
         }
       ]
     }

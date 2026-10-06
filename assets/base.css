@@ -5859,9 +5859,24 @@ summary {
   width: var(--swiper-pagination-bullet-size);
 }
 
-.swiper .swiper-pagination-progressbar {
+.swiper:not(.swiper-vertical) .swiper-pagination-progressbar,
+.swiper-horizontal > .swiper-pagination.swiper-pagination-progressbar,
+.swiper-pagination-progressbar.swiper-pagination-horizontal {
   position: relative;
-  margin-top: 4rem;
+  width: 100% !important;
+  max-width: min(280px, calc(100% - 40px)) !important;
+  height: 3px;
+  margin-top: calc(var(--progress-top-offset, 4rem) - 4px);
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  left: 0 !important;
+  right: auto !important;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.swiper-pagination-progressbar .swiper-pagination-progressbar-fill {
+  border-radius: 999px;
 }
 
 .swiper.has-swiper-pagination-progressbar {
@@ -20679,7 +20694,7 @@ fieldset.variant-option .form__label {
 /* change font size  and family of description and price  */
 @media (max-width: 768px) {
 .text-block.text-block--full-width.custom-typography h1 {
-  font-family: "Cormorant Garamond", sans-serif !important;
+  font-family: var(--font-heading--family) !important;
   font-weight: 600 !important;
   font-size:18px;
   
@@ -20759,28 +20774,28 @@ product-price.text-block.custom-typography.custom-font-size.custom-color {
 
 /* Heading: Shop. Earn. Sparkle. */
 .section-content-wrapper .group-block-content h2 {
-  font-family: "Cormorant Garamond", sans-serif;
+  font-family: var(--font-heading--family);
   font-weight: 400;
   font-size: 30px;
 }
 
 /* Paragraph text */
 .section-content-wrapper .group-block-content .rte p {
-  font-family: "Cormorant Garamond", serif;
+  font-family: var(--font-body--family);
   font-weight: 400;
   font-size: 14px;
 }
 
 /* Heading: "Stella McCartney in Diamonds" */
 .section-content-wrapper .group-block-content h2 {
-  font-family: "Cormorant Garamond", serif;
+  font-family: var(--font-heading--family);
   font-weight: 400;
   font-size: 30px;
 }
 
 /* Paragraph under heading */
 .section-content-wrapper .group-block-content .rte p {
-  font-family: "Cormorant Garamond", serif;
+  font-family: var(--font-body--family);
   font-weight: 400;
   font-size: 14px;
 }
@@ -21169,55 +21184,57 @@ footer.section-footer .email-signup__input {
 }
 
 
+/* The one size for every scroller arrow in the theme: the swiper sliders below,
+   the category tile row (sections/category-tiles.liquid) and the carousel blocks
+   (blocks/ai_gen_block_5ee0a2a.liquid, blocks/ai_gen_block_c1757b9.liquid). */
+:root {
+  --er-arrow-size: 40px;
+  --er-arrow-icon-size: 1.4rem;
+}
+
+@media screen and (min-width: 1400px) {
+  :root {
+    --er-arrow-size: 56px;
+    --er-arrow-icon-size: 1.6rem;
+  }
+}
+
 /* ==================================================================
    Eden Raine: slider arrows
-   Every scroller gets the same button: a grey disc that turns black on
-   hover with the icon reversing to white. Without this each section
-   took its arrow colours from its colour scheme, which is why the rows
-   did not match one another.
+   Every scroller gets the same button: a white disc, dark icon, on
+   screen at all times so it reads over a pale product shot. Hover draws
+   a ring in around it. Without this each section took its arrow colours
+   from its colour scheme, which is why the rows did not match.
    ================================================================== */
 
 .swiper-button.swiper-button-prev,
 .swiper-button.swiper-button-next {
-  --arrow-background: #e4e2df;
+  --arrow-background: #fff;
+  --arrow-background-hover: #fff;
   --arrow-color: #1a1a1a;
+  --arrow-color-hover: #1a1a1a;
   --arrow-border: transparent;
-  transition: background-color 0.2s ease, color 0.2s ease,
+  --er-arrow-ring: #1a1a1a;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease,
     opacity var(--animation-speed-slow) var(--cubic-fast),
     transform var(--animation-speed-slow) var(--cubic-fast);
 }
 
-@media (hover: hover) {
-  .swiper-button.swiper-button-prev:hover,
-  .swiper-button.swiper-button-next:hover {
-    --arrow-background: #000;
-    --arrow-color: #fff;
-  }
-}
-
-.swiper-button.swiper-button-prev:focus-visible,
-.swiper-button.swiper-button-next:focus-visible {
-  --arrow-background: #000;
-  --arrow-color: #fff;
-}
-
 /* The theme's own hover is a panel of --arrow-color sliding in from the side. These
-   buttons swap colour instead, so the panel would only show as a second colour. */
+   buttons keep their white face and draw a ring instead. */
 .swiper-button .fill-bg {
   display: none;
 }
 
 /* One disc for every scroller: a fixed-size circle with a soft shadow, always on screen
    instead of fading in when the row is hovered, and gone once the row reaches that end.
-   This started as the collection "shop by style" row; it now applies to every slider so the
-   rows match. The announcement bar is put back below — its arrows are bare icons beside the
+   The announcement bar is put back below — its arrows are bare icons beside the
    message, not discs. */
 .swiper-button.swiper-button-prev,
 .swiper-button.swiper-button-next {
-  --er-arrow-size: 40px;
   --button-width: var(--er-arrow-size);
   --button-height: var(--er-arrow-size);
-  --button-icon-size: 1.4rem;
+  --button-icon-size: var(--er-arrow-icon-size);
   --arrow-radius: 50%;
   border-radius: 50%;
   box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
@@ -21225,13 +21242,38 @@ footer.section-footer .email-signup__input {
   transform: none;
 }
 
-@media screen and (min-width: 1400px) {
-  .swiper-button.swiper-button-prev,
-  .swiper-button.swiper-button-next {
-    --er-arrow-size: 56px;
-    --button-icon-size: 1.6rem;
+/* The ring. It grows out from the middle of the disc to its edge, so it is never
+   clipped by the overflow the theme sets on these buttons. Swiper's own ::after
+   holds its arrow glyph, which the theme hides; this takes it over. */
+.swiper-button.swiper-button-prev::after,
+.swiper-button.swiper-button-next::after {
+  display: block;
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--er-arrow-ring);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.22s ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .swiper-button.swiper-button-prev:hover::after,
+  .swiper-button.swiper-button-next:hover::after {
+    opacity: 1;
+    transform: scale(1);
   }
 }
+
+.swiper-button.swiper-button-prev:focus-visible::after,
+.swiper-button.swiper-button-next:focus-visible::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+
 
 /* Keep the theme's press effect, which the transform above would otherwise cancel */
 .swiper-button.swiper-button-prev:active,
@@ -21250,8 +21292,101 @@ footer.section-footer .email-signup__input {
   pointer-events: none;
 }
 
-/* The announcement bar's arrows are transparent, so a shadow would hang in mid-air */
+/* The announcement bar's arrows are transparent, so a disc and a shadow would sit oddly
+   beside the message */
 .announcement-bar-slider .swiper-button.swiper-button-prev,
 .announcement-bar-slider .swiper-button.swiper-button-next {
+  --arrow-background: transparent;
+  --arrow-background-hover: transparent;
   box-shadow: none;
+}
+
+.announcement-bar-slider .swiper-button.swiper-button-prev::after,
+.announcement-bar-slider .swiper-button.swiper-button-next::after {
+  display: none;
+}
+
+/* Best Sellers carousel on the homepage. Kept in the stylesheet because
+   Shopify limits a section's Custom CSS setting to 500 characters. */
+[id$="__featured_collection_QbxCWk"] .card--block-media.overflow-hidden.card-badge-is-custom.relative.group-block.w-full {
+  background: #f9f9f9;
+}
+
+[id$="__featured_collection_QbxCWk"] .swiper:has(.swiper-button) {
+  --arrow-gutter: 2rem;
+  width: calc(100% + var(--arrow-gutter) * 2);
+  padding-inline: var(--arrow-gutter);
+  margin-inline: calc(var(--arrow-gutter) * -1);
+}
+
+/* The arrows sit halfway down the product image, not halfway down the card.
+   The card's text grows with the title -- one line here, two there -- so any
+   fixed share of the carousel's height drifts below the image. Instead the
+   button wrap is made exactly as tall as one image, and Swiper's own centring
+   (top: 50% plus a margin-top of minus half a button, from vendor.css) then
+   lands the buttons on the middle of the image.
+
+   The wrap's height comes from the slides themselves: percentage padding
+   resolves against the containing block's width, so taking the arrow gutter and
+   the gaps between slides off the swiper's width leaves one slide width -- and
+   the cards are square, so that is one image tall. Slides per view follow the
+   breakpoints featured-collection.liquid hands Swiper: the tablet count from
+   768px, the desktop count from 1400px. Below 750px the wrap is hidden.
+
+   The wrap class is named twice on purpose: component-slider.css loads after
+   this file and pushes every wrap in a paginated slider to
+   top: calc(50% - 2rem) at the same specificity, so a single class here would
+   lose the tie and the arrows would drop back down the card. */
+[id$="__featured_collection_QbxCWk"] .swiper .swiper-btns-wrap.swiper-btns-wrap--inside {
+  --er-slides-per-view: var(--card-grid-per-row-mobile, 1);
+  position: absolute;
+  top: 0;
+  bottom: auto;
+  left: var(--arrow-gutter, 0px);
+  right: var(--arrow-gutter, 0px);
+  width: auto;
+  height: 0;
+  padding-bottom: calc(
+    (100% - var(--arrow-gutter, 0px) * 2 - var(--card-grid-per-row-gap, 0px) * (var(--er-slides-per-view) - 1)) /
+      var(--er-slides-per-view)
+  );
+  pointer-events: none;
+}
+
+@media screen and (min-width: 768px) {
+  [id$="__featured_collection_QbxCWk"] .swiper .swiper-btns-wrap.swiper-btns-wrap--inside {
+    --er-slides-per-view: var(--card-grid-per-row-tablet, 3);
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  [id$="__featured_collection_QbxCWk"] .swiper .swiper-btns-wrap.swiper-btns-wrap--inside {
+    --er-slides-per-view: var(--card-grid-per-row-desktop, 4);
+  }
+}
+
+[id$="__featured_collection_QbxCWk"] .swiper .swiper-btns-wrap.swiper-btns-wrap--inside .swiper-button {
+  pointer-events: auto;
+  top: 50%;
+}
+
+/* The wrap now stops short of the gutter, so the buttons reach back out over it
+   and keep straddling the edge of the first and last card. */
+[id$="__featured_collection_QbxCWk"] .swiper .swiper-button.swiper-button-prev {
+  --swiper-navigation-sides-offset: 0;
+  left: calc(var(--arrow-gutter, 0px) * -1);
+}
+
+[id$="__featured_collection_QbxCWk"] .swiper .swiper-button.swiper-button-next {
+  --swiper-navigation-sides-offset: 0;
+  right: calc(var(--arrow-gutter, 0px) * -1);
+}
+
+[id$="__featured_collection_QbxCWk"] .swiper .swiper-pagination-progressbar {
+  left: 0;
+  right: auto;
+  margin-left: 0;
+  margin-right: auto;
+  width: 100%;
+  max-width: min(280px, calc(100% - 40px));
 }

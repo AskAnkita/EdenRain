@@ -241,7 +241,7 @@
       line-height: 1.2;
       {% comment %} change font size , family and color {% endcomment %}
       font-weight: 600;
-      font-family:'Cormorant garamond' , 'sans-serif';
+      font-family: var(--font-heading--family);
       {% comment %}  {% endcomment %}
       {% if block.settings.layout_direction == 'horizontal' %}
         width: 100%;
@@ -254,7 +254,7 @@
       font-size: {{ block.settings.description_size }}px;
       line-height: 1.5;
       {% comment %} font changes {% endcomment %}
-      font-family: "Source Sans 3", sans-serif;
+      font-family: var(--font-body--family);
       {% comment %}  {% endcomment %}
       {% if block.settings.layout_direction == 'horizontal' %}
         width: 100%;

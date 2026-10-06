@@ -1,0 +1,89 @@
+{% comment %}
+  The "Featured" tab of a desktop mega menu: four large cards in one row, each a picture or a
+  looping video with one line of copy over it. The other tabs use 'header-menu-drawer-tiles'.
+
+  Accepts:
+  - group_id: {String} matches the tab button's data-menu-drawer-category
+  - active: {Boolean} shown first
+  - top_title: {String} the top-level item's title, used to look up the cards
+
+  The cards themselves come from 'menu-featured-cards'. Nothing is output when that snippet
+  lists none for this menu, which leaves the tab empty rather than half-built.
+{% endcomment %}
+
+{%- liquid
+  capture cards_source
+    render 'menu-featured-cards', parent: top_title
+  endcapture
+  assign cards = cards_source | strip
+-%}
+
+<div class="menu-drawer-desktop__group" data-menu-drawer-group="{{ group_id }}"{% unless active %} hidden{% endunless %}>
+  {%- if cards != '' -%}
+    <ul class="menu-drawer-desktop__features" role="list">
+      {%- assign card_list = cards | split: '~' -%}
+      {%- for card in card_list -%}
+        {%- liquid
+          assign card_parts = card | split: '|'
+          assign card_caption = card_parts[0] | strip
+          assign card_url = card_parts[1] | strip
+          assign card_image = card_parts[2] | strip
+          assign card_video = card_parts[3] | strip
+        -%}
+        <li class="menu-drawer-desktop__feature">
+          <a class="menu-drawer-desktop__feature-link" href="{{ card_url }}">
+            <span class="menu-drawer-desktop__feature-media">
+              {%- if card_video != blank -%}
+                {%- comment -%}
+                  The video lives in Content > Files, not in the theme. It is left unplayed
+                  until its tab is opened (see menu-drawer-desktop.js), so a menu that is
+                  never opened costs nothing, and the still stands in if the file is missing.
+                {%- endcomment -%}
+                <video
+                  class="menu-drawer-desktop__feature-video"
+                  poster="{{ card_image | asset_img_url: '800x' }}"
+                  preload="none"
+                  muted
+                  loop
+                  playsinline
+                  disablepictureinpicture
+                  aria-hidden="true"
+                  tabindex="-1"
+                >
+                  <source src="{{ card_video | file_url }}" type="video/mp4">
+                </video>
+              {%- else -%}
+                <img
+                  src="{{ card_image | asset_img_url: '800x' }}"
+                  srcset="{{ card_image | asset_img_url: '500x' }} 500w, {{ card_image | asset_img_url: '800x' }} 800w"
+                  sizes="20vw"
+                  alt="{{ card_caption | escape }}"
+                  width="800"
+                  height="1020"
+                  loading="lazy"
+                >
+              {%- endif -%}
+            </span>
+            <span class="menu-drawer-desktop__feature-caption">{{ card_caption | escape }}</span>
+          </a>
+
+          {%- if card_video != blank -%}
+            <button
+              type="button"
+              class="menu-drawer-desktop__feature-toggle is-paused"
+              data-menu-drawer-video
+              aria-label="Play video, {{ card_caption | escape }}"
+            >
+              <svg class="menu-drawer-desktop__feature-icon-pause" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                <path d="M3 1.5h2.2v9H3zM6.8 1.5H9v9H6.8z" fill="currentColor"/>
+              </svg>
+              <svg class="menu-drawer-desktop__feature-icon-play" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                <path d="M3.4 1.6 10 6l-6.6 4.4z" fill="currentColor"/>
+              </svg>
+            </button>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</div>

@@ -229,8 +229,8 @@
     text-align: {{ block.settings.heading_alignment }};
     margin: 0 0 {{ block.settings.heading_spacing }}px;
     color: {{ block.settings.heading_color }};
-    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
-    font-weight: {{ block.settings.heading_font.weight }};
+    font-family: var(--font-{{ block.settings.heading_font_family }}--family);
+    font-weight: var(--font-{{ block.settings.heading_font_family }}--weight);
     font-size: {{ block.settings.heading_font_size }}px;
     line-height: {{ block.settings.heading_line_height }};
     letter-spacing: {{ block.settings.heading_letter_spacing }}em;
@@ -240,6 +240,7 @@
   .ai-collection-carousel-wrapper-{{ ai_gen_id }} {
     position: relative;
     width: 100%;
+    touch-action: pan-y;
   }
 
   /* The clipping lives here so the arrows, which sit half outside the
@@ -247,6 +248,7 @@
   .ai-collection-carousel-viewport-{{ ai_gen_id }} {
     overflow: hidden;
     width: 100%;
+    touch-action: pan-y;
   }
 
   .ai-collection-carousel-track-{{ ai_gen_id }} {
@@ -254,6 +256,10 @@
     gap: {{ block.settings.item_gap_desktop }}px;
     transition: transform 0.4s ease-in-out;
     will-change: transform;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
   }
 
   .ai-collection-carousel-item-{{ ai_gen_id }} {
@@ -275,6 +281,8 @@
     border: {{ block.settings.item_border_width }}px solid {{ block.settings.border_color }};
     box-shadow: {{ block.settings.shadow }};
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    -webkit-user-drag: none;
+    user-select: none;
   }
 
   @media (hover: hover) {
@@ -307,6 +315,9 @@
     display: block;
     object-fit: cover;
     transition: opacity 0.3s ease;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;
   }
 
   .ai-collection-carousel-hover-image-{{ ai_gen_id }} {
@@ -338,9 +349,12 @@
     background: #f8f8f8;
   }
 
+  /* How large the ring sits inside its tile. The picture is shown whole (contain), so this
+     is the only lever for how much of the frame it fills: raise it to zoom in, lower it to
+     leave more space around the ring. Above ~0.95 the picture starts to meet the tile edges. */
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-{{ ai_gen_id }} {
     object-fit: contain;
-    transform: scale(0.74);
+    transform: scale(0.86);
   }
 
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-hover-image-{{ ai_gen_id }} {
@@ -392,8 +406,8 @@
     padding: {{ block.settings.title_padding }}px;
     text-align: center;
     color: {{ block.settings.text_color }};
-    font-family: {{ block.settings.title_font.family }}, {{ block.settings.title_font.fallback_families }};
-    font-weight: {{ block.settings.title_font.weight }};
+    font-family: var(--font-{{ block.settings.title_font_family }}--family);
+    font-weight: var(--font-{{ block.settings.title_font_family }}--weight);
     font-size: {{ block.settings.title_font_size }}px;
     line-height: {{ block.settings.title_line_height }};
     letter-spacing: {{ block.settings.title_letter_spacing }}em;
@@ -407,8 +421,10 @@
     background: {{ block.settings.arrow_background }};
     border: {{ block.settings.arrow_border_width }}px solid {{ block.settings.arrow_border_color }};
     border-radius: var(--arrow-radius, {{ block.settings.arrow_border_radius }}px);
-    width: var(--arrow-width, {{ block.settings.arrow_size }}px);
-    height: var(--arrow-height, {{ block.settings.arrow_size }}px);
+    /* --er-arrow-size is the shared scroller arrow size (assets/base.css), so this
+       carousel's buttons match every other row; the setting is the fallback. */
+    width: var(--er-arrow-size, {{ block.settings.arrow_size }}px);
+    height: var(--er-arrow-size, {{ block.settings.arrow_size }}px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -416,6 +432,7 @@
     z-index: 10;
     transition: all 0.3s ease;
     color: {{ block.settings.arrow_color }};
+    box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }}:hover {
@@ -423,16 +440,36 @@
     color: {{ block.settings.arrow_hover_color }};
   }
 
+  /* Hover draws a ring in from the middle of the disc to its edge, as on every
+     other scroller in the theme (assets/base.css). */
+  .ai-collection-carousel-nav-{{ ai_gen_id }}::after {
+    position: absolute;
+    inset: 0;
+    border: 1.5px solid {{ block.settings.arrow_color }};
+    border-radius: inherit;
+    content: "";
+    opacity: 0;
+    transform: scale(0.7);
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.22s ease;
+    pointer-events: none;
+  }
+
+  .ai-collection-carousel-nav-{{ ai_gen_id }}:hover::after,
+  .ai-collection-carousel-nav-{{ ai_gen_id }}:focus-visible::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
   .ai-collection-carousel-nav-{{ ai_gen_id }}.prev {
-    left: calc(var(--arrow-width, {{ block.settings.arrow_size }}px) / -2 + {{ block.settings.arrow_offset }}px);
+    left: calc(var(--er-arrow-size, {{ block.settings.arrow_size }}px) / -2 + {{ block.settings.arrow_offset }}px);
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }}.next {
-    right: calc(var(--arrow-width, {{ block.settings.arrow_size }}px) / -2 + {{ block.settings.arrow_offset }}px);
+    right: calc(var(--er-arrow-size, {{ block.settings.arrow_size }}px) / -2 + {{ block.settings.arrow_offset }}px);
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }} svg {
-    width: var(--arrow-icon-size, {{ block.settings.arrow_icon_size }}px);
+    width: var(--er-arrow-icon-size, {{ block.settings.arrow_icon_size }}px);
     height: auto;
   }
 
@@ -448,8 +485,12 @@
   .ai-collection-carousel-pagination-{{ ai_gen_id }} {
     position: relative;
     width: 100%;
-    height: 4px;
+    max-width: min({{ block.settings.pagination_max_width | default: 280 }}px, calc(100% - 40px));
+    height: 3px;
     margin-top: {{ block.settings.pagination_spacing }}px;
+    margin-left: 0;
+    margin-right: auto;
+    border-radius: 999px;
     overflow: hidden;
     background: {{ block.settings.pagination_color }};
   }
@@ -461,16 +502,7 @@
     transform: scaleX(0);
     transform-origin: left center;
     transition: transform 0.4s ease-in-out;
-  }
-
-  @media screen and (min-width: 1025px) {
-    .ai-collection-carousel-nav-{{ ai_gen_id }}:not(.is-disabled) {
-      opacity: 0;
-    }
-
-    .ai-collection-carousel-wrapper-{{ ai_gen_id }}:hover .ai-collection-carousel-nav-{{ ai_gen_id }}:not(.is-disabled) {
-      opacity: 1;
-    }
+    border-radius: 999px;
   }
 
   @media screen and (max-width: 989px) {
@@ -500,7 +532,7 @@
 
   @media screen and (max-width: 749px) {
     .ai-collection-carousel-{{ ai_gen_id }} {
-      padding: {{ block.settings.padding_top | times: 0.7 }}px {{ block.settings.padding_right | times: 0.7 }}px {{ block.settings.padding_bottom | times: 0.7 }}px {{ block.settings.padding_left | times: 0.7 }}px;
+      padding: clamp(16px, {{ block.settings.padding_top | times: 0.3 }}px, 24px) {{ block.settings.padding_right | times: 0.7 }}px {{ block.settings.padding_bottom | times: 0.7 }}px {{ block.settings.padding_left | times: 0.7 }}px;
     }
 
     .ai-collection-carousel-track-{{ ai_gen_id }} {
@@ -578,29 +610,36 @@
   {% if block.settings.heading == 'FIND YOUR STYLE' %}
     @media screen and (max-width: 749px) {
       .ai-collection-carousel-{{ ai_gen_id }} {
-        padding-left: 18px;
-        padding-right: 18px;
+        padding-top: 16px;
+        padding-left: 16px;
+        padding-right: 16px;
       }
 
       .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-heading-{{ ai_gen_id }} {
         color: #00211c;
         font-family: var(--font-heading--family);
         font-size: 26px;
-        text-align: left;
         margin-bottom: 24px;
       }
 
       .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-track-{{ ai_gen_id }} {
-        gap: 24px;
+        gap: 12px;
       }
 
       .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-item-{{ ai_gen_id }} {
-        flex: 0 0 70%;
-        max-width: 70%;
+        flex: 0 0 72%;
+        max-width: 72%;
       }
 
       .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }} {
         aspect-ratio: 2 / 3;
+      }
+
+      /* The tile is portrait (2/3) but the ring photo is square, so "contain" fits it to the
+         tile's width and leaves a band of empty space above and below. Scaling past 1 fills
+         that band; the overflow is only the photo's own white margin, which the tile clips. */
+      .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-{{ ai_gen_id }} {
+        transform: scale(1.28);
       }
     }
   {% endif %}
@@ -901,14 +940,125 @@
           this.nextBtn.addEventListener('click', () => this.next());
         }
 
+        let startX = 0;
+        let startY = 0;
+        let startOffset = 0;
+        let deltaX = 0;
+        let isDragging = false;
+        let isScrolling = undefined;
+        this.hasDragged = false;
+
+        const onDragStart = (clientX, clientY) => {
+          if (!this.visibleItems.length) return;
+          startX = clientX;
+          startY = clientY;
+          deltaX = 0;
+          isDragging = true;
+          isScrolling = undefined;
+          this.hasDragged = false;
+          startOffset = this.getOffsetForIndex(this.currentIndex);
+          this.track.style.transition = 'none';
+        };
+
+        const onDragMove = (clientX, clientY, e) => {
+          if (!isDragging) return;
+          deltaX = clientX - startX;
+          const deltaY = clientY - startY;
+
+          if (isScrolling === undefined) {
+            if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 6) {
+              isScrolling = true;
+            } else if (Math.abs(deltaX) > 6) {
+              isScrolling = false;
+            }
+          }
+
+          if (isScrolling === false) {
+            if (e && e.cancelable) e.preventDefault();
+            this.hasDragged = true;
+            const maxOffset = Math.max(0, this.track.scrollWidth - this.wrapper.clientWidth);
+            let currentOffset = startOffset - deltaX;
+            if (currentOffset < 0) {
+              currentOffset = currentOffset * 0.3;
+            } else if (currentOffset > maxOffset) {
+              currentOffset = maxOffset + (currentOffset - maxOffset) * 0.3;
+            }
+            this.track.style.transform = `translateX(-${currentOffset}px)`;
+
+            if (maxOffset > 0 && this.pagination) {
+              const ratio = Math.max(0, Math.min(1, currentOffset / maxOffset));
+              const totalSlides = this.getTotalSlides();
+              const progressValue = (1 + ratio * (totalSlides - 1)) / totalSlides;
+              const progress = this.pagination.querySelector('.ai-collection-carousel-progress-{{ ai_gen_id }}');
+              if (progress) progress.style.transform = `scaleX(${progressValue})`;
+            }
+          }
+        };
+
+        const onDragEnd = () => {
+          if (!isDragging) return;
+          isDragging = false;
+          this.track.style.transition = 'transform 0.35s ease-out';
+
+          if (isScrolling === false) {
+            const threshold = 35;
+            if (deltaX < -threshold) {
+              this.next();
+            } else if (deltaX > threshold) {
+              this.prev();
+            } else {
+              this.updateSlidePosition();
+            }
+          } else {
+            this.updateSlidePosition();
+          }
+
+          setTimeout(() => {
+            this.hasDragged = false;
+          }, 120);
+        };
+
         this.track.addEventListener('touchstart', (e) => {
-          this.touchStartX = e.changedTouches[0].screenX;
+          if (e.touches.length > 0) {
+            onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+          }
         }, { passive: true });
 
-        this.track.addEventListener('touchend', (e) => {
-          this.touchEndX = e.changedTouches[0].screenX;
-          this.handleSwipe();
+        this.track.addEventListener('touchmove', (e) => {
+          if (e.touches.length > 0) {
+            onDragMove(e.touches[0].clientX, e.touches[0].clientY, e);
+          }
+        }, { passive: false });
+
+        this.track.addEventListener('touchend', () => {
+          onDragEnd();
         }, { passive: true });
+
+        this.track.addEventListener('touchcancel', () => {
+          onDragEnd();
+        }, { passive: true });
+
+        this.track.addEventListener('mousedown', (e) => {
+          if (e.button !== 0) return;
+          onDragStart(e.clientX, e.clientY);
+          const onMouseMove = (moveEvent) => {
+            onDragMove(moveEvent.clientX, moveEvent.clientY, moveEvent);
+          };
+          const onMouseUp = () => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            onDragEnd();
+          };
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+
+        this.track.addEventListener('click', (e) => {
+          if (this.hasDragged) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }, true);
 
         if (this.settings.pauseOnHover && this.settings.autoplay) {
           this.wrapper.addEventListener('mouseenter', () => this.stopAutoplay());
@@ -926,17 +1076,18 @@
         });
       }
 
-      handleSwipe() {
-        const swipeThreshold = 50;
-        const diff = this.touchStartX - this.touchEndX;
-
-        if (Math.abs(diff) > swipeThreshold) {
-          if (diff > 0) {
-            this.next();
-          } else {
-            this.prev();
-          }
+      getOffsetForIndex(index) {
+        if (!this.visibleItems.length) return 0;
+        if (this.isShapeGrid && window.innerWidth <= 749) {
+          return index * (this.wrapper.clientWidth + 12);
         }
+        const gap = parseInt(getComputedStyle(this.track).gap) || 0;
+        let offset = 0;
+        for (let i = 0; i < index && i < this.visibleItems.length; i++) {
+          offset += this.visibleItems[i].offsetWidth + gap;
+        }
+        const maxOffset = Math.max(0, this.track.scrollWidth - this.wrapper.clientWidth);
+        return Math.min(offset, maxOffset);
       }
 
       updateSlidePosition() {
@@ -944,27 +1095,9 @@
 
         if (this.isShapeGrid && window.innerWidth <= 749) {
           this.track.style.setProperty('--shape-page-width', `${this.wrapper.clientWidth}px`);
-          const offset = this.currentIndex * (this.wrapper.clientWidth + 12);
-          this.track.style.transform = `translateX(-${offset}px)`;
-          this.updatePaginationProgress();
-          this.updateControls();
-          return;
         }
 
-        const firstVisibleItem = this.visibleItems[0];
-        if (!firstVisibleItem) return;
-
-        const itemWidth = firstVisibleItem.offsetWidth;
-        const gap = parseInt(getComputedStyle(this.track).gap) || 0;
-        
-        let offset = 0;
-        for (let i = 0; i < this.currentIndex && i < this.visibleItems.length; i++) {
-          offset += this.visibleItems[i].offsetWidth + gap;
-        }
-
-        const maxOffset = Math.max(0, this.track.scrollWidth - this.wrapper.clientWidth);
-        offset = Math.min(offset, maxOffset);
-
+        const offset = this.getOffsetForIndex(this.currentIndex);
         this.track.style.transform = `translateX(-${offset}px)`;
         this.updatePaginationProgress();
         this.updateControls();
@@ -982,6 +1115,7 @@
         } else if (this.settings.loop) {
           this.currentIndex = 0;
         } else {
+          this.updateSlidePosition();
           return;
         }
 
@@ -1000,6 +1134,7 @@
         } else if (this.settings.loop) {
           this.currentIndex = totalSlides - 1;
         } else {
+          this.updateSlidePosition();
           return;
         }
 
@@ -1128,10 +1263,16 @@
       "default": "center"
     },
     {
-      "type": "font_picker",
-      "id": "heading_font",
+      "type": "select",
+      "id": "heading_font_family",
       "label": "Font",
-      "default": "assistant_n4"
+      "info": "Uses the theme's typography so fonts stay consistent sitewide.",
+      "options": [
+        { "value": "heading", "label": "Heading" },
+        { "value": "subheading", "label": "Subheading" },
+        { "value": "body", "label": "Body" }
+      ],
+      "default": "heading"
     },
     {
       "type": "range",
@@ -1460,6 +1601,16 @@
       "default": 24
     },
     {
+      "type": "range",
+      "id": "pagination_max_width",
+      "label": "Progress bar width",
+      "min": 120,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "default": 280
+    },
+    {
       "type": "header",
       "content": "Item style"
     },
@@ -1500,10 +1651,16 @@
       "content": "Title style"
     },
     {
-      "type": "font_picker",
-      "id": "title_font",
+      "type": "select",
+      "id": "title_font_family",
       "label": "Font",
-      "default": "assistant_n4"
+      "info": "Uses the theme's typography so fonts stay consistent sitewide.",
+      "options": [
+        { "value": "heading", "label": "Heading" },
+        { "value": "subheading", "label": "Subheading" },
+        { "value": "body", "label": "Body" }
+      ],
+      "default": "body"
     },
     {
       "type": "range",

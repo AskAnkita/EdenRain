@@ -86,15 +86,14 @@
   }
 
   .signature-grid-{{ section.id }} .signature-grid__card-title {
+    position: relative;
     margin-top: 1.6rem;
+    padding-bottom: 0.6rem;
     font-size: 1.3rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     text-align: center;
     line-height: 1.8;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.6rem;
     max-width: 100%;
     flex-shrink: 0;
     /* Long product names wrap to two lines; the last line stays on the shared baseline */
@@ -102,6 +101,34 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__card-title::before,
+  .signature-grid-{{ section.id }} .signature-grid__card-title::after {
+    position: absolute;
+    bottom: 0;
+    width: 50%;
+    height: 1px;
+    background: currentColor;
+    content: "";
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__card-title::before {
+    left: 0;
+    transform-origin: right center;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__card-title::after {
+    right: 0;
+    transform-origin: left center;
+  }
+
+  .signature-grid-{{ section.id }} .signature-grid__card:hover .signature-grid__card-title::before,
+  .signature-grid-{{ section.id }} .signature-grid__card:focus-visible .signature-grid__card-title::before,
+  .signature-grid-{{ section.id }} .signature-grid__card:hover .signature-grid__card-title::after,
+  .signature-grid-{{ section.id }} .signature-grid__card:focus-visible .signature-grid__card-title::after {
+    transform: scaleX(0);
   }
 
   @media screen and (max-width: 989px) {
@@ -119,19 +146,40 @@
 
   @media screen and (max-width: 749px) {
     .signature-grid-{{ section.id }} {
-      padding-inline: 16px;
+      padding-inline: 12px;
+      padding-bottom: 20px;
     }
 
     .signature-grid-{{ section.id }} .signature-grid__layout {
-      gap: 12px;
+      gap: 10px;
     }
 
     .signature-grid-{{ section.id }} .signature-grid__card {
-      padding: 1.6rem 1.2rem 2rem;
+      /* Minimal side padding so the product name has the full card width to sit on one line */
+      padding: 1.2rem 0.4rem 1.6rem;
+    }
+
+    .signature-grid-{{ section.id }} .signature-grid__card-media img {
+      max-width: 100%;
     }
 
     .signature-grid-{{ section.id }} .signature-grid__card-title {
-      font-size: 1.2rem;
+      /* Scales with the viewport so names like "THE KRISTINA - 17 1/3 CTW" stay on a single line */
+      font-size: clamp(0.78rem, 2.5vw, 1.15rem);
+      letter-spacing: 0.03em;
+      line-height: 1.6;
+      white-space: nowrap;
+      display: block;
+      -webkit-line-clamp: none;
+      text-overflow: ellipsis;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .signature-grid-{{ section.id }} .signature-grid__card-media img,
+    .signature-grid-{{ section.id }} .signature-grid__card-title::before,
+    .signature-grid-{{ section.id }} .signature-grid__card-title::after {
+      transition: none;
     }
   }
 {% endstyle %}

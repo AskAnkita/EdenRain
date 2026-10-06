@@ -13,7 +13,6 @@
     --invert          filled white, for an action sitting on a photo
 
   Links             .eden-link, with .eden-link--light on a dark background.
-  Arrow             .eden-action__arrow on the glyph inside either.
 
   A button that sits inside a larger clickable area (a whole tile that is one
   link) also needs .eden-action-host on that outer link, so the button reacts
@@ -136,6 +135,37 @@
   color: var(--eden-action-ink);
 }
 
+/* Keep every call to action aligned with the hero: generous hit area, a quiet
+   lift on hover, and the existing colour scheme left entirely in charge. */
+.eden-action,
+.button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block),
+.button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button),
+.shopify-challenge__button,
+button.shopify-payment-button__button--unbranded {
+  min-height: 48px;
+  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+@media screen and (min-width: 750px) {
+  .eden-action,
+  .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block),
+  .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button),
+  .shopify-challenge__button,
+  button.shopify-payment-button__button--unbranded {
+    min-height: 50px;
+  }
+}
+
+@media (hover: hover) {
+  .eden-action:hover,
+  .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block):hover:not([disabled]),
+  .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button):hover:not([disabled]),
+  .shopify-challenge__button:hover:not([disabled]),
+  button.shopify-payment-button__button--unbranded:hover:not([disabled]) {
+    transform: translateY(-2px);
+  }
+}
+
 /* -------------------------------------------------------------------- links */
 
 .eden-link {
@@ -157,13 +187,6 @@
 .eden-link:focus-visible,
 .eden-action-host:hover .eden-link {
   border-bottom-color: currentcolor;
-}
-
-/* -------------------------------------------------------------------- arrow */
-
-.eden-action__arrow {
-  font-size: 1.5em;
-  line-height: 0.7;
 }
 
 /* ------------------------------------------------------------------- focus */

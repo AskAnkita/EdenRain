@@ -1,0 +1,50 @@
+{% comment %}
+  The four large cards of a mega menu's "Featured" tab: two pictures and two videos, in a
+  single row. Unlike the other tabs, which list collections as small tiles, this one is
+  editorial - each card is a piece of art with one line of copy over it.
+
+  Accepts:
+  - parent: {String} the top-level item's title, e.g. "Engagement"
+
+  Outputs one card per entry, separated by "~", each in this shape:
+
+      Caption|url|picture|video
+
+  - picture is a file under assets/. It is the card's image, and for a card that has a video
+    it is also the still shown before the video starts, so it should be a frame from it.
+  - video is optional, and names a file uploaded in Shopify admin under Content > Files.
+    A card with no video is just the picture. Anything ending .mp4 or .webm plays muted and
+    looping, with a pause button, and never plays for a visitor who has asked for reduced
+    motion.
+
+  The videos are NOT in this theme: a theme is capped at 50MB and these run 10-16MB each.
+  Upload them under Content > Files with exactly the names below and they appear here. Until
+  then each card falls back to its picture, so the menu looks finished either way.
+
+  ---------------------------------------------------------------------------
+  PLACEHOLDERS - the pictures are MiaDonna's, kept only until the shop has its
+  own. Swap the file under assets/ to change a card; the name stays the same.
+  ---------------------------------------------------------------------------
+{% endcomment %}
+
+{%- liquid
+  assign parent_key = parent | handle
+
+  case parent_key
+    when 'engagement'
+      echo 'The Value Edit|/collections/ready-to-ship|featured-engagement-value.jpg|'
+      echo '~Shop Signature Engagement|/collections/engagement-rings|featured-engagement-signature.jpg|featured-engagement-signature.mp4'
+      echo '~New Engagement Arrivals|/collections/new-in|featured-engagement-new.jpg|featured-engagement-new.mp4'
+      echo '~Shop Bridal Sets|/collections/bridal-sets|featured-engagement-bridal.jpg|'
+    when 'wedding'
+      echo "Shop Men's Wedding Bands|/collections/mens-rings|featured-wedding-mens.jpg|"
+      echo '~The Eternity Collection|/collections/eternity-rings|featured-wedding-eternity.jpg|featured-wedding-eternity.mp4'
+      echo '~New Wedding Arrivals|/collections/new-in|featured-wedding-new.jpg|featured-wedding-new.mp4'
+      echo '~Shop Anniversary Rings|/collections/anniversary-rings|featured-wedding-anniversary.jpg|'
+    when 'jewellery'
+      echo 'Shop Signature Earrings|/collections/signature-earrings|featured-jewellery-earrings.jpg|'
+      echo '~Shop Must-Have Studs|/collections/studs|featured-jewellery-studs.jpg|featured-jewellery-studs.mp4'
+      echo '~Shop Tennis Bracelets|/collections/tennis-bracelets|featured-jewellery-bracelets.jpg|featured-jewellery-bracelets.mp4'
+      echo '~Shop Signature Necklaces|/collections/signature-necklaces|featured-jewellery-necklaces.jpg|'
+  endcase
+-%}

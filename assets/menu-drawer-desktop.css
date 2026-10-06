@@ -313,8 +313,12 @@
   overflow: hidden;
 }
 
-/* Only a stand-in needs a panel behind it; a real photo fills the tile itself. */
-.menu-drawer-desktop__tile-media:has(.menu-tile-fallback) {
+/* A collection's own photo is square and fills the tile. A stand-in does not: the line
+   drawing and the initial are drawn small, and the shipped pictures are tall, so both need
+   the panel painted behind them. The pictures carry this same grey, so the two meet without
+   a seam where the picture stops. */
+.menu-drawer-desktop__tile-media:has(.menu-tile-fallback),
+.menu-drawer-desktop__tile-media:has(.menu-drawer-desktop__tile-placeholder) {
   background: #f8f8f8;
 }
 
@@ -324,6 +328,16 @@
   padding: 0;
   object-fit: cover;
   transition: transform 0.4s ease;
+}
+
+/* The shipped pictures come in two shapes. The engagement styles are tall (684x1014) and
+   frame their ring far tighter than a square product photo does: cropping one to fill the
+   tile would blow the ring up to roughly half again the size of its neighbours. The rest are
+   already square. Fitting rather than cropping suits both - the tall ones land at about the
+   same ring width as the collections' own photos, the square ones fill the tile exactly - and
+   every picture carries the same grey, so the space either side never shows as a seam. */
+.menu-drawer-desktop__tile-media img.menu-drawer-desktop__tile-placeholder {
+  object-fit: contain;
 }
 
 .menu-drawer-desktop__tile:hover .menu-drawer-desktop__tile-media img {
@@ -710,6 +724,143 @@ a.menu-drawer-desktop__group-heading:hover {
 
 .menu-drawer-desktop__group > .menu-drawer-desktop__tiles + .menu-drawer-desktop__tiles {
   margin-top: 3.2rem;
+}
+
+/* ---------------------------------------------------------------------------
+   The "Featured" tab: four large cards in one row, in place of the small tiles.
+   The panel runs the full width of the window, so all four fit side by side.
+   Markup: snippets/header-menu-drawer-featured.liquid
+   --------------------------------------------------------------------------- */
+.menu-drawer-desktop__features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.6rem;
+}
+
+.menu-drawer-desktop__feature {
+  position: relative;
+}
+
+.menu-drawer-desktop__feature-link {
+  display: block;
+  position: relative;
+  color: #fff;
+  text-decoration: none;
+}
+
+.menu-drawer-desktop__feature-media {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  background: #f1f1f1;
+}
+
+.menu-drawer-desktop__feature-media img,
+.menu-drawer-desktop__feature-media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.menu-drawer-desktop__feature-link:hover .menu-drawer-desktop__feature-media img,
+.menu-drawer-desktop__feature-link:hover .menu-drawer-desktop__feature-media video {
+  transform: scale(1.03);
+}
+
+/* Several of these cards are a pale stone on a near-white backdrop, so white copy needs the
+   picture darkened under it rather than trusting the art to carry it. The shadow catches the
+   odd bright pixel the gradient leaves. */
+.menu-drawer-desktop__feature-caption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 6rem 1.6rem 2.4rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.62));
+  font-size: 1.4rem;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.menu-drawer-desktop__feature-link:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 3px;
+}
+
+/* Pausing a looping video is a requirement, not a nicety, so the control is always there
+   rather than appearing on hover. It sits outside the link: a button inside one is not
+   reachable on its own. Top right, because four cards across leaves captions long enough to
+   run the full width of the card and straight under a button in the bottom corner. */
+.menu-drawer-desktop__feature-toggle {
+  position: absolute;
+  right: 1.2rem;
+  top: 1.2rem;
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  /* Dark enough to hold a white icon against the palest card, where a lighter wash left the
+     control all but invisible */
+  background: rgba(0, 0, 0, 0.38);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.menu-drawer-desktop__feature-toggle:hover,
+.menu-drawer-desktop__feature-toggle:focus-visible {
+  background: #fff;
+  color: #111;
+}
+
+.menu-drawer-desktop__feature-toggle svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.menu-drawer-desktop__feature-toggle .menu-drawer-desktop__feature-icon-play,
+.menu-drawer-desktop__feature-toggle.is-paused .menu-drawer-desktop__feature-icon-pause {
+  display: none;
+}
+
+.menu-drawer-desktop__feature-toggle.is-paused .menu-drawer-desktop__feature-icon-play {
+  display: block;
+}
+
+@media screen and (max-width: 1399px) {
+  .menu-drawer-desktop__features {
+    gap: 1rem;
+  }
+
+  .menu-drawer-desktop__feature-caption {
+    padding: 4rem 0.8rem 1.6rem;
+    font-size: 1.15rem;
+    letter-spacing: 0.1em;
+  }
+
+  .menu-drawer-desktop__feature-toggle {
+    right: 0.8rem;
+    top: 0.8rem;
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-drawer-desktop__feature-media img,
+  .menu-drawer-desktop__feature-media video {
+    transition: none;
+  }
 }
 
 /* Stand-ins for tiles whose collection has no image yet */

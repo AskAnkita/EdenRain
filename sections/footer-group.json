@@ -4395,10 +4395,10 @@
         "fc_newsletter": {
           "type": "newsletter",
           "settings": {
-            "heading": "Subscribe",
-            "text": "<p>Sign up to get the latest on sales, new releases and more …</p>",
-            "field_label": "Email*",
-            "button_label": "Sign up"
+            "heading": "JOIN THE EDEN RAINE CIRCLE",
+            "text": "<p>Sign up to receive private previews, bridal guides, and exclusive releases.</p>",
+            "field_label": "Enter your email",
+            "button_label": "JOIN"
           }
         }
       },
@@ -4410,22 +4410,22 @@
         "fc_newsletter"
       ],
       "settings": {
-        "background": "#ffffff",
-        "text_color": "#1d1d1b",
-        "link_color": "#1d1d1b",
-        "link_hover_color": "#6f6f6f",
-        "border_color": "#ededed",
+        "background": "#faf8f5",
+        "text_color": "#202020",
+        "link_color": "#202020",
+        "link_hover_color": "#8c7d6b",
+        "border_color": "#e8e5df",
         "text_size": 13,
-        "heading_size": 16,
-        "logo_width": 160,
-        "button_background": "#000000",
+        "heading_size": 14,
+        "logo_width": 110,
+        "button_background": "#051514",
         "button_text_color": "#ffffff",
         "show_payment_methods": true,
         "credit_text": "Website by",
         "credit_name": "Lionsorbet",
         "credit_url": "https://www.lionsorbet.com/",
-        "padding_top": 160,
-        "padding_bottom": 160,
+        "padding_top": 72,
+        "padding_bottom": 56,
         "content_width": 1400,
         "side_padding": 64
       }

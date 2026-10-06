@@ -20,6 +20,10 @@
 
   Liquid gives these groups no sub-links even though the menu has them, so the static sections
   win over `parent.links`. Drop the static branch to go back to the navigation menu.
+
+  A tile's picture is `collection.featured_image`. Where a collection has none, the static
+  branch falls back to a picture shipped under assets/ ('menu-tile-placeholder'), and only
+  then to the initial or line drawing in 'menu-tile-fallback'.
 {% endcomment %}
 
 {%- liquid
@@ -94,11 +98,38 @@
           {%- if item_url == heading_url -%}
             {%- continue -%}
           {%- endif -%}
+          {%- comment -%}
+            A collection with no picture of its own falls back to one we ship under assets/,
+            and only to the initial when there is no picture for it either. See
+            'menu-tile-placeholder' for the list and for how to retire it.
+          {%- endcomment -%}
+          {%- capture placeholder_asset -%}
+            {%- render 'menu-tile-placeholder', handle: item_handle -%}
+          {%- endcapture -%}
+          {%- assign placeholder_asset = placeholder_asset | strip -%}
           <li>
             <a class="menu-drawer-desktop__tile" href="{{ item_url }}">
               <span class="menu-drawer-desktop__tile-media">
                 {%- if item_collection.featured_image != blank -%}
                   {{ item_collection.featured_image | image_url: width: 400 | image_tag: loading: 'lazy', sizes: '180px', alt: item_title }}
+                {%- elsif placeholder_asset != '' -%}
+                  {%- comment -%}
+                    The shipped pictures come in two shapes - tall for the engagement styles,
+                    square for everything else. The width and height below describe the box
+                    the tile draws, not the file: the tile is a fixed square either way
+                    (menu-drawer-desktop.css) and a tall picture is fitted inside it, so the
+                    square is what the browser should reserve.
+                  {%- endcomment -%}
+                  <img
+                    class="menu-drawer-desktop__tile-placeholder"
+                    src="{{ placeholder_asset | asset_img_url: '400x' }}"
+                    srcset="{{ placeholder_asset | asset_img_url: '400x' }} 400w, {{ placeholder_asset | asset_img_url: '600x' }} 600w"
+                    sizes="180px"
+                    alt="{{ item_title | escape }}"
+                    width="400"
+                    height="400"
+                    loading="lazy"
+                  >
                 {%- else -%}
                   {%- render 'menu-tile-fallback', title: item_title -%}
                 {%- endif -%}

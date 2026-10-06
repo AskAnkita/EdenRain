@@ -28,25 +28,81 @@
 .hj-cta { margin-top: 28px; }
 .hj-signature-note { margin: 26px 0 0; padding-top: 19px; border-top: 1px solid var(--hj-line); color: var(--hj-muted); font-size: 1.15rem; letter-spacing: .04em; }
 .hj-products { margin-top: clamp(38px, 5vw, 72px); }
-.hj-products__heading { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
-.hj-products__heading h3 { margin: 0; font-size: clamp(2.2rem, 2.5vw, 3.4rem); }
-.hj-products__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
-.hj-product { color: inherit; text-decoration: none; }
-.hj-product__media { aspect-ratio: 4 / 4.7; overflow: hidden; background: #f5f4f2; }
+.hj-products__heading { margin-bottom: 18px; text-align: center; }
+.hj-products__heading h3 { margin: 0; font-family: var(--font-heading--family); font-size: clamp(2rem, 3vw, 3rem); font-weight: 600; letter-spacing: var(--letter-spacing--body-loose, .03em); line-height: normal; text-transform: uppercase; }
+.hj-products__carousel { display: block; }
+.hj-products__grid { margin: 0; padding: 0; }
+.hj-product { height: auto; color: inherit; }
+.hj-product > a { display: block; height: 100%; color: inherit; text-decoration: none; }
+.hj-product__media { aspect-ratio: 1; overflow: hidden; background: #f9f9f9; }
 .hj-product__media img { transition: transform .5s ease; }
 .hj-product:hover .hj-product__media img { transform: scale(1.04); }
 .hj-product__title,
-.hj-product__price { display: block; margin-top: 11px; font-size: 1.25rem; }
-.hj-product__price { margin-top: 4px; color: var(--hj-muted); }
+.hj-product__price { display: block; }
+.hj-product__title { display: -webkit-box; margin-top: 20px; overflow: hidden; font-family: var(--font-h5--family); font-style: var(--font-h5--style); font-size: var(--font-size--h5); font-weight: var(--font-h5--weight); letter-spacing: var(--font-h5--letter-spacing); line-height: var(--font-h5--line-height); text-transform: var(--font-h5--case); -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.hj-product__price { margin-top: 14px; font-family: var(--font-paragraph--family); font-style: var(--font-paragraph--style); font-size: var(--font-paragraph--size); font-weight: var(--font-paragraph--weight); letter-spacing: var(--font-paragraph--letter-spacing); line-height: var(--font-paragraph--line-height); }
+.hj-products__carousel .swiper { padding-bottom: 36px; }
+.hj-products__carousel .swiper-pagination { bottom: 0; }
 
-.homepage-journey--purpose { padding: 0; background: #17211e; color: #fff; }
+/* Arrows straddle the card edge (half over the image, half outside), matching
+   the Trending Styles carousel. Desktop only -- the arrows are hidden below
+   750px, so the swiper keeps its plain full-bleed clipping there. */
+@media screen and (min-width: 750px) {
+  .hj-products__carousel .swiper:has(.swiper-button) { --arrow-gutter: 2rem; width: calc(100% + var(--arrow-gutter) * 2); padding-inline: var(--arrow-gutter); margin-inline: calc(var(--arrow-gutter) * -1); }
+  /* The arrows centre on the image, not on the card: the controls are made as
+     tall as one image and the buttons sit halfway down. Percentage padding goes
+     by the containing block's width, so dropping the arrow gutter and the gaps
+     between slides leaves one slide width -- and the images are square, so that
+     is one image tall. Counts match data-breakpoints on the carousel above. */
+  .hj-products__carousel .swiper .swiper-btns-wrap.hj-products__controls { --hj-slides-per-view: 2; position: absolute; top: 0; bottom: auto; left: var(--arrow-gutter); right: var(--arrow-gutter); width: auto; height: 0; padding-bottom: calc((100% - var(--arrow-gutter) * 2 - 20px * (var(--hj-slides-per-view) - 1)) / var(--hj-slides-per-view)); }
+  /* Swiper already pulls each button up by half its own height (vendor.css), so
+     top: 50% of a wrap this tall centres it on the image -- no transform here. */
+  .hj-products__carousel .hj-products__controls .swiper-button { top: 50%; }
+  .hj-products__carousel .hj-products__controls .swiper-button.swiper-button-prev { --swiper-navigation-sides-offset: 0; left: calc(var(--arrow-gutter) * -1); }
+  .hj-products__carousel .hj-products__controls .swiper-button.swiper-button-next { --swiper-navigation-sides-offset: 0; right: calc(var(--arrow-gutter) * -1); }
+  .hj-products__carousel .swiper-pagination-progressbar { left: var(--arrow-gutter, 0px); width: calc(100% - var(--arrow-gutter, 0px) * 2); }
+}
+
+@media screen and (min-width: 900px) {
+  .hj-products__carousel .swiper .swiper-btns-wrap.hj-products__controls { --hj-slides-per-view: 3; }
+}
+
+@media screen and (min-width: 1200px) {
+  .hj-products__carousel .swiper .swiper-btns-wrap.hj-products__controls { --hj-slides-per-view: 4; }
+}
+
+/* The panel colour and its text colour are the only two values a merchant sets;
+   the section writes them onto this element as --hj-purpose-bg / --hj-purpose-ink.
+   Everything else on the panel -- muted copy, the rule above the proof points,
+   the placeholder behind the photo, the CTA -- is derived from those two, so
+   trying a new colour stays a one-setting change. The flat value before each
+   color-mix is the fallback for browsers that do not support it. */
+.homepage-journey--purpose {
+  --hj-purpose-bg: #17211e;
+  --hj-purpose-ink: #fff;
+  --hj-purpose-muted: rgba(255, 255, 255, .76);
+  --hj-purpose-muted: color-mix(in srgb, var(--hj-purpose-ink) 76%, transparent);
+  --hj-purpose-line: rgba(255, 255, 255, .3);
+  --hj-purpose-line: color-mix(in srgb, var(--hj-purpose-ink) 30%, transparent);
+  --hj-purpose-placeholder: #343c37;
+  --hj-purpose-placeholder: color-mix(in srgb, var(--hj-purpose-bg) 86%, var(--hj-purpose-ink));
+  /* The CTA is the outline variant, which inverts to a solid fill on hover, so
+     its two tokens have to track the panel or the hover state goes invisible. */
+  --eden-action-ink: var(--hj-purpose-bg);
+  --eden-action-on-ink: var(--hj-purpose-ink);
+  --eden-action-border-light: rgba(255, 255, 255, .8);
+  --eden-action-border-light: color-mix(in srgb, var(--hj-purpose-ink) 80%, transparent);
+  padding: 0;
+  background: var(--hj-purpose-bg);
+  color: var(--hj-purpose-ink);
+}
 .hj-purpose { display: grid; min-height: 590px; grid-template-columns: 1.05fr .95fr; }
-.hj-purpose__image { min-height: 590px; background: #343c37; }
+.hj-purpose__image { min-height: 590px; background: var(--hj-purpose-placeholder); }
 .hj-purpose__content { align-self: center; max-width: 720px; padding: clamp(42px, 7vw, 100px); }
-.hj-purpose h2 { color: #fff; }
+.hj-purpose h2 { color: var(--hj-purpose-ink); }
 .hj-purpose .hj-eyebrow,
-.hj-purpose .hj-description { color: rgba(255,255,255,.76); }
-.hj-proof-points { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 52px; padding-top: 19px; border-top: 1px solid rgba(255,255,255,.3); }
+.hj-purpose .hj-description { color: var(--hj-purpose-muted); }
+.hj-proof-points { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 52px; padding-top: 19px; border-top: 1px solid var(--hj-purpose-line); }
 .hj-proof-points span { font-size: 1.05rem; letter-spacing: .11em; line-height: 1.5; text-transform: uppercase; }
 
 .homepage-journey--experience { background: #f5f3ef; }
@@ -70,17 +126,32 @@
 
 @media (max-width: 680px) {
   .homepage-journey { padding: 42px 20px; }
+  /* The dark panel runs edge to edge on desktop. On mobile it keeps only a thin
+     strip of the panel colour around the photo -- spelled out here so it reads
+     as a decision rather than a side effect of the rule above overriding
+     .homepage-journey--purpose { padding: 0 }. */
+  .homepage-journey--purpose { padding: 8px; }
   .hj-discover,
   .hj-purpose { grid-template-columns: 1fr; }
+  /* Grid items default to min-width: auto, so neither column may force the
+     track wider than the screen. */
+  .hj-discover > *,
+  .hj-purpose > * { min-width: 0; }
   .hj-discover__media { min-height: 0; aspect-ratio: 1 / 1.05; }
   .hj-discover__copy { padding: 8px 0 0; }
   .hj-discover h2,
   .hj-purpose h2,
   .hj-section-intro h2 { font-size: clamp(3rem, 9vw, 4.2rem); }
-  .hj-products__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; }
   .hj-products__heading { align-items: flex-end; }
-  .hj-products__heading h3 { font-size: 2.3rem; }
-  .hj-purpose__image { min-height: 320px; aspect-ratio: 1.2; }
+  .hj-product__title { margin-top: 14px; }
+  .hj-product__price { margin-top: 10px; }
+  /* The min-height has to go when the ratio comes in: an item with an aspect
+     ratio and a definite height takes height x ratio as its automatic minimum
+     width -- 320 x 1.2 = 384px, wider than a phone -- which pushed this column
+     and the page with it past the viewport, so the gutter showed on the left
+     and was shoved off-screen on the right. .hj-discover__media above already
+     zeroes it for the same reason. */
+  .hj-purpose__image { min-height: 0; aspect-ratio: 1.2; }
   .hj-purpose__content { padding: 42px 24px; }
   .hj-proof-points { gap: 10px; margin-top: 34px; }
   .hj-proof-points span { font-size: .95rem; }

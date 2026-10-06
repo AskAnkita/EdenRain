@@ -128,7 +128,9 @@
           # The tiles are looked up under the tab's name, not the heading above them
           assign group_collection = blank
           assign group_sections = ''
-          if group_source == 'products'
+          if group_source == 'featured'
+            # the cards come from 'menu-featured-cards', not from collections
+          elsif group_source == 'products'
             assign group_collection = collections[group_handle]
           else
             capture group_sections_source
@@ -137,16 +139,24 @@
             assign group_sections = group_sections_source | strip
           endif
         -%}
-        {%- render 'header-menu-drawer-tiles',
-          group_id: group_id,
-          group_title: group_heading,
-          group_url: group_url,
-          tile_collection: group_collection,
-          static_sections: group_sections,
-          top_title: link.title,
-          top_url: link.url,
-          active: forloop.first
-        -%}
+        {%- if group_source == 'featured' -%}
+          {%- render 'header-menu-drawer-featured',
+            group_id: group_id,
+            top_title: link.title,
+            active: forloop.first
+          -%}
+        {%- else -%}
+          {%- render 'header-menu-drawer-tiles',
+            group_id: group_id,
+            group_title: group_heading,
+            group_url: group_url,
+            tile_collection: group_collection,
+            static_sections: group_sections,
+            top_title: link.title,
+            top_url: link.url,
+            active: forloop.first
+          -%}
+        {%- endif -%}
       {%- endfor -%}
     {%- else -%}
       {%- for child in link.links -%}

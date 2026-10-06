@@ -6,6 +6,7 @@
   const HOVER_DELAY = 120;
   const CLOSE_DELAY = 200;
   const desktop = window.matchMedia('(min-width: 990px)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   let activeRoot = null;
   let activeTrigger = null;
@@ -28,6 +29,23 @@
         button.addEventListener('mouseenter', activate);
         button.addEventListener('click', activate);
         button.addEventListener('focus', activate);
+      });
+
+      root.querySelectorAll('[data-menu-drawer-video]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const video = button.closest('.menu-drawer-desktop__feature')?.querySelector('video');
+          if (!video) return;
+          // A visitor who pauses a card keeps it paused for the rest of the visit, even
+          // after switching tabs and coming back
+          if (video.paused) {
+            delete video.dataset.menuDrawerPaused;
+            video.play().catch(() => {});
+          } else {
+            video.dataset.menuDrawerPaused = 'true';
+            video.pause();
+          }
+          markToggle(button, video);
+        });
       });
 
       root.querySelectorAll('[data-menu-drawer-product]').forEach((button) => {
@@ -101,6 +119,8 @@
     }
     activeRoot = root;
     activeTrigger = trigger;
+    // after activeRoot, which is what syncVideos reads to tell an open panel from a closed one
+    syncVideos(page);
   }
 
   function showGroup(button) {
@@ -108,6 +128,32 @@
     const groupId = button.dataset.menuDrawerCategory;
     page.querySelectorAll('[data-menu-drawer-category]').forEach((b) => b.classList.toggle('is-active', b === button));
     page.querySelectorAll('[data-menu-drawer-group]').forEach((g) => (g.hidden = g.dataset.menuDrawerGroup !== groupId));
+    syncVideos(page);
+  }
+
+  function markToggle(button, video) {
+    button.classList.toggle('is-paused', video.paused);
+    const caption = (button.getAttribute('aria-label') || '').replace(/^(Play|Pause) video, /, '');
+    button.setAttribute('aria-label', `${video.paused ? 'Play' : 'Pause'} video, ${caption}`);
+  }
+
+  // The featured cards are the only videos in the menu. They carry preload="none" and are
+  // left alone until their tab is open, so a menu nobody opens costs no bandwidth, and a
+  // tab the visitor has left stops rather than playing on out of sight.
+  function syncVideos(scope) {
+    (scope || document).querySelectorAll('[data-menu-drawer-group] video').forEach((video) => {
+      const group = video.closest('[data-menu-drawer-group]');
+      const page = video.closest('[data-menu-drawer-page]');
+      const visible = group && !group.hidden && page && !page.hidden && activeRoot;
+      const toggle = video.closest('.menu-drawer-desktop__feature')?.querySelector('[data-menu-drawer-video]');
+
+      if (!visible || reducedMotion.matches || video.dataset.menuDrawerPaused) {
+        video.pause();
+      } else {
+        video.play().catch(() => {});
+      }
+      if (toggle) markToggle(toggle, video);
+    });
   }
 
   function showProduct(button) {
@@ -131,6 +177,7 @@
     document.querySelectorAll('[data-menu-drawer-trigger]').forEach((t) => t.setAttribute('aria-expanded', 'false'));
     root.classList.remove('is-open');
     activeRoot = null;
+    root.querySelectorAll('video').forEach((video) => video.pause());
     activeTrigger = null;
     if (immediate) {
       root.hidden = true;

@@ -10,8 +10,9 @@
   Outputs "Tab|collection-handle|source|Heading" entries separated by commas:
   - Tab is the label in the left-hand column
   - collection-handle is where the heading links; "-" leaves the heading as plain text
-  - source is "items" (tiles come from 'menu-static-items' for a group of this tab's name)
-    or "products" (tiles are that collection's products)
+  - source is "items" (tiles come from 'menu-static-items' for a group of this tab's name),
+    "products" (tiles are that collection's products), or "featured" (the four large cards
+    from 'menu-featured-cards' instead of tiles)
   - Heading is the title above the tiles
 {% endcomment %}
 
@@ -23,9 +24,10 @@
       echo 'By Style|-|items|Shop All'
       echo ',By Shape|-|items|Shop All'
       echo ',By Metal|-|items|Shop All'
+      echo ',Featured|-|featured|Featured'
     when 'wedding'
       echo 'By Style|-|items|Shop All'
-      echo ',Featured|-|items|Featured'
+      echo ',Featured|-|featured|Featured'
     when 'diamonds'
       echo 'Lab-Grown Diamonds|lab-grown-diamonds|items|Shop All'
       echo ',Learn|-|items|Learn'
@@ -33,6 +35,6 @@
       echo 'Earrings|earrings|items|Shop All Earrings'
       echo ',Necklaces|necklaces|items|Shop All Necklaces'
       echo ',Bracelets|bracelets|items|Shop All Bracelets'
-      echo ',Featured|-|items|Featured'
+      echo ',Featured|-|featured|Featured'
   endcase
 -%}

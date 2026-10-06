@@ -27,7 +27,8 @@
 
 {%- style -%}
   #category-tiles-{{ section.id }} {
-    --ct-arrow-size: 56px;
+    /* --er-arrow-size is the shared scroller arrow size, set in assets/base.css */
+    --ct-arrow-size: var(--er-arrow-size, 40px);
     padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
   }
 
@@ -82,16 +83,6 @@
     text-decoration: none;
   }
 
-  #category-tiles-{{ section.id }} .ct-link::after {
-    position: absolute;
-    inset: 45% 0 0;
-    background: linear-gradient(transparent, rgb(0 0 0 / 0.16));
-    content: "";
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-  }
-
   #category-tiles-{{ section.id }} .ct-link:focus-visible {
     outline: 3px solid #111;
     outline-offset: 4px;
@@ -111,31 +102,52 @@
     transform: scale(1.06);
   }
 
-  #category-tiles-{{ section.id }} .ct-link:hover::after,
-  #category-tiles-{{ section.id }} .ct-link:focus-visible::after {
-    opacity: 1;
-  }
-
-  /* The chip's look comes from .eden-action--invert in assets/eden-actions.css.
-     This rule only places it on the picture and lifts it on hover. */
+  /* A permanent text label keeps the tile simple; its full underline closes
+     into the centre while the tile is hovered. */
   #category-tiles-{{ section.id }} .ct-label {
     position: absolute;
     left: 50%;
     bottom: 2.4rem;
     z-index: 1;
+    display: inline-block;
+    padding-bottom: 0.9rem;
+    color: #111;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    line-height: 1.2;
+    text-transform: uppercase;
     transform: translateX(-50%);
-    box-shadow: 0 0.4rem 1.6rem rgb(0 0 0 / 0.12);
-    transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+    text-shadow: 0 0 0.8rem rgb(255 255 255 / 0.65);
   }
 
-  #category-tiles-{{ section.id }} .ct-link:hover .ct-label,
-  #category-tiles-{{ section.id }} .ct-link:focus-visible .ct-label {
-    transform: translateX(-50%) translateY(-0.4rem);
-    box-shadow: 0 0.8rem 2.4rem rgb(0 0 0 / 0.24);
+  #category-tiles-{{ section.id }} .ct-label::before,
+  #category-tiles-{{ section.id }} .ct-label::after {
+    position: absolute;
+    bottom: 0;
+    width: 50%;
+    height: 1px;
+    background: currentColor;
+    content: "";
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  #category-tiles-{{ section.id }} .ct-link:active .ct-label {
-    transform: translateX(-50%) translateY(-0.1rem) scale(0.97);
+  #category-tiles-{{ section.id }} .ct-label::before {
+    left: 0;
+    transform-origin: right center;
+  }
+
+  #category-tiles-{{ section.id }} .ct-label::after {
+    right: 0;
+    transform-origin: left center;
+  }
+
+  #category-tiles-{{ section.id }} .ct-link:hover .ct-label::before,
+  #category-tiles-{{ section.id }} .ct-link:focus-visible .ct-label::before,
+  #category-tiles-{{ section.id }} .ct-link:hover .ct-label::after,
+  #category-tiles-{{ section.id }} .ct-link:focus-visible .ct-label::after {
+    transform: scaleX(0);
   }
 
   #category-tiles-{{ section.id }} .ct-arrow {
@@ -146,20 +158,38 @@
     place-items: center;
     width: var(--ct-arrow-size);
     height: var(--ct-arrow-size);
+    /* The same white disc as every other scroller, set in assets/base.css */
     border: 0;
     border-radius: 50%;
-    background: #e4e2df;
-    box-shadow: 0 0.4rem 1.6rem rgb(0 0 0 / 0.12);
+    background: #fff;
+    box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
     color: #1a1a1a;
     cursor: pointer;
     transform: translateY(-50%);
-    transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    transition: opacity 0.2s ease, box-shadow 0.2s ease;
   }
 
-  #category-tiles-{{ section.id }} .ct-arrow:hover,
-  #category-tiles-{{ section.id }} .ct-arrow:focus-visible {
-    background: #000;
-    color: #fff;
+  /* Hover draws a ring in from the middle of the disc to its edge */
+  #category-tiles-{{ section.id }} .ct-arrow::after {
+    position: absolute;
+    inset: 0;
+    border: 1.5px solid #1a1a1a;
+    border-radius: 50%;
+    content: "";
+    opacity: 0;
+    transform: scale(0.7);
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.22s ease;
+    pointer-events: none;
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow:hover::after,
+  #category-tiles-{{ section.id }} .ct-arrow:focus-visible::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow:active {
+    transform: translateY(-50%) scale(0.9);
   }
 
   #category-tiles-{{ section.id }} .ct-arrow[disabled] {
@@ -176,7 +206,7 @@
   }
 
   #category-tiles-{{ section.id }} .ct-arrow .icon {
-    width: var(--arrow-icon-size);
+    width: var(--er-arrow-icon-size, 1.4rem);
   }
 
   #category-tiles-{{ section.id }} .ct-arrow--prev .icon-caret { transform: rotate(90deg); }
@@ -184,8 +214,14 @@
   #category-tiles-{{ section.id }} .ct-arrow--prev .icon-arrow { transform: rotate(180deg); }
 
   #category-tiles-{{ section.id }} .ct-progress {
-    height: 2px;
+    width: 100%;
+    max-width: min(280px, calc(100% - 40px));
+    height: 3px;
     margin-top: 2.8rem;
+    margin-left: 0;
+    margin-right: auto;
+    border-radius: 999px;
+    overflow: hidden;
     background: rgb(0 0 0 / 0.1);
   }
 
@@ -194,17 +230,8 @@
     height: 100%;
     width: var(--ct-progress, 50%);
     background: #111;
+    border-radius: 999px;
     transition: width 0.2s ease;
-  }
-
-  @media screen and (max-width: 1399px) {
-    #category-tiles-{{ section.id }} {
-      --ct-arrow-size: 40px;
-    }
-
-    #category-tiles-{{ section.id }} .ct-arrow .icon {
-      width: 1.4rem;
-    }
   }
 
   #category-tiles-{{ section.id }} .ct-empty {
@@ -220,13 +247,23 @@
   }
 
   @media screen and (max-width: 749px) {
+    #category-tiles-{{ section.id }} {
+      padding-block-start: 12px;
+    }
+
     #category-tiles-{{ section.id }} .ct-inner {
       padding-inline: 1.6rem;
     }
 
     #category-tiles-{{ section.id }} .ct-track {
-      grid-auto-columns: 72%;
+      grid-auto-columns: 100%;
       gap: 1.2rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #category-tiles-{{ section.id }} .ct-tile {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
     }
 
     #category-tiles-{{ section.id }} .ct-arrow {
@@ -237,8 +274,9 @@
   @media (prefers-reduced-motion: reduce) {
     #category-tiles-{{ section.id }} .ct-track { scroll-behavior: auto; }
     #category-tiles-{{ section.id }} .ct-link img,
-    #category-tiles-{{ section.id }} .ct-link::after,
-    #category-tiles-{{ section.id }} .ct-label { transition: none; }
+    #category-tiles-{{ section.id }} .ct-label,
+    #category-tiles-{{ section.id }} .ct-label::before,
+    #category-tiles-{{ section.id }} .ct-label::after { transition: none; }
   }
 {%- endstyle -%}
 
@@ -297,7 +335,7 @@
                   <img
                     src="{{ tile_asset | asset_img_url: '900x' }}"
                     srcset="{{ tile_asset | asset_img_url: '450x' }} 450w, {{ tile_asset | asset_img_url: '700x' }} 700w, {{ tile_asset | asset_img_url: '900x' }} 900w, {{ tile_asset | asset_img_url: '1200x' }} 1200w"
-                    sizes="(min-width: 990px) 25vw, 72vw"
+                    sizes="(min-width: 990px) 25vw, 100vw"
                     alt="{{ link.title | escape }}"
                     width="1122"
                     height="1402"
@@ -305,9 +343,9 @@
                     data-ct-asset
                   >
                 {%- elsif tile_image != blank -%}
-                  {{ tile_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, 72vw', alt: link.title }}
+                  {{ tile_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, 100vw', alt: link.title }}
                 {%- endif -%}
-                <span class="ct-label eden-action eden-action--invert">{{ link.title | escape }}</span>
+                <span class="ct-label">{{ link.title | escape }}</span>
               </a>
             </li>
           {%- endfor -%}
