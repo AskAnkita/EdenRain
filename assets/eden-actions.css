@@ -1,0 +1,182 @@
+/*
+  Eden actions - the one place that decides what a call to action looks like.
+
+  Every button and link outside the theme's own .button system should use one of
+  these classes instead of rolling its own border, padding and type. The shape,
+  padding, weight and case come from the theme's button settings, so changing
+  "Buttons" in the theme editor moves these in step with add-to-cart and the cart.
+
+  Buttons           .eden-action plus one variant:
+    --solid           filled ink, for the main action on a light background
+    --outline         ink outline, for a second action on a light background
+    --light           white outline, for an action on a dark background
+    --invert          filled white, for an action sitting on a photo
+
+  Links             .eden-link, with .eden-link--light on a dark background.
+  Arrow             .eden-action__arrow on the glyph inside either.
+
+  A button that sits inside a larger clickable area (a whole tile that is one
+  link) also needs .eden-action-host on that outer link, so the button reacts
+  when any part of the tile is hovered rather than only the button itself.
+*/
+
+:root {
+  --eden-action-ink: #171714;
+  --eden-action-on-ink: #ffffff;
+  --eden-action-rule: rgba(23, 23, 20, 0.22);
+  --eden-action-rule-light: rgba(255, 255, 255, 0.45);
+  --eden-action-border-light: rgba(255, 255, 255, 0.8);
+  --eden-action-font-size: 1.25rem;
+  --eden-action-tracking: 0.12em;
+}
+
+.eden-action,
+.eden-link {
+  font-family: var(--button-font-family-primary, var(--font-body--family));
+  font-size: var(--eden-action-font-size);
+  font-weight: var(--button-font-weight-primary, 500);
+  letter-spacing: var(--eden-action-tracking);
+  line-height: 1;
+  text-decoration: none;
+  text-transform: var(--button-text-case-primary, uppercase);
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------------ buttons */
+
+.eden-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  border: var(--style-border-width-primary, 0.1rem) solid transparent;
+  border-radius: var(--style-border-radius-buttons-primary, 0);
+  padding: var(--button-padding-vertical-mobile, 1.2rem) var(--button-padding-horizontal-mobile, 1.6rem);
+  background: transparent;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+@media screen and (min-width: 750px) {
+  .eden-action {
+    padding: var(--button-padding-vertical, 1.2rem) var(--button-padding-horizontal, 3.2rem);
+  }
+}
+
+.eden-action--solid {
+  border-color: var(--eden-action-ink);
+  background: var(--eden-action-ink);
+  color: var(--eden-action-on-ink);
+}
+
+.eden-action--outline {
+  border-color: var(--eden-action-ink);
+  color: var(--eden-action-ink);
+}
+
+.eden-action--light {
+  border-color: var(--eden-action-border-light);
+  color: var(--eden-action-on-ink);
+}
+
+.eden-action--invert {
+  border-color: var(--eden-action-on-ink);
+  background: var(--eden-action-on-ink);
+  color: var(--eden-action-ink);
+}
+
+/*
+  Hover and keyboard focus swap the fill and the text, whichever way round the
+  variant started. The .eden-action-host selectors cover a button that is part
+  of a bigger link, where the pointer is over the tile and not over the button.
+*/
+@media (hover: hover) {
+  .eden-action--solid:hover,
+  .eden-action-host:hover .eden-action--solid {
+    background: transparent;
+    color: var(--eden-action-ink);
+  }
+
+  .eden-action--outline:hover,
+  .eden-action-host:hover .eden-action--outline,
+  .eden-action--invert:hover,
+  .eden-action-host:hover .eden-action--invert {
+    border-color: var(--eden-action-ink);
+    background: var(--eden-action-ink);
+    color: var(--eden-action-on-ink);
+  }
+
+  .eden-action--light:hover,
+  .eden-action-host:hover .eden-action--light {
+    border-color: var(--eden-action-on-ink);
+    background: var(--eden-action-on-ink);
+    color: var(--eden-action-ink);
+  }
+}
+
+.eden-action--solid:focus-visible,
+.eden-action-host:focus-visible .eden-action--solid {
+  background: transparent;
+  color: var(--eden-action-ink);
+}
+
+.eden-action--outline:focus-visible,
+.eden-action-host:focus-visible .eden-action--outline,
+.eden-action--invert:focus-visible,
+.eden-action-host:focus-visible .eden-action--invert {
+  border-color: var(--eden-action-ink);
+  background: var(--eden-action-ink);
+  color: var(--eden-action-on-ink);
+}
+
+.eden-action--light:focus-visible,
+.eden-action-host:focus-visible .eden-action--light {
+  border-color: var(--eden-action-on-ink);
+  background: var(--eden-action-on-ink);
+  color: var(--eden-action-ink);
+}
+
+/* -------------------------------------------------------------------- links */
+
+.eden-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: var(--style-border-width, 1px) solid var(--eden-action-rule);
+  color: var(--eden-action-ink);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.eden-link--light {
+  border-bottom-color: var(--eden-action-rule-light);
+  color: var(--eden-action-on-ink);
+}
+
+.eden-link:hover,
+.eden-link:focus-visible,
+.eden-action-host:hover .eden-link {
+  border-bottom-color: currentcolor;
+}
+
+/* -------------------------------------------------------------------- arrow */
+
+.eden-action__arrow {
+  font-size: 1.5em;
+  line-height: 0.7;
+}
+
+/* ------------------------------------------------------------------- focus */
+
+.eden-action:focus-visible,
+.eden-link:focus-visible {
+  outline: var(--focus-outline-width, 2px) solid currentcolor;
+  outline-offset: var(--focus-outline-offset, 0.2em);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eden-action,
+  .eden-link {
+    transition: none;
+  }
+}

@@ -3550,5 +3550,39 @@
         "visible_if": "{{ settings.enable_preloading_screen == true }}"
       }
     ]
+  },
+  {
+    "name": "Metal swatches",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Upload a plain coloured circle for each metal. The karat text (10K, 14K, SS\u2026) is drawn on top, so leave the image blank to keep the built-in gradient. Square images around 120\u00d7120px work best."
+      },
+      {
+        "type": "image_picker",
+        "id": "metal_swatch_image_yellow",
+        "label": "Yellow gold"
+      },
+      {
+        "type": "image_picker",
+        "id": "metal_swatch_image_white",
+        "label": "White gold"
+      },
+      {
+        "type": "image_picker",
+        "id": "metal_swatch_image_rose",
+        "label": "Rose gold"
+      },
+      {
+        "type": "image_picker",
+        "id": "metal_swatch_image_platinum",
+        "label": "Platinum"
+      },
+      {
+        "type": "image_picker",
+        "id": "metal_swatch_image_silver",
+        "label": "Sterling silver"
+      }
+    ]
   }
 ]

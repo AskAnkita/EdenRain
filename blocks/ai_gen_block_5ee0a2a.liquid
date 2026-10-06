@@ -329,20 +329,18 @@
     border-radius: 0;
     border: 0;
     box-shadow: none;
-    background: #f6f6f4;
+    background: #f8f8f8;
   }
 
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-wrapper-{{ ai_gen_id }} {
     position: absolute;
     inset: 0;
-    background: #f6f6f4;
+    background: #f8f8f8;
   }
 
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-{{ ai_gen_id }} {
     object-fit: contain;
     transform: scale(0.74);
-    -webkit-mask-image: radial-gradient(ellipse 88% 88% at 50% 50%, black 70%, transparent 100%);
-    mask-image: radial-gradient(ellipse 88% 88% at 50% 50%, black 70%, transparent 100%);
   }
 
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-hover-image-{{ ai_gen_id }} {
@@ -628,7 +626,7 @@
   }
 {% endstyle %}
 
-<collection-carousel-{{ ai_gen_id }} class="ai-collection-carousel-{{ ai_gen_id }}{% if block.settings.use_diamond_shape_placeholders %} is-diamond-shape{% endif %}{% if block.settings.heading == 'Find Your Shape' %} is-shape-grid{% endif %}"{% if block.settings.heading == 'FIND YOUR STYLE' %} id="find-your-style"{% elsif block.settings.heading == 'Find Your Shape' %} id="find-your-shape"{% endif %} {{ block.shopify_attributes }}>
+<collection-carousel-{{ ai_gen_id }} class="ai-collection-carousel-{{ ai_gen_id }}{% if block.settings.use_diamond_shape_placeholders or block.settings.use_placeholder_images %} is-diamond-shape{% endif %}{% if block.settings.heading == 'Find Your Shape' %} is-shape-grid{% endif %}"{% if block.settings.heading == 'FIND YOUR STYLE' %} id="find-your-style"{% elsif block.settings.heading == 'Find Your Shape' %} id="find-your-shape"{% endif %} {{ block.shopify_attributes }}>
   <div class="ai-collection-carousel-container-{{ ai_gen_id }}">
     {% if block.settings.heading != blank %}
       <h2 class="ai-collection-carousel-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>

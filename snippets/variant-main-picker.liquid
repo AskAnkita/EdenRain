@@ -107,6 +107,12 @@
             assign variant_style = 'swatch'
           endif
         endif
+
+        assign is_size = false
+        if option_name contains 'size'
+          assign is_size = true
+          assign variant_style = 'dropdowns'
+        endif
       -%}
       {%- unless skip_combined_color_option -%}
       {%- if variant_style == 'pills' or variant_style == 'swatch' -%}
@@ -124,6 +130,7 @@
             swatch_type: swatch_type,
             swatch_size: swatch_size,
             is_color: is_color,
+            is_size: is_size,
             index: forloop.index0,
             product: product_resource,
             show_variant_media_grouped: show_variant_media_grouped
@@ -137,12 +144,32 @@
             assign new_width = settings.variant_swatch_width | times: 1.0 | divided_by: settings.variant_swatch_height | times: 20
           endif
         %}
-        <div class="product-form__input product-form__input--dropdown variant-option variant-option--dropdowns">
+        <div class="product-form__input product-form__input--dropdown variant-option variant-option--dropdowns{% if is_size %} variant-option--size{% endif %}">
           <label class="form__label" for="Option-{{ block.id }}-{{ forloop.index0 }}">
-            {{ product_option.name  | escape }}:
-            <span data-selected-value>
-              {{- product_option.selected_value -}}
+            <span class="variant-option__label-title">
+              {%- if is_size and option_name contains 'ring' -%}
+                U.S. Ring Size:
+              {%- elsif is_size and option_name == 'size' -%}
+                U.S. Ring Size:
+              {%- else -%}
+                {{ product_option.name  | escape }}:
+              {%- endif -%}
             </span>
+            {%- if is_size -%}
+              <a
+                href="#size-chart"
+                class="size-guide-link"
+                role="button"
+                tabindex="0"
+                onclick="event.preventDefault(); const opener = document.querySelector('side-drawer-opener.size-chart button, [data-side-drawer*=&quot;size&quot;] button, side-drawer-opener[data-side-drawer*=&quot;Size&quot;] button'); if (opener) { opener.click(); } else { window.open('/pages/er-sizing', '_blank'); }"
+              >
+                Size Guide
+              </a>
+            {%- else -%}
+              <span data-selected-value>
+                {{- product_option.selected_value -}}
+              </span>
+            {%- endif -%}
           </label>
           <div
             class="select variant-option__select-wrapper"
@@ -159,6 +186,7 @@
               swatch_type: swatch_type,
               swatch_size: swatch_size,
               is_color: is_color,
+              is_size: is_size,
               index: forloop.index0,
               product: product_resource,
               show_variant_media_grouped: show_variant_media_grouped
@@ -168,6 +196,64 @@
       {%- endif -%}
       {%- endunless -%}
     {%- endfor -%}
+
+    {%- liquid
+      assign has_size_option = false
+      for opt in product_resource.options_with_values
+        assign opt_name_check = opt.name | downcase
+        if opt_name_check contains 'size'
+          assign has_size_option = true
+          break
+        endif
+      endfor
+    -%}
+    {%- unless has_size_option -%}
+      {%- liquid
+        assign is_ring = false
+        assign p_title_lower = product_resource.title | downcase
+        assign p_type_lower = product_resource.type | downcase
+        assign p_tags_string = product_resource.tags | join: ' ' | downcase
+        if p_title_lower contains 'ring' or p_type_lower contains 'ring' or p_tags_string contains 'ring'
+          assign is_ring = true
+        endif
+      -%}
+      {%- if is_ring -%}
+        <div class="product-form__input product-form__input--dropdown variant-option variant-option--dropdowns variant-option--size">
+          <label class="form__label" for="Option-{{ block.id }}-ring-size">
+            <span class="variant-option__label-title">U.S. Ring Size:</span>
+            <a
+              href="#size-chart"
+              class="size-guide-link"
+              role="button"
+              tabindex="0"
+              onclick="event.preventDefault(); const opener = document.querySelector('side-drawer-opener.size-chart button, [data-side-drawer*=&quot;size&quot;] button, side-drawer-opener[data-side-drawer*=&quot;Size&quot;] button'); if (opener) { opener.click(); } else { window.open('/pages/er-sizing', '_blank'); }"
+            >
+              Size Guide
+            </a>
+          </label>
+          <div class="select variant-option__select-wrapper">
+            <select
+              id="Option-{{ block.id }}-ring-size"
+              class="select__select variant-option__select"
+              name="properties[Ring Size]"
+              form="{{ 'product-form-' | append: block.id }}"
+              required
+            >
+              <option value="" disabled selected hidden>Select Ring Size</option>
+              {%- assign standard_sizes = '3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12' | split: ',' -%}
+              {%- for sz in standard_sizes -%}
+                <option value="{{ sz }}">Size {{ sz }}</option>
+              {%- endfor -%}
+            </select>
+            <span class="svg-wrapper">
+              <svg aria-hidden="true" focusable="false" class="icon icon-caret" viewBox="0 0 10 6">
+                {%- render 'icon', icon: 'caret' -%}
+              </svg>
+            </span>
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endunless -%}
 
     <script type="application/json" data-selected-variant>
       {{ product_resource.selected_or_first_available_variant | json }}

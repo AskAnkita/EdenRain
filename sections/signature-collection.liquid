@@ -75,8 +75,9 @@
     max-width: 80%;
     max-height: 100%;
     object-fit: contain;
-    /* Blend white product-photo backgrounds into the card colour */
-    mix-blend-mode: multiply;
+    /* No mix-blend-mode here. The renders are on #f8f8f6, not white, so blending
+       them into the card colour darkened each photo to #f1f1f0 and left a visible
+       rectangle inside the lighter card -- the picture only covers 80% of it. */
     transition: transform 0.4s ease;
   }
 

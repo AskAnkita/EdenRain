@@ -116,37 +116,22 @@
     opacity: 1;
   }
 
+  /* The chip's look comes from .eden-action--invert in assets/eden-actions.css.
+     This rule only places it on the picture and lifts it on hover. */
   #category-tiles-{{ section.id }} .ct-label {
     position: absolute;
     left: 50%;
     bottom: 2.4rem;
     z-index: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
     transform: translateX(-50%);
-    padding: 1rem 1.6rem;
-    border: 1px solid rgb(255 255 255 / 0.85);
-    background: rgb(255 255 255 / 0.96);
     box-shadow: 0 0.4rem 1.6rem rgb(0 0 0 / 0.12);
-    color: #111;
-    font-family: var(--font-body--family);
-    font-size: 1.3rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
 
   #category-tiles-{{ section.id }} .ct-link:hover .ct-label,
   #category-tiles-{{ section.id }} .ct-link:focus-visible .ct-label {
     transform: translateX(-50%) translateY(-0.4rem);
-    border-color: #111;
-    background: #111;
     box-shadow: 0 0.8rem 2.4rem rgb(0 0 0 / 0.24);
-    color: #fff;
   }
 
   #category-tiles-{{ section.id }} .ct-link:active .ct-label {
@@ -306,7 +291,7 @@
               endif
             -%}
             <li class="ct-tile">
-              <a class="ct-link" href="{{ link.url }}">
+              <a class="ct-link eden-action-host" href="{{ link.url }}">
                 {%- if tile_asset != blank -%}
                   {%- comment -%} The shipped pictures are 1122x1402; the CDN resizes them here. {%- endcomment -%}
                   <img
@@ -322,7 +307,7 @@
                 {%- elsif tile_image != blank -%}
                   {{ tile_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, 72vw', alt: link.title }}
                 {%- endif -%}
-                <span class="ct-label">{{ link.title | escape }}</span>
+                <span class="ct-label eden-action eden-action--invert">{{ link.title | escape }}</span>
               </a>
             </li>
           {%- endfor -%}

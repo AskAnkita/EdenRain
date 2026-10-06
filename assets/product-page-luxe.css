@@ -11,21 +11,29 @@
   --pdp-ink-soft: rgb(var(--color-foreground-rgb) / 0.62);
   --pdp-label-size: 1.3rem;
   --pdp-label-tracking: 0.1em;
+
+  /* The backdrop the product renders are actually shot on. A gallery tile shows
+     this wherever the picture does not reach, so the two have to agree. If the
+     renders ever change, read a corner pixel off one and put the value here --
+     this is the only place the gallery decides what colour sits behind a photo. */
+  --pdp-render-backdrop: #f8f8f6;
 }
 
 /* ---------- Gallery: two images side by side, then one wide, repeating ---------- */
 .template-product .media-gallery__grid-item {
-  background: #f6f6f4;
+  background: var(--pdp-render-backdrop);
 }
 
-/* Product shots are on white; multiply sinks the white into the grey tile */
-.template-product .media-gallery__grid-item img {
-  mix-blend-mode: multiply;
-}
+/* There was a mix-blend-mode: multiply here, on the assumption that the renders
+   were shot on pure white and the blend would sink that white into a grey tile.
+   The renders are on #f8f8f6, not white, so instead of disappearing the blend
+   darkened every photo by 3.5% -- diamonds and metal included -- and left each
+   tile a different grey depending on its own picture's backdrop. The tile now
+   simply matches the renders, so a photo shows exactly as it was rendered. */
 
 @media screen and (min-width: 750px) {
   .template-product .media-gallery--two-column .media-gallery__grid {
-    gap: 1rem;
+    gap: var(--image-gap, 0.4rem);
   }
 
   /* Every third tile runs full width. While a metal filters the gallery the positional
@@ -164,14 +172,15 @@
 /* ---------- Metal swatches: a metal circle with the karat or metal code ---------- */
 .product-form__input--pill input[type='radio'] + label.metal-swatch {
   --metal: linear-gradient(135deg, #f1f1f1, #cfcfcf);
+  /* --metal-image is set inline from the theme setting when an image is uploaded */
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
   vertical-align: top;
-  width: 5.6rem !important;
-  height: 5.6rem !important;
+  width: 4rem !important;
+  height: 4rem !important;
   min-width: 0 !important;
-  margin: 0 1.6rem 1.2rem 0 !important;
+  margin: 0 1rem 1rem 0 !important;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 50% !important;
@@ -191,10 +200,15 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: var(--metal);
+  /* An uploaded circle wins; the gradient stays as the fallback so a metal with
+     no image still looks right. */
+  background-image: var(--metal-image, var(--metal));
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07);
-  font-size: 1.4rem;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1;
   color: #2b2b2b;
@@ -301,31 +315,130 @@
 }
 
 /* ---------- Dropdown options (ring size) ---------- */
-.template-product .variant-option--dropdowns .variant-option__select-wrapper,
-.template-product .variant-option--dropdowns .select {
-  position: relative;
+.template-product .variant-option--dropdowns,
+.template-product .variant-option--size {
   max-width: 34rem;
 }
 
-.template-product .variant-option--dropdowns .select__select {
+.template-product .variant-option--dropdowns .variant-option__select-wrapper,
+.template-product .variant-option--dropdowns .select,
+.template-product .variant-option--size .variant-option__select-wrapper,
+.template-product .variant-option--size .select {
+  position: relative;
+  display: block;
   width: 100%;
-  height: 5.4rem;
-  padding: 0 4.4rem 0 2rem;
+  max-width: 34rem;
+  /* The theme sizes .select to a fixed 4rem; the pill below is 5.2rem, so the
+     wrapper has to follow the select rather than box it in. */
+  height: auto;
+  min-height: 0;
+  background: transparent;
+  /* base.css gives .variant-option__select-wrapper a real border of its own, at
+     --inputs-radius — which this theme sets to 0, so it draws square. The rounded
+     border belongs to the <select> inside it, so the wrapper's has to go or it
+     reads as a second, square box around the pill. Its "overflow: clip" goes with
+     it: that would crop the pill's corners and its focus ring. */
+  border: 0;
+  overflow: visible;
+}
+
+/* Same frame again, drawn a second way: base.css paints .select::after with a
+   box-shadow at --inputs-radius. The wrapper is both .select and
+   .variant-option__select-wrapper, so both layers landed on this one element. */
+.template-product .variant-option--dropdowns .select::before,
+.template-product .variant-option--dropdowns .select::after,
+.template-product .variant-option--size .select::before,
+.template-product .variant-option--size .select::after {
+  display: none !important;
+}
+
+.template-product .variant-option--dropdowns .form__label,
+.template-product .variant-option--size .form__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 34rem;
+  margin-bottom: 1.2rem;
+  gap: 1rem;
+}
+
+.template-product .variant-option--size .variant-option__label-title {
+  font-family: var(--font-body--family);
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--pdp-ink);
+}
+
+.template-product .variant-option--size .size-guide-link {
+  font-family: var(--font-body--family);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--pdp-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+  transition: opacity var(--duration-short) ease;
+}
+
+.template-product .variant-option--size .size-guide-link:hover {
+  opacity: 0.7;
+}
+
+.template-product .variant-option--dropdowns .select__select,
+.template-product .variant-option--size .select__select {
+  width: 100%;
+  height: 5.2rem;
+  padding: 0 4.4rem 0 2.2rem;
   border: 1px solid rgb(var(--color-foreground-rgb) / 0.18);
   border-radius: 999px;
   background: var(--color-background);
-  font-size: 1.6rem;
+  font-family: var(--font-body--family);
+  font-size: 1.5rem;
+  font-weight: 400;
   color: var(--pdp-ink);
   appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   cursor: pointer;
+  outline: none;
+  transition: border-color var(--duration-short) ease;
 }
 
-.template-product .variant-option--dropdowns .svg-wrapper {
+.template-product .variant-option--dropdowns .select__select:focus,
+.template-product .variant-option--size .select__select:focus {
+  border-color: var(--pdp-ink);
+}
+
+/* Same square-corner problem on the keyboard focus ring, which base.css draws
+   at --inputs-radius. Keep the ring — it is the focus indicator — but round it. */
+.template-product .variant-option--dropdowns .select__select:focus-visible,
+.template-product .variant-option--size .select__select:focus-visible {
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 3px var(--pdp-ink);
+  outline: 0;
+}
+
+.template-product .variant-option--dropdowns .svg-wrapper,
+.template-product .variant-option--size .svg-wrapper {
   position: absolute;
   top: 50%;
-  right: 2rem;
+  right: 2.2rem;
   transform: translateY(-50%);
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.template-product .variant-option--dropdowns .svg-wrapper .icon,
+.template-product .variant-option--size .svg-wrapper .icon {
+  width: 1.2rem;
+  height: 0.8rem;
+  color: var(--pdp-ink);
 }
 
 

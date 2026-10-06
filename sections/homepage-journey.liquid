@@ -19,7 +19,7 @@
           <h2>{{ section.settings.heading | escape }}</h2>
           <div class="hj-description">{{ section.settings.description }}</div>
           {% if section.settings.primary_label != blank %}
-            <a class="hj-button" href="{{ section.settings.primary_link | default: routes.all_products_collection_url }}">{{ section.settings.primary_label | escape }} <span aria-hidden="true">↗</span></a>
+            <a class="eden-action eden-action--solid hj-cta" href="{{ section.settings.primary_link | default: routes.all_products_collection_url }}">{{ section.settings.primary_label | escape }} <span class="eden-action__arrow" aria-hidden="true">↗</span></a>
           {% endif %}
           <p class="hj-signature-note">{{ section.settings.supporting_note | escape }}</p>
         </div>
@@ -28,7 +28,7 @@
         <div class="hj-products">
           <div class="hj-products__heading">
             <h3>{{ section.settings.products_heading | escape }}</h3>
-            <a href="{{ section.settings.collection.url }}">Shop all <span aria-hidden="true">↗</span></a>
+            <a class="eden-link" href="{{ section.settings.collection.url }}">Shop all <span class="eden-action__arrow" aria-hidden="true">↗</span></a>
           </div>
           <div class="hj-products__grid">
             {% for product in section.settings.collection.products limit: 4 %}
@@ -63,7 +63,7 @@
         <h2>{{ section.settings.heading | escape }}</h2>
         <div class="hj-description">{{ section.settings.description }}</div>
         {% if section.settings.primary_label != blank %}
-          <a class="hj-button hj-button--light" href="{{ section.settings.primary_link | default: routes.root_url }}">{{ section.settings.primary_label | escape }} <span aria-hidden="true">↗</span></a>
+          <a class="eden-action eden-action--light hj-cta" href="{{ section.settings.primary_link | default: routes.root_url }}">{{ section.settings.primary_label | escape }} <span class="eden-action__arrow" aria-hidden="true">↗</span></a>
         {% endif %}
         <div class="hj-proof-points">
           {% assign proof_items = section.settings.proof_points | split: '|' %}
@@ -94,7 +94,7 @@
             <p class="hj-eyebrow">{{ section.settings.card_one_eyebrow | escape }}</p>
             <h3>{{ section.settings.card_one_heading | escape }}</h3>
             <p>{{ section.settings.card_one_text | escape }}</p>
-            <a class="hj-text-link" href="{{ section.settings.card_one_link | default: routes.account_register_url }}">{{ section.settings.card_one_label | escape }} <span aria-hidden="true">↗</span></a>
+            <a class="eden-link" href="{{ section.settings.card_one_link | default: routes.account_register_url }}">{{ section.settings.card_one_label | escape }} <span class="eden-action__arrow" aria-hidden="true">↗</span></a>
           </div>
         </article>
         <article class="hj-experience-card">
@@ -109,7 +109,7 @@
             <p class="hj-eyebrow">{{ section.settings.card_two_eyebrow | escape }}</p>
             <h3>{{ section.settings.card_two_heading | escape }}</h3>
             <p>{{ section.settings.card_two_text | escape }}</p>
-            <a class="hj-text-link" href="{{ section.settings.card_two_link | default: routes.root_url }}">{{ section.settings.card_two_label | escape }} <span aria-hidden="true">↗</span></a>
+            <a class="eden-link" href="{{ section.settings.card_two_link | default: routes.root_url }}">{{ section.settings.card_two_label | escape }} <span class="eden-action__arrow" aria-hidden="true">↗</span></a>
           </div>
         </article>
       </div>

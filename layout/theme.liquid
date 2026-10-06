@@ -65,6 +65,9 @@
     {% render 'global-style' %}
 
     {% render 'global-css', direction: direction %}
+
+    {%- comment -%} One shared look for every button and link outside the theme's .button system. {%- endcomment -%}
+    {{ 'eden-actions.css' | asset_url | stylesheet_tag }}
     {%- if template.name == 'collection' -%}
       {{ 'collection-style-row.css' | asset_url | stylesheet_tag }}
     {%- endif -%}

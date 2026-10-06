@@ -358,6 +358,10 @@
             endif
           endif
           if metal != blank
+            # A shop can upload a plain coloured circle per metal in Theme settings
+            # > Metal swatches; the karat text still sits on top of it.
+            assign metal_image_key = 'metal_swatch_image_' | append: metal
+            assign metal_image = settings[metal_image_key]
             assign metal_first_word = value | split: ' ' | first
             assign metal_short = metal_first_word | upcase
             assign metal_first_word_size = metal_first_word | size
@@ -382,6 +386,7 @@
         <label
           for="{{ input_id }}"
           {%- if metal != blank %} class="metal-swatch metal-swatch--{{ metal }}" title="{{ value | escape }}"
+            {%- if metal_image != blank %} style="--metal-image: url('{{ metal_image | image_url: width: 160 | escape }}');"{% endif %}
           {%- elsif shape != blank %} class="shape-swatch shape-swatch--{{ shape }}" title="{{ value | escape }}"
           {%- endif -%}
         >
@@ -402,7 +407,7 @@
         <option
           id="{{ input_id }}"
           value="{{ value | escape }}"
-          {% if value.selected %}
+          {% if value.selected and is_size != true or value.selected and product.selected_variant != blank %}
             selected="selected"
           {% endif %}
           {{ input_dataset }}
@@ -425,7 +430,17 @@
       class="select__select variant-option__select"
       name="options[{{ option.name | escape }}]"
       form="{{ product_form_id }}"
+      {% if is_size %}required{% endif %}
     >
+      {%- if is_size -%}
+        {%- assign placeholder_label = 'Select Ring Size' -%}
+        {%- unless option.name contains 'ring' or option.name contains 'Ring' or option.name == 'size' or option.name == 'Size' -%}
+          {%- assign placeholder_label = 'Select ' | append: option.name -%}
+        {%- endunless -%}
+        <option value="" disabled hidden{% if product.selected_variant == blank %} selected="selected"{% endif %}>
+          {{ placeholder_label }}
+        </option>
+      {%- endif -%}
       {{ product_variants }}
     </select>
     <span class="svg-wrapper">

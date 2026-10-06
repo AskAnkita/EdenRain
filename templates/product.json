@@ -40,7 +40,7 @@
           "settings": {
             "media_presentation": "grid",
             "media_columns": "two",
-            "image_gap": 5,
+            "image_gap": 4,
             "large_first_image": false,
             "loop": true,
             "navigation": "arrows",
