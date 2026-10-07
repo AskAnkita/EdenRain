@@ -1,0 +1,157 @@
+{
+  "sections": {
+    "breadcrumb": {
+      "type": "breadcrumb",
+      "settings": {
+        "section_width": "page-width",
+        "padding-block-start": 24,
+        "padding-block-end": 0
+      }
+    },
+    "education_guides": {
+      "type": "education-guides",
+      "blocks": {
+        "four_cs": {
+          "type": "topic",
+          "settings": {
+            "title": "The 4 C's",
+            "text": "Cut, colour, clarity and carat weight are what decide a diamond's beauty and its price. Of the four, cut does the most for sparkle.",
+            "image_asset": "featured-diamonds-education.jpg",
+            "link": "/pages/diamond-education",
+            "link_label": "Learn more"
+          }
+        },
+        "lab_grown": {
+          "type": "topic",
+          "settings": {
+            "title": "About lab-grown diamonds",
+            "text": "Grown rather than mined, and identical to a mined diamond in chemistry, structure and brilliance - at roughly 40% less.",
+            "image_asset": "lifestyle-princess-ring.jpg",
+            "link": "/pages/lab-grown-diamonds",
+            "link_label": "Learn more"
+          }
+        },
+        "gemstones": {
+          "type": "topic",
+          "settings": {
+            "title": "Lab-grown gemstones",
+            "text": "Real sapphires, rubies and emeralds with the same properties as their mined counterparts, in colours that are hard to find in nature.",
+            "image_asset": "featured-diamonds-gemstones.jpg",
+            "link": "/pages/gemstones",
+            "link_label": "Learn more"
+          }
+        },
+        "comparison": {
+          "type": "topic",
+          "settings": {
+            "title": "Stone comparison",
+            "text": "Where a lab-grown diamond sits next to a simulant such as cubic zirconia or moissanite, and how to tell one from the other.",
+            "image_asset": "lifestyle-emerald-earring.jpg",
+            "link": "/pages/stone-comparison",
+            "link_label": "Learn more"
+          }
+        },
+        "ring_size": {
+          "type": "topic",
+          "settings": {
+            "title": "Find your ring size",
+            "text": "A printable ring sizer, an international conversion chart, and what to do when you are buying a surprise.",
+            "image_asset": "featured-diamonds-sizing.jpg",
+            "link": "/pages/er-sizing",
+            "link_label": "Learn more"
+          }
+        },
+        "metals": {
+          "type": "topic",
+          "settings": {
+            "title": "Find the right metal",
+            "text": "Platinum, and 14K or 18K white, yellow and rose gold - how each wears day to day and which suits which stone.",
+            "image_asset": "menu-tile-plain-metal-wedding-bands.png",
+            "link": "/pages/metal-guide",
+            "link_label": "Learn more"
+          }
+        },
+        "care": {
+          "type": "topic",
+          "settings": {
+            "title": "Jewellery care & cleaning",
+            "text": "How to clean your pieces at home, when to have them checked, and the habits that keep a setting secure for years.",
+            "image_asset": "featured-diamonds-care.jpg",
+            "link": "/pages/jewellery-care",
+            "link_label": "Learn more"
+          }
+        },
+        "glossary": {
+          "type": "topic",
+          "settings": {
+            "title": "Glossary of jewellery terms",
+            "text": "Bezel, pave, culet, girdle - the words you will meet while you shop, in plain language.",
+            "image_asset": "lifestyle-round-necklace.jpg",
+            "link": "/pages/glossary",
+            "link_label": "Learn more"
+          }
+        }
+      },
+      "block_order": [
+        "four_cs",
+        "lab_grown",
+        "gemstones",
+        "comparison",
+        "ring_size",
+        "metals",
+        "care",
+        "glossary"
+      ],
+      "settings": {
+        "eyebrow": "Education & guides",
+        "heading": "Lab-grown diamond & gemstone education",
+        "description": "<p>There is a lot to take in when you are choosing fine diamond and gemstone jewellery, from an engagement ring to a pair of everyday earrings. Explore the guides below to learn about diamonds and gemstones, caring for your jewellery, finding your ring size and more.</p>",
+        "columns": 3,
+        "card_gap": 24,
+        "card_radius": 20,
+        "show_images": true,
+        "image_ratio": "1 / 1",
+        "show_numbers": true,
+        "heading_size": 44,
+        "body_size": 17,
+        "card_title_size": 21,
+        "card_text_size": 15,
+        "color_scheme": "scheme-1",
+        "background": "#fdf9f7",
+        "text_color": "#171714",
+        "muted_text_color": "#5c5a55",
+        "card_background": "#ffffff",
+        "card_border_color": "#ebe4df",
+        "accent_color": "#ead9d1",
+        "show_cta": true,
+        "cta_heading": "Still deciding? Talk it through with us.",
+        "cta_text": "<p>Our team can walk you through stones, settings and sizing, and help you choose with confidence.</p>",
+        "cta_button_label": "Get in touch",
+        "cta_button_link": "/pages/contact",
+        "cta_background": "#ead9d1",
+        "cta_text_color": "#171714",
+        "cta_button_background": "#171714",
+        "cta_button_text_color": "#ffffff",
+        "padding_top": 48,
+        "padding_bottom": 80
+      }
+    },
+    "category_tiles": {
+      "type": "category-tiles",
+      "settings": {
+        "menu": "category",
+        "heading": "Shop the collection",
+        "per_row": 5,
+        "ratio": "3 / 4",
+        "color_scheme": "scheme-1",
+        "padding_top": 0,
+        "padding_bottom": 88
+      }
+    }
+  },
+  "order": [
+    "breadcrumb",
+    "education_guides",
+    "category_tiles"
+  ]
+}

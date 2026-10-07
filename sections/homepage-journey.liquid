@@ -162,13 +162,63 @@
                       endif
                     endfor
                   endif
+
+                  # Hover photo: the next view of the SAME metal the card opens on.
+                  # Every render carries Shopify's media-grouping alt text -- one group per
+                  # metal, "#Jewelry material_Rose gold" and friends -- and the importer
+                  # uploads the views of a colour in sequence, so the next image inside the
+                  # card image's own group is the next angle of that same ring.
+                  # assets/product-metal-media.js reads these same tags on the product page;
+                  # the '#' test mirrors its own, so a product that does not follow the
+                  # convention is left alone rather than guessed at.
+                  assign card_group = card_image.alt | strip | downcase
+                  assign card_group_marker = card_group | slice: 0
+
+                  assign hover_image = null
+                  if card_group != blank and card_group_marker == '#'
+                    assign seen_card_image = false
+                    assign earlier_in_group = null
+                    for image in product.images
+                      assign image_group = image.alt | strip | downcase
+                      unless image_group == card_group
+                        continue
+                      endunless
+                      if image.id == card_image.id
+                        assign seen_card_image = true
+                        continue
+                      endif
+                      if seen_card_image
+                        assign hover_image = image
+                        break
+                      endif
+                      # The card opens on the last view of its metal: wrap back to the
+                      # first rather than leave the metal.
+                      unless earlier_in_group
+                        assign earlier_in_group = image
+                      endunless
+                    endfor
+                    unless hover_image
+                      assign hover_image = earlier_in_group
+                    endunless
+                  endif
                 -%}
                 <li class="hj-product swiper-slide">
                   <a href="{{ product.url }}">
                     <div class="hj-product__media">
                       {% if card_image %}
-                        {% assign product_image_alt = card_image.alt | default: product.title | escape %}
+                        {% comment %}
+                          The alt on these renders is the metal grouping tag, not a
+                          description, so it must not reach a screen reader. The product
+                          title is the useful thing to announce.
+                        {% endcomment %}
+                        {% assign product_image_alt = card_image.alt | default: product.title %}
+                        {% if card_group_marker == '#' %}{% assign product_image_alt = product.title %}{% endif %}
+                        {% assign product_image_alt = product_image_alt | escape %}
                         {{ card_image | image_url: width: 640 | image_tag: loading: 'lazy', widths: '320, 480, 640', alt: product_image_alt }}
+                        {% if hover_image %}
+                          {% assign hover_image_alt = product.title | escape %}
+                          {{ hover_image | image_url: width: 640 | image_tag: loading: 'lazy', widths: '320, 480, 640', alt: hover_image_alt, class: 'hj-product__media-hover' }}
+                        {% endif %}
                       {% else %}
                         {{ 'product-1' | placeholder_svg_tag: 'hj-placeholder' }}
                       {% endif %}

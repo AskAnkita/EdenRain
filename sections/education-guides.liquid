@@ -1,0 +1,630 @@
+{% comment %}
+  Education & Guides - the friendly Learn page.
+
+  Same guides and the same copy as 'learn-hub', re-dressed: a picture at the top
+  of each card, soft rounded corners on a cream field, a pill in place of the
+  bare number, sentence-case titles, a nudging arrow, and a closing panel that
+  offers a person once the reading is done.
+
+  Where a card's picture comes from, in order:
+    1. "Image" on the block, chosen in the theme editor;
+    2. "Image file name" on the block, a file under assets/ (the shipped guides
+       reuse the mega menu's pictures, e.g. featured-diamonds-education.jpg);
+    3. nothing - the card keeps its tint and reads as type, and a file name that
+       does not resolve hides the picture rather than leaving a broken frame.
+
+  Every look is a setting: colours, type sizes, corner radius, columns, image
+  ratio and the closing panel's button all come from the schema below and are
+  written out as custom properties. assets/education-guides.css holds the shape.
+{% endcomment %}
+
+{{ 'education-guides.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign stts = section.settings
+  assign topics = section.blocks
+  assign columns = stts.columns | default: 3
+
+  comment
+    A tablet never shows more than two across, and never more than the desktop
+    count, so a single-column choice stays single all the way up.
+  endcomment
+  assign columns_tablet = 2
+  if columns < 2
+    assign columns_tablet = columns
+  endif
+
+  comment
+    An arbitrary file under assets/ has no size the theme can know, so the img
+    declares the frame's own proportions instead: the ratio chosen in the editor
+    at a nominal 900px wide. .eg-card__media crops to the same ratio, so the
+    declared size is what the picture actually occupies and nothing shifts while
+    it loads. A picture chosen with the image picker carries its real size via
+    image_tag and skips all of this.
+  endcomment
+  assign ratio_parts = stts.image_ratio | split: '/'
+  assign ratio_w = ratio_parts[0] | strip | times: 1
+  assign ratio_h = ratio_parts[1] | strip | times: 1
+  if ratio_w < 1
+    assign ratio_w = 1
+  endif
+  if ratio_h < 1
+    assign ratio_h = 1
+  endif
+  assign asset_width = 900
+  assign asset_height = asset_width | times: ratio_h | divided_by: ratio_w
+-%}
+
+{%- style -%}
+  #education-guides-{{ section.id }} {
+    --eg-columns-desktop: {{ columns }};
+    --eg-columns-tablet: {{ columns_tablet }};
+    --eg-ink: {{ stts.text_color }};
+    --eg-muted: {{ stts.muted_text_color }};
+    --eg-card-bg: {{ stts.card_background }};
+    --eg-card-border: {{ stts.card_border_color }};
+    --eg-accent: {{ stts.accent_color }};
+    --eg-radius: {{ stts.card_radius }}px;
+    --eg-gap: {{ stts.card_gap | divided_by: 10.0 }}rem;
+    --eg-ratio: {{ stts.image_ratio }};
+    --eg-heading-size: {{ stts.heading_size | divided_by: 10.0 }}rem;
+    --eg-body-size: {{ stts.body_size | divided_by: 10.0 }}rem;
+    --eg-card-title-size: {{ stts.card_title_size | divided_by: 10.0 }}rem;
+    --eg-card-text-size: {{ stts.card_text_size | divided_by: 10.0 }}rem;
+    --eg-cta-bg: {{ stts.cta_background }};
+    --eg-cta-ink: {{ stts.cta_text_color }};
+    --eg-btn-bg: {{ stts.cta_button_background }};
+    --eg-btn-ink: {{ stts.cta_button_text_color }};
+    background: {{ stts.background }};
+    color: {{ stts.text_color }};
+    padding-block: {{ stts.padding_top }}px {{ stts.padding_bottom }}px;
+  }
+{%- endstyle -%}
+
+<section
+  id="education-guides-{{ section.id }}"
+  class="education-guides color-{{ stts.color_scheme }}"
+>
+  <div class="eg-shell">
+    <div class="eg-intro">
+      {%- if stts.eyebrow != blank -%}
+        <p class="eg-eyebrow">{{ stts.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      {%- if stts.heading != blank -%}
+        <h1 class="eg-heading">{{ stts.heading | escape }}</h1>
+      {%- endif -%}
+
+      {%- if stts.description != blank -%}
+        <div class="eg-description rte">{{ stts.description }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- if topics.size == 0 -%}
+      <p class="eg-empty">Add a guide to this section in the theme editor.</p>
+    {%- else -%}
+      <ul class="eg-grid" role="list">
+        {%- for block in topics -%}
+          {%- liquid
+            assign title = block.settings.title
+            if title == blank
+              continue
+            endif
+
+            assign badge = block.settings.badge
+            if badge == blank
+              assign badge = forloop.index | prepend: '0' | slice: -2, 2
+            endif
+
+            assign label = block.settings.link_label | default: 'Learn more'
+            assign has_link = false
+            if block.settings.link != blank
+              assign has_link = true
+            endif
+
+            assign picture = block.settings.image
+            assign picture_asset = blank
+            if picture == blank
+              assign picture_asset = block.settings.image_asset | strip
+            endif
+
+            comment
+              Spelt out as nested conditions rather than one `and`/`or` line,
+              because Liquid has no parentheses and reads such a line right to left.
+            endcomment
+            assign has_media = false
+            if stts.show_images
+              if picture != blank or picture_asset != blank
+                assign has_media = true
+              endif
+            endif
+          -%}
+
+          <li class="eg-card" {{ block.shopify_attributes }}>
+            {%- if has_link -%}
+              <a class="eg-card__link eden-action-host" href="{{ block.settings.link }}">
+            {%- else -%}
+              <div class="eg-card__link">
+            {%- endif -%}
+
+              {%- if has_media -%}
+                <div class="eg-card__media">
+                  {%- if picture != blank -%}
+                    {{
+                      picture
+                      | image_url: width: 900
+                      | image_tag:
+                        loading: 'lazy',
+                        sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
+                        alt: title
+                    }}
+                  {%- else -%}
+                    {%- comment -%}
+                      A file under assets/, resized by the CDN. No intrinsic size is
+                      known for an arbitrary file, so the ratio on .eg-card__media
+                      holds the space and the script below hides a 404.
+                    {%- endcomment -%}
+                    <img
+                      src="{{ picture_asset | asset_img_url: '900x' }}"
+                      srcset="
+                        {{ picture_asset | asset_img_url: '450x' }} 450w,
+                        {{ picture_asset | asset_img_url: '700x' }} 700w,
+                        {{ picture_asset | asset_img_url: '900x' }} 900w
+                      "
+                      sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
+                      alt="{{ title | escape }}"
+                      width="{{ asset_width }}"
+                      height="{{ asset_height }}"
+                      loading="lazy"
+                      data-eg-asset
+                    >
+                  {%- endif -%}
+
+                  {%- if stts.show_numbers -%}
+                    <span class="eg-card__badge">{{ badge | escape }}</span>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+              <div class="eg-card__body">
+                {%- if stts.show_numbers and has_media == false -%}
+                  <span class="eg-card__badge">{{ badge | escape }}</span>
+                {%- endif -%}
+
+                <h2 class="eg-card__title">{{ title | escape }}</h2>
+
+                {%- if block.settings.text != blank -%}
+                  <p class="eg-card__text">{{ block.settings.text | escape }}</p>
+                {%- endif -%}
+
+                {%- if has_link -%}
+                  <span class="eg-card__action">
+                    {{- label | escape -}}
+                    <span class="eg-card__arrow" aria-hidden="true">&rarr;</span>
+                  </span>
+                {%- endif -%}
+              </div>
+
+            {%- if has_link -%}
+              </a>
+            {%- else -%}
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if stts.show_cta and stts.cta_heading != blank -%}
+      <div class="eg-cta">
+        <div class="eg-cta__copy">
+          <p class="eg-cta__heading">{{ stts.cta_heading | escape }}</p>
+          {%- if stts.cta_text != blank -%}
+            <div class="eg-cta__text rte">{{ stts.cta_text }}</div>
+          {%- endif -%}
+        </div>
+        {%- if stts.cta_button_label != blank and stts.cta_button_link != blank -%}
+          <a class="eg-cta__button eden-action eden-action--solid" href="{{ stts.cta_button_link }}">
+            {{- stts.cta_button_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{%- comment -%}
+  A card can name a file under assets/ that the shop has not uploaded yet. Rather
+  than leave a broken frame, the picture is dropped and the card carries on as
+  type - the same card the "Show pictures" switch produces.
+{%- endcomment -%}
+<script>
+  (() => {
+    const root = document.getElementById('education-guides-{{ section.id }}');
+    if (!root) return;
+    root.querySelectorAll('img[data-eg-asset]').forEach((img) => {
+      img.addEventListener('error', () => img.closest('.eg-card__media')?.remove());
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Education & guides",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Introduction"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Education & guides"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Everything you need to know, in plain language"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Introduction",
+      "default": "<p>There is a lot to take in when you are choosing fine diamond and gemstone jewellery, from an engagement ring to a pair of everyday earrings. Explore the guides below to learn about diamonds and gemstones, caring for your jewellery, finding your ring size and more.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Guides across on desktop",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3,
+      "info": "A tablet shows at most two, and a phone one."
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Space between cards",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Corner rounding",
+      "min": 0,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "show_images",
+      "label": "Show pictures",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Picture shape",
+      "options": [
+        { "value": "4 / 3", "label": "Landscape (4:3)" },
+        { "value": "3 / 2", "label": "Landscape (3:2)" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 5", "label": "Portrait (4:5)" },
+        { "value": "16 / 9", "label": "Wide (16:9)" }
+      ],
+      "default": "1 / 1",
+      "info": "The guide pictures are portrait, so a square frame keeps more of each one than a landscape crop."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_numbers",
+      "label": "Show the pill on each card",
+      "default": true,
+      "info": "Numbers the guides unless a card sets its own pill text."
+    },
+    {
+      "type": "header",
+      "content": "Type sizes"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 24,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Introduction size",
+      "min": 13,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "label": "Card title size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 21
+    },
+    {
+      "type": "range",
+      "id": "card_text_size",
+      "label": "Card text size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Section background",
+      "default": "#fdf9f7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Headings and titles",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Body text",
+      "default": "#5c5a55"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Card border",
+      "default": "#ebe4df"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Pills and picture tint",
+      "default": "#ead9d1"
+    },
+    {
+      "type": "header",
+      "content": "Closing panel"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show the closing panel",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_heading",
+      "label": "Heading",
+      "default": "Still deciding? Talk it through with us."
+    },
+    {
+      "type": "richtext",
+      "id": "cta_text",
+      "label": "Text",
+      "default": "<p>Our team can walk you through stones, settings and sizing, and help you choose with confidence.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_label",
+      "label": "Button label",
+      "default": "Get in touch"
+    },
+    {
+      "type": "url",
+      "id": "cta_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "color",
+      "id": "cta_background",
+      "label": "Panel background",
+      "default": "#ead9d1"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Panel text",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_background",
+      "label": "Button background",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "topic",
+      "name": "Guide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Description"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "Image file name",
+          "info": "A file under assets/, e.g. featured-diamonds-education.jpg. Used only when no image is chosen above, and ignored if the file is missing."
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Pill text",
+          "info": "Leave empty to number the guide."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Leave empty while the guide is still being written and the card shows as plain text."
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link text",
+          "default": "Learn more"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Education & guides",
+      "blocks": [
+        {
+          "type": "topic",
+          "settings": {
+            "title": "The 4 C's",
+            "text": "Cut, colour, clarity and carat weight are what decide a diamond's beauty and its price. Of the four, cut does the most for sparkle.",
+            "image_asset": "featured-diamonds-education.jpg"
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "About lab-grown diamonds",
+            "text": "Grown rather than mined, and identical to a mined diamond in chemistry, structure and brilliance - at roughly 40% less.",
+            "image_asset": "lifestyle-princess-ring.jpg"
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Lab-grown gemstones",
+            "text": "Real sapphires, rubies and emeralds with the same properties as their mined counterparts, in colours that are hard to find in nature.",
+            "image_asset": "featured-diamonds-gemstones.jpg"
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Stone comparison",
+            "text": "Where a lab-grown diamond sits next to a simulant such as cubic zirconia or moissanite, and how to tell one from the other.",
+            "image_asset": "lifestyle-emerald-earring.jpg"
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Find your ring size",
+            "text": "A printable ring sizer, an international conversion chart, and what to do when you are buying a surprise.",
+            "image_asset": "featured-diamonds-sizing.jpg"
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Find the right metal",
+            "text": "Platinum, and 14K or 18K white, yellow and rose gold - how each wears day to day and which suits which stone.",
+            "image_asset": "menu-tile-plain-metal-wedding-bands.png"
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Jewellery care & cleaning",
+            "text": "How to clean your pieces at home, when to have them checked, and the habits that keep a setting secure for years.",
+            "image_asset": "featured-diamonds-care.jpg"
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Glossary of jewellery terms",
+            "text": "Bezel, pave, culet, girdle - the words you will meet while you shop, in plain language.",
+            "image_asset": "lifestyle-round-necklace.jpg"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -38,9 +38,21 @@
 .hj-products__grid { margin: 0; padding: 0; }
 .hj-product { height: auto; color: inherit; }
 .hj-product > a { display: block; height: 100%; color: inherit; text-decoration: none; }
-.hj-product__media { aspect-ratio: 1; overflow: hidden; background: #f9f9f9; }
-.hj-product__media img { transition: transform .5s ease; }
+.hj-product__media { position: relative; aspect-ratio: 1; overflow: hidden; background: #f9f9f9; }
+.hj-product__media img { transition: transform .5s ease, opacity .4s ease; }
+/* The second frame is stacked on top of the first and stays invisible until the
+   card is hovered. It is taken out of flow so the card keeps one image's height
+   rather than stacking the two, and both frames hold the same scale through the
+   swap, so only the shared zoom reads as motion -- no mid-hover double image. */
+.hj-product__media-hover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
 .hj-product:hover .hj-product__media img { transform: scale(1.04); }
+
+/* Hover swap is desktop only, matching the product cards elsewhere: a touch
+   device has no hover, so the second photo would either never show or flash on
+   tap-through to the product. */
+@media screen and (min-width: 1025px) {
+  .hj-product:hover .hj-product__media-hover { opacity: 1; }
+}
 .hj-product__title,
 .hj-product__price { display: block; }
 .hj-product__title { display: -webkit-box; margin-top: 20px; overflow: hidden; font-family: var(--font-h5--family); font-style: var(--font-h5--style); font-size: var(--font-size--h5); font-weight: var(--font-h5--weight); letter-spacing: var(--font-h5--letter-spacing); line-height: var(--font-h5--line-height); text-transform: var(--font-h5--case); -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
@@ -168,6 +180,7 @@
 @media (prefers-reduced-motion: reduce) {
   .hj-discover__media img,
   .hj-product__media img { transition: none; }
+  .hj-product__media-hover { transition: none; }
 }
 
 /* ------------------------------------------------------- merchant CTA colours

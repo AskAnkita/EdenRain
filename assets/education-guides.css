@@ -1,0 +1,348 @@
+/*
+  Education & Guides - the friendly face of the Learn page.
+
+  Same guides as 'learn-hub', and the same copy, but warm instead of austere:
+  soft rounded cards on a cream field, a picture at the top of each, a pill in
+  place of the bare number, sentence-case titles and a nudging arrow. Where the
+  learn hub reads as a contents list of hairlines, this reads as a shelf of
+  friendly cards, which suits a shopper who has arrived wanting to be taught.
+
+  Everything that a merchant can change lives in a custom property, and the
+  section writes those properties onto #education-guides-<id> from its schema.
+  The values below are only the fallbacks, so the file stays readable on its own.
+*/
+
+.education-guides {
+  --eg-ink: #171714;
+  --eg-muted: rgba(23, 23, 20, 0.64);
+  --eg-card-bg: #ffffff;
+  --eg-card-border: rgba(23, 23, 20, 0.09);
+  --eg-accent: #ead9d1;
+  --eg-radius: 20px;
+  --eg-gap: 2.4rem;
+  /*
+    Mobile first: one card across. The tablet and desktop counts arrive as
+    --eg-columns-tablet / --eg-columns-desktop, written by the section onto its
+    own id. Keeping the breakpoints here and the merchant's numbers there is
+    what stops an id selector from out-ranking the narrow layout.
+  */
+  --eg-columns: 1;
+}
+
+.education-guides .eg-shell {
+  max-width: var(--page-width, 160rem);
+  margin: 0 auto;
+  padding-inline: 2.4rem;
+}
+
+/* ------------------------------------------------------------------- intro */
+
+.education-guides .eg-intro {
+  max-width: 72rem;
+  margin: 0 auto 4.8rem;
+  text-align: center;
+}
+
+/*
+  A pill rather than letter-spaced capitals on their own: the rounded shape is
+  the single cheapest way to make the top of the page feel welcoming.
+*/
+.education-guides .eg-eyebrow {
+  display: inline-block;
+  margin: 0 0 2rem;
+  padding: 0.7rem 1.6rem;
+  border-radius: 999px;
+  background: var(--eg-accent);
+  color: var(--eg-ink);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.education-guides .eg-heading {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: var(--eg-heading-size, clamp(3rem, 3.6vw, 4.6rem));
+  font-weight: 400;
+  line-height: 1.14;
+  text-wrap: balance;
+}
+
+.education-guides .eg-description {
+  margin-top: 2rem;
+  color: var(--eg-muted);
+  font-size: var(--eg-body-size, 1.65rem);
+  line-height: 1.75;
+}
+
+.education-guides .eg-description > :first-child { margin-top: 0; }
+.education-guides .eg-description > :last-child { margin-bottom: 0; }
+
+/* ------------------------------------------------------------------- cards */
+
+.education-guides .eg-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--eg-columns), minmax(0, 1fr));
+  gap: var(--eg-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.education-guides .eg-card {
+  display: flex;
+}
+
+/*
+  The whole card is the link, so the title, the picture and the arrow all react
+  together. A guide with no link yet renders the same markup as a <div>, which
+  is why the lift and the zoom are hung off a.eg-card__link and not .eg-card.
+*/
+.education-guides .eg-card__link {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--eg-card-border);
+  border-radius: var(--eg-radius);
+  background: var(--eg-card-bg);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+@media (hover: hover) {
+  .education-guides a.eg-card__link:hover {
+    transform: translateY(-4px);
+    border-color: transparent;
+    box-shadow: 0 1.4rem 3.2rem rgba(23, 23, 20, 0.1);
+  }
+
+  .education-guides a.eg-card__link:hover .eg-card__media img {
+    transform: scale(1.05);
+  }
+
+  .education-guides a.eg-card__link:hover .eg-card__arrow {
+    transform: translateX(4px);
+  }
+}
+
+.education-guides a.eg-card__link:focus-visible {
+  outline: 2px solid var(--eg-ink);
+  outline-offset: 3px;
+}
+
+.education-guides .eg-card__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--eg-ratio, 1 / 1);
+  background: var(--eg-accent);
+}
+
+.education-guides .eg-card__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+/* The pill floats on the picture when there is one, and sits in the body when
+   there is not, so a numbered card works with images switched off. */
+.education-guides .eg-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.2rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  background: var(--eg-accent);
+  color: var(--eg-ink);
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.education-guides .eg-card__media .eg-card__badge {
+  position: absolute;
+  inset-block-start: 1.4rem;
+  inset-inline-start: 1.4rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(2px);
+}
+
+.education-guides .eg-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.2rem;
+  padding: clamp(2.2rem, 2.4vw, 3rem);
+}
+
+.education-guides .eg-card__title {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: var(--eg-card-title-size, 2.1rem);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.3;
+  /* Sentence case on purpose: the uppercase tracking of the learn hub is what
+     made it read as a reference index rather than an invitation. */
+  text-transform: none;
+}
+
+.education-guides .eg-card__text {
+  margin: 0;
+  color: var(--eg-muted);
+  font-size: var(--eg-card-text-size, 1.5rem);
+  line-height: 1.7;
+}
+
+/* Keeps the call to action on the bottom edge, so a short card lines up with a
+   tall one in the same row. */
+.education-guides .eg-card__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: auto;
+  padding-top: 1.4rem;
+  color: var(--eg-ink);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.education-guides .eg-card__arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.education-guides .eg-empty {
+  padding: 6rem 0;
+  color: var(--eg-muted);
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------- cta */
+
+/*
+  The closing panel. A guides page answers questions, so it ends by offering a
+  person - the one thing a guide cannot do.
+*/
+.education-guides .eg-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.4rem;
+  margin-top: 4.8rem;
+  padding: clamp(2.8rem, 3.6vw, 4.8rem);
+  border-radius: var(--eg-radius);
+  background: var(--eg-cta-bg, var(--eg-accent));
+  color: var(--eg-cta-ink, var(--eg-ink));
+}
+
+.education-guides .eg-cta__copy {
+  max-width: 62rem;
+}
+
+.education-guides .eg-cta__heading {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: clamp(2.2rem, 2.2vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.education-guides .eg-cta__text {
+  margin: 1rem 0 0;
+  font-size: 1.55rem;
+  line-height: 1.7;
+  opacity: 0.8;
+}
+
+.education-guides .eg-cta__text > :first-child { margin-top: 0; }
+.education-guides .eg-cta__text > :last-child { margin-bottom: 0; }
+
+/*
+  The button borrows the shared .eden-action shape from eden-actions.css, then
+  overrides only the three colours the section exposes, so a merchant's choice
+  wins while the padding, radius and type stay in step with the rest of the shop.
+*/
+.education-guides .eg-cta__button {
+  flex-shrink: 0;
+  border-color: var(--eg-btn-bg, var(--eg-ink));
+  background: var(--eg-btn-bg, var(--eg-ink));
+  color: var(--eg-btn-ink, #ffffff);
+}
+
+@media (hover: hover) {
+  .education-guides .eg-cta__button:hover {
+    border-color: var(--eg-btn-bg, var(--eg-ink));
+    background: transparent;
+    color: var(--eg-btn-bg, var(--eg-ink));
+  }
+}
+
+.education-guides .eg-cta__button:focus-visible {
+  background: transparent;
+  color: var(--eg-btn-bg, var(--eg-ink));
+}
+
+/* ------------------------------------------------------------- breakpoints */
+
+@media screen and (min-width: 750px) {
+  .education-guides {
+    --eg-columns: var(--eg-columns-tablet, 2);
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .education-guides {
+    --eg-columns: var(--eg-columns-desktop, 2);
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .education-guides {
+    --eg-gap: 1.6rem;
+  }
+
+  .education-guides .eg-shell {
+    padding-inline: 1.6rem;
+  }
+
+  .education-guides .eg-intro {
+    margin-bottom: 3.2rem;
+  }
+
+  .education-guides .eg-cta {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .education-guides .eg-cta__button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .education-guides .eg-card__link,
+  .education-guides .eg-card__media img,
+  .education-guides .eg-card__arrow {
+    transition: none;
+  }
+
+  .education-guides a.eg-card__link:hover {
+    transform: none;
+  }
+
+  .education-guides a.eg-card__link:hover .eg-card__media img {
+    transform: none;
+  }
+}

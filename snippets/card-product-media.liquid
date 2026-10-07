@@ -10,65 +10,36 @@
   {{ 'content.product_image_secondary' | t }}
 {%- endcapture -%}
 
-{%- capture default_metal -%}
-  {%- render 'card-default-metal', card_product: card_product -%}
+{%- capture default_variant -%}
+  {%- render 'card-default-variant', card_product: card_product -%}
 {%- endcapture -%}
 
 {%- liquid
   assign f_media = card_product.featured_media
 
   # Every product is photographed in yellow gold first, so a grid of cards opens as one
-  # block of yellow. card-default-metal picks a metal per product, and the card opens on
-  # that variant's photo when it has one of its own.
+  # block of yellow. card-default-variant picks a metal per product and hands back the
+  # variant behind it; the card opens on that variant's photo and links to it, so the
+  # product page opens on the same ring rather than on Sterling Silver.
   assign metal_override = false
-  assign default_metal = default_metal | strip
-  if default_metal != blank
-    assign metal_parts = default_metal | split: '||'
-    assign metal_index = metal_parts.first | plus: 0
-    assign metal_value = metal_parts.last
+  assign metal_variant_id = ''
+  assign default_variant = default_variant | strip
+  if default_variant != blank
+    assign variant_parts = default_variant | split: '||'
+    assign metal_variant_id = variant_parts[0]
+    assign metal_index = variant_parts[1] | plus: 0
+    assign metal_value = variant_parts[2]
 
-    assign featured_variant = null
+    # Matched as text. A variant id is fourteen digits, and the id only ever travels
+    # from here into a URL, so there is nothing to gain by turning it into a number.
     for variant in card_product.variants
-      if variant.featured_media != blank and variant.featured_media.id == card_product.featured_media.id
-        assign featured_variant = variant
+      assign variant_id_text = variant.id | append: ''
+      if variant_id_text == metal_variant_id
+        assign f_media = variant.featured_media
+        assign metal_override = true
         break
       endif
     endfor
-
-    # Only the metal changes: shape, carat and anything else stay as the featured image
-    # has them, so the card's other option rows still describe the photo.
-    for variant in card_product.variants
-      if variant.options[metal_index] != metal_value or variant.featured_media == blank
-        continue
-      endif
-      if featured_variant
-        assign others_match = true
-        for option_value in variant.options
-          unless forloop.index0 == metal_index
-            if option_value != featured_variant.options[forloop.index0]
-              assign others_match = false
-            endif
-          endunless
-        endfor
-        unless others_match
-          continue
-        endunless
-      endif
-      assign f_media = variant.featured_media
-      assign metal_override = true
-      break
-    endfor
-
-    # That exact pair may not be photographed -- any photo of the chosen metal will do.
-    unless metal_override
-      for variant in card_product.variants
-        if variant.options[metal_index] == metal_value and variant.featured_media != blank
-          assign f_media = variant.featured_media
-          assign metal_override = true
-          break
-        endif
-      endfor
-    endunless
   endif
 
   assign f_media_width = f_media.width
@@ -77,8 +48,9 @@
   # The hover photo has to be a different frame from the one the card opens on. The metal
   # override above can land on media[1], which was the hover image, so taking media[1]
   # blindly leaves those cards swapping a photo for itself and hover looking broken.
-  # Another metal's variant shot reads as a different ring rather than a second look at
-  # this one, so a detail or lifestyle frame is preferred where the product has one.
+  # Only the fallback below uses this now -- products that carry the metal grouping tags
+  # are matched by group instead -- but for the rest, another metal's variant shot reads
+  # as a different ring, so a detail or lifestyle frame is still preferred.
   assign other_metal_media = '|'
   if metal_override
     for variant in card_product.variants
@@ -88,32 +60,94 @@
     endfor
   endif
 
-  assign hover_media = null
-  for item in media
-    if item.id == f_media.id
-      continue
-    endif
-    assign media_id_key = '|' | append: item.id | append: '|'
-    unless other_metal_media contains media_id_key
-      assign hover_media = item
-      break
-    endunless
-  endfor
+  # Prefer the next view of the metal the card actually opens on. Every render carries
+  # Shopify's media-grouping alt text -- one group per metal, "#Jewelry material_Rose gold"
+  # and friends -- and the importer uploads a colour's views in sequence, so the next item
+  # inside f_media's own group is the next angle of the same ring. Picking by media order
+  # instead is what made this wrong: the files land Yellow, then White, then Rose, so the
+  # first frame that was not another metal's *variant* photo was still a yellow view, and
+  # a white or rose card hovered to yellow. assets/product-metal-media.js reads these same
+  # tags on the product page, and the '#' test mirrors its own.
+  assign f_group = f_media.alt | strip | downcase
+  assign f_group_marker = f_group | slice: 0
 
-  # Only other metals left to show: a swap still beats a hover that does nothing.
-  unless hover_media
+  assign hover_media = null
+  assign grouped_media = false
+
+  if f_group != blank and f_group_marker == '#'
+    assign grouped_media = true
+    assign seen_f_media = false
+    assign earlier_in_group = null
     for item in media
-      unless item.id == f_media.id
+      assign item_group = item.alt | strip | downcase
+      unless item_group == f_group
+        continue
+      endunless
+      if item.id == f_media.id
+        assign seen_f_media = true
+        continue
+      endif
+      if seen_f_media
+        assign hover_media = item
+        break
+      endif
+      # The card opens on the last view of its metal: wrap back to the first rather
+      # than leave the metal.
+      unless earlier_in_group
+        assign earlier_in_group = item
+      endunless
+    endfor
+    unless hover_media
+      assign hover_media = earlier_in_group
+    endunless
+  endif
+
+  # Products that do not use the grouping convention keep the original behaviour: any
+  # frame that is not another metal's variant photo, and failing that any other frame,
+  # because for them a swap still beats a hover that does nothing. Grouped products are
+  # deliberately left alone here -- changing metal under the cursor is the bug, so a
+  # metal with only one view simply does not swap.
+  unless grouped_media
+    for item in media
+      if item.id == f_media.id
+        continue
+      endif
+      assign media_id_key = '|' | append: item.id | append: '|'
+      unless other_metal_media contains media_id_key
         assign hover_media = item
         break
       endunless
     endfor
+
+    unless hover_media
+      for item in media
+        unless item.id == f_media.id
+          assign hover_media = item
+          break
+        endunless
+      endfor
+    endunless
   endunless
 
   assign media_width = hover_media.width
 
-  assign f_media_alt = f_media.alt | default: card_product.title | append: ' ' | append: f_media_alt | strip
-  assign media_alt = hover_media.alt | default: card_product.title | append: ' ' | append: media_alt | strip
+  # The grouping alt ("#Jewelry material_Gold") is a machine tag for product-metal-media.js,
+  # not a description, so it must never reach a screen reader. Where a frame carries one,
+  # the product title is the useful thing to announce instead.
+  assign f_alt_source = f_media.alt | default: card_product.title
+  assign f_alt_marker = f_media.alt | strip | slice: 0
+  if f_alt_marker == '#'
+    assign f_alt_source = card_product.title
+  endif
+
+  assign hover_alt_source = hover_media.alt | default: card_product.title
+  assign hover_alt_marker = hover_media.alt | strip | slice: 0
+  if hover_alt_marker == '#'
+    assign hover_alt_source = card_product.title
+  endif
+
+  assign f_media_alt = f_alt_source | append: ' ' | append: f_media_alt | strip
+  assign media_alt = hover_alt_source | append: ' ' | append: media_alt | strip
 
   assign sizes = sizes
 
@@ -128,6 +162,13 @@
     assign href_product_url = '/collections/' | append: collection.handle | append: '/products/' | append: card_product.handle
   else
     assign href_product_url = card_product.url
+  endif
+
+  # The card is showing one particular variant, so say so in the link. Without this the
+  # product page falls back to its first variant and a Rose Gold card opens on Silver.
+  # card-option-swatches.js rewrites the same parameter when a shopper picks another dot.
+  if metal_override
+    assign href_product_url = href_product_url | append: '?variant=' | append: metal_variant_id
   endif
 
   if f_media.presentation.focal_point != blank

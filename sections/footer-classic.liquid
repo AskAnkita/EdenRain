@@ -488,6 +488,19 @@
                     {%- for item in fc_menu.links -%}
                       <li><a href="{{ item.url }}">{{ item.title | escape }}</a></li>
                     {%- endfor -%}
+                    {%- comment -%}
+                      One extra link per column, set in the theme editor rather than in
+                      Shopify navigation. It is here for a page that belongs under an
+                      existing heading - "Education & Guides" under Help - without
+                      having to rebuild the admin menu around it.
+                    {%- endcomment -%}
+                    {%- if block.settings.extra_link_label != blank and block.settings.extra_link_url != blank -%}
+                      <li>
+                        <a href="{{ block.settings.extra_link_url }}">
+                          {{- block.settings.extra_link_label | escape -}}
+                        </a>
+                      </li>
+                    {%- endif -%}
                   </ul>
                 </div>
               {%- endif -%}
@@ -788,6 +801,21 @@
           "id": "menu",
           "label": "Menu",
           "default": "footer"
+        },
+        {
+          "type": "header",
+          "content": "Extra link"
+        },
+        {
+          "type": "text",
+          "id": "extra_link_label",
+          "label": "Label",
+          "info": "Added to the bottom of this column, after the menu's own links."
+        },
+        {
+          "type": "url",
+          "id": "extra_link_url",
+          "label": "Link"
         },
         {
           "type": "checkbox",

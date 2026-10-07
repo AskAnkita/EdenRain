@@ -53,7 +53,18 @@
         {%- endif -%}
       {%- endcapture -%}
 
+      {%- comment -%}
+        The name is prefixed with the block id because a radio group is scoped by name
+        AND form owner -- and these radios have no form owner: the form they point at
+        ("product-form-<block id>") is never rendered, only "product-form-<section id>"
+        is. Without the prefix the main picker and the sticky add-to-cart bar, which
+        render the same options twice, shared one group, so the browser unchecked the
+        visible swatch in favour of the sticky one further down the page and the chosen
+        metal lost its ring. The two stay in step through product-info.js, which syncs
+        them on data-option-value-id, not on a shared name.
+      {%- endcomment -%}
       {%- capture input_name -%}
+        {%- if block.id -%}{{ block.id }}-{%- else -%}StickyCart-{%- endif -%}
         {{ option.name | escape | append: section_name }}-{{ product.id }}-{{ option.position }}
       {%- endcapture -%}
 
@@ -295,7 +306,18 @@
         {%- endif -%}
       {%- endcapture -%}
 
+      {%- comment -%}
+        The name is prefixed with the block id because a radio group is scoped by name
+        AND form owner -- and these radios have no form owner: the form they point at
+        ("product-form-<block id>") is never rendered, only "product-form-<section id>"
+        is. Without the prefix the main picker and the sticky add-to-cart bar, which
+        render the same options twice, shared one group, so the browser unchecked the
+        visible swatch in favour of the sticky one further down the page and the chosen
+        metal lost its ring. The two stay in step through product-info.js, which syncs
+        them on data-option-value-id, not on a shared name.
+      {%- endcomment -%}
       {%- capture input_name -%}
+        {%- if block.id -%}{{ block.id }}-{%- else -%}StickyCart-{%- endif -%}
         {{ option.name | escape | append: section_name }}-{{ product.id }}-{{ option.position }}
       {%- endcapture -%}
 
