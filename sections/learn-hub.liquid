@@ -1,0 +1,278 @@
+{% comment %}
+  Learn hub - the education landing page, modelled on MiaDonna's Learn page.
+
+  A short introduction, then one card per guide: a number, a title, a sentence
+  and "Learn more". The cards carry no artwork on purpose - a guide's subject is
+  lettering and diagrams, and nothing legible survives at card size, which is
+  why the mega menu leaves its four Learn links without pictures too.
+
+  The guides are blocks, so the theme editor adds, reorders and relabels them.
+  The preset ships the eight MiaDonna covers; their links point at pages the
+  store is still to write, and a guide with no link yet reads as plain text
+  rather than a dead link.
+
+  Looks come from assets/learn-hub.css. Only the column count is written here,
+  because nth-child cannot read a custom property.
+{% endcomment %}
+
+{{ 'learn-hub.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign columns = section.settings.columns | default: 2
+  assign topics = section.blocks
+-%}
+
+{%- style -%}
+  #learn-hub-{{ section.id }} {
+    padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
+  }
+
+  /*
+    The column count and the first-in-row rule both belong to the wide layout, so
+    they stay inside this breakpoint: learn-hub.css keeps one column below it, and
+    an id selector out here would beat that.
+  */
+  @media screen and (min-width: 990px) {
+    #learn-hub-{{ section.id }} {
+      --lh-columns: {{ columns }};
+    }
+
+    #learn-hub-{{ section.id }} .lh-card:nth-child({{ columns }}n + 1) {
+      border-left: 0;
+    }
+  }
+{%- endstyle -%}
+
+<section
+  id="learn-hub-{{ section.id }}"
+  class="learn-hub color-{{ section.settings.color_scheme }}"
+>
+  <div class="lh-shell">
+    <div class="lh-intro">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="lh-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h1 class="lh-heading">{{ section.settings.heading | escape }}</h1>
+      {%- endif -%}
+
+      {%- if section.settings.description != blank -%}
+        <div class="lh-description rte">{{ section.settings.description }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- if topics.size == 0 -%}
+      <p class="lh-empty">Add a guide to this section in the theme editor.</p>
+    {%- else -%}
+      <ul class="lh-grid" role="list">
+        {%- for block in topics -%}
+          {%- liquid
+            assign title = block.settings.title
+            if title == blank
+              continue
+            endif
+
+            assign index = forloop.index | prepend: '0' | slice: -2, 2
+            assign label = block.settings.link_label | default: 'Learn more'
+            assign has_link = false
+            if block.settings.link != blank
+              assign has_link = true
+            endif
+          -%}
+
+          <li class="lh-card" {{ block.shopify_attributes }}>
+            {%- if has_link -%}
+              <a class="lh-card__link eden-action-host" href="{{ block.settings.link }}">
+            {%- else -%}
+              <div class="lh-card__link">
+            {%- endif -%}
+
+              {%- if section.settings.show_numbers -%}
+                <span class="lh-card__index" aria-hidden="true">{{ index }}</span>
+              {%- endif -%}
+
+              <h2 class="lh-card__title">{{ title | escape }}</h2>
+
+              {%- if block.settings.text != blank -%}
+                <p class="lh-card__text">{{ block.settings.text | escape }}</p>
+              {%- endif -%}
+
+              {%- if has_link -%}
+                <span class="lh-card__action">
+                  <span class="eden-link">{{ label | escape }}</span>
+                </span>
+              {%- endif -%}
+
+            {%- if has_link -%}
+              </a>
+            {%- else -%}
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Learn hub",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Education"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Lab-Grown Diamond & Gemstone Education"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Introduction",
+      "default": "<p>There is a lot to take in when you are choosing fine diamond and gemstone jewellery, from an engagement ring to a pair of everyday earrings. Explore the guides below to learn about diamonds and gemstones, caring for your jewellery, finding your ring size and more.</p>"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Guides across on desktop",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "show_numbers",
+      "label": "Number the guides",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "topic",
+      "name": "Guide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Description"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Leave empty while the guide is still being written and the card shows as plain text."
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link text",
+          "default": "Learn more"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Learn hub",
+      "blocks": [
+        {
+          "type": "topic",
+          "settings": {
+            "title": "The 4 C's",
+            "text": "Cut, colour, clarity and carat weight are what decide a diamond's beauty and its price. Of the four, cut does the most for sparkle."
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "About lab-grown diamonds",
+            "text": "Grown rather than mined, and identical to a mined diamond in chemistry, structure and brilliance - at roughly 40% less."
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Lab-grown gemstones",
+            "text": "Real sapphires, rubies and emeralds with the same properties as their mined counterparts, in colours that are hard to find in nature."
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Stone comparison",
+            "text": "Where a lab-grown diamond sits next to a simulant such as cubic zirconia or moissanite, and how to tell one from the other."
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Find your ring size",
+            "text": "A printable ring sizer, an international conversion chart, and what to do when you are buying a surprise."
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Find the right metal",
+            "text": "Platinum, and 14K or 18K white, yellow and rose gold - how each wears day to day and which suits which stone."
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Jewellery care & cleaning",
+            "text": "How to clean your pieces at home, when to have them checked, and the habits that keep a setting secure for years."
+          }
+        },
+        {
+          "type": "topic",
+          "settings": {
+            "title": "Glossary of jewellery terms",
+            "text": "Bezel, pavé, culet, girdle - the words you will meet while you shop, in plain language."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

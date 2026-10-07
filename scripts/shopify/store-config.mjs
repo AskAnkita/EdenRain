@@ -184,7 +184,7 @@ export const menu = {
     { title: 'Diamonds', collection: 'lab-grown-diamonds' },
     { title: 'Design Studio', url: '/pages/custom-design' },
     // Shown on the right of the header (theme setting "right_menu_items")
-    { title: 'Learn', url: '/blogs/news' },
+    { title: 'Learn', url: '/pages/learn' },
     { title: 'About', url: '/pages/about' },
     { title: 'Contact Us', url: '/pages/contact' },
   ],

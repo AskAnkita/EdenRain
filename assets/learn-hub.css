@@ -1,0 +1,177 @@
+/*
+  Learn hub - the education landing page, modelled on MiaDonna's Learn page:
+  a short introduction, then one card per guide and nothing else.
+
+  The cards are deliberately typographic. A guide's artwork is lettering, and
+  nothing legible survives at card size, which is why the mega menu leaves the
+  Learn links without pictures too ('menu-tile-placeholder').
+
+  Hairlines, not boxes: the cards share one grid of rules, so the page reads as
+  a contents list rather than eight floating panels. --lh-columns comes from the
+  section, so the theme editor decides how many cards sit across.
+*/
+
+.learn-hub {
+  --lh-rule: rgba(23, 23, 20, 0.14);
+  --lh-muted: rgba(23, 23, 20, 0.62);
+  /*
+    Mobile first: one card across, and the desktop count comes from the section,
+    which writes --lh-columns inside the same breakpoint used below. Keeping the
+    narrow case here means the section's id selector cannot out-rank it.
+  */
+  --lh-columns: 1;
+}
+
+.learn-hub .lh-shell {
+  max-width: var(--page-width, 160rem);
+  margin: 0 auto;
+  padding-inline: 2.4rem;
+}
+
+/* ------------------------------------------------------------------- intro */
+
+.learn-hub .lh-intro {
+  max-width: 68rem;
+  margin: 0 auto 6rem;
+  text-align: center;
+}
+
+.learn-hub .lh-eyebrow {
+  margin: 0 0 1.6rem;
+  color: var(--lh-muted);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.learn-hub .lh-heading {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: clamp(2.8rem, 3.4vw, 4.4rem);
+  font-weight: 400;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.learn-hub .lh-description {
+  margin-top: 2.4rem;
+  color: var(--lh-muted);
+  font-size: 1.6rem;
+  line-height: 1.75;
+}
+
+.learn-hub .lh-description > :first-child { margin-top: 0; }
+.learn-hub .lh-description > :last-child { margin-bottom: 0; }
+
+/* ------------------------------------------------------------------- cards */
+
+/*
+  The rules are borders, not gaps, so a row that is short of cards still closes
+  off tidily: one rule above the grid, one under every card, and one down the
+  left of every card. The section switches the left rule off for the first card
+  in each row, because nth-child cannot read a custom property and only the
+  section knows the column count.
+*/
+.learn-hub .lh-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--lh-columns), minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--lh-rule);
+  list-style: none;
+}
+
+.learn-hub .lh-card {
+  border-bottom: 1px solid var(--lh-rule);
+}
+
+.learn-hub .lh-card__link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.4rem;
+  height: 100%;
+  padding: 4rem clamp(2.4rem, 4vw, 5.6rem);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Only a card that leads somewhere reacts; a guide with no link yet sits still. */
+@media (hover: hover) {
+  .learn-hub a.lh-card__link:hover {
+    background: rgba(23, 23, 20, 0.025);
+  }
+}
+
+.learn-hub a.lh-card__link:focus-visible {
+  outline: 2px solid var(--eden-action-ink, #171714);
+  outline-offset: -4px;
+}
+
+.learn-hub .lh-card__index {
+  color: var(--lh-muted);
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.16em;
+}
+
+.learn-hub .lh-card__title {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: clamp(1.7rem, 1.5vw, 2rem);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.learn-hub .lh-card__text {
+  margin: 0;
+  max-width: 46rem;
+  color: var(--lh-muted);
+  font-size: 1.5rem;
+  line-height: 1.7;
+}
+
+/* Pushes the call to action to the bottom so a short card lines up with a tall one. */
+.learn-hub .lh-card__action {
+  margin-top: auto;
+  padding-top: 1.4rem;
+}
+
+.learn-hub .lh-empty {
+  padding: 6rem 0;
+  color: var(--lh-muted);
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- breakpoints */
+
+/* Side by side only from here up, so a single column never draws a stray rule. */
+@media screen and (min-width: 990px) {
+  .learn-hub .lh-card {
+    border-left: 1px solid var(--lh-rule);
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .learn-hub .lh-shell {
+    padding-inline: 1.6rem;
+  }
+
+  .learn-hub .lh-intro {
+    margin-bottom: 4rem;
+  }
+
+  .learn-hub .lh-card__link {
+    padding: 3.2rem 0.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .learn-hub .lh-card__link {
+    transition: none;
+  }
+}

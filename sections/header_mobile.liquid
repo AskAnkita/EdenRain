@@ -84,19 +84,205 @@
                             <div class="mnav__panel">
                               {%- if link.links != blank -%}
                                 <ul class="mnav__sub" role="list">
+                                {%- assign has_grandchild_links = false -%}
+                                {%- for child in link.links -%}
+                                  {%- capture static_probe -%}
+                                    {%- render 'menu-static-items', group: child.title, parent: link.title -%}
+                                  {%- endcapture -%}
+                                  {%- assign static_probe = static_probe | strip -%}
+                                  {%- if child.links != blank or static_probe != '' -%}
+                                    {%- assign has_grandchild_links = true -%}
+                                    {%- break -%}
+                                  {%- endif -%}
+                                {%- endfor -%}
+
+                                {%- if has_grandchild_links -%}
                                   {%- for child in link.links -%}
                                     <li>
                                       <a href="{{ child.url }}">{{ child.title | escape }}</a>
+                                    {%- liquid
+                                      capture static_items
+                                        render 'menu-static-items', group: child.title, parent: link.title
+                                      endcapture
+                                      assign static_items = static_items | strip
+
+                                      assign all_link = blank
+                                      for grandchild in child.links
+                                        assign grandchild_title_lower = grandchild.title | downcase
+                                        if grandchild_title_lower contains 'all ' or grandchild_title_lower == 'all'
+                                          assign all_link = grandchild
+                                          break
+                                        endif
+                                      endfor
+                                    -%}
+                                    <div class="mnav__section">
+                                      <div class="mnav__section-head">
+                                        <span class="mnav__section-title">{{ child.title | escape }}</span>
+                                        {%- if all_link != blank -%}
+                                          <a href="{{ all_link.url }}" class="mnav__section-all">{{ all_link.title | escape }} &rarr;</a>
+                                        {%- elsif child.url != blank and child.url != '#' -%}
+                                          <a href="{{ child.url }}" class="mnav__section-all">Shop all &rarr;</a>
+                                        {%- endif -%}
+                                      </div>
+
                                       {%- if child.links != blank -%}
                                         <ul class="mnav__sub mnav__sub--nested" role="list">
+                                        <ul class="mnav__tiles" role="list">
                                           {%- for grandchild in child.links -%}
                                             <li><a href="{{ grandchild.url }}">{{ grandchild.title | escape }}</a></li>
+                                            {%- liquid
+                                              if all_link != blank and grandchild == all_link
+                                                continue
+                                              endif
+
+                                              assign item_handle = grandchild.object.handle
+                                              if item_handle == blank
+                                                assign item_handle = grandchild.title | handleize
+                                              endif
+
+                                              assign item_image = blank
+                                              if grandchild.type == 'collection_link' and grandchild.object.featured_image != blank
+                                                assign item_image = grandchild.object.featured_image
+                                              elsif grandchild.type == 'product_link' and grandchild.object.featured_image != blank
+                                                assign item_image = grandchild.object.featured_image
+                                              endif
+
+                                              assign placeholder_asset = blank
+                                              capture placeholder_capture
+                                                render 'menu-tile-placeholder', handle: item_handle
+                                              endcapture
+                                              assign placeholder_asset = placeholder_capture | strip
+                                            -%}
+                                            <li class="mnav__tile-item">
+                                              <a class="mnav__tile" href="{{ grandchild.url }}">
+                                                <span class="mnav__tile-media">
+                                                  {%- if item_image != blank -%}
+                                                    {{ item_image | image_url: width: 300 | image_tag: loading: 'lazy', sizes: '28vw', class: 'mnav__tile-cover', alt: grandchild.title }}
+                                                  {%- elsif placeholder_asset != blank and placeholder_asset != '' -%}
+                                                    <img
+                                                      src="{{ placeholder_asset | asset_img_url: '300x' }}"
+                                                      alt="{{ grandchild.title | escape }}"
+                                                      loading="lazy"
+                                                      width="300"
+                                                      height="300"
+                                                    >
+                                                  {%- else -%}
+                                                    {%- render 'menu-tile-fallback', title: grandchild.title -%}
+                                                  {%- endif -%}
+                                                </span>
+                                                <span class="mnav__tile-title">{{ grandchild.title | escape }}</span>
+                                              </a>
+                                            </li>
                                           {%- endfor -%}
                                         </ul>
+                                      {%- elsif static_items != '' -%}
+                                        {%- assign tile_sections = static_items | split: ';;' -%}
+                                        {%- for section_raw in tile_sections -%}
+                                          {%- liquid
+                                            assign section_parts = section_raw | split: '::'
+                                            assign section_subhead = ''
+                                            assign section_items = section_parts[0]
+                                            if section_parts.size > 1
+                                              assign section_subhead = section_parts[0]
+                                              assign section_items = section_parts[1]
+                                            endif
+                                            assign section_tiles = section_items | split: '~'
+                                          -%}
+                                          {%- if section_subhead != '' -%}
+                                            <p class="mnav__section-subhead">{{ section_subhead | escape }}</p>
+                                          {%- endif -%}
+                                          <ul class="mnav__tiles" role="list">
+                                            {%- for tile_item in section_tiles -%}
+                                              {%- liquid
+                                                assign parts = tile_item | split: '|'
+                                                assign item_title = parts[0]
+                                                assign item_handle = parts[1]
+                                                assign item_url = item_handle
+                                                assign item_collection = blank
+                                                unless item_handle contains '/'
+                                                  assign item_collection = collections[item_handle]
+                                                  assign item_url = item_handle | prepend: '/collections/'
+                                                endunless
+
+                                                assign placeholder_asset = blank
+                                                capture placeholder_capture
+                                                  render 'menu-tile-placeholder', handle: item_handle
+                                                endcapture
+                                                assign placeholder_asset = placeholder_capture | strip
+                                              -%}
+                                              <li class="mnav__tile-item">
+                                                <a class="mnav__tile" href="{{ item_url }}">
+                                                  <span class="mnav__tile-media">
+                                                    {%- if item_collection.featured_image != blank -%}
+                                                      {{ item_collection.featured_image | image_url: width: 300 | image_tag: loading: 'lazy', sizes: '28vw', class: 'mnav__tile-cover', alt: item_title }}
+                                                    {%- elsif placeholder_asset != blank and placeholder_asset != '' -%}
+                                                      <img
+                                                        src="{{ placeholder_asset | asset_img_url: '300x' }}"
+                                                        alt="{{ item_title | escape }}"
+                                                        loading="lazy"
+                                                        width="300"
+                                                        height="300"
+                                                      >
+                                                    {%- else -%}
+                                                      {%- render 'menu-tile-fallback', title: item_title -%}
+                                                    {%- endif -%}
+                                                  </span>
+                                                  <span class="mnav__tile-title">{{ item_title | escape }}</span>
+                                                </a>
+                                              </li>
+                                            {%- endfor -%}
+                                          </ul>
+                                        {%- endfor -%}
                                       {%- endif -%}
                                     </li>
+                                    </div>
                                   {%- endfor -%}
                                 </ul>
+                                {%- else -%}
+                                  <ul class="mnav__tiles" role="list">
+                                    {%- for child in link.links -%}
+                                      {%- liquid
+                                        assign item_handle = child.object.handle
+                                        if item_handle == blank
+                                          assign item_handle = child.title | handleize
+                                        endif
+
+                                        assign item_image = blank
+                                        if child.type == 'collection_link' and child.object.featured_image != blank
+                                          assign item_image = child.object.featured_image
+                                        elsif child.type == 'product_link' and child.object.featured_image != blank
+                                          assign item_image = child.object.featured_image
+                                        endif
+
+                                        assign placeholder_asset = blank
+                                        capture placeholder_capture
+                                          render 'menu-tile-placeholder', handle: item_handle
+                                        endcapture
+                                        assign placeholder_asset = placeholder_capture | strip
+                                      -%}
+                                      <li class="mnav__tile-item">
+                                        <a class="mnav__tile" href="{{ child.url }}">
+                                          <span class="mnav__tile-media">
+                                            {%- if item_image != blank -%}
+                                              {{ item_image | image_url: width: 300 | image_tag: loading: 'lazy', sizes: '28vw', class: 'mnav__tile-cover', alt: child.title }}
+                                            {%- elsif placeholder_asset != blank and placeholder_asset != '' -%}
+                                              <img
+                                                src="{{ placeholder_asset | asset_img_url: '300x' }}"
+                                                alt="{{ child.title | escape }}"
+                                                loading="lazy"
+                                                width="300"
+                                                height="300"
+                                              >
+                                            {%- else -%}
+                                              {%- render 'menu-tile-fallback', title: child.title -%}
+                                            {%- endif -%}
+                                          </span>
+                                          <span class="mnav__tile-title">{{ child.title | escape }}</span>
+                                        </a>
+                                      </li>
+                                    {%- endfor -%}
+                                  </ul>
+                                {%- endif -%}
                               {%- else -%}
                                 <ul class="mnav__sub" role="list">
                                   {%- for type in link_collection.all_types limit: 6 -%}

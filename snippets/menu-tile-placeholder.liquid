@@ -40,6 +40,8 @@
   for style_handle in style_handles
     if style_handle == handle
       assign placeholder = 'style-' | append: handle | append: '.png'
+    if style_handle == handle or handle contains style_handle
+      assign placeholder = 'style-' | append: style_handle | append: '.png'
       break
     endif
   endfor
@@ -48,6 +50,10 @@
     for tile_handle in tile_handles
       if tile_handle == handle
         assign placeholder = 'menu-tile-' | append: handle | append: '.png'
+    for diamond_shape in diamond_shapes
+      assign diamond_handle = diamond_shape | append: '-diamonds'
+      if diamond_handle == handle or diamond_shape == handle or handle contains diamond_shape
+        assign placeholder = 'diamond-shape-' | append: diamond_shape | append: '.png'
         break
       endif
     endfor
@@ -58,9 +64,42 @@
       assign diamond_handle = diamond_shape | append: '-diamonds'
       if diamond_handle == handle
         assign placeholder = 'diamond-shape-' | append: diamond_shape | append: '.png'
+    for tile_handle in tile_handles
+      if tile_handle == handle
+        assign placeholder = 'menu-tile-' | append: handle | append: '.png'
         break
       endif
     endfor
+  endif
+
+  if placeholder == ''
+    if handle contains 'dangle'
+      assign placeholder = 'menu-tile-dangles-drops.png'
+    elsif handle contains 'ear-cuff' or handle contains 'climber'
+      assign placeholder = 'menu-tile-climbers-jackets-cuffs.png'
+    elsif handle contains 'hoop' or handle contains 'huggie'
+      assign placeholder = 'menu-tile-hoops-huggies.png'
+    elsif handle contains 'stud'
+      assign placeholder = 'menu-tile-studs.png'
+    elsif handle contains 'tennis-necklace' or (handle contains 'tennis' and handle contains 'neck')
+      assign placeholder = 'menu-tile-tennis-necklaces.png'
+    elsif handle contains 'tennis-bracelet' or (handle contains 'tennis' and handle contains 'brace')
+      assign placeholder = 'menu-tile-tennis-bracelets.png'
+    elsif handle contains 'pendant'
+      assign placeholder = 'menu-tile-pendants.png'
+    elsif handle contains 'curved'
+      assign placeholder = 'menu-tile-curved-wedding-bands.png'
+    elsif handle contains 'stackable'
+      assign placeholder = 'menu-tile-stackable-rings.png'
+    elsif handle contains 'eternity'
+      assign placeholder = 'menu-tile-eternity-rings.png'
+    elsif handle contains 'anniversary'
+      assign placeholder = 'menu-tile-anniversary-rings.png'
+    elsif handle contains 'plain-metal'
+      assign placeholder = 'menu-tile-plain-metal-wedding-bands.png'
+    elsif handle contains 'mens' or handle contains 'men'
+      assign placeholder = 'menu-tile-mens-rings.png'
+    endif
   endif
 
   echo placeholder
