@@ -25,10 +25,51 @@ node scripts/shopify/setup-store.mjs --apply --menu-handle=miadonna-menu   # new
 
 - Edit `store-config.mjs` to change the collections or the menu.
 - Existing collections are never changed or deleted; only missing ones are created and published
-  to the Online Store.
+  to the Online Store. `--update-rules` adds to an automated collection any rule `store-config.mjs`
+  gives it that it is missing — additively, so a rule an app put there (the gift-box app adds
+  `TYPE NOT_EQUALS giftbox_ghost_product` everywhere) survives. `--update-rules --convert-manual`
+  goes further and hands a manual collection to the rules, which discards whatever was added to it
+  by hand; the preview names each one and how many products it holds before you decide.
 - Automated collections fill themselves from product tags, e.g. tag a product `shape:oval` or
-  `metal:rose-gold`.
+  `metal:rose-gold`. **Run `tag-products.mjs` first** (below) — without the tags they are empty.
 - Before the menu is replaced, the current one is saved to `scripts/shopify/backups/` (git-ignored).
+
+## The tags every collection and filter is built on
+
+The products arrived with almost no tags: 294 of 304 had nothing saying what kind of piece they
+were, what shape the stone was, or what metal. So every automated collection stood empty, the
+Shape and Metal groups in the collection filter drawer had nothing to filter, and the mega menu's
+"Studs", "Hoops" and "Round" tiles pointed at collections that did not exist at all.
+
+`tag-products.mjs` works the tags out from each product's title, its existing tags and its option
+values — "Round Stud Earrings 3MM" becomes `category:stud`, `category:earring`, `shape:round`, and
+a Colour option of "18k White Gold" becomes `metal:white-gold`. Six namespaces: `category:`,
+`shape:`, `stone:`, `metal:`, `style:`, `type:`.
+
+```bash
+node scripts/shopify/tag-products.mjs                    # preview: a count per tag, nothing written
+node scripts/shopify/tag-products.mjs --verbose          # ...and every product it would touch
+node scripts/shopify/tag-products.mjs --apply            # add them
+node scripts/shopify/tag-products.mjs --only=shape,metal # just those namespaces
+node scripts/shopify/tag-products.mjs --handle=some-product   # one product, to check a rule
+node scripts/shopify/tag-products.mjs --undo --apply     # remove the tags it added
+```
+
+It only ever **adds** tags, so nothing set by hand is lost, and the current tags of every product
+go to `backups/` before the first write. `--undo` removes only those six namespaces; a tag outside
+them is never touched.
+
+The rules live in `tag-rules.mjs`, as a table per namespace. Word boundaries are doing real work
+there — `\bring\b` must not match "Earrings", `\bpear\b` must not match "Pearl", `\bround\b`
+must not match "Wrap Around Ring" — so check a change with
+`node scripts/shopify/tag-products.mjs --only=<namespace> --verbose` before applying it.
+
+The order for a fresh store is: tag the products, then create the collections, then write the menu.
+
+```bash
+node scripts/shopify/tag-products.mjs --apply
+node scripts/shopify/setup-store.mjs --apply --update-rules
+```
 
 ## Undo the menu / match collection pictures to the homepage
 

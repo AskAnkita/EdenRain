@@ -3,7 +3,11 @@
   --hj-muted: #69675f;
   --hj-line: rgba(23, 23, 20, .18);
   color: var(--hj-ink);
-  padding: clamp(42px, 6vw, 92px) clamp(20px, 4vw, 64px);
+  background: var(--hj-section-bg, transparent);
+  /* Each var below is written by the section only when the merchant moved that
+     setting off its "use the default" value, so an untouched section renders
+     the fallback -- the value this file always had. */
+  padding: var(--hj-pad-top, clamp(42px, 6vw, 92px)) clamp(20px, 4vw, 64px) var(--hj-pad-bottom, clamp(42px, 6vw, 92px));
 }
 
 .homepage-journey img,
@@ -13,23 +17,23 @@
 .hj-discover__media { position: relative; min-height: 440px; aspect-ratio: 1.22; overflow: hidden; background: #f1efec; }
 .hj-discover__media img { transition: transform .7s ease; }
 .hj-discover__media:hover img { transform: scale(1.025); }
-.hj-image-note { position: absolute; left: 18px; bottom: 18px; padding: 10px 13px; background: rgba(255,255,255,.92); font-size: 1.05rem; letter-spacing: .12em; }
+.hj-image-note { position: absolute; left: 18px; bottom: 18px; padding: 10px 13px; background: var(--hj-note-bg, rgba(255,255,255,.92)); color: var(--hj-note-ink, var(--hj-ink)); font-size: var(--hj-eyebrow-size, 1.05rem); letter-spacing: .12em; }
 .hj-discover__copy { max-width: 570px; padding: 30px 0; }
-.hj-eyebrow { margin: 0 0 15px; color: var(--hj-muted); font-size: 1.05rem; letter-spacing: .18em; line-height: 1.4; text-transform: uppercase; }
+.hj-eyebrow { margin: 0 0 15px; color: var(--hj-eyebrow-color, var(--hj-muted)); font-size: var(--hj-eyebrow-size, 1.05rem); letter-spacing: .18em; line-height: 1.4; text-transform: uppercase; }
 .homepage-journey h2,
-.homepage-journey h3 { color: var(--hj-ink); font-family: var(--font-heading--family); font-weight: 400; }
+.homepage-journey h3 { color: var(--hj-heading-color, var(--hj-ink)); font-family: var(--font-heading--family); font-weight: 400; }
 .hj-discover h2,
 .hj-purpose h2,
-.hj-section-intro h2 { margin: 0 0 20px; font-size: clamp(3rem, 4vw, 5.4rem); letter-spacing: .015em; line-height: 1.1; }
-.hj-description { color: var(--hj-muted); font-size: 1.55rem; line-height: 1.75; }
+.hj-section-intro h2 { margin: 0 0 20px; font-size: var(--hj-heading-size, clamp(3rem, 4vw, 5.4rem)); letter-spacing: .015em; line-height: 1.1; }
+.hj-description { color: var(--hj-text-color, var(--hj-muted)); font-size: var(--hj-text-size, 1.55rem); line-height: 1.75; }
 .hj-description p { margin: 0; }
 /* Buttons and links use the shared .eden-action / .eden-link classes in
    assets/eden-actions.css. Only where they sit is this file's business. */
 .hj-cta { margin-top: 28px; }
-.hj-signature-note { margin: 26px 0 0; padding-top: 19px; border-top: 1px solid var(--hj-line); color: var(--hj-muted); font-size: 1.15rem; letter-spacing: .04em; }
+.hj-signature-note { margin: 26px 0 0; padding-top: 19px; border-top: 1px solid var(--hj-line); color: var(--hj-text-color, var(--hj-muted)); font-size: 1.15rem; letter-spacing: .04em; }
 .hj-products { margin-top: clamp(38px, 5vw, 72px); }
 .hj-products__heading { margin-bottom: 18px; text-align: center; }
-.hj-products__heading h3 { margin: 0; font-family: var(--font-heading--family); font-size: clamp(2rem, 3vw, 3rem); font-weight: 600; letter-spacing: var(--letter-spacing--body-loose, .03em); line-height: normal; text-transform: uppercase; }
+.hj-products__heading h3 { margin: 0; font-family: var(--font-heading--family); font-size: var(--hj-products-heading-size, clamp(2rem, 3vw, 3rem)); font-weight: 600; letter-spacing: var(--letter-spacing--body-loose, .03em); line-height: normal; text-transform: uppercase; }
 .hj-products__carousel { display: block; }
 .hj-products__grid { margin: 0; padding: 0; }
 .hj-product { height: auto; color: inherit; }
@@ -93,19 +97,19 @@
   --eden-action-border-light: rgba(255, 255, 255, .8);
   --eden-action-border-light: color-mix(in srgb, var(--hj-purpose-ink) 80%, transparent);
   padding: 0;
-  background: var(--hj-purpose-bg);
+  background: var(--hj-section-bg, var(--hj-purpose-bg));
   color: var(--hj-purpose-ink);
 }
 .hj-purpose { display: grid; min-height: 590px; grid-template-columns: 1.05fr .95fr; }
 .hj-purpose__image { min-height: 590px; background: var(--hj-purpose-placeholder); }
 .hj-purpose__content { align-self: center; max-width: 720px; padding: clamp(42px, 7vw, 100px); }
-.hj-purpose h2 { color: var(--hj-purpose-ink); }
-.hj-purpose .hj-eyebrow,
-.hj-purpose .hj-description { color: var(--hj-purpose-muted); }
+.hj-purpose h2 { color: var(--hj-heading-color, var(--hj-purpose-ink)); }
+.hj-purpose .hj-eyebrow { color: var(--hj-eyebrow-color, var(--hj-purpose-muted)); }
+.hj-purpose .hj-description { color: var(--hj-text-color, var(--hj-purpose-muted)); }
 .hj-proof-points { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 52px; padding-top: 19px; border-top: 1px solid var(--hj-purpose-line); }
 .hj-proof-points span { font-size: 1.05rem; letter-spacing: .11em; line-height: 1.5; text-transform: uppercase; }
 
-.homepage-journey--experience { background: #f5f3ef; }
+.homepage-journey--experience { background: var(--hj-section-bg, #f5f3ef); }
 .hj-experience-shell { max-width: 1450px; }
 .hj-section-intro { max-width: 700px; margin: 0 auto 44px; text-align: center; }
 .hj-section-intro .hj-description { max-width: 580px; margin: 0 auto; }
@@ -115,7 +119,7 @@
 .hj-experience-card__copy { align-self: center; padding: clamp(22px, 3vw, 42px); }
 .hj-experience-card__copy .hj-eyebrow { margin-bottom: 11px; }
 .hj-experience-card__copy h3 { margin: 0 0 13px; font-size: clamp(2.2rem, 2.4vw, 3.1rem); line-height: 1.15; }
-.hj-experience-card__copy > p:not(.hj-eyebrow) { margin: 0 0 20px; color: var(--hj-muted); font-size: 1.3rem; line-height: 1.6; }
+.hj-experience-card__copy > p:not(.hj-eyebrow) { margin: 0 0 20px; color: var(--hj-text-color, var(--hj-muted)); font-size: 1.3rem; line-height: 1.6; }
 .hj-placeholder { background: #f0eeeb; }
 
 @media (max-width: 900px) {
@@ -125,7 +129,7 @@
 }
 
 @media (max-width: 680px) {
-  .homepage-journey { padding: 42px 20px; }
+  .homepage-journey { padding: var(--hj-pad-top, 42px) 20px var(--hj-pad-bottom, 42px); }
   /* The dark panel runs edge to edge on desktop. On mobile it keeps only a thin
      strip of the panel colour around the photo -- spelled out here so it reads
      as a decision rather than a side effect of the rule above overriding
@@ -141,7 +145,7 @@
   .hj-discover__copy { padding: 8px 0 0; }
   .hj-discover h2,
   .hj-purpose h2,
-  .hj-section-intro h2 { font-size: clamp(3rem, 9vw, 4.2rem); }
+  .hj-section-intro h2 { font-size: var(--hj-heading-size-mobile, clamp(3rem, 9vw, 4.2rem)); }
   .hj-products__heading { align-items: flex-end; }
   .hj-product__title { margin-top: 14px; }
   .hj-product__price { margin-top: 10px; }
@@ -164,4 +168,46 @@
 @media (prefers-reduced-motion: reduce) {
   .hj-discover__media img,
   .hj-product__media img { transition: none; }
+}
+
+/* ------------------------------------------------------- merchant CTA colours
+
+   The section's button settings land here. Every property falls back to the
+   shared .eden-action token it would otherwise have used, so a colour left
+   cleared in the panel keeps the theme's own button, hover included. The
+   section selector is only here to out-specify .eden-action--solid. */
+.homepage-journey .hj-cta { font-size: var(--hj-btn-size, var(--eden-action-font-size)); }
+.homepage-journey .hj-cta.eden-action--solid {
+  border-color: var(--hj-btn-border, var(--eden-action-ink));
+  background: var(--hj-btn-bg, var(--eden-action-ink));
+  color: var(--hj-btn-ink, var(--eden-action-on-ink));
+}
+.homepage-journey .hj-cta.eden-action--light {
+  border-color: var(--hj-btn-border, var(--eden-action-border-light));
+  background: var(--hj-btn-bg, transparent);
+  color: var(--hj-btn-ink, var(--eden-action-on-ink));
+}
+
+@media (hover: hover) {
+  .homepage-journey .hj-cta.eden-action--solid:hover {
+    border-color: var(--hj-btn-hover-border, var(--hj-btn-border, var(--eden-action-ink)));
+    background: var(--hj-btn-hover-bg, transparent);
+    color: var(--hj-btn-hover-ink, var(--eden-action-ink));
+  }
+  .homepage-journey .hj-cta.eden-action--light:hover {
+    border-color: var(--hj-btn-hover-border, var(--eden-action-on-ink));
+    background: var(--hj-btn-hover-bg, var(--eden-action-on-ink));
+    color: var(--hj-btn-hover-ink, var(--eden-action-ink));
+  }
+}
+
+.homepage-journey .hj-cta.eden-action--solid:focus-visible {
+  border-color: var(--hj-btn-hover-border, var(--hj-btn-border, var(--eden-action-ink)));
+  background: var(--hj-btn-hover-bg, transparent);
+  color: var(--hj-btn-hover-ink, var(--eden-action-ink));
+}
+.homepage-journey .hj-cta.eden-action--light:focus-visible {
+  border-color: var(--hj-btn-hover-border, var(--eden-action-on-ink));
+  background: var(--hj-btn-hover-bg, var(--eden-action-on-ink));
+  color: var(--hj-btn-hover-ink, var(--eden-action-ink));
 }

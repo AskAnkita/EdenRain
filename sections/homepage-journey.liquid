@@ -1,31 +1,108 @@
 {{ 'homepage-journey.css' | asset_url | stylesheet_tag }}
 
-{% assign layout = section.settings.layout_style %}
+{%- liquid
+  assign layout = section.settings.layout_style
+  assign transparent = 'rgba(0,0,0,0)'
+
+  # A template saved before these settings existed has no value for them, so the
+  # numbers are coerced with 'plus: 0' rather than compared raw: a missing size
+  # becomes 0, which means "keep the theme default". The paddings cannot use a
+  # sentinel of their own -- a range's span has to divide evenly by its step, so
+  # 0 is a real value there -- and are gated by the custom_padding checkbox.
+  assign eyebrow_size = section.settings.eyebrow_size | plus: 0
+  assign heading_size = section.settings.heading_size | plus: 0
+  assign heading_size_mobile = section.settings.heading_size_mobile | plus: 0
+  assign text_size = section.settings.text_size | plus: 0
+  assign products_heading_size = section.settings.products_heading_size | plus: 0
+  assign button_size = section.settings.button_size | plus: 0
+  assign pad_top = section.settings.padding_top | plus: 0
+  assign pad_bottom = section.settings.padding_bottom | plus: 0
+-%}
 
 {%- comment -%}
-  The dark panel layout takes its colour from the theme editor. Only the two
-  values go on the element; homepage-journey.css derives the muted text, the
-  divider, the photo placeholder and the CTA from them.
+  Everything a merchant can restyle is written onto the section element as a CSS
+  custom property, and homepage-journey.css reads each one with the old hard
+  coded value as its fallback. A setting left at its "use the layout default"
+  value (a cleared colour, or a size of 0) writes nothing, so the section keeps
+  looking exactly as it did before anyone opened the panel.
+
+  The dark panel layout still takes its two colours from the theme editor; the
+  stylesheet derives the muted text, the divider, the photo placeholder and the
+  CTA from them.
 {%- endcomment -%}
-{%- capture purpose_colours -%}
+{%- capture section_styles -%}
   {%- if layout == 'purpose' -%}
     --hj-purpose-bg: {{ section.settings.purpose_background | default: '#17211e' }};
     --hj-purpose-ink: {{ section.settings.purpose_text | default: '#ffffff' }};
   {%- endif -%}
-{%- endcapture -%}
-{%- assign purpose_colours = purpose_colours | strip | strip_newlines -%}
 
-<section class="homepage-journey homepage-journey--{{ layout }}" id="HomepageJourney-{{ section.id }}"{% if purpose_colours != blank %} style="{{ purpose_colours }}"{% endif %}>
+  {%- if section.settings.section_background != blank and section.settings.section_background != transparent -%}
+    --hj-section-bg: {{ section.settings.section_background }};
+  {%- endif -%}
+  {%- if section.settings.eyebrow_color != blank and section.settings.eyebrow_color != transparent -%}
+    --hj-eyebrow-color: {{ section.settings.eyebrow_color }};
+  {%- endif -%}
+  {%- if section.settings.heading_color != blank and section.settings.heading_color != transparent -%}
+    --hj-heading-color: {{ section.settings.heading_color }};
+  {%- endif -%}
+  {%- if section.settings.text_color != blank and section.settings.text_color != transparent -%}
+    --hj-text-color: {{ section.settings.text_color }};
+  {%- endif -%}
+  {%- if section.settings.note_background != blank and section.settings.note_background != transparent -%}
+    --hj-note-bg: {{ section.settings.note_background }};
+  {%- endif -%}
+  {%- if section.settings.note_color != blank and section.settings.note_color != transparent -%}
+    --hj-note-ink: {{ section.settings.note_color }};
+  {%- endif -%}
+
+  {%- if eyebrow_size > 0 -%}--hj-eyebrow-size: {{ eyebrow_size }}px;{%- endif -%}
+  {%- if heading_size > 0 -%}--hj-heading-size: {{ heading_size }}px;{%- endif -%}
+  {%- if heading_size_mobile > 0 -%}--hj-heading-size-mobile: {{ heading_size_mobile }}px;{%- endif -%}
+  {%- if text_size > 0 -%}--hj-text-size: {{ text_size }}px;{%- endif -%}
+  {%- if products_heading_size > 0 -%}--hj-products-heading-size: {{ products_heading_size }}px;{%- endif -%}
+
+  {%- if section.settings.button_background != blank and section.settings.button_background != transparent -%}
+    --hj-btn-bg: {{ section.settings.button_background }};
+    --hj-btn-border: {{ section.settings.button_background }};
+  {%- endif -%}
+  {%- if section.settings.button_border != blank and section.settings.button_border != transparent -%}
+    --hj-btn-border: {{ section.settings.button_border }};
+  {%- endif -%}
+  {%- if section.settings.button_text_color != blank and section.settings.button_text_color != transparent -%}
+    --hj-btn-ink: {{ section.settings.button_text_color }};
+  {%- endif -%}
+  {%- if section.settings.button_hover_background != blank and section.settings.button_hover_background != transparent -%}
+    --hj-btn-hover-bg: {{ section.settings.button_hover_background }};
+    --hj-btn-hover-border: {{ section.settings.button_hover_background }};
+  {%- endif -%}
+  {%- if section.settings.button_hover_text_color != blank and section.settings.button_hover_text_color != transparent -%}
+    --hj-btn-hover-ink: {{ section.settings.button_hover_text_color }};
+  {%- endif -%}
+  {%- if button_size > 0 -%}--hj-btn-size: {{ button_size }}px;{%- endif -%}
+
+  {%- if section.settings.custom_padding -%}
+    --hj-pad-top: {{ pad_top }}px;
+    --hj-pad-bottom: {{ pad_bottom }}px;
+  {%- endif -%}
+{%- endcapture -%}
+{%- assign section_styles = section_styles | strip | strip_newlines -%}
+
+<section class="homepage-journey homepage-journey--{{ layout }}" id="HomepageJourney-{{ section.id }}"{% if section_styles != blank %} style="{{ section_styles }}"{% endif %}>
   {% if layout == 'discover' %}
     <div class="hj-shell">
       <div class="hj-discover">
         <div class="hj-discover__media">
-          {% if section.settings.image_url != blank %}
-            <img src="{{ section.settings.image_url | escape }}" alt="{{ section.settings.image_alt | escape }}" loading="lazy" width="1600" height="1200">
-          {% else %}
-            {{ 'product-1' | placeholder_svg_tag: 'hj-placeholder' }}
+          {% render 'homepage-journey-image',
+            image: section.settings.image,
+            image_url: section.settings.image_url,
+            alt: section.settings.image_alt,
+            placeholder: 'product-1',
+            width: 1600,
+            height: 1200
+          %}
+          {% if section.settings.image_note != blank %}
+            <span class="hj-image-note">{{ section.settings.image_note | escape }}</span>
           {% endif %}
-          <span class="hj-image-note">{{ section.settings.image_note | escape }}</span>
         </div>
         <div class="hj-discover__copy">
           <p class="hj-eyebrow">{{ section.settings.eyebrow | escape }}</p>
@@ -114,11 +191,14 @@
   {% elsif layout == 'purpose' %}
     <div class="hj-purpose">
       <div class="hj-purpose__image">
-        {% if section.settings.image_url != blank %}
-          <img src="{{ section.settings.image_url | escape }}" alt="{{ section.settings.image_alt | escape }}" loading="lazy" width="1600" height="1200">
-        {% else %}
-          {{ 'lifestyle-1' | placeholder_svg_tag: 'hj-placeholder' }}
-        {% endif %}
+        {% render 'homepage-journey-image',
+          image: section.settings.image,
+          image_url: section.settings.image_url,
+          alt: section.settings.image_alt,
+          placeholder: 'lifestyle-1',
+          width: 1600,
+          height: 1200
+        %}
       </div>
       <div class="hj-purpose__content">
         <p class="hj-eyebrow">{{ section.settings.eyebrow | escape }}</p>
@@ -146,11 +226,14 @@
       <div class="hj-experience-grid">
         <article class="hj-experience-card">
           <div class="hj-experience-card__image">
-            {% if section.settings.image_url != blank %}
-              <img src="{{ section.settings.image_url | escape }}" alt="{{ section.settings.image_alt | escape }}" loading="lazy" width="1200" height="800">
-            {% else %}
-              {{ 'lifestyle-1' | placeholder_svg_tag: 'hj-placeholder' }}
-            {% endif %}
+            {% render 'homepage-journey-image',
+              image: section.settings.image,
+              image_url: section.settings.image_url,
+              alt: section.settings.image_alt,
+              placeholder: 'lifestyle-1',
+              width: 1200,
+              height: 800
+            %}
           </div>
           <div class="hj-experience-card__copy">
             <p class="hj-eyebrow">{{ section.settings.card_one_eyebrow | escape }}</p>
@@ -161,11 +244,14 @@
         </article>
         <article class="hj-experience-card">
           <div class="hj-experience-card__image">
-            {% if section.settings.second_image_url != blank %}
-              <img src="{{ section.settings.second_image_url | escape }}" alt="{{ section.settings.second_image_alt | escape }}" loading="lazy" width="1200" height="800">
-            {% else %}
-              {{ 'lifestyle-2' | placeholder_svg_tag: 'hj-placeholder' }}
-            {% endif %}
+            {% render 'homepage-journey-image',
+              image: section.settings.second_image,
+              image_url: section.settings.second_image_url,
+              alt: section.settings.second_image_alt,
+              placeholder: 'lifestyle-2',
+              width: 1200,
+              height: 800
+            %}
           </div>
           <div class="hj-experience-card__copy">
             <p class="hj-eyebrow">{{ section.settings.card_two_eyebrow | escape }}</p>
@@ -186,25 +272,57 @@
   "class": "section-homepage-journey",
   "settings": [
     { "type": "select", "id": "layout_style", "label": "Layout", "options": [ { "value": "discover", "label": "Discover and shop" }, { "value": "purpose", "label": "The Eden difference" }, { "value": "experience", "label": "Rewards and boutique" } ], "default": "discover" },
+
+    { "type": "header", "content": "Content" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "THE EDEN EDIT" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Iconic style, conscious luxury" },
     { "type": "richtext", "id": "description", "label": "Description", "default": "<p>Discover beautifully crafted lab-grown diamond jewellery, made to be worn and loved.</p>" },
-    { "type": "text", "id": "image_url", "label": "Primary image URL" },
-    { "type": "text", "id": "image_alt", "label": "Primary image alt text", "default": "Lab-grown diamond jewellery" },
-    { "type": "text", "id": "image_note", "label": "Image note", "default": "THE SIGNATURE VALUE EDIT" },
-    { "type": "header", "content": "Panel colour", "info": "Applies to the 'The Eden difference' layout only." },
-    { "type": "color", "id": "purpose_background", "label": "Panel background", "default": "#17211e" },
-    { "type": "color", "id": "purpose_text", "label": "Panel text", "default": "#ffffff" },
-    { "type": "text", "id": "primary_label", "label": "Primary link label", "default": "Discover the look" },
-    { "type": "url", "id": "primary_link", "label": "Primary link" },
     { "type": "text", "id": "supporting_note", "label": "Supporting note", "default": "Exceptional detail. Considered value. Made to last." },
+    { "type": "text", "id": "proof_points", "label": "Proof points (separate with |)", "info": "'The Eden difference' layout only.", "default": "Lab-grown diamonds | Thoughtful materials | Designed in London" },
+
+    { "type": "header", "content": "Images" },
+    { "type": "image_picker", "id": "image", "label": "Primary image", "info": "Used by all three layouts. In 'Rewards and boutique' this is the first card's photo. Overrides the URL below." },
+    { "type": "text", "id": "image_url", "label": "Primary image URL (fallback)", "info": "Only used when no image is picked above." },
+    { "type": "text", "id": "image_alt", "label": "Primary image alt text", "default": "Lab-grown diamond jewellery" },
+    { "type": "text", "id": "image_note", "label": "Image note", "info": "Caption chip over the photo. Leave empty to hide it.", "default": "THE SIGNATURE VALUE EDIT" },
+    { "type": "image_picker", "id": "second_image", "label": "Second image", "info": "'Rewards and boutique' layout only - the second card's photo. Overrides the URL below." },
+    { "type": "text", "id": "second_image_url", "label": "Second image URL (fallback)" },
+    { "type": "text", "id": "second_image_alt", "label": "Second image alt text", "default": "Visit our jewellery boutique" },
+
+    { "type": "header", "content": "Button" },
+    { "type": "text", "id": "primary_label", "label": "Button label", "info": "Leave empty to hide the button.", "default": "Discover the look" },
+    { "type": "url", "id": "primary_link", "label": "Button link" },
+    { "type": "color", "id": "button_background", "label": "Button background", "default": "rgba(0,0,0,0)", "info": "Clear a colour to use the theme default." },
+    { "type": "color", "id": "button_text_color", "label": "Button text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_border", "label": "Button border", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_hover_background", "label": "Button background on hover", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_hover_text_color", "label": "Button text on hover", "default": "rgba(0,0,0,0)" },
+    { "type": "range", "id": "button_size", "label": "Button text size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the theme default." },
+
+    { "type": "header", "content": "Colours" },
+    { "type": "color", "id": "section_background", "label": "Section background", "default": "rgba(0,0,0,0)", "info": "Clear a colour to use the layout default." },
+    { "type": "color", "id": "heading_color", "label": "Heading", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "text_color", "label": "Body text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "note_background", "label": "Image note background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "note_color", "label": "Image note text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "purpose_background", "label": "Dark panel background", "info": "'The Eden difference' layout only.", "default": "#17211e" },
+    { "type": "color", "id": "purpose_text", "label": "Dark panel text", "default": "#ffffff" },
+
+    { "type": "header", "content": "Typography", "info": "Set a size to 0 to keep the theme's responsive default." },
+    { "type": "range", "id": "heading_size", "label": "Heading size (desktop)", "min": 0, "max": 90, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "heading_size_mobile", "label": "Heading size (mobile)", "min": 0, "max": 60, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "eyebrow_size", "label": "Eyebrow size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "text_size", "label": "Body text size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "products_heading_size", "label": "Product row heading size", "min": 0, "max": 60, "step": 1, "unit": "px", "default": 0 },
+
+    { "type": "header", "content": "Product row", "info": "'Discover and shop' layout only." },
     { "type": "collection", "id": "collection", "label": "Featured products collection" },
     { "type": "text", "id": "products_heading", "label": "Products heading", "default": "The pieces to know" },
     { "type": "checkbox", "id": "vary_metals", "label": "Vary metal colour across the cards", "info": "Shows a different metal on each card instead of every product's default photo.", "default": true },
     { "type": "text", "id": "metal_rotation", "label": "Metal rotation order", "info": "Comma separated, repeated across the row. Use yellow, white, rose, platinum or silver.", "default": "yellow, white, rose" },
-    { "type": "text", "id": "proof_points", "label": "Proof points (separate with |)", "default": "Lab-grown diamonds | Thoughtful materials | Designed in London" },
-    { "type": "text", "id": "second_image_url", "label": "Second image URL" },
-    { "type": "text", "id": "second_image_alt", "label": "Second image alt text", "default": "Visit our jewellery boutique" },
+
+    { "type": "header", "content": "Cards", "info": "'Rewards and boutique' layout only." },
     { "type": "text", "id": "card_one_eyebrow", "label": "First card eyebrow", "default": "REWARDS" },
     { "type": "text", "id": "card_one_heading", "label": "First card heading", "default": "A little more, every time" },
     { "type": "text", "id": "card_one_text", "label": "First card text", "default": "Join our rewards programme and collect points toward timeless jewellery." },
@@ -214,7 +332,12 @@
     { "type": "text", "id": "card_two_heading", "label": "Second card heading", "default": "Step into our world" },
     { "type": "text", "id": "card_two_text", "label": "Second card text", "default": "Discover considered design and personal service in our boutique." },
     { "type": "text", "id": "card_two_label", "label": "Second card link label", "default": "Plan your visit" },
-    { "type": "url", "id": "card_two_link", "label": "Second card link" }
+    { "type": "url", "id": "card_two_link", "label": "Second card link" },
+
+    { "type": "header", "content": "Section padding" },
+    { "type": "checkbox", "id": "custom_padding", "label": "Use custom section padding", "info": "Off keeps the theme's responsive padding.", "default": false },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 60 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 60 }
   ],
   "presets": [ { "name": "Homepage journey" } ]
 }

@@ -19,6 +19,10 @@
   which is what the first section of every group does — the group's own heading covers it.
   "~" and "::" are the separators rather than a comma because labels contain commas
   ("Climbers, Jackets & Cuffs"). Nothing is output for a group that isn't listed.
+
+  Every collection named here has to exist, or the tile opens a 404 — which is what the
+  MiaDonna-shaped lists that used to be here did. `scripts/shopify/store-config.mjs` is where they
+  are declared and `scripts/shopify/tag-products.mjs` is what fills them; keep the three in step.
 {% endcomment %}
 
 {%- liquid
@@ -26,7 +30,27 @@
   assign parent_key = parent | handle
   assign key = parent_key | append: '/' | append: group_key
 
-  assign metals = '::Yellow Gold|yellow-gold-jewelry~White Gold|white-gold-jewelry~Rose Gold|rose-gold-jewelry~Platinum|platinum-jewelry'
+  comment
+    Platinum is not here: the shop stocks none, so the tile opened an empty page. Sterling silver
+    takes its place and is the biggest of the four. Collections: scripts/shopify/store-config.mjs.
+  endcomment
+  assign metals = '::Yellow Gold|yellow-gold-jewelry~White Gold|white-gold-jewelry~Rose Gold|rose-gold-jewelry~Sterling Silver|sterling-silver-jewelry'
+
+  comment
+    Shape and Stone span the whole catalogue - a round stone in a stud counts, not only in a ring -
+    and both are automated on the tags 'scripts/shopify/tag-products.mjs' derives, so a new product
+    joins them on its own. Only values the shop stocks more than one of are listed; cushion,
+    emerald and asscher have a single piece each and their collections wait in store-config.mjs
+    until there is more to show.
+  endcomment
+  assign shapes = '::Round|shape-round~Heart|shape-heart~Pear|shape-pear~Marquise|shape-marquise~Triangle|shape-trillion~Baguette|shape-baguette~Oval|shape-oval~Princess|shape-princess~Square|shape-square'
+  assign stones = '::Cubic Zirconia|stone-cubic-zirconia~Lab-Grown Diamond|stone-lab-grown-diamond~Pearl|stone-pearl~Shell & Abalone|stone-shell~Turquoise|stone-turquoise~Black Onyx|stone-onyx~Opal|stone-opal~Birthstone|stone-birthstone'
+
+  comment
+    The Jewellery lists below name what the shop actually sells. The MiaDonna-shaped ones that used
+    to stand there - Tennis, Fashion, Signature, Ready to Ship - named collections the store has
+    never had, so every one of those tiles opened a 404.
+  endcomment
 
   case key
     when 'engagement/by-style' or 'engagement/shop-by-style'
@@ -42,20 +66,23 @@
       echo '::Round|round-diamonds~Oval|oval-diamonds~Emerald|emerald-diamonds~Cushion|cushion-diamonds~Marquise|marquise-diamonds~Radiant|radiant-diamonds~Pear|pear-diamonds~Princess|princess-diamonds~Asscher|asscher-diamonds~Heart|heart-diamonds'
     when 'diamonds/learn'
       echo '::Education & Guides|/blogs/education-guides~Gemstones|/pages/gemstones~Ring Size Guide|/pages/er-sizing~Jewellery Care|/pages/jewellery-care'
-    when 'jewellery/earrings'
+    when 'jewellery/earrings' or 'jewelry/earrings'
       echo '::Studs|studs~Hoops & Huggies|hoops-huggies~Dangles & Drops|dangles-drops~Climbers, Jackets & Cuffs|climbers-jackets-cuffs'
-      echo ';;Featured Collections::Signature Earrings|signature-earrings~New Arrivals|new-in~Ready to Ship|ready-to-ship'
-    when 'jewellery/necklaces'
-      echo '::Tennis|tennis-necklaces~Pendants|pendants~Fashion|fashion-necklaces'
-      echo ';;Featured Collections::Signature Necklaces|signature-necklaces~New Arrivals|new-in~Ready to Ship|ready-to-ship'
-    when 'jewellery/bracelets'
-      echo '::Tennis|tennis-bracelets~Bangles & Cuffs|bangles-cuffs~Fashion|fashion-bracelets'
-      echo ';;Featured Collections::Signature Bracelets|signature-bracelets~New Arrivals|new-in~Ready to Ship|ready-to-ship'
-    when 'jewellery/featured'
+    when 'jewellery/necklaces' or 'jewelry/necklaces'
+      echo '::Pendants|pendants~Chains|chains~Charms|charms'
+    when 'jewellery/shop-by-shape' or 'jewelry/shop-by-shape' or 'jewellery/by-shape'
+      echo shapes
+    when 'jewellery/shop-by-stone' or 'jewelry/shop-by-stone' or 'jewellery/by-stone'
+      echo stones
+    when 'jewellery/featured' or 'jewelry/featured'
       echo '::New In|new-in~Best Sellers|best-sellers'
     else
       if group_key == 'by-metal' or group_key == 'shop-by-metal'
         echo metals
+      elsif group_key == 'by-shape' or group_key == 'shop-by-shape'
+        echo shapes
+      elsif group_key == 'by-stone' or group_key == 'shop-by-stone'
+        echo stones
       endif
   endcase
 -%}

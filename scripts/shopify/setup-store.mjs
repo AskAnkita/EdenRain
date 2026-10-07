@@ -8,9 +8,17 @@
 //   node scripts/shopify/setup-store.mjs --apply --menu-handle=miadonna-menu
 //       writes the menu under another handle instead of replacing main-menu, so the live menu
 //       stays as it is until you pick the new one in the theme editor (Header > Menu)
+//   node scripts/shopify/setup-store.mjs --apply --update-rules
+//       also adds to an existing automated collection any rule store-config.mjs gives it
+//   node scripts/shopify/setup-store.mjs --apply --update-rules --convert-manual
+//       ...and turns a manual collection with rules in store-config.mjs into an automated one
 //
-// Existing collections are left untouched. Before the menu is replaced, the current one is saved
-// to scripts/shopify/backups/ (git-ignored).
+// Existing collections are left untouched unless --update-rules is passed, and even then only
+// automated ones: turning a manual collection into an automated one throws away the products
+// somebody added to it by hand, because Shopify lets a collection be one or the other, never both.
+// Those are reported and skipped unless --convert-manual says otherwise — and the preview names
+// each one with how many products it would hand over to the rules first. Before the menu is
+// replaced, the current one is saved to scripts/shopify/backups/ (git-ignored).
 
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -20,6 +28,8 @@ import { collections, menu } from './store-config.mjs';
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');
 const only = (args.find((a) => a.startsWith('--only=')) || '').split('=')[1];
+const updateRules = args.includes('--update-rules');
+const convertManual = args.includes('--convert-manual');
 const doCollections = !only || only === 'collections';
 const doMenu = !only || only === 'menu';
 const menuHandle = (args.find((a) => a.startsWith('--menu-handle=')) || '').split('=')[1] || menu.handle;
@@ -31,9 +41,40 @@ const log = (...m) => console.log(...m);
 // ---------- lookups ----------
 
 async function findCollection(handle) {
-  const data = await gql(cfg, `query($h: String!) { collectionByIdentifier(identifier: { handle: $h }) { id handle title } }`, { h: handle });
+  const data = await gql(
+    cfg,
+    `query($h: String!) {
+      collectionByIdentifier(identifier: { handle: $h }) {
+        id handle title
+        productsCount { count }
+        ruleSet { appliedDisjunctively rules { column relation condition } }
+      }
+    }`,
+    { h: handle }
+  );
   return data.collectionByIdentifier;
 }
+
+// A config entry's rules, whether it used `rule` (one) or `rules` (several, all of which must
+// match). An entry with neither is a manual collection.
+const rulesOf = (c) => c.rules || (c.rule ? [c.rule] : []);
+
+const describeRules = (rules) =>
+  rules.length ? `automated: products tagged ${rules.map((r) => `"${r.condition}"`).join(' and ')}` : 'manual';
+
+const ruleKey = (r) => `${r.column}|${r.relation}|${r.condition}`.toLowerCase();
+
+// Which of the rules this file asks for the live collection does not already have. Order and
+// letter case are not differences worth a write.
+//
+// Only ever additive: a live collection can carry rules nothing here knows about — the gift-box
+// app, for one, adds `TYPE NOT_EQUALS giftbox_ghost_product` to every collection it sees — and
+// rewriting the rule set wholesale would quietly drop them and let that ghost product back into
+// the shop. So an update keeps what is there and appends what is missing.
+const missingRules = (have, want) => {
+  const known = new Set(have.map(ruleKey));
+  return want.filter((r) => !known.has(ruleKey(r)));
+};
 
 async function findPage(handle) {
   const data = await gql(cfg, `query($q: String!) { pages(first: 1, query: $q) { nodes { id handle } } }`, { q: `handle:${handle}` });
@@ -60,22 +101,46 @@ async function syncCollections() {
   if (apply && !publicationId) log('  ! No "Online Store" sales channel found; new collections will not be published.');
 
   let created = 0;
+  let updated = 0;
   for (const c of collections) {
+    const wantRules = rulesOf(c);
+    const kind = describeRules(wantRules);
     const existing = await findCollection(c.handle);
     if (existing) {
       collectionIds.set(c.handle, existing.id);
-      log(`  = ${c.handle} (exists)`);
+      const haveRules = existing.ruleSet?.rules || [];
+      const missing = wantRules.length ? missingRules(haveRules, wantRules) : [];
+      const describeMissing = missing.map((r) => `"${r.condition}"`).join(' and ');
+
+      if (!missing.length) {
+        log(`  = ${c.handle} (exists)`);
+      } else if (!haveRules.length && !(updateRules && convertManual)) {
+        const held = existing.productsCount?.count ?? 0;
+        log(`  = ${c.handle} (exists, and is manual with ${held} product${held === 1 ? '' : 's'}; --update-rules --convert-manual would hand it to ${kind})`);
+      } else if (!updateRules) {
+        log(`  = ${c.handle} (exists; it is missing the rule ${describeMissing}. Pass --update-rules to add it)`);
+      } else if (!apply) {
+        log(`  ~ ${c.handle}  + rule ${describeMissing}`);
+      } else {
+        await gql(
+          cfg,
+          `mutation($input: CollectionInput!) { collectionUpdate(input: $input) { collection { id } userErrors { field message } } }`,
+          { input: { id: existing.id, ruleSet: { appliedDisjunctively: false, rules: [...haveRules, ...missing] } } },
+          'collectionUpdate'
+        );
+        updated++;
+        log(`  ~ ${c.handle}  + rule ${describeMissing}`);
+      }
       continue;
     }
 
-    const kind = c.rule ? `automated: products tagged "${c.rule.condition}"` : 'manual';
     if (!apply) {
       log(`  + ${c.handle}  "${c.title}"  (${kind})`);
       continue;
     }
 
     const input = { title: c.title, handle: c.handle };
-    if (c.rule) input.ruleSet = { appliedDisjunctively: false, rules: [c.rule] };
+    if (wantRules.length) input.ruleSet = { appliedDisjunctively: false, rules: wantRules };
     const data = await gql(
       cfg,
       `mutation($input: CollectionInput!) { collectionCreate(input: $input) { collection { id handle } userErrors { field message } } }`,
@@ -96,7 +161,7 @@ async function syncCollections() {
     created++;
     log(`  + ${c.handle}  created${publicationId ? ' and published' : ''} (${kind})`);
   }
-  if (apply) log(`  ${created} created`);
+  if (apply) log(`  ${created} created${updated ? `, ${updated} re-ruled` : ''}`);
 }
 
 // ---------- menu ----------

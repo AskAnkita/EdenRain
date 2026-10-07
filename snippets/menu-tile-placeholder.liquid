@@ -18,6 +18,8 @@
   - WEDDING AND JEWELLERY ship as assets/menu-tile-<handle>.png: squares that fill the tile.
   - LOOSE DIAMONDS reuse the shape photographs the homepage already carries, so
     "oval-diamonds" is served by assets/diamond-shape-oval.png and nothing is duplicated.
+    The shop-wide shape collections ("shape-oval", every piece set with an oval stone) borrow
+    the same photographs - it is the same cut either way.
 
   Diamond shapes (round-engagement-rings and so on) and metals are deliberately absent: they
   draw the line art and the colour discs in 'menu-tile-fallback', which is what MiaDonna's own
@@ -56,7 +58,8 @@
   if placeholder == ''
     for diamond_shape in diamond_shapes
       assign diamond_handle = diamond_shape | append: '-diamonds'
-      if diamond_handle == handle or diamond_shape == handle
+      assign shape_handle = 'shape-' | append: diamond_shape
+      if diamond_handle == handle or shape_handle == handle or diamond_shape == handle
         assign placeholder = 'diamond-shape-' | append: diamond_shape | append: '.png'
         break
       endif

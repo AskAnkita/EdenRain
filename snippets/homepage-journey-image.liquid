@@ -1,0 +1,33 @@
+{%- comment -%}
+  One image slot for the Homepage journey section.
+
+  A picked image wins; the plain URL field is the fallback so the homepage keeps
+  the images it was set up with before the picker existed. With neither, the
+  theme placeholder keeps the layout from collapsing in the editor.
+
+  Accepts: image (image_picker), image_url (string), alt (string),
+  placeholder (string), width, height.
+{%- endcomment -%}
+
+{%- liquid
+  assign placeholder_name = placeholder | default: 'lifestyle-1'
+  assign fallback_width = width | default: 1600
+  assign fallback_height = height | default: 1200
+-%}
+
+{%- if image != blank -%}
+  {%- assign image_alt = alt | default: image.alt | default: '' -%}
+  {{
+    image
+    | image_url: width: 1800
+    | image_tag:
+      loading: 'lazy',
+      widths: '480, 660, 900, 1200, 1500, 1800',
+      alt: image_alt,
+      class: 'hj-image'
+  }}
+{%- elsif image_url != blank -%}
+  <img src="{{ image_url | escape }}" alt="{{ alt | escape }}" loading="lazy" width="{{ fallback_width }}" height="{{ fallback_height }}" class="hj-image">
+{%- else -%}
+  {{ placeholder_name | placeholder_svg_tag: 'hj-placeholder' }}
+{%- endif -%}

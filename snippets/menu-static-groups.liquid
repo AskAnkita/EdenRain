@@ -36,10 +36,24 @@
         and take video, which is what a guide is better sold with. Cards: 'menu-featured-cards'.
       endcomment
       echo ',Learn|-|featured|Learn'
-    when 'jewellery'
+    when 'jewellery' or 'jewelry'
       echo 'Earrings|earrings|items|Shop All Earrings'
       echo ',Necklaces|necklaces|items|Shop All Necklaces'
-      echo ',Bracelets|bracelets|items|Shop All Bracelets'
+      comment
+        Bracelets and Rings have no sub-categories to tile - the shop sells bracelets, not tennis
+        bracelets and bangles - so these tabs show the pieces themselves instead of category tiles.
+      endcomment
+      echo ',Bracelets|bracelets|products|Shop All Bracelets'
+      echo ',Rings|rings|products|Shop All Rings'
+      comment
+        Shape and Stone browse the whole catalogue rather than one category: a shopper after a
+        round stone wants it in a stud as much as in a ring. They read the same `shape:` tags the
+        Shape group in the collection filter drawer filters on ('static-filters'), so the menu and
+        the drawer cannot drift apart. Tiles and collections: 'menu-static-items', store-config.mjs.
+      endcomment
+      echo ',Shop by Shape|-|items|Shop by Shape'
+      echo ',Shop by Stone|-|items|Shop by Stone'
+      echo ',Shop by Metal|-|items|Shop by Metal'
       echo ',Featured|-|featured|Featured'
   endcase
 -%}
