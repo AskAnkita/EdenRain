@@ -21213,7 +21213,11 @@ footer.section-footer .email-signup__input {
   --arrow-background-hover: #fff;
   --arrow-color: #1a1a1a;
   --arrow-color-hover: #1a1a1a;
-  --arrow-border: transparent;
+  /* The disc is white and the page behind it is white too wherever a button overhangs the
+     product band, which left the outer third of the circle with nothing to draw it -- the
+     shadow alone is too faint over white, so the circle read as unfinished on that side.
+     The 1px border box is already reserved by the theme, so colouring it shifts nothing. */
+  --arrow-border: rgb(0 0 0 / 0.1);
   --er-arrow-ring: #1a1a1a;
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease,
     opacity var(--animation-speed-slow) var(--cubic-fast),

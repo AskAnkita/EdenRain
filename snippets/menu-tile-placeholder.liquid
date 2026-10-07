@@ -39,8 +39,6 @@
 
   for style_handle in style_handles
     if style_handle == handle
-      assign placeholder = 'style-' | append: handle | append: '.png'
-    if style_handle == handle or handle contains style_handle
       assign placeholder = 'style-' | append: style_handle | append: '.png'
       break
     endif
@@ -49,11 +47,7 @@
   if placeholder == ''
     for tile_handle in tile_handles
       if tile_handle == handle
-        assign placeholder = 'menu-tile-' | append: handle | append: '.png'
-    for diamond_shape in diamond_shapes
-      assign diamond_handle = diamond_shape | append: '-diamonds'
-      if diamond_handle == handle or diamond_shape == handle or handle contains diamond_shape
-        assign placeholder = 'diamond-shape-' | append: diamond_shape | append: '.png'
+        assign placeholder = 'menu-tile-' | append: tile_handle | append: '.png'
         break
       endif
     endfor
@@ -62,14 +56,51 @@
   if placeholder == ''
     for diamond_shape in diamond_shapes
       assign diamond_handle = diamond_shape | append: '-diamonds'
-      if diamond_handle == handle
+      if diamond_handle == handle or diamond_shape == handle
         assign placeholder = 'diamond-shape-' | append: diamond_shape | append: '.png'
-    for tile_handle in tile_handles
-      if tile_handle == handle
-        assign placeholder = 'menu-tile-' | append: handle | append: '.png'
         break
       endif
     endfor
+  endif
+
+  comment
+    Near misses, after every exact match has had its turn: "hidden-halo" must not be
+    caught by "halo", and "oval-diamond-rings" should still find the oval photograph.
+  endcomment
+  if placeholder == ''
+    for style_handle in style_handles
+      if handle contains style_handle
+        assign placeholder = 'style-' | append: style_handle | append: '.png'
+        break
+      endif
+    endfor
+  endif
+
+  if placeholder == '' and handle contains 'diamond'
+    for diamond_shape in diamond_shapes
+      if handle contains diamond_shape
+        assign placeholder = 'diamond-shape-' | append: diamond_shape | append: '.png'
+        break
+      endif
+    endfor
+  endif
+
+  comment
+    Tennis spans two tiles, and Liquid has no parentheses to group the test with,
+    so the choice is made here and the chain below only reads the answer.
+  endcomment
+  assign tennis_necklace = false
+  assign tennis_bracelet = false
+  if handle contains 'tennis-necklace'
+    assign tennis_necklace = true
+  elsif handle contains 'tennis-bracelet'
+    assign tennis_bracelet = true
+  elsif handle contains 'tennis'
+    if handle contains 'neck'
+      assign tennis_necklace = true
+    elsif handle contains 'brace'
+      assign tennis_bracelet = true
+    endif
   endif
 
   if placeholder == ''
@@ -81,9 +112,9 @@
       assign placeholder = 'menu-tile-hoops-huggies.png'
     elsif handle contains 'stud'
       assign placeholder = 'menu-tile-studs.png'
-    elsif handle contains 'tennis-necklace' or (handle contains 'tennis' and handle contains 'neck')
+    elsif tennis_necklace
       assign placeholder = 'menu-tile-tennis-necklaces.png'
-    elsif handle contains 'tennis-bracelet' or (handle contains 'tennis' and handle contains 'brace')
+    elsif tennis_bracelet
       assign placeholder = 'menu-tile-tennis-bracelets.png'
     elsif handle contains 'pendant'
       assign placeholder = 'menu-tile-pendants.png'

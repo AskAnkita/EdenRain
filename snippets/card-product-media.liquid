@@ -10,14 +10,110 @@
   {{ 'content.product_image_secondary' | t }}
 {%- endcapture -%}
 
+{%- capture default_metal -%}
+  {%- render 'card-default-metal', card_product: card_product -%}
+{%- endcapture -%}
+
 {%- liquid
   assign f_media = card_product.featured_media
+
+  # Every product is photographed in yellow gold first, so a grid of cards opens as one
+  # block of yellow. card-default-metal picks a metal per product, and the card opens on
+  # that variant's photo when it has one of its own.
+  assign metal_override = false
+  assign default_metal = default_metal | strip
+  if default_metal != blank
+    assign metal_parts = default_metal | split: '||'
+    assign metal_index = metal_parts.first | plus: 0
+    assign metal_value = metal_parts.last
+
+    assign featured_variant = null
+    for variant in card_product.variants
+      if variant.featured_media != blank and variant.featured_media.id == card_product.featured_media.id
+        assign featured_variant = variant
+        break
+      endif
+    endfor
+
+    # Only the metal changes: shape, carat and anything else stay as the featured image
+    # has them, so the card's other option rows still describe the photo.
+    for variant in card_product.variants
+      if variant.options[metal_index] != metal_value or variant.featured_media == blank
+        continue
+      endif
+      if featured_variant
+        assign others_match = true
+        for option_value in variant.options
+          unless forloop.index0 == metal_index
+            if option_value != featured_variant.options[forloop.index0]
+              assign others_match = false
+            endif
+          endunless
+        endfor
+        unless others_match
+          continue
+        endunless
+      endif
+      assign f_media = variant.featured_media
+      assign metal_override = true
+      break
+    endfor
+
+    # That exact pair may not be photographed -- any photo of the chosen metal will do.
+    unless metal_override
+      for variant in card_product.variants
+        if variant.options[metal_index] == metal_value and variant.featured_media != blank
+          assign f_media = variant.featured_media
+          assign metal_override = true
+          break
+        endif
+      endfor
+    endunless
+  endif
+
   assign f_media_width = f_media.width
   assign media = card_product.media
-  assign media_width = media.width
+
+  # The hover photo has to be a different frame from the one the card opens on. The metal
+  # override above can land on media[1], which was the hover image, so taking media[1]
+  # blindly leaves those cards swapping a photo for itself and hover looking broken.
+  # Another metal's variant shot reads as a different ring rather than a second look at
+  # this one, so a detail or lifestyle frame is preferred where the product has one.
+  assign other_metal_media = '|'
+  if metal_override
+    for variant in card_product.variants
+      if variant.featured_media != blank and variant.options[metal_index] != metal_value
+        assign other_metal_media = other_metal_media | append: variant.featured_media.id | append: '|'
+      endif
+    endfor
+  endif
+
+  assign hover_media = null
+  for item in media
+    if item.id == f_media.id
+      continue
+    endif
+    assign media_id_key = '|' | append: item.id | append: '|'
+    unless other_metal_media contains media_id_key
+      assign hover_media = item
+      break
+    endunless
+  endfor
+
+  # Only other metals left to show: a swap still beats a hover that does nothing.
+  unless hover_media
+    for item in media
+      unless item.id == f_media.id
+        assign hover_media = item
+        break
+      endunless
+    endfor
+  endunless
+
+  assign media_width = hover_media.width
 
   assign f_media_alt = f_media.alt | default: card_product.title | append: ' ' | append: f_media_alt | strip
-  assign media_alt = media.alt | default: card_product.title | append: ' ' | append: media_alt | strip
+  assign media_alt = hover_media.alt | default: card_product.title | append: ' ' | append: media_alt | strip
 
   assign sizes = sizes
 
@@ -35,34 +131,42 @@
   endif
 
   if f_media.presentation.focal_point != blank
-    assign focal_point_style = '--image-focal-point: ' | append: media[0].presentation.focal_point | append: ';'
+    assign focal_point_style = '--image-focal-point: ' | append: f_media.presentation.focal_point | append: ';'
   endif
 
-  assign secondary_focal_point_style = '--image-focal-point: ' | append: media[1].presentation.focal_point | append: ';'
+  if hover_media.presentation.focal_point != blank
+    assign secondary_focal_point_style = '--image-focal-point: ' | append: hover_media.presentation.focal_point | append: ';'
+  endif
 -%}
 
 <card-media class="card__media block{% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ settings.card_color_scheme }}{% endif %}">
   {% comment %} <section-fetcher class="absolute inset-0" data-section-id="{{ section.id }}" data-target-id="{{ secondary_media_id }}" data-activate="inview"></section-fetcher> {% endcomment %}
+  {% comment %}
+    'is-swatch-selected' is deliberately not set here. It hides the hover photo, and
+    card-option-swatches.js adds it once a shopper picks a swatch, because from then on the
+    hover frame belongs to the variant they replaced. Emitting it at render time instead
+    applied that to every card on first paint and killed hover across the grid.
+  {% endcomment %}
   <div class="media media--transparent media--hover-effect" id="CardProductMedia-Content-{{ section.id }}-{{ card_product.id }}">
     {% if f_media %}
       {{ f_media | image_url: width: f_media_width , format: 'webp' | image_tag: sizes: sizes, widths: f_widths, loading: 'lazy', alt: f_media_alt, class: 'motion-reduce', loading: loading, style: focal_point_style }}
     {% else %}
       {{ 'product-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
     {% endif %}
-    {%- if media[1] != null and show_secondary_image -%}
-      {%- case media[1].media_type -%}
+    {%- if hover_media != null and show_secondary_image -%}
+      {%- case hover_media.media_type -%}
         {%- when 'image' -%}
-          {{ media[1] | image_url: width: media_width , format: 'webp' | image_tag: sizes: sizes, widths: m_widths, loading: 'lazy', alt: media_alt, class: 'motion-reduce', loading: 'lazy', id: secondary_media_id, style: secondary_focal_point_style }}
+          {{ hover_media | image_url: width: media_width , format: 'webp' | image_tag: sizes: sizes, widths: m_widths, loading: 'lazy', alt: media_alt, class: 'motion-reduce', loading: 'lazy', id: secondary_media_id, style: secondary_focal_point_style }}
         {%- when 'video', 'external_video' -%}
           {%- render 'video',
-            video: media[1],
+            video: hover_media,
             widths: widths,
             sizes: sizes,
             loading: loading,
             disable_controls: true,
             video_autoplay: true,
             video_loop: true,
-            video_id: media[1].id,
+            video_id: hover_media.id,
             section_id: section.id,
             id: secondary_media_id
           -%}

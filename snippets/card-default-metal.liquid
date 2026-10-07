@@ -1,0 +1,89 @@
+{%- doc -%}
+  The metal a product card should open on.
+
+  Every product's featured image is yellow gold, so a grid of cards used to read as one
+  long row of yellow rings. This spreads the opening metal across the metals a product
+  actually sells: the dots are collapsed by tone the same way blocks/_card-product-metals.liquid
+  collapses them, then one is chosen by a seed built from the product, so a card always
+  opens on the same metal (nothing shifts between page loads, filters or pagination)
+  while neighbouring cards land on different ones.
+
+  Outputs "<option index>||<option value>" for the chosen metal, or nothing when the
+  product has no metal option or sells only one metal — callers then keep the product's
+  own featured image.
+
+  @param {object} card_product - Product Liquid object
+
+  Usage:
+  {%- capture default_metal -%}{%- render 'card-default-metal', card_product: card_product -%}{%- endcapture -%}
+{%- enddoc -%}
+
+{%- liquid
+  assign option_keys = 'metal,material,color,colour,finish,gold' | split: ','
+
+  assign metal_source = ''
+  assign metal_index = -1
+  for option in card_product.options_with_values
+    assign option_name = option.name | downcase
+    assign is_metal_option = false
+    for key in option_keys
+      if option_name contains key
+        assign is_metal_option = true
+        break
+      endif
+    endfor
+    if is_metal_option
+      assign metal_source = option.values | join: '||'
+      assign metal_index = forloop.index0
+      break
+    endif
+  endfor
+
+  assign metal_values_raw = metal_source | split: '||'
+
+  # Same collapsing as the metals row: every karat of white gold is one dot, and the
+  # first value of each tone is kept because that is the one with a variant behind it.
+  assign seen_tones = '|'
+  assign metal_unique = ''
+  for value in metal_values_raw
+    assign dedupe_text = value | strip | downcase
+    if dedupe_text contains 'rose' or dedupe_text contains 'pink'
+      assign dedupe_tone = 'rg'
+    elsif dedupe_text contains 'white'
+      assign dedupe_tone = 'wg'
+    elsif dedupe_text contains 'yellow'
+      assign dedupe_tone = 'yg'
+    elsif dedupe_text contains 'platinum'
+      assign dedupe_tone = 'pl'
+    elsif dedupe_text contains 'silver'
+      assign dedupe_tone = 'ss'
+    elsif dedupe_text contains 'gold'
+      assign dedupe_tone = 'yg'
+    else
+      assign dedupe_tone = dedupe_text | handle
+    endif
+    assign tone_key = '|' | append: dedupe_tone | append: '|'
+    unless seen_tones contains tone_key
+      assign seen_tones = seen_tones | append: dedupe_tone | append: '|'
+      assign metal_unique = metal_unique | append: '||' | append: value
+    endunless
+  endfor
+
+  assign metal_values = metal_unique | remove_first: '||' | split: '||'
+-%}
+{%- if metal_index >= 0 and metal_values.size > 1 -%}
+  {%- liquid
+    # The product id alone is no good as a seed: this catalogue was imported in bulk, so
+    # Shopify handed out ids in a regular stride and every one of them leaves the same
+    # remainder -- `id | modulo: 4` picked White Gold for the whole grid. Dividing the id
+    # by a prime brings the digits that do differ down into the low bits, and the title's
+    # length moves products whose ids sit close together apart. Checked against the live
+    # catalogue: all four metals come up, and no long run of cards shares one.
+    assign seed_text = card_product.handle | append: '-' | append: card_product.title
+    assign seed_size = seed_text | size
+    assign seed = card_product.id | divided_by: 7 | plus: seed_size
+    assign pick_position = seed | modulo: metal_values.size
+    assign picked = metal_values[pick_position] | strip
+  -%}
+  {{- metal_index }}||{{ picked -}}
+{%- endif -%}
