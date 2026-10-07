@@ -6,6 +6,8 @@
   - group_id: {String} matches the tab button's data-menu-drawer-category
   - active: {Boolean} shown first
   - top_title: {String} the top-level item's title, used to look up the cards
+  - group_title: {String} optional; the tab's own name, passed on so a menu can give cards to
+    a tab that isn't called "Featured" - Diamonds does this with its Learn tab
 
   The cards themselves come from 'menu-featured-cards'. Nothing is output when that snippet
   lists none for this menu, which leaves the tab empty rather than half-built.
@@ -13,7 +15,7 @@
 
 {%- liquid
   capture cards_source
-    render 'menu-featured-cards', parent: top_title
+    render 'menu-featured-cards', parent: top_title, group: group_title
   endcapture
   assign cards = cards_source | strip
 -%}

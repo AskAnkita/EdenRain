@@ -93,6 +93,18 @@
               assign item_collection = collections[item_handle]
               assign item_url = item_handle | prepend: '/collections/'
             endunless
+
+            comment
+              The metal discs are photographed on white, so beside the diamond shapes - which
+              carry the menu's own grey - they read as bright squares. Marking them here lets
+              the CSS lay that grey behind and multiply the picture over it, which turns the
+              white into the panel colour and leaves the metal untouched. Keyed off the handle,
+              so it holds whether the picture comes from the collection or from assets/.
+            endcomment
+            assign metal_tile = false
+            if item_handle contains 'gold' or item_handle contains 'platinum' or item_handle contains 'silver'
+              assign metal_tile = true
+            endif
           -%}
           {%- comment -%} Skip an item that just repeats the group's own link {%- endcomment -%}
           {%- if item_url == heading_url -%}
@@ -107,9 +119,18 @@
             {%- render 'menu-tile-placeholder', handle: item_handle -%}
           {%- endcapture -%}
           {%- assign placeholder_asset = placeholder_asset | strip -%}
+          {%- comment -%}
+            The shape photographs are framed tight - the stone all but fills its file - so at
+            tile size they stand noticeably larger than everything around them. Marked here so
+            the CSS can inset them; see 'menu-drawer-desktop.css'.
+          {%- endcomment -%}
+          {%- assign shape_tile = false -%}
+          {%- if placeholder_asset contains 'diamond-shape-' -%}
+            {%- assign shape_tile = true -%}
+          {%- endif -%}
           <li>
             <a class="menu-drawer-desktop__tile" href="{{ item_url }}">
-              <span class="menu-drawer-desktop__tile-media">
+              <span class="menu-drawer-desktop__tile-media{% if metal_tile %} menu-drawer-desktop__tile-media--metal{% endif %}">
                 {%- if item_collection.featured_image != blank -%}
                   {{ item_collection.featured_image | image_url: width: 400 | image_tag: loading: 'lazy', sizes: '180px', alt: item_title }}
                 {%- elsif placeholder_asset != '' -%}
@@ -121,7 +142,7 @@
                     square is what the browser should reserve.
                   {%- endcomment -%}
                   <img
-                    class="menu-drawer-desktop__tile-placeholder"
+                    class="menu-drawer-desktop__tile-placeholder{% if shape_tile %} menu-drawer-desktop__tile-placeholder--shape{% endif %}"
                     src="{{ placeholder_asset | asset_img_url: '400x' }}"
                     srcset="{{ placeholder_asset | asset_img_url: '400x' }} 400w, {{ placeholder_asset | asset_img_url: '600x' }} 600w"
                     sizes="180px"

@@ -142,6 +142,7 @@
         {%- if group_source == 'featured' -%}
           {%- render 'header-menu-drawer-featured',
             group_id: group_id,
+            group_title: tab_title,
             top_title: link.title,
             active: forloop.first
           -%}

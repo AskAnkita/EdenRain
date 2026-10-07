@@ -5,6 +5,9 @@
 
   Accepts:
   - parent: {String} the top-level item's title, e.g. "Engagement"
+  - group: {String} optional; the tab's own name, for a menu where more than one tab wants
+    cards. Diamonds names its tab "Learn"; the rest call theirs "Featured" and are looked up
+    under the parent alone, so an unnamed group keeps the old behaviour.
 
   Outputs one card per entry, separated by "~", each in this shape:
 
@@ -29,22 +32,41 @@
 
 {%- liquid
   assign parent_key = parent | handle
+  assign group_key = group | handle
+  assign key = parent_key | append: '/' | append: group_key
 
-  case parent_key
-    when 'engagement'
-      echo 'The Value Edit|/collections/ready-to-ship|featured-engagement-value.jpg|'
-      echo '~Shop Signature Engagement|/collections/engagement-rings|featured-engagement-signature.jpg|featured-engagement-signature.mp4'
-      echo '~New Engagement Arrivals|/collections/new-in|featured-engagement-new.jpg|featured-engagement-new.mp4'
-      echo '~Shop Bridal Sets|/collections/bridal-sets|featured-engagement-bridal.jpg|'
-    when 'wedding'
-      echo "Shop Men's Wedding Bands|/collections/mens-rings|featured-wedding-mens.jpg|"
-      echo '~The Eternity Collection|/collections/eternity-rings|featured-wedding-eternity.jpg|featured-wedding-eternity.mp4'
-      echo '~New Wedding Arrivals|/collections/new-in|featured-wedding-new.jpg|featured-wedding-new.mp4'
-      echo '~Shop Anniversary Rings|/collections/anniversary-rings|featured-wedding-anniversary.jpg|'
-    when 'jewellery'
-      echo 'Shop Signature Earrings|/collections/signature-earrings|featured-jewellery-earrings.jpg|'
-      echo '~Shop Must-Have Studs|/collections/studs|featured-jewellery-studs.jpg|featured-jewellery-studs.mp4'
-      echo '~Shop Tennis Bracelets|/collections/tennis-bracelets|featured-jewellery-bracelets.jpg|featured-jewellery-bracelets.mp4'
-      echo '~Shop Signature Necklaces|/collections/signature-necklaces|featured-jewellery-necklaces.jpg|'
+  comment
+    A tab that names itself is matched first; every other menu has a single "Featured" tab and
+    is matched on the parent alone, in the inner case.
+  endcomment
+  case key
+    when 'diamonds/learn'
+      comment
+        Diamonds > Learn points at guides and pages. Its first two cards carry video once the
+        files are uploaded under Content > Files; the last two stay stills. To give one of
+        those a video, put its file name after the picture, as the first two have.
+      endcomment
+      echo 'Education & Guides|/blogs/education-guides|featured-diamonds-education.jpg|featured-diamonds-education.mp4'
+      echo '~Gemstones|/pages/gemstones|featured-diamonds-gemstones.jpg|featured-diamonds-gemstones.mp4'
+      echo '~Ring Size Guide|/pages/er-sizing|featured-diamonds-sizing.jpg|'
+      echo '~Jewellery Care|/pages/jewellery-care|featured-diamonds-care.jpg|'
+    else
+      case parent_key
+        when 'engagement'
+          echo 'The Value Edit|/collections/ready-to-ship|featured-engagement-value.jpg|'
+          echo '~Shop Signature Engagement|/collections/engagement-rings|featured-engagement-signature.jpg|featured-engagement-signature.mp4'
+          echo '~New Engagement Arrivals|/collections/new-in|featured-engagement-new.jpg|featured-engagement-new.mp4'
+          echo '~Shop Bridal Sets|/collections/bridal-sets|featured-engagement-bridal.jpg|'
+        when 'wedding'
+          echo "Shop Men's Wedding Bands|/collections/mens-rings|featured-wedding-mens.jpg|"
+          echo '~The Eternity Collection|/collections/eternity-rings|featured-wedding-eternity.jpg|featured-wedding-eternity.mp4'
+          echo '~New Wedding Arrivals|/collections/new-in|featured-wedding-new.jpg|featured-wedding-new.mp4'
+          echo '~Shop Anniversary Rings|/collections/anniversary-rings|featured-wedding-anniversary.jpg|'
+        when 'jewellery'
+          echo 'Shop Signature Earrings|/collections/signature-earrings|featured-jewellery-earrings.jpg|'
+          echo '~Shop Must-Have Studs|/collections/studs|featured-jewellery-studs.jpg|featured-jewellery-studs.mp4'
+          echo '~Shop Tennis Bracelets|/collections/tennis-bracelets|featured-jewellery-bracelets.jpg|featured-jewellery-bracelets.mp4'
+          echo '~Shop Signature Necklaces|/collections/signature-necklaces|featured-jewellery-necklaces.jpg|'
+      endcase
   endcase
 -%}

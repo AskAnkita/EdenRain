@@ -340,6 +340,28 @@
   object-fit: contain;
 }
 
+/* The shape photographs are framed tight: the stone fills three quarters of its file and more,
+   where a ring in the tile beside it sits well inside its frame, so at tile size the stones
+   read as outsized. The padding insets the picture within the same square - the file's own
+   background is this panel's #f8f8f8, so what shows is more space around the stone, not a
+   border. Raise it to shrink the stones further. */
+.menu-drawer-desktop__tile-media img.menu-drawer-desktop__tile-placeholder--shape {
+  padding: 12%;
+}
+
+/* Metals: the discs are photographed on white, which beside the grey diamond tiles reads as
+   four bright squares. The grey goes behind them and the picture multiplies over it - white
+   lands exactly on the panel colour, so the square disappears, while the metal keeps its own
+   colour. Fitted rather than cropped, so an upload that is not square keeps its whole disc. */
+.menu-drawer-desktop__tile-media--metal {
+  background: #f8f8f8;
+}
+
+.menu-drawer-desktop__tile-media--metal img {
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
 .menu-drawer-desktop__tile:hover .menu-drawer-desktop__tile-media img {
   transform: scale(1.05);
 }
@@ -582,7 +604,9 @@ p.menu-drawer-desktop__shop-all {
 
 @media (prefers-reduced-motion: reduce) {
   .menu-drawer-desktop__nav-link,
-  .menu-drawer-desktop__campaign-media img {
+  .menu-drawer-desktop__campaign-media img,
+  .menu-drawer-desktop__tab,
+  .menu-drawer-desktop__tab-arrow {
     transition: none;
   }
 }
@@ -643,13 +667,37 @@ p.menu-drawer-desktop__shop-all {
   letter-spacing: 0.08em;
   text-align: left;
   text-transform: uppercase;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.menu-drawer-desktop__tab:hover,
-.menu-drawer-desktop__tab.is-active {
-  background: #f4efec;
+/* No fill behind the tab: a beige block on a white panel read as a painted-on state, and the
+   menu says "current" with ink everywhere else - the underline under the header item, the one
+   under Shop all. So hover darkens the label, and the tab you are on holds that dark label and
+   a hairline down its left edge. The rule is drawn as an inset shadow rather than a border so
+   the label never shifts as it comes and goes. */
+.menu-drawer-desktop__tab:hover {
   color: #111;
+}
+
+.menu-drawer-desktop__tab.is-active {
+  color: #111;
+  box-shadow: inset 2px 0 0 #111;
+}
+
+/* The chevron sits quiet until the tab is pointed at or open, then it comes up to the label's
+   weight and steps toward the panel it opens. */
+.menu-drawer-desktop__tab:hover .menu-drawer-desktop__tab-arrow,
+.menu-drawer-desktop__tab.is-active .menu-drawer-desktop__tab-arrow {
+  opacity: 1;
+  transform: rotate(45deg) translate(0.15rem, -0.15rem);
+}
+
+/* Must sit after the rule above to beat it: a media query carries no weight of its own. */
+@media (prefers-reduced-motion: reduce) {
+  .menu-drawer-desktop__tab:hover .menu-drawer-desktop__tab-arrow,
+  .menu-drawer-desktop__tab.is-active .menu-drawer-desktop__tab-arrow {
+    transform: rotate(45deg);
+  }
 }
 
 .menu-drawer-desktop__tab:focus-visible {
@@ -666,6 +714,7 @@ p.menu-drawer-desktop__shop-all {
   border-right: 1.5px solid currentColor;
   transform: rotate(45deg);
   opacity: 0.6;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .menu-drawer-desktop__tab-panels {
