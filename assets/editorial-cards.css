@@ -1,7 +1,8 @@
 /*
-  Education & Guides - the friendly face of the Learn page.
+  Editorial cards - the shared card language for the Education & Guides page
+  (sections/education-guides.liquid) and the blog (sections/blog-editorial.liquid).
 
-  Same guides as 'learn-hub', and the same copy, but warm instead of austere:
+  Warm instead of austere, where 'learn-hub' was typographic and cold:
   soft rounded cards on a cream field, a picture at the top of each, a pill in
   place of the bare number, sentence-case titles and a nudging arrow. Where the
   learn hub reads as a contents list of hairlines, this reads as a shelf of
@@ -12,7 +13,7 @@
   The values below are only the fallbacks, so the file stays readable on its own.
 */
 
-.education-guides {
+.editorial-cards {
   --eg-ink: #171714;
   --eg-muted: rgba(23, 23, 20, 0.64);
   --eg-card-bg: #ffffff;
@@ -29,7 +30,7 @@
   --eg-columns: 1;
 }
 
-.education-guides .eg-shell {
+.editorial-cards .eg-shell {
   max-width: var(--page-width, 160rem);
   margin: 0 auto;
   padding-inline: 2.4rem;
@@ -37,7 +38,7 @@
 
 /* ------------------------------------------------------------------- intro */
 
-.education-guides .eg-intro {
+.editorial-cards .eg-intro {
   max-width: 72rem;
   margin: 0 auto 4.8rem;
   text-align: center;
@@ -47,7 +48,7 @@
   A pill rather than letter-spaced capitals on their own: the rounded shape is
   the single cheapest way to make the top of the page feel welcoming.
 */
-.education-guides .eg-eyebrow {
+.editorial-cards .eg-eyebrow {
   display: inline-block;
   margin: 0 0 2rem;
   padding: 0.7rem 1.6rem;
@@ -60,7 +61,7 @@
   text-transform: uppercase;
 }
 
-.education-guides .eg-heading {
+.editorial-cards .eg-heading {
   margin: 0;
   font-family: var(--font-heading--family);
   font-size: var(--eg-heading-size, clamp(3rem, 3.6vw, 4.6rem));
@@ -69,19 +70,19 @@
   text-wrap: balance;
 }
 
-.education-guides .eg-description {
+.editorial-cards .eg-description {
   margin-top: 2rem;
   color: var(--eg-muted);
   font-size: var(--eg-body-size, 1.65rem);
   line-height: 1.75;
 }
 
-.education-guides .eg-description > :first-child { margin-top: 0; }
-.education-guides .eg-description > :last-child { margin-bottom: 0; }
+.editorial-cards .eg-description > :first-child { margin-top: 0; }
+.editorial-cards .eg-description > :last-child { margin-bottom: 0; }
 
 /* ------------------------------------------------------------------- cards */
 
-.education-guides .eg-grid {
+.editorial-cards .eg-grid {
   display: grid;
   grid-template-columns: repeat(var(--eg-columns), minmax(0, 1fr));
   gap: var(--eg-gap);
@@ -90,7 +91,7 @@
   list-style: none;
 }
 
-.education-guides .eg-card {
+.editorial-cards .eg-card {
   display: flex;
 }
 
@@ -99,7 +100,7 @@
   together. A guide with no link yet renders the same markup as a <div>, which
   is why the lift and the zoom are hung off a.eg-card__link and not .eg-card.
 */
-.education-guides .eg-card__link {
+.editorial-cards .eg-card__link {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -113,34 +114,34 @@
 }
 
 @media (hover: hover) {
-  .education-guides a.eg-card__link:hover {
+  .editorial-cards a.eg-card__link:hover {
     transform: translateY(-4px);
     border-color: transparent;
     box-shadow: 0 1.4rem 3.2rem rgba(23, 23, 20, 0.1);
   }
 
-  .education-guides a.eg-card__link:hover .eg-card__media img {
+  .editorial-cards a.eg-card__link:hover .eg-card__media img {
     transform: scale(1.05);
   }
 
-  .education-guides a.eg-card__link:hover .eg-card__arrow {
+  .editorial-cards a.eg-card__link:hover .eg-card__arrow {
     transform: translateX(4px);
   }
 }
 
-.education-guides a.eg-card__link:focus-visible {
+.editorial-cards a.eg-card__link:focus-visible {
   outline: 2px solid var(--eg-ink);
   outline-offset: 3px;
 }
 
-.education-guides .eg-card__media {
+.editorial-cards .eg-card__media {
   position: relative;
   overflow: hidden;
   aspect-ratio: var(--eg-ratio, 1 / 1);
   background: var(--eg-accent);
 }
 
-.education-guides .eg-card__media img {
+.editorial-cards .eg-card__media img {
   display: block;
   width: 100%;
   height: 100%;
@@ -150,7 +151,7 @@
 
 /* The pill floats on the picture when there is one, and sits in the body when
    there is not, so a numbered card works with images switched off. */
-.education-guides .eg-card__badge {
+.editorial-cards .eg-card__badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -166,7 +167,7 @@
   text-transform: uppercase;
 }
 
-.education-guides .eg-card__media .eg-card__badge {
+.editorial-cards .eg-card__media .eg-card__badge {
   position: absolute;
   inset-block-start: 1.4rem;
   inset-inline-start: 1.4rem;
@@ -174,7 +175,7 @@
   backdrop-filter: blur(2px);
 }
 
-.education-guides .eg-card__body {
+.editorial-cards .eg-card__body {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -183,7 +184,7 @@
   padding: clamp(2.2rem, 2.4vw, 3rem);
 }
 
-.education-guides .eg-card__title {
+.editorial-cards .eg-card__title {
   margin: 0;
   font-family: var(--font-heading--family);
   font-size: var(--eg-card-title-size, 2.1rem);
@@ -195,7 +196,7 @@
   text-transform: none;
 }
 
-.education-guides .eg-card__text {
+.editorial-cards .eg-card__text {
   margin: 0;
   color: var(--eg-muted);
   font-size: var(--eg-card-text-size, 1.5rem);
@@ -204,7 +205,7 @@
 
 /* Keeps the call to action on the bottom edge, so a short card lines up with a
    tall one in the same row. */
-.education-guides .eg-card__action {
+.editorial-cards .eg-card__action {
   display: inline-flex;
   align-items: center;
   gap: 0.8rem;
@@ -216,12 +217,12 @@
   letter-spacing: 0.04em;
 }
 
-.education-guides .eg-card__arrow {
+.editorial-cards .eg-card__arrow {
   display: inline-block;
   transition: transform 0.3s ease;
 }
 
-.education-guides .eg-empty {
+.editorial-cards .eg-empty {
   padding: 6rem 0;
   color: var(--eg-muted);
   text-align: center;
@@ -233,7 +234,7 @@
   The closing panel. A guides page answers questions, so it ends by offering a
   person - the one thing a guide cannot do.
 */
-.education-guides .eg-cta {
+.editorial-cards .eg-cta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -246,11 +247,11 @@
   color: var(--eg-cta-ink, var(--eg-ink));
 }
 
-.education-guides .eg-cta__copy {
+.editorial-cards .eg-cta__copy {
   max-width: 62rem;
 }
 
-.education-guides .eg-cta__heading {
+.editorial-cards .eg-cta__heading {
   margin: 0;
   font-family: var(--font-heading--family);
   font-size: clamp(2.2rem, 2.2vw, 2.8rem);
@@ -258,22 +259,22 @@
   line-height: 1.25;
 }
 
-.education-guides .eg-cta__text {
+.editorial-cards .eg-cta__text {
   margin: 1rem 0 0;
   font-size: 1.55rem;
   line-height: 1.7;
   opacity: 0.8;
 }
 
-.education-guides .eg-cta__text > :first-child { margin-top: 0; }
-.education-guides .eg-cta__text > :last-child { margin-bottom: 0; }
+.editorial-cards .eg-cta__text > :first-child { margin-top: 0; }
+.editorial-cards .eg-cta__text > :last-child { margin-bottom: 0; }
 
 /*
   The button borrows the shared .eden-action shape from eden-actions.css, then
   overrides only the three colours the section exposes, so a merchant's choice
   wins while the padding, radius and type stay in step with the rest of the shop.
 */
-.education-guides .eg-cta__button {
+.editorial-cards .eg-cta__button {
   flex-shrink: 0;
   border-color: var(--eg-btn-bg, var(--eg-ink));
   background: var(--eg-btn-bg, var(--eg-ink));
@@ -281,14 +282,14 @@
 }
 
 @media (hover: hover) {
-  .education-guides .eg-cta__button:hover {
+  .editorial-cards .eg-cta__button:hover {
     border-color: var(--eg-btn-bg, var(--eg-ink));
     background: transparent;
     color: var(--eg-btn-bg, var(--eg-ink));
   }
 }
 
-.education-guides .eg-cta__button:focus-visible {
+.editorial-cards .eg-cta__button:focus-visible {
   background: transparent;
   color: var(--eg-btn-bg, var(--eg-ink));
 }
@@ -296,53 +297,192 @@
 /* ------------------------------------------------------------- breakpoints */
 
 @media screen and (min-width: 750px) {
-  .education-guides {
+  .editorial-cards {
     --eg-columns: var(--eg-columns-tablet, 2);
   }
 }
 
 @media screen and (min-width: 990px) {
-  .education-guides {
+  .editorial-cards {
     --eg-columns: var(--eg-columns-desktop, 2);
   }
 }
 
 @media screen and (max-width: 749px) {
-  .education-guides {
+  .editorial-cards {
     --eg-gap: 1.6rem;
   }
 
-  .education-guides .eg-shell {
+  .editorial-cards .eg-shell {
     padding-inline: 1.6rem;
   }
 
-  .education-guides .eg-intro {
+  .editorial-cards .eg-intro {
     margin-bottom: 3.2rem;
   }
 
-  .education-guides .eg-cta {
+  .editorial-cards .eg-cta {
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
   }
 
-  .education-guides .eg-cta__button {
+  .editorial-cards .eg-cta__button {
     width: 100%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .education-guides .eg-card__link,
-  .education-guides .eg-card__media img,
-  .education-guides .eg-card__arrow {
+  .editorial-cards .eg-card__link,
+  .editorial-cards .eg-card__media img,
+  .editorial-cards .eg-card__arrow {
     transition: none;
   }
 
-  .education-guides a.eg-card__link:hover {
+  .editorial-cards a.eg-card__link:hover {
     transform: none;
   }
 
-  .education-guides a.eg-card__link:hover .eg-card__media img {
+  .editorial-cards a.eg-card__link:hover .eg-card__media img {
+    transform: none;
+  }
+}
+
+/* =====================================================================
+   The blog listing.
+
+   Articles in the same language as the guide cards above: cream field,
+   soft rounded cards, a pill for the date,
+   sentence-case titles and a nudging arrow. The stock blog layout put a
+   category sidebar, a recent-articles list and a placeholder graphic beside
+   the posts; none of that is reading material, so none of it is here. Shares
+   every token with .editorial-cards, so changing a colour moves both.
+   ===================================================================== */
+
+/* -------------------------------------------------------- featured post */
+
+/*
+  The newest article, given the width the others share between them: picture on
+  one side, copy on the other. It is the one piece of hierarchy on the page.
+*/
+.editorial-cards .eg-feature {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  overflow: hidden;
+  margin-bottom: var(--eg-gap);
+  border: 1px solid var(--eg-card-border);
+  border-radius: var(--eg-radius);
+  background: var(--eg-card-bg);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+@media (hover: hover) {
+  .editorial-cards a.eg-feature:hover {
+    transform: translateY(-4px);
+    border-color: transparent;
+    box-shadow: 0 1.4rem 3.2rem rgba(23, 23, 20, 0.1);
+  }
+
+  .editorial-cards a.eg-feature:hover .eg-feature__media img {
+    transform: scale(1.04);
+  }
+
+  .editorial-cards a.eg-feature:hover .eg-card__arrow {
+    transform: translateX(4px);
+  }
+}
+
+.editorial-cards a.eg-feature:focus-visible {
+  outline: 2px solid var(--eg-ink);
+  outline-offset: 3px;
+}
+
+.editorial-cards .eg-feature__media {
+  position: relative;
+  overflow: hidden;
+  /* Taller than a guide card, because it sits beside a column of text and has
+     to reach the same height without the copy being stretched to meet it. */
+  aspect-ratio: 3 / 2;
+  background: var(--eg-accent);
+}
+
+.editorial-cards .eg-feature__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.editorial-cards .eg-feature__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.4rem;
+  padding: clamp(2.4rem, 3.2vw, 4rem);
+}
+
+.editorial-cards .eg-feature__title {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: clamp(2.2rem, 2.4vw, 3rem);
+  font-weight: 500;
+  line-height: 1.22;
+  text-transform: none;
+}
+
+/* ------------------------------------------------------------ meta line */
+
+.editorial-cards .eg-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1.2rem;
+  margin: 0;
+  color: var(--eg-muted);
+  font-size: 1.25rem;
+  letter-spacing: 0.02em;
+}
+
+.editorial-cards .eg-meta__dot {
+  opacity: 0.5;
+}
+
+/* ------------------------------------------------------------ empty blog */
+
+.editorial-cards .eg-pagination {
+  margin-top: 4rem;
+}
+
+.editorial-cards .eg-pagination .pagination__list {
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------ narrow */
+
+@media screen and (max-width: 749px) {
+  .editorial-cards .eg-feature {
+    grid-template-columns: 1fr;
+  }
+
+  .editorial-cards .eg-feature__media {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorial-cards .eg-feature,
+  .editorial-cards .eg-feature__media img {
+    transition: none;
+  }
+
+  .editorial-cards a.eg-feature:hover {
+    transform: none;
+  }
+
+  .editorial-cards a.eg-feature:hover .eg-feature__media img {
     transform: none;
   }
 }

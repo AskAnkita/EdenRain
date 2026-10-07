@@ -15,10 +15,10 @@
 
   Every look is a setting: colours, type sizes, corner radius, columns, image
   ratio and the closing panel's button all come from the schema below and are
-  written out as custom properties. assets/education-guides.css holds the shape.
+  written out as custom properties. assets/editorial-cards.css holds the shape, shared with the blog.
 {% endcomment %}
 
-{{ 'education-guides.css' | asset_url | stylesheet_tag }}
+{{ 'editorial-cards.css' | asset_url | stylesheet_tag }}
 
 {%- liquid
   assign stts = section.settings
@@ -83,7 +83,7 @@
 
 <section
   id="education-guides-{{ section.id }}"
-  class="education-guides color-{{ stts.color_scheme }}"
+  class="editorial-cards color-{{ stts.color_scheme }}"
 >
   <div class="eg-shell">
     <div class="eg-intro">

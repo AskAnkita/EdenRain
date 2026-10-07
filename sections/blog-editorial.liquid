@@ -1,0 +1,543 @@
+{% comment %}
+  Editorial blog - a blog listing and nothing else.
+
+  Works on any blog. The newest post takes the full width when the toggle is on;
+  the rest follow as cards with a picture, a date pill, a sentence-case title, a
+  short summary and a nudging arrow.
+
+  The stock blog layout wrapped the posts in a category sidebar, a recent-articles
+  list and a placeholder graphic. None of that is reading material and all of it
+  pulled the eye away from the posts, so none of it is here.
+
+  Looks come from assets/editorial-cards.css, shared with the Education & Guides
+  page, so a colour or a corner radius changed in one moves the other with it.
+{% endcomment %}
+
+{{ 'editorial-cards.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign stts = section.settings
+  assign columns = stts.columns | default: 3
+
+  assign columns_tablet = 2
+  if columns < 2
+    assign columns_tablet = columns
+  endif
+
+  assign heading = stts.heading | default: blog.title
+-%}
+
+{%- style -%}
+  #blog-editorial-{{ section.id }} {
+    --eg-columns-desktop: {{ columns }};
+    --eg-columns-tablet: {{ columns_tablet }};
+    --eg-ink: {{ stts.text_color }};
+    --eg-muted: {{ stts.muted_text_color }};
+    --eg-card-bg: {{ stts.card_background }};
+    --eg-card-border: {{ stts.card_border_color }};
+    --eg-accent: {{ stts.accent_color }};
+    --eg-radius: {{ stts.card_radius }}px;
+    --eg-gap: {{ stts.card_gap | divided_by: 10.0 }}rem;
+    --eg-ratio: {{ stts.image_ratio }};
+    --eg-heading-size: {{ stts.heading_size | divided_by: 10.0 }}rem;
+    --eg-body-size: {{ stts.body_size | divided_by: 10.0 }}rem;
+    --eg-card-title-size: {{ stts.card_title_size | divided_by: 10.0 }}rem;
+    --eg-card-text-size: {{ stts.card_text_size | divided_by: 10.0 }}rem;
+    --eg-cta-bg: {{ stts.cta_background }};
+    --eg-cta-ink: {{ stts.cta_text_color }};
+    --eg-btn-bg: {{ stts.cta_button_background }};
+    --eg-btn-ink: {{ stts.cta_button_text_color }};
+    background: {{ stts.background }};
+    color: {{ stts.text_color }};
+    padding-block: {{ stts.padding_top }}px {{ stts.padding_bottom }}px;
+  }
+{%- endstyle -%}
+
+<section
+  id="blog-editorial-{{ section.id }}"
+  class="editorial-cards color-{{ stts.color_scheme }}"
+>
+  <div class="eg-shell">
+    <div class="eg-intro">
+      {%- if stts.eyebrow != blank -%}
+        <p class="eg-eyebrow">{{ stts.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      {%- if heading != blank -%}
+        <h1 class="eg-heading">{{ heading | escape }}</h1>
+      {%- endif -%}
+
+      {%- if stts.description != blank -%}
+        <div class="eg-description rte">{{ stts.description }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- paginate blog.articles by stts.posts_per_page -%}
+      {%- if blog.articles.size == 0 -%}
+        <p class="eg-empty">There are no posts here yet.</p>
+      {%- else -%}
+        {%- liquid
+          comment
+            The newest article is given the full width when the toggle is on, and the
+            grid below starts at the second. offset is what keeps it from appearing twice.
+          endcomment
+          assign feature_article = null
+          assign grid_offset = 0
+          if stts.show_feature and paginate.current_page == 1
+            assign feature_article = blog.articles.first
+            assign grid_offset = 1
+          endif
+        -%}
+
+        {%- if feature_article -%}
+          <a class="eg-feature eden-action-host" href="{{ feature_article.url }}">
+            {%- if feature_article.image != blank -%}
+              <div class="eg-feature__media">
+                {{
+                  feature_article.image
+                  | image_url: width: 1200
+                  | image_tag:
+                    loading: 'eager',
+                    sizes: '(min-width: 750px) 55vw, 100vw',
+                    alt: feature_article.title
+                }}
+              </div>
+            {%- endif -%}
+
+            <div class="eg-feature__body">
+              <span class="eg-card__badge">{{ stts.feature_label | default: 'Latest' | escape }}</span>
+              <h2 class="eg-feature__title">{{ feature_article.title | escape }}</h2>
+
+              {%- if stts.show_meta -%}
+                <p class="eg-meta">
+                  {{ feature_article.published_at | time_tag: '%b %d, %Y' }}
+                  {%- if stts.show_author and feature_article.author != blank -%}
+                    <span class="eg-meta__dot" aria-hidden="true">&middot;</span>
+                    <span>{{ feature_article.author | escape }}</span>
+                  {%- endif -%}
+                </p>
+              {%- endif -%}
+
+              {%- if stts.show_excerpt -%}
+                {%- assign feature_excerpt = feature_article.excerpt_or_content | strip_html | truncatewords: 40 -%}
+                {%- if feature_excerpt != blank -%}
+                  <p class="eg-card__text">{{ feature_excerpt }}</p>
+                {%- endif -%}
+              {%- endif -%}
+
+              <span class="eg-card__action">
+                {{- stts.link_label | default: 'Read more' | escape -}}
+                <span class="eg-card__arrow" aria-hidden="true">&rarr;</span>
+              </span>
+            </div>
+          </a>
+        {%- endif -%}
+
+        <ul class="eg-grid" role="list">
+          {%- for article in blog.articles offset: grid_offset -%}
+            <li class="eg-card">
+              <a class="eg-card__link eden-action-host" href="{{ article.url }}">
+                {%- if stts.show_images and article.image != blank -%}
+                  <div class="eg-card__media">
+                    {{
+                      article.image
+                      | image_url: width: 900
+                      | image_tag:
+                        loading: 'lazy',
+                        sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
+                        alt: article.title
+                    }}
+                    {%- if stts.show_meta -%}
+                      <span class="eg-card__badge">{{ article.published_at | date: '%b %d, %Y' }}</span>
+                    {%- endif -%}
+                  </div>
+                {%- endif -%}
+
+                <div class="eg-card__body">
+                  {%- comment -%}
+                    With no picture the pill has nothing to sit on, so it moves into the
+                    body - the same arrangement the guide cards use.
+                  {%- endcomment -%}
+                  {%- if stts.show_meta -%}
+                    {%- unless stts.show_images and article.image != blank -%}
+                      <span class="eg-card__badge">{{ article.published_at | date: '%b %d, %Y' }}</span>
+                    {%- endunless -%}
+                  {%- endif -%}
+
+                  <h2 class="eg-card__title">{{ article.title | escape }}</h2>
+
+                  {%- if stts.show_author and article.author != blank -%}
+                    <p class="eg-meta">{{ article.author | escape }}</p>
+                  {%- endif -%}
+
+                  {%- if stts.show_excerpt -%}
+                    {%- assign article_excerpt = article.excerpt_or_content | strip_html | truncatewords: 24 -%}
+                    {%- if article_excerpt != blank -%}
+                      <p class="eg-card__text">{{ article_excerpt }}</p>
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  <span class="eg-card__action">
+                    {{- stts.link_label | default: 'Read more' | escape -}}
+                    <span class="eg-card__arrow" aria-hidden="true">&rarr;</span>
+                  </span>
+                </div>
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        {%- if paginate.pages > 1 -%}
+          <div class="eg-pagination">
+            {%- render 'pagination', paginate: paginate, settings: stts, suffix: 'pagination' -%}
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endpaginate -%}
+
+    {%- if stts.show_cta and stts.cta_heading != blank -%}
+      <div class="eg-cta">
+        <div class="eg-cta__copy">
+          <p class="eg-cta__heading">{{ stts.cta_heading | escape }}</p>
+          {%- if stts.cta_text != blank -%}
+            <div class="eg-cta__text rte">{{ stts.cta_text }}</div>
+          {%- endif -%}
+        </div>
+        {%- if stts.cta_button_label != blank and stts.cta_button_link != blank -%}
+          <a class="eg-cta__button eden-action eden-action--solid" href="{{ stts.cta_button_link }}">
+            {{- stts.cta_button_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Editorial blog",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Introduction"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Leave empty to use the blog's own title."
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Introduction"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_feature",
+      "label": "Feature the newest post",
+      "default": true,
+      "info": "Gives the first post the full width, on page one only."
+    },
+    {
+      "type": "text",
+      "id": "feature_label",
+      "label": "Featured pill text",
+      "default": "Latest"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Posts across on desktop",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3,
+      "info": "A tablet shows at most two, and a phone one."
+    },
+    {
+      "type": "range",
+      "id": "posts_per_page",
+      "label": "Posts per page",
+      "min": 3,
+      "max": 24,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Space between cards",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Corner rounding",
+      "min": 0,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "show_images",
+      "label": "Show pictures",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Picture shape",
+      "options": [
+        { "value": "4 / 3", "label": "Landscape (4:3)" },
+        { "value": "3 / 2", "label": "Landscape (3:2)" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 5", "label": "Portrait (4:5)" },
+        { "value": "16 / 9", "label": "Wide (16:9)" }
+      ],
+      "default": "3 / 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_meta",
+      "label": "Show the date pill",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "Show the author",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "Show a summary",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link text",
+      "default": "Read more"
+    },
+    {
+      "type": "header",
+      "content": "Type sizes"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 24,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Introduction size",
+      "min": 13,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "label": "Card title size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 21
+    },
+    {
+      "type": "range",
+      "id": "card_text_size",
+      "label": "Card text size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Section background",
+      "default": "#fdf9f7"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Headings and titles",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Body text",
+      "default": "#5c5a55"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Card border",
+      "default": "#ebe4df"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Pills and picture tint",
+      "default": "#ead9d1"
+    },
+    {
+      "type": "header",
+      "content": "Pagination"
+    },
+    {
+      "type": "select",
+      "id": "pagination_alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Centre" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "pagination_icons_type",
+      "label": "Arrow style",
+      "options": [
+        { "value": "arrows", "label": "Arrows" },
+        { "value": "chevron", "label": "Chevrons" }
+      ],
+      "default": "arrows"
+    },
+    {
+      "type": "header",
+      "content": "Closing panel"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show the closing panel",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "cta_heading",
+      "label": "Heading",
+      "default": "Still deciding? Talk it through with us."
+    },
+    {
+      "type": "richtext",
+      "id": "cta_text",
+      "label": "Text",
+      "default": "<p>Our team can walk you through stones, settings and sizing, and help you choose with confidence.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_label",
+      "label": "Button label",
+      "default": "Get in touch"
+    },
+    {
+      "type": "url",
+      "id": "cta_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "color",
+      "id": "cta_background",
+      "label": "Panel background",
+      "default": "#ead9d1"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Panel text",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_background",
+      "label": "Button background",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial blog"
+    }
+  ]
+}
+{% endschema %}

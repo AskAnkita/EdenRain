@@ -17,18 +17,8 @@
             "title": "The 4 C's",
             "text": "Cut, colour, clarity and carat weight are what decide a diamond's beauty and its price. Of the four, cut does the most for sparkle.",
             "image_asset": "featured-diamonds-education.jpg",
-            "link": "/pages/diamond-education",
-            "link_label": "Learn more"
-          }
-        },
-        "lab_grown": {
-          "type": "topic",
-          "settings": {
-            "title": "About lab-grown diamonds",
-            "text": "Grown rather than mined, and identical to a mined diamond in chemistry, structure and brilliance - at roughly 40% less.",
-            "image_asset": "lifestyle-princess-ring.jpg",
-            "link": "/pages/lab-grown-diamonds",
-            "link_label": "Learn more"
+            "link": "/blogs/education-guides/4cs",
+            "link_label": "Read the guide"
           }
         },
         "gemstones": {
@@ -38,17 +28,7 @@
             "text": "Real sapphires, rubies and emeralds with the same properties as their mined counterparts, in colours that are hard to find in nature.",
             "image_asset": "featured-diamonds-gemstones.jpg",
             "link": "/pages/gemstones",
-            "link_label": "Learn more"
-          }
-        },
-        "comparison": {
-          "type": "topic",
-          "settings": {
-            "title": "Stone comparison",
-            "text": "Where a lab-grown diamond sits next to a simulant such as cubic zirconia or moissanite, and how to tell one from the other.",
-            "image_asset": "lifestyle-emerald-earring.jpg",
-            "link": "/pages/stone-comparison",
-            "link_label": "Learn more"
+            "link_label": "Read the guide"
           }
         },
         "ring_size": {
@@ -58,17 +38,17 @@
             "text": "A printable ring sizer, an international conversion chart, and what to do when you are buying a surprise.",
             "image_asset": "featured-diamonds-sizing.jpg",
             "link": "/pages/er-sizing",
-            "link_label": "Learn more"
+            "link_label": "Read the guide"
           }
         },
-        "metals": {
+        "wrist_size": {
           "type": "topic",
           "settings": {
-            "title": "Find the right metal",
-            "text": "Platinum, and 14K or 18K white, yellow and rose gold - how each wears day to day and which suits which stone.",
-            "image_asset": "menu-tile-plain-metal-wedding-bands.png",
-            "link": "/pages/metal-guide",
-            "link_label": "Learn more"
+            "title": "Find your wrist size",
+            "text": "How to measure your wrist at home for a bracelet or bangle, and how much room to leave for a comfortable fit.",
+            "image_asset": "lifestyle-bracelet.jpg",
+            "link": "/pages/wrist-sizer-guide",
+            "link_label": "Read the guide"
           }
         },
         "care": {
@@ -78,34 +58,21 @@
             "text": "How to clean your pieces at home, when to have them checked, and the habits that keep a setting secure for years.",
             "image_asset": "featured-diamonds-care.jpg",
             "link": "/pages/jewellery-care",
-            "link_label": "Learn more"
-          }
-        },
-        "glossary": {
-          "type": "topic",
-          "settings": {
-            "title": "Glossary of jewellery terms",
-            "text": "Bezel, pave, culet, girdle - the words you will meet while you shop, in plain language.",
-            "image_asset": "lifestyle-round-necklace.jpg",
-            "link": "/pages/glossary",
-            "link_label": "Learn more"
+            "link_label": "Read the guide"
           }
         }
       },
       "block_order": [
         "four_cs",
-        "lab_grown",
         "gemstones",
-        "comparison",
         "ring_size",
-        "metals",
-        "care",
-        "glossary"
+        "wrist_size",
+        "care"
       ],
       "settings": {
         "eyebrow": "Education & guides",
-        "heading": "Lab-grown diamond & gemstone education",
-        "description": "<p>There is a lot to take in when you are choosing fine diamond and gemstone jewellery, from an engagement ring to a pair of everyday earrings. Explore the guides below to learn about diamonds and gemstones, caring for your jewellery, finding your ring size and more.</p>",
+        "heading": "Education & guides",
+        "description": "<p>Short, practical guides to choosing and caring for fine diamond and gemstone jewellery - from the 4 C's to measuring your ring and wrist size.</p>",
         "columns": 3,
         "card_gap": 24,
         "card_radius": 20,
