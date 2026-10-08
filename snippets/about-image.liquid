@@ -1,0 +1,71 @@
+{%- doc -%}
+  One picture on the About page, from either place a merchant can put one.
+
+  A photograph may be uploaded in the theme editor (an image_picker) or already
+  sit in the theme's own files (a filename under assets/, which is how the rest
+  of this shop seeds its defaults). This renders whichever of the two is there,
+  responsively, and marks an asset-file picture so the section can drop the frame
+  if the file was never uploaded.
+
+  @param {object} [image] - the image_picker setting
+  @param {string} [asset] - a file name under assets/, used when no image is picked
+  @param {string} alt - alternative text
+  @param {string} [sizes] - the sizes attribute. Default '100vw'.
+  @param {string} [loading] - 'lazy' or 'eager'. Default 'lazy'.
+  @param {string} [fetchpriority] - 'high' on the one picture above the fold
+  @param {number} [width] - intrinsic width for the asset fallback. Default 1600.
+  @param {number} [height] - intrinsic height for the asset fallback. Default 1200.
+
+  Usage:
+  {%- render 'about-image', image: stts.hero_image, asset: stts.hero_image_asset, alt: heading -%}
+{%- enddoc -%}
+
+{%- liquid
+  assign file = asset | default: '' | strip
+  assign img_sizes = sizes | default: '100vw'
+  assign img_loading = loading | default: 'lazy'
+  assign img_width = width | default: 1600
+  assign img_height = height | default: 1200
+-%}
+
+{%- if image != blank -%}
+  {%- if fetchpriority == 'high' -%}
+    {{
+      image
+      | image_url: width: 2400
+      | image_tag:
+        loading: img_loading,
+        fetchpriority: 'high',
+        widths: '400, 600, 900, 1200, 1600, 2000, 2400',
+        sizes: img_sizes,
+        alt: alt
+    }}
+  {%- else -%}
+    {{
+      image
+      | image_url: width: 2400
+      | image_tag:
+        loading: img_loading,
+        widths: '400, 600, 900, 1200, 1600, 2000, 2400',
+        sizes: img_sizes,
+        alt: alt
+    }}
+  {%- endif -%}
+{%- elsif file != blank -%}
+  <img
+    src="{{ file | asset_img_url: '1600x' }}"
+    srcset="
+      {{ file | asset_img_url: '600x' }} 600w,
+      {{ file | asset_img_url: '900x' }} 900w,
+      {{ file | asset_img_url: '1600x' }} 1600w,
+      {{ file | asset_img_url: '2400x' }} 2400w
+    "
+    sizes="{{ img_sizes }}"
+    alt="{{ alt | escape }}"
+    width="{{ img_width }}"
+    height="{{ img_height }}"
+    loading="{{ img_loading }}"
+    {% if fetchpriority == 'high' %}fetchpriority="high"{% endif %}
+    data-ab-asset
+  >
+{%- endif -%}

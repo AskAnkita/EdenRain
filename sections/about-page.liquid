@@ -1,0 +1,1697 @@
+{% comment %}
+  The About page - the story behind /pages/about-er.
+
+  The page was a title and one block of rich text: six hundred words of founder's
+  letter set the full width of the browser, with nothing to look at and no measure
+  to read by. The letter already had chapters in it - the family trade, what the
+  house makes, who makes it, the care, the future - they were just typed as lines
+  rather than built as parts.
+
+  So this gives each of those parts its own shape: a photographed hero, the letter
+  beside a portrait with a signature under it, the facts pulled out as figures, what
+  the house makes as cards, how a piece is made as numbered steps, the long chapters
+  as picture-and-words rows, and a closing panel that asks for the next move.
+
+  Every part can be switched off, and the repeatable parts - figures, cards, steps,
+  chapters - are blocks, so the story can be re-ordered and re-written in the theme
+  editor without touching this file.
+
+  Looks come from assets/about-page.css; buttons from assets/eden-actions.css.
+{% endcomment %}
+
+{{ 'about-page.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign stts = section.settings
+
+  assign heading = stts.hero_heading | default: page.title
+
+  assign hero_has_media = false
+  if stts.hero_image != blank or stts.hero_image_asset != blank
+    assign hero_has_media = true
+  endif
+
+  assign hero_class = 'ab-hero ab-hero--' | append: stts.hero_width
+  case stts.hero_align
+    when 'left'
+      assign hero_class = hero_class | append: ' ab-hero--left'
+    when 'bottom'
+      assign hero_class = hero_class | append: ' ab-hero--bottom'
+    when 'bottom-left'
+      assign hero_class = hero_class | append: ' ab-hero--bottom ab-hero--left'
+  endcase
+
+  assign story_alt = stts.signature_name | default: stts.story_heading | default: page.title
+
+  comment
+    A full-width hero is rendered before .ab-shell rather than inside it: a
+    full-bleed child of a padded, centred shell can only be built from 100vw,
+    and 100vw is wider than the page on any desktop showing a scrollbar.
+  endcomment
+  assign hero_outside = false
+  if stts.show_hero and stts.hero_width == 'full'
+    assign hero_outside = true
+  endif
+
+  assign shell_class = 'ab-shell'
+  if hero_outside
+    assign shell_class = shell_class | append: ' ab-shell--after-hero'
+  endif
+
+  assign story_class = 'ab-story'
+  if stts.story_flip
+    assign story_class = story_class | append: ' ab-story--flipped'
+  endif
+
+  assign cta_has_media = false
+  if stts.cta_image != blank or stts.cta_image_asset != blank
+    assign cta_has_media = true
+  endif
+
+  comment
+    The blocks arrive in one list however the merchant arranges them, so each
+    band counts its own kind first and is skipped when it has none - an empty
+    heading over an empty grid is worse than no band at all.
+  endcomment
+  assign stat_count = 0
+  assign pillar_count = 0
+  assign step_count = 0
+  assign feature_count = 0
+  for block in section.blocks
+    case block.type
+      when 'stat'
+        assign stat_count = stat_count | plus: 1
+      when 'pillar'
+        assign pillar_count = pillar_count | plus: 1
+      when 'step'
+        assign step_count = step_count | plus: 1
+      when 'feature'
+        assign feature_count = feature_count | plus: 1
+    endcase
+  endfor
+
+  assign hero_scrim_alpha = stts.hero_overlay | divided_by: 100.0
+  assign hero_wash_alpha = stts.hero_wash | divided_by: 100.0
+  assign hero_pill_alpha = stts.hero_eyebrow_opacity | divided_by: 100.0
+  assign cta_scrim_alpha = stts.cta_overlay | divided_by: 100.0
+
+  assign pillar_sizes = '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw'
+  assign half_sizes = '(min-width: 750px) 50vw, 100vw'
+  assign step_sizes = '(min-width: 990px) 25vw, (min-width: 750px) 50vw, 100vw'
+-%}
+
+{%- style -%}
+  #about-page-{{ section.id }} {
+    --ab-ink: {{ stts.text_color }};
+    --ab-muted: {{ stts.muted_text_color }};
+    --ab-accent: {{ stts.accent_color }};
+    --ab-card-bg: {{ stts.card_background }};
+    --ab-card-border: {{ stts.card_border_color }};
+    --ab-radius: {{ stts.corner_radius }}px;
+    --ab-gap: {{ stts.grid_gap | divided_by: 10.0 }}rem;
+    --ab-band-gap: {{ stts.band_gap | divided_by: 10.0 }}rem;
+    --ab-ratio: {{ stts.image_ratio }};
+    --ab-heading-size: {{ stts.heading_size | divided_by: 10.0 }}rem;
+    --ab-body-size: {{ stts.body_size | divided_by: 10.0 }}rem;
+    --ab-card-title-size: {{ stts.card_title_size | divided_by: 10.0 }}rem;
+    --ab-card-text-size: {{ stts.card_text_size | divided_by: 10.0 }}rem;
+
+    --ab-hero-height: {{ stts.hero_height | divided_by: 10.0 }}rem;
+    --ab-hero-height-mobile: {{ stts.hero_height_mobile | divided_by: 10.0 }}rem;
+    --ab-hero-radius: {{ stts.hero_radius }}px;
+    --ab-hero-ink: {{ stts.hero_text_color }};
+    --ab-hero-focus: {{ stts.hero_focal }};
+    --ab-hero-fallback: {{ stts.hero_fallback_color }};
+    --ab-hero-scrim: {{ stts.hero_overlay_color | color_modify: 'alpha', hero_scrim_alpha }};
+    --ab-hero-wash: {{ stts.hero_overlay_color | color_modify: 'alpha', hero_wash_alpha }};
+    --ab-hero-pill-bg: {{ stts.hero_eyebrow_background | color_modify: 'alpha', hero_pill_alpha }};
+    --ab-hero-pill-ink: {{ stts.hero_eyebrow_text_color }};
+    --ab-hero-heading-size: {{ stts.hero_heading_size | divided_by: 10.0 }}rem;
+    --ab-hero-text-size: {{ stts.hero_text_size | divided_by: 10.0 }}rem;
+    --ab-hero-btn-bg: {{ stts.hero_button_background }};
+    --ab-hero-btn-ink: {{ stts.hero_button_text_color }};
+    --ab-hero-btn2-ink: {{ stts.hero_button_2_text_color }};
+    --ab-hero-btn2-bg: {{ stts.hero_button_2_background }};
+
+    --ab-story-media-col: {{ stts.story_media_width }}%;
+    --ab-story-ratio: {{ stts.story_image_ratio }};
+
+    --ab-stats-bg: {{ stts.stats_background }};
+    --ab-stats-ink: {{ stts.stats_text_color }};
+    --ab-stats-muted: {{ stts.stats_label_color }};
+    --ab-stat-size: {{ stts.stat_size | divided_by: 10.0 }}rem;
+    --ab-stat-label-size: {{ stts.stat_label_size | divided_by: 10.0 }}rem;
+    --ab-stat-columns-desktop: {{ stts.stat_columns }};
+    --ab-stat-columns-tablet: {{ stts.stat_columns_tablet }};
+    --ab-stats-padding: {{ stts.stats_padding | divided_by: 10.0 }}rem;
+
+    --ab-pillar-columns-desktop: {{ stts.pillar_columns }};
+    --ab-pillar-columns-tablet: {{ stts.pillar_columns_tablet }};
+    --ab-step-columns-desktop: {{ stts.step_columns }};
+    --ab-feature-ratio: {{ stts.feature_image_ratio }};
+
+    --ab-cta-bg: {{ stts.cta_background }};
+    --ab-cta-ink: {{ stts.cta_text_color }};
+    --ab-cta-scrim: {{ stts.cta_overlay_color | color_modify: 'alpha', cta_scrim_alpha }};
+    --ab-cta-heading-size: {{ stts.cta_heading_size | divided_by: 10.0 }}rem;
+    --ab-btn-bg: {{ stts.cta_button_background }};
+    --ab-btn-ink: {{ stts.cta_button_text_color }};
+    --ab-btn2-ink: {{ stts.cta_button_2_text_color }};
+    --ab-btn2-bg: {{ stts.cta_button_2_background }};
+
+    background: {{ stts.background }};
+    color: {{ stts.text_color }};
+    padding-block: {{ stts.padding_top }}px {{ stts.padding_bottom }}px;
+  }
+{%- endstyle -%}
+
+<section
+  id="about-page-{{ section.id }}"
+  class="about-page color-{{ stts.color_scheme }}"
+>
+  {%- if stts.show_hero -%}
+    {%- capture hero -%}
+      <div class="{{ hero_class }}">
+        {%- if hero_has_media -%}
+          <div class="ab-hero__media" data-ab-media>
+            {%- render 'about-image',
+              image: stts.hero_image,
+              asset: stts.hero_image_asset,
+              alt: heading,
+              sizes: '100vw',
+              loading: 'eager',
+              fetchpriority: 'high',
+              width: 2400,
+              height: 1350
+            -%}
+          </div>
+          <span class="ab-hero__scrim" aria-hidden="true"></span>
+        {%- endif -%}
+
+        <div class="ab-hero__inner">
+          {%- if stts.hero_eyebrow != blank -%}
+            {%- if stts.hero_eyebrow_link != blank -%}
+              <a class="ab-eyebrow" href="{{ stts.hero_eyebrow_link }}">{{ stts.hero_eyebrow | escape }}</a>
+            {%- else -%}
+              <p class="ab-eyebrow">{{ stts.hero_eyebrow | escape }}</p>
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- if heading != blank -%}
+            <h1 class="ab-hero__heading">{{ heading | escape }}</h1>
+          {%- endif -%}
+
+          {%- if stts.hero_text != blank -%}
+            <div class="ab-hero__text rte">{{ stts.hero_text }}</div>
+          {%- endif -%}
+
+          {%- if stts.hero_button_label != blank or stts.hero_button_2_label != blank -%}
+            <div class="ab-actions">
+              {%- if stts.hero_button_label != blank -%}
+                <a
+                  class="eden-action ab-hero__button--primary"
+                  href="{{ stts.hero_button_link | default: '#' }}"
+                >
+                  {{- stts.hero_button_label | escape -}}
+                </a>
+              {%- endif -%}
+
+              {%- if stts.hero_button_2_label != blank -%}
+                <a
+                  class="eden-action ab-hero__button--secondary"
+                  href="{{ stts.hero_button_2_link | default: '#' }}"
+                >
+                  {{- stts.hero_button_2_label | escape -}}
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endcapture -%}
+
+    {%- if hero_outside -%}
+      {{ hero }}
+    {%- endif -%}
+  {%- endif -%}
+
+  <div class="{{ shell_class }}">
+    {%- if stts.show_hero and hero_outside == false -%}
+      <div class="ab-band">{{ hero }}</div>
+    {%- endif -%}
+
+    {%- if stts.show_story and stts.story_text != blank -%}
+      {%- comment -%}
+        The letter itself, beside the person who wrote it.
+      {%- endcomment -%}
+      <div class="ab-band">
+        <div class="{{ story_class }}">
+          {%- if stts.story_image != blank or stts.story_image_asset != blank -%}
+            <figure class="ab-story__media" data-ab-media>
+              {%- render 'about-image',
+                image: stts.story_image,
+                asset: stts.story_image_asset,
+                alt: story_alt,
+                sizes: half_sizes,
+                width: 1200,
+                height: 1500
+              -%}
+              {%- if stts.story_caption != blank -%}
+                <figcaption class="ab-story__caption">{{ stts.story_caption | escape }}</figcaption>
+              {%- endif -%}
+            </figure>
+          {%- endif -%}
+
+          <div class="ab-story__copy">
+            {%- if stts.story_eyebrow != blank -%}
+              <p class="ab-eyebrow">{{ stts.story_eyebrow | escape }}</p>
+            {%- endif -%}
+
+            {%- if stts.story_heading != blank -%}
+              <h2 class="ab-heading">{{ stts.story_heading | escape }}</h2>
+            {%- endif -%}
+
+            <div class="ab-text rte">{{ stts.story_text }}</div>
+
+            {%- if stts.signature_name != blank -%}
+              <div class="ab-signature">
+                <p class="ab-signature__name">{{ stts.signature_name | escape }}</p>
+                {%- if stts.signature_role != blank -%}
+                  <p class="ab-signature__role">{{ stts.signature_role | escape }}</p>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+
+            {%- if stts.story_button_label != blank -%}
+              <div class="ab-actions">
+                <a
+                  class="eden-action eden-action--outline"
+                  href="{{ stts.story_button_link | default: '#' }}"
+                  style="--eden-action-ink: {{ stts.story_button_background }}; --eden-action-on-ink: {{ stts.background }};"
+                >
+                  {{- stts.story_button_label | escape -}}
+                </a>
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if stts.show_stats and stat_count > 0 -%}
+      <div class="ab-band">
+        <ul class="ab-stats" role="list">
+          {%- for block in section.blocks -%}
+            {%- if block.type != 'stat' -%}
+              {%- continue -%}
+            {%- endif -%}
+            <li class="ab-stat" {{ block.shopify_attributes }}>
+              <span class="ab-stat__value">{{ block.settings.value | escape }}</span>
+              {%- if block.settings.label != blank -%}
+                <span class="ab-stat__label">{{ block.settings.label | escape }}</span>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+
+    {%- if stts.show_pillars and pillar_count > 0 -%}
+      <div class="ab-band">
+        {%- if stts.pillars_heading != blank or stts.pillars_text != blank -%}
+          <div class="ab-section-head{% if stts.pillars_align == 'centre' %} ab-section-head--centred{% endif %}">
+            {%- if stts.pillars_eyebrow != blank -%}
+              <p class="ab-eyebrow">{{ stts.pillars_eyebrow | escape }}</p>
+            {%- endif -%}
+            {%- if stts.pillars_heading != blank -%}
+              <h2 class="ab-heading">{{ stts.pillars_heading | escape }}</h2>
+            {%- endif -%}
+            {%- if stts.pillars_text != blank -%}
+              <div class="ab-text rte">{{ stts.pillars_text }}</div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        <ul class="ab-pillars" role="list">
+          {%- for block in section.blocks -%}
+            {%- if block.type != 'pillar' -%}
+              {%- continue -%}
+            {%- endif -%}
+
+            {%- liquid
+              assign has_media = false
+              if stts.show_pillar_images
+                if block.settings.image != blank or block.settings.image_asset != blank
+                  assign has_media = true
+                endif
+              endif
+
+              assign has_link = false
+              if block.settings.link != blank
+                assign has_link = true
+              endif
+            -%}
+
+            <li class="ab-pillar" {{ block.shopify_attributes }}>
+              {%- if has_link -%}
+                <a class="ab-pillar__link" href="{{ block.settings.link }}">
+              {%- else -%}
+                <div class="ab-pillar__link">
+              {%- endif -%}
+
+                {%- if has_media -%}
+                  <div class="ab-pillar__media" data-ab-media>
+                    {%- render 'about-image',
+                      image: block.settings.image,
+                      asset: block.settings.image_asset,
+                      alt: block.settings.title,
+                      sizes: pillar_sizes,
+                      width: 900,
+                      height: 1125
+                    -%}
+                  </div>
+                {%- endif -%}
+
+                <div class="ab-pillar__body">
+                  {%- if block.settings.title != blank -%}
+                    <h3 class="ab-pillar__title">{{ block.settings.title | escape }}</h3>
+                  {%- endif -%}
+
+                  {%- if block.settings.text != blank -%}
+                    <p class="ab-pillar__text">{{ block.settings.text | escape }}</p>
+                  {%- endif -%}
+
+                  {%- if has_link and block.settings.link_label != blank -%}
+                    <span class="ab-pillar__action">
+                      {{- block.settings.link_label | escape -}}
+                      <span class="ab-pillar__arrow" aria-hidden="true">&rarr;</span>
+                    </span>
+                  {%- endif -%}
+                </div>
+
+              {%- if has_link -%}
+                </a>
+              {%- else -%}
+                </div>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+
+    {%- if stts.show_steps and step_count > 0 -%}
+      <div class="ab-band">
+        {%- if stts.steps_heading != blank or stts.steps_text != blank -%}
+          <div class="ab-section-head{% if stts.steps_align == 'centre' %} ab-section-head--centred{% endif %}">
+            {%- if stts.steps_eyebrow != blank -%}
+              <p class="ab-eyebrow">{{ stts.steps_eyebrow | escape }}</p>
+            {%- endif -%}
+            {%- if stts.steps_heading != blank -%}
+              <h2 class="ab-heading">{{ stts.steps_heading | escape }}</h2>
+            {%- endif -%}
+            {%- if stts.steps_text != blank -%}
+              <div class="ab-text rte">{{ stts.steps_text }}</div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        <ol class="ab-steps">
+          {%- assign step_number = 0 -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type != 'step' -%}
+              {%- continue -%}
+            {%- endif -%}
+            {%- assign step_number = step_number | plus: 1 -%}
+
+            <li class="ab-step" {{ block.shopify_attributes }}>
+              {%- liquid
+                assign step_has_media = false
+                if stts.show_step_images
+                  if block.settings.image != blank or block.settings.image_asset != blank
+                    assign step_has_media = true
+                  endif
+                endif
+              -%}
+
+              {%- if step_has_media -%}
+                <div class="ab-step__media" data-ab-media>
+                  {%- render 'about-image',
+                    image: block.settings.image,
+                    asset: block.settings.image_asset,
+                    alt: block.settings.title,
+                    sizes: step_sizes,
+                    width: 900,
+                    height: 600
+                  -%}
+                </div>
+              {%- endif -%}
+
+              <span class="ab-step__number" aria-hidden="true">{{ step_number }}</span>
+
+              {%- if block.settings.title != blank -%}
+                <h3 class="ab-step__title">{{ block.settings.title | escape }}</h3>
+              {%- endif -%}
+
+              {%- if block.settings.text != blank -%}
+                <p class="ab-step__text">{{ block.settings.text | escape }}</p>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ol>
+      </div>
+    {%- endif -%}
+
+    {%- if stts.show_features and feature_count > 0 -%}
+      <div class="ab-band">
+        {%- assign feature_index = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type != 'feature' -%}
+            {%- continue -%}
+          {%- endif -%}
+
+          {%- liquid
+            comment
+              Sides alternate down the page unless a merchant has pinned a row,
+              so a story written as one long chapter after another still reads
+              as a page rather than a column.
+            endcomment
+            assign flipped = block.settings.flip
+            if stts.features_alternate
+              assign remainder = feature_index | modulo: 2
+              if remainder == 1
+                if flipped
+                  assign flipped = false
+                else
+                  assign flipped = true
+                endif
+              endif
+            endif
+            assign feature_index = feature_index | plus: 1
+          -%}
+
+          <div class="ab-feature{% if flipped %} ab-feature--flipped{% endif %}" {{ block.shopify_attributes }}>
+            {%- if block.settings.image != blank or block.settings.image_asset != blank -%}
+              <figure class="ab-feature__media" data-ab-media>
+                {%- render 'about-image',
+                  image: block.settings.image,
+                  asset: block.settings.image_asset,
+                  alt: block.settings.title,
+                  sizes: half_sizes,
+                  width: 1200,
+                  height: 800
+                -%}
+              </figure>
+            {%- endif -%}
+
+            <div class="ab-feature__copy">
+              {%- if block.settings.eyebrow != blank -%}
+                <p class="ab-eyebrow">{{ block.settings.eyebrow | escape }}</p>
+              {%- endif -%}
+
+              {%- if block.settings.title != blank -%}
+                <h2 class="ab-heading">{{ block.settings.title | escape }}</h2>
+              {%- endif -%}
+
+              {%- if block.settings.text != blank -%}
+                <div class="ab-text rte">{{ block.settings.text }}</div>
+              {%- endif -%}
+
+              {%- if block.settings.button_label != blank -%}
+                <div class="ab-actions">
+                  <a
+                    class="eden-action eden-action--solid"
+                    href="{{ block.settings.button_link | default: '#' }}"
+                    style="--eden-action-ink: {{ block.settings.button_background }}; --eden-action-on-ink: {{ block.settings.button_text_color }};"
+                  >
+                    {{- block.settings.button_label | escape -}}
+                  </a>
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if stts.show_page_content and page.content != blank -%}
+      {%- comment -%}
+        For a merchant who would rather write in the page editor than in here.
+        Off by default: the fields above say the same thing with pictures.
+      {%- endcomment -%}
+      <div class="ab-band">
+        <div class="ab-content rte{% if stts.content_measure %} ab-measure{% endif %}">{{ page.content }}</div>
+      </div>
+    {%- endif -%}
+
+    {%- if stts.show_cta and stts.cta_heading != blank -%}
+      <div class="ab-band">
+        <div class="ab-cta">
+          {%- if cta_has_media -%}
+            <div class="ab-cta__media" data-ab-media>
+              {%- render 'about-image',
+                image: stts.cta_image,
+                asset: stts.cta_image_asset,
+                alt: stts.cta_heading,
+                sizes: '100vw',
+                width: 2000,
+                height: 900
+              -%}
+            </div>
+            <span class="ab-cta__scrim" aria-hidden="true"></span>
+          {%- endif -%}
+
+          <div class="ab-cta__copy">
+            <p class="ab-cta__heading">{{ stts.cta_heading | escape }}</p>
+            {%- if stts.cta_text != blank -%}
+              <div class="ab-cta__text rte">{{ stts.cta_text }}</div>
+            {%- endif -%}
+          </div>
+
+          {%- if stts.cta_button_label != blank or stts.cta_button_2_label != blank -%}
+            <div class="ab-cta__actions">
+              {%- if stts.cta_button_label != blank -%}
+                <a class="eden-action ab-cta__button--primary" href="{{ stts.cta_button_link | default: '#' }}">
+                  {{- stts.cta_button_label | escape -}}
+                </a>
+              {%- endif -%}
+
+              {%- if stts.cta_button_2_label != blank -%}
+                <a class="eden-action ab-cta__button--secondary" href="{{ stts.cta_button_2_link | default: '#' }}">
+                  {{- stts.cta_button_2_label | escape -}}
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{%- comment -%}
+  A picture can name a file under assets/ the shop has not uploaded. Rather than
+  leave a broken frame the whole frame is dropped and the words carry on alone.
+{%- endcomment -%}
+<script>
+  (() => {
+    const root = document.getElementById('about-page-{{ section.id }}');
+    if (!root) return;
+    root.querySelectorAll('img[data-ab-asset]').forEach((img) => {
+      img.addEventListener('error', () => img.closest('[data-ab-media]')?.remove());
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "About page",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hero",
+      "label": "Show the hero",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "hero_eyebrow",
+      "label": "Eyebrow",
+      "default": "Our story"
+    },
+    {
+      "type": "url",
+      "id": "hero_eyebrow_link",
+      "label": "Eyebrow link"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading",
+      "label": "Heading",
+      "info": "Leave empty to use the page's own title."
+    },
+    {
+      "type": "richtext",
+      "id": "hero_text",
+      "label": "Standfirst",
+      "default": "<p>A family of jewellers since 1957, and a house named after a daughter.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero picture"
+    },
+    {
+      "type": "text",
+      "id": "hero_image_asset",
+      "label": "Hero picture from theme files",
+      "info": "A file name under assets/, used when no picture is uploaded above. For example lifestyle-necklace.jpg."
+    },
+    {
+      "type": "select",
+      "id": "hero_width",
+      "label": "Hero width",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full width of the screen"
+        },
+        {
+          "value": "page",
+          "label": "Page width, rounded corners"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "select",
+      "id": "hero_align",
+      "label": "Where the words sit",
+      "options": [
+        {
+          "value": "centre",
+          "label": "Centre"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "bottom-left",
+          "label": "Bottom left"
+        }
+      ],
+      "default": "centre"
+    },
+    {
+      "type": "select",
+      "id": "hero_focal",
+      "label": "Part of the picture to keep",
+      "options": [
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "hero_height",
+      "label": "Hero height on desktop",
+      "min": 320,
+      "max": 820,
+      "step": 10,
+      "unit": "px",
+      "default": 560
+    },
+    {
+      "type": "range",
+      "id": "hero_height_mobile",
+      "label": "Hero height on mobile",
+      "min": 240,
+      "max": 640,
+      "step": 10,
+      "unit": "px",
+      "default": 420
+    },
+    {
+      "type": "range",
+      "id": "hero_radius",
+      "label": "Hero corner rounding",
+      "min": 0,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 20,
+      "info": "Only used when the hero is set to page width."
+    },
+    {
+      "type": "range",
+      "id": "hero_heading_size",
+      "label": "Hero heading size",
+      "min": 24,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "hero_text_size",
+      "label": "Hero standfirst size",
+      "min": 13,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "hero_overlay",
+      "label": "Shade at the foot of the picture",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "hero_wash",
+      "label": "Shade at the top of the picture",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "hero_overlay_color",
+      "label": "Shade colour",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "hero_text_color",
+      "label": "Hero text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "hero_fallback_color",
+      "label": "Hero background without a picture",
+      "default": "#ead9d1"
+    },
+    {
+      "type": "color",
+      "id": "hero_eyebrow_background",
+      "label": "Hero eyebrow pill",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "hero_eyebrow_opacity",
+      "label": "Hero eyebrow pill strength",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "hero_eyebrow_text_color",
+      "label": "Hero eyebrow text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "hero_button_label",
+      "label": "First button",
+      "default": "Design your own"
+    },
+    {
+      "type": "url",
+      "id": "hero_button_link",
+      "label": "First button link"
+    },
+    {
+      "type": "color",
+      "id": "hero_button_background",
+      "label": "First button fill",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "hero_button_text_color",
+      "label": "First button text",
+      "default": "#171714"
+    },
+    {
+      "type": "text",
+      "id": "hero_button_2_label",
+      "label": "Second button",
+      "default": "Talk to us"
+    },
+    {
+      "type": "url",
+      "id": "hero_button_2_link",
+      "label": "Second button link"
+    },
+    {
+      "type": "color",
+      "id": "hero_button_2_text_color",
+      "label": "Second button outline and text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "hero_button_2_background",
+      "label": "Second button text on hover",
+      "default": "#171714"
+    },
+    {
+      "type": "header",
+      "content": "The letter"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_story",
+      "label": "Show the letter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "story_eyebrow",
+      "label": "Eyebrow",
+      "default": "A letter from our founder"
+    },
+    {
+      "type": "text",
+      "id": "story_heading",
+      "label": "Heading",
+      "default": "Jewellery has always been more than a passion"
+    },
+    {
+      "type": "richtext",
+      "id": "story_text",
+      "label": "The letter"
+    },
+    {
+      "type": "image_picker",
+      "id": "story_image",
+      "label": "Portrait"
+    },
+    {
+      "type": "text",
+      "id": "story_image_asset",
+      "label": "Portrait from theme files",
+      "info": "A file name under assets/, used when no portrait is uploaded above."
+    },
+    {
+      "type": "text",
+      "id": "story_caption",
+      "label": "Caption under the portrait"
+    },
+    {
+      "type": "checkbox",
+      "id": "story_flip",
+      "label": "Put the portrait on the right",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "story_media_width",
+      "label": "How much width the portrait takes",
+      "min": 25,
+      "max": 55,
+      "step": 1,
+      "unit": "%",
+      "default": 42
+    },
+    {
+      "type": "select",
+      "id": "story_image_ratio",
+      "label": "Portrait shape",
+      "options": [
+        {
+          "value": "4 / 5",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "3 / 4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "1 / 1",
+          "label": "Square"
+        },
+        {
+          "value": "3 / 2",
+          "label": "Landscape (3:2)"
+        }
+      ],
+      "default": "4 / 5"
+    },
+    {
+      "type": "text",
+      "id": "signature_name",
+      "label": "Signed",
+      "default": "Nathan"
+    },
+    {
+      "type": "text",
+      "id": "signature_role",
+      "label": "Role",
+      "default": "Founder, Eden Raine"
+    },
+    {
+      "type": "text",
+      "id": "story_button_label",
+      "label": "Button"
+    },
+    {
+      "type": "url",
+      "id": "story_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "color",
+      "id": "story_button_background",
+      "label": "Button outline and text",
+      "default": "#171714"
+    },
+    {
+      "type": "header",
+      "content": "Figures"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stats",
+      "label": "Show the figures",
+      "default": true,
+      "info": "Add a \"Figure\" block for each one."
+    },
+    {
+      "type": "range",
+      "id": "stat_columns",
+      "label": "Figures across on desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "stat_columns_tablet",
+      "label": "Figures across on tablet",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "stats_padding",
+      "label": "Space inside the figures panel",
+      "min": 16,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "stat_size",
+      "label": "Figure size",
+      "min": 18,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "stat_label_size",
+      "label": "Figure caption size",
+      "min": 11,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "stats_background",
+      "label": "Figures panel",
+      "default": "#fdf9f7"
+    },
+    {
+      "type": "color",
+      "id": "stats_text_color",
+      "label": "Figures",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "stats_label_color",
+      "label": "Figure captions",
+      "default": "#5c5a55"
+    },
+    {
+      "type": "header",
+      "content": "What we make"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pillars",
+      "label": "Show the cards",
+      "default": true,
+      "info": "Add a \"Card\" block for each one."
+    },
+    {
+      "type": "text",
+      "id": "pillars_eyebrow",
+      "label": "Eyebrow",
+      "default": "What we do"
+    },
+    {
+      "type": "text",
+      "id": "pillars_heading",
+      "label": "Heading",
+      "default": "Made by hand, drawn by CAD"
+    },
+    {
+      "type": "richtext",
+      "id": "pillars_text",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "pillars_align",
+      "label": "Heading alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "centre",
+          "label": "Centre"
+        }
+      ],
+      "default": "centre"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pillar_images",
+      "label": "Show pictures on the cards",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "pillar_columns",
+      "label": "Cards across on desktop",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "pillar_columns_tablet",
+      "label": "Cards across on tablet",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Card picture shape",
+      "options": [
+        {
+          "value": "4 / 3",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "3 / 2",
+          "label": "Landscape (3:2)"
+        },
+        {
+          "value": "1 / 1",
+          "label": "Square"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "16 / 9",
+          "label": "Wide (16:9)"
+        }
+      ],
+      "default": "4 / 5"
+    },
+    {
+      "type": "header",
+      "content": "How a piece is made"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_steps",
+      "label": "Show the steps",
+      "default": true,
+      "info": "Add a \"Step\" block for each one."
+    },
+    {
+      "type": "text",
+      "id": "steps_eyebrow",
+      "label": "Eyebrow",
+      "default": "From sketch to polish"
+    },
+    {
+      "type": "text",
+      "id": "steps_heading",
+      "label": "Heading",
+      "default": "How your piece is made"
+    },
+    {
+      "type": "richtext",
+      "id": "steps_text",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "steps_align",
+      "label": "Heading alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "centre",
+          "label": "Centre"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_step_images",
+      "label": "Show pictures on the steps",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "step_columns",
+      "label": "Steps across on desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Chapters"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_features",
+      "label": "Show the chapters",
+      "default": true,
+      "info": "Add a \"Chapter\" block for each one."
+    },
+    {
+      "type": "checkbox",
+      "id": "features_alternate",
+      "label": "Alternate the picture from side to side",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "feature_image_ratio",
+      "label": "Chapter picture shape",
+      "options": [
+        {
+          "value": "3 / 2",
+          "label": "Landscape (3:2)"
+        },
+        {
+          "value": "4 / 3",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "1 / 1",
+          "label": "Square"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait (4:5)"
+        }
+      ],
+      "default": "3 / 2"
+    },
+    {
+      "type": "header",
+      "content": "The page's own text"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_page_content",
+      "label": "Also show the text typed on the page",
+      "default": false,
+      "info": "Off by default: the fields above tell the same story with pictures. Turn this on if you would rather write in the page editor."
+    },
+    {
+      "type": "checkbox",
+      "id": "content_measure",
+      "label": "Keep that text to a readable column",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Closing panel"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show the closing panel",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_heading",
+      "label": "Heading",
+      "default": "Have a piece in mind?"
+    },
+    {
+      "type": "richtext",
+      "id": "cta_text",
+      "label": "Text",
+      "default": "<p>Tell us what you are imagining and we will draw it with you, from the first sketch to the final polish.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "cta_image",
+      "label": "Background picture"
+    },
+    {
+      "type": "text",
+      "id": "cta_image_asset",
+      "label": "Background picture from theme files",
+      "info": "A file name under assets/, used when no picture is uploaded above."
+    },
+    {
+      "type": "range",
+      "id": "cta_overlay",
+      "label": "Shade over the background picture",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 45
+    },
+    {
+      "type": "color",
+      "id": "cta_overlay_color",
+      "label": "Shade colour",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "cta_background",
+      "label": "Panel background",
+      "default": "#ead9d1"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Panel text",
+      "default": "#171714"
+    },
+    {
+      "type": "range",
+      "id": "cta_heading_size",
+      "label": "Panel heading size",
+      "min": 18,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "text",
+      "id": "cta_button_label",
+      "label": "First button",
+      "default": "Start a bespoke piece"
+    },
+    {
+      "type": "url",
+      "id": "cta_button_link",
+      "label": "First button link"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_background",
+      "label": "First button fill",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_text_color",
+      "label": "First button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_2_label",
+      "label": "Second button",
+      "default": "Contact us"
+    },
+    {
+      "type": "url",
+      "id": "cta_button_2_link",
+      "label": "Second button link"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_2_text_color",
+      "label": "Second button outline and text",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_2_background",
+      "label": "Second button text on hover",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Type sizes"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 20,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 38
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Body text size",
+      "min": 13,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "label": "Card and step title size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 21
+    },
+    {
+      "type": "range",
+      "id": "card_text_size",
+      "label": "Card and step text size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Page background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Headings and titles",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Body text",
+      "default": "#5c5a55"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Pills, numbers and picture backgrounds",
+      "default": "#ead9d1"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#fdf9f7"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Card border and rules",
+      "default": "#ebe4df"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "corner_radius",
+      "label": "Corner rounding",
+      "min": 0,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Space between cards",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "band_gap",
+      "label": "Space between the parts of the page",
+      "min": 24,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Figure",
+      "settings": [
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Figure",
+          "default": "1957"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Caption",
+          "default": "A family of jewellers since"
+        }
+      ]
+    },
+    {
+      "type": "pillar",
+      "name": "Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Eden Raine Collection"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Picture"
+        },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "Picture from theme files",
+          "info": "A file name under assets/, used when no picture is uploaded above."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link text",
+          "default": "Explore"
+        }
+      ]
+    },
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "The sketch"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Picture"
+        },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "Picture from theme files",
+          "info": "A file name under assets/, used when no picture is uploaded above. Shown only when \"Show pictures on the steps\" is on."
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Chapter",
+      "settings": [
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Our global team"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Picture"
+        },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "Picture from theme files",
+          "info": "A file name under assets/, used when no picture is uploaded above."
+        },
+        {
+          "type": "checkbox",
+          "id": "flip",
+          "label": "Put the picture on the right",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "color",
+          "id": "button_background",
+          "label": "Button fill",
+          "default": "#171714"
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Button text",
+          "default": "#ffffff"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 24,
+  "presets": [
+    {
+      "name": "About page"
+    }
+  ]
+}{% endschema %}

@@ -1,0 +1,717 @@
+/*
+  About page - the story layout behind /pages/about-er (sections/about-page.liquid).
+
+  The page had been a title and one block of rich text, set the full width of the
+  browser: six hundred words of founder's letter with nothing to look at and no
+  measure to read by. This breaks the same story into the parts it was always
+  made of - the letter, what the house makes, who makes it, how a piece is made,
+  and where it is going - and gives each part a picture and a width.
+
+  It borrows the warm card language of editorial-cards.css (cream ground, soft
+  corners, a pill eyebrow) so the About page and the guides read as one shop, and
+  the shared .eden-action button from eden-actions.css for every call to action.
+
+  Everything a merchant can change is a custom property, written onto
+  #about-page-<id> by the section from its schema. The values here are only the
+  fallbacks, so this file stays readable on its own.
+*/
+
+.about-page {
+  --ab-ink: #171714;
+  --ab-muted: rgba(23, 23, 20, 0.64);
+  --ab-accent: #ead9d1;
+  --ab-card-bg: #fdf9f7;
+  --ab-card-border: #ebe4df;
+  --ab-radius: 20px;
+  --ab-gap: 2.4rem;
+  --ab-ratio: 4 / 5;
+  /*
+    Mobile first: one across. The tablet and desktop counts arrive as
+    --ab-pillar-columns-* and --ab-stat-columns-*, written by the section onto
+    its own id. Keeping the breakpoints here and the merchant's numbers there is
+    what stops an id selector out-ranking the narrow layout.
+  */
+  --ab-pillar-columns: 1;
+  --ab-stat-columns: 2;
+  --ab-step-columns: 1;
+}
+
+.about-page .ab-shell {
+  max-width: var(--page-width, 160rem);
+  margin: 0 auto;
+  padding-inline: 2.4rem;
+}
+
+/* A readable measure for anything that is only words. */
+.about-page .ab-measure {
+  max-width: 68rem;
+}
+
+/* --------------------------------------------------------------- shared type */
+
+.about-page .ab-eyebrow {
+  display: inline-block;
+  margin: 0 0 2rem;
+  padding: 0.7rem 1.6rem;
+  border-radius: 999px;
+  background: var(--ab-accent);
+  color: var(--ab-ink);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.about-page .ab-heading {
+  margin: 0;
+  color: var(--ab-ink);
+  font-family: var(--font-heading--family);
+  font-size: var(--ab-heading-size, clamp(2.8rem, 3.4vw, 4.2rem));
+  font-weight: 400;
+  line-height: 1.12;
+}
+
+.about-page .ab-text {
+  margin: 1.6rem 0 0;
+  color: var(--ab-muted);
+  font-size: var(--ab-body-size, 1.65rem);
+  line-height: 1.75;
+}
+
+.about-page .ab-text > :first-child { margin-top: 0; }
+.about-page .ab-text > :last-child { margin-bottom: 0; }
+
+.about-page .ab-section-head {
+  margin: 0 0 var(--ab-gap);
+}
+
+.about-page .ab-section-head--centred {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.about-page .ab-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-top: 2.8rem;
+}
+
+/*
+  Each zone is a band down the page rather than one long scroll of text, so the
+  space between them is set once here and inherited by all of them.
+*/
+.about-page .ab-band {
+  margin-top: var(--ab-band-gap, 7.2rem);
+}
+
+.about-page .ab-band:first-child {
+  margin-top: 0;
+}
+
+/* ---------------------------------------------------------------------- hero */
+
+.about-page .ab-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: var(--ab-hero-height-mobile, 42rem);
+  border-radius: var(--ab-hero-radius, 20px);
+  background: var(--ab-hero-fallback, var(--ab-accent));
+  color: var(--ab-hero-ink, #ffffff);
+  text-align: center;
+}
+
+/*
+  Full width means exactly that: the section renders this hero outside .ab-shell,
+  so it needs no negative margin and no 100vw - which would have put a horizontal
+  scrollbar on every desktop that shows a vertical one.
+*/
+.about-page .ab-hero--full {
+  border-radius: 0;
+}
+
+/* The first band inside the shell still needs its gap when the hero is above it. */
+.about-page .ab-shell--after-hero > .ab-band:first-child {
+  margin-top: var(--ab-band-gap, 7.2rem);
+}
+
+.about-page .ab-hero--left { text-align: left; justify-content: flex-start; }
+.about-page .ab-hero--bottom { align-items: flex-end; }
+
+.about-page .ab-hero__media,
+.about-page .ab-hero__media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.about-page .ab-hero__media img {
+  object-fit: cover;
+  object-position: var(--ab-hero-focus, center);
+}
+
+.about-page .ab-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--ab-hero-scrim, rgba(23, 23, 20, 0.5)), var(--ab-hero-wash, rgba(23, 23, 20, 0.2)));
+}
+
+.about-page .ab-hero__inner {
+  position: relative;
+  max-width: 76rem;
+  padding: 6.4rem 2.4rem;
+}
+
+.about-page .ab-hero .ab-eyebrow {
+  background: var(--ab-hero-pill-bg, rgba(255, 255, 255, 0.2));
+  color: var(--ab-hero-pill-ink, #ffffff);
+}
+
+.about-page .ab-hero__heading {
+  margin: 0;
+  color: inherit;
+  font-family: var(--font-heading--family);
+  font-size: var(--ab-hero-heading-size, clamp(3.2rem, 5vw, 5.6rem));
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.about-page .ab-hero__text {
+  margin: 1.8rem 0 0;
+  color: inherit;
+  font-size: var(--ab-hero-text-size, 1.8rem);
+  line-height: 1.6;
+  opacity: 0.92;
+}
+
+.about-page .ab-hero__text > :first-child { margin-top: 0; }
+.about-page .ab-hero__text > :last-child { margin-bottom: 0; }
+
+.about-page .ab-hero .ab-actions {
+  justify-content: center;
+}
+
+.about-page .ab-hero--left .ab-actions {
+  justify-content: flex-start;
+}
+
+/* The hero's own two buttons, coloured from the schema. */
+.about-page .ab-hero__button--primary {
+  border-color: var(--ab-hero-btn-bg, #ffffff);
+  background: var(--ab-hero-btn-bg, #ffffff);
+  color: var(--ab-hero-btn-ink, #171714);
+}
+
+.about-page .ab-hero__button--secondary {
+  border-color: var(--ab-hero-btn2-ink, #ffffff);
+  background: transparent;
+  color: var(--ab-hero-btn2-ink, #ffffff);
+}
+
+@media (hover: hover) {
+  .about-page .ab-hero__button--primary:hover {
+    background: transparent;
+    color: var(--ab-hero-btn-bg, #ffffff);
+  }
+
+  .about-page .ab-hero__button--secondary:hover {
+    background: var(--ab-hero-btn2-ink, #ffffff);
+    color: var(--ab-hero-btn2-bg, #171714);
+  }
+}
+
+/* --------------------------------------------------------------------- story */
+
+/*
+  The founder's letter. Mobile keeps the portrait above the words; from tablet up
+  they sit side by side, the picture sticky so it stays with the paragraph being
+  read on a long letter.
+*/
+.about-page .ab-story {
+  display: grid;
+  gap: var(--ab-gap);
+  align-items: start;
+}
+
+.about-page .ab-story__media {
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--ab-radius);
+  background: var(--ab-accent);
+}
+
+.about-page .ab-story__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: var(--ab-story-ratio, 4 / 5);
+  object-fit: cover;
+}
+
+.about-page .ab-story__caption {
+  margin: 1rem 0 0;
+  color: var(--ab-muted);
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+}
+
+.about-page .ab-signature {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 2.8rem;
+  padding-top: 2.4rem;
+  border-top: 1px solid var(--ab-card-border);
+}
+
+.about-page .ab-signature__name {
+  margin: 0;
+  color: var(--ab-ink);
+  font-family: var(--font-heading--family);
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.about-page .ab-signature__role {
+  margin: 0;
+  color: var(--ab-muted);
+  font-size: 1.35rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------- stats */
+
+/*
+  The facts the letter states in passing - a family of jewellers since 1957,
+  three places a piece passes through - pulled out where a skim-reader finds them.
+*/
+.about-page .ab-stats {
+  display: grid;
+  grid-template-columns: repeat(var(--ab-stat-columns), minmax(0, 1fr));
+  gap: var(--ab-gap);
+  margin: 0;
+  padding: var(--ab-stats-padding, 4rem) 2.4rem;
+  border-radius: var(--ab-radius);
+  background: var(--ab-stats-bg, var(--ab-card-bg));
+  list-style: none;
+}
+
+.about-page .ab-stat {
+  text-align: center;
+}
+
+.about-page .ab-stat__value {
+  display: block;
+  color: var(--ab-stats-ink, var(--ab-ink));
+  font-family: var(--font-heading--family);
+  font-size: var(--ab-stat-size, 3.2rem);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.about-page .ab-stat__label {
+  display: block;
+  margin-top: 0.8rem;
+  color: var(--ab-stats-muted, var(--ab-muted));
+  font-size: var(--ab-stat-label-size, 1.4rem);
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------------- pillars */
+
+.about-page .ab-pillars {
+  display: grid;
+  grid-template-columns: repeat(var(--ab-pillar-columns), minmax(0, 1fr));
+  gap: var(--ab-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-page .ab-pillar {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--ab-card-border);
+  border-radius: var(--ab-radius);
+  background: var(--ab-card-bg);
+}
+
+.about-page .ab-pillar__link {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.about-page .ab-pillar__media {
+  overflow: hidden;
+  aspect-ratio: var(--ab-ratio);
+  background: var(--ab-accent);
+}
+
+.about-page .ab-pillar__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+@media (hover: hover) {
+  .about-page .ab-pillar__link:hover .ab-pillar__media img {
+    transform: scale(1.04);
+  }
+}
+
+.about-page .ab-pillar__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 2.4rem;
+}
+
+.about-page .ab-pillar__title {
+  margin: 0;
+  color: var(--ab-ink);
+  font-family: var(--font-heading--family);
+  font-size: var(--ab-card-title-size, 2.1rem);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.about-page .ab-pillar__text {
+  margin: 1.2rem 0 0;
+  color: var(--ab-muted);
+  font-size: var(--ab-card-text-size, 1.5rem);
+  line-height: 1.7;
+}
+
+.about-page .ab-pillar__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: auto;
+  padding-top: 2rem;
+  color: var(--ab-ink);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.about-page .ab-pillar__arrow {
+  transition: transform 0.2s ease;
+}
+
+@media (hover: hover) {
+  .about-page .ab-pillar__link:hover .ab-pillar__arrow {
+    transform: translateX(4px);
+  }
+}
+
+.about-page .ab-pillar__link:focus-visible {
+  outline: 2px solid var(--ab-ink);
+  outline-offset: 4px;
+}
+
+/* --------------------------------------------------------------------- steps */
+
+/*
+  How a piece is made. Numbered rather than pictured, because the sequence is the
+  point; a merchant can still give any step a photograph.
+*/
+.about-page .ab-steps {
+  display: grid;
+  grid-template-columns: repeat(var(--ab-step-columns), minmax(0, 1fr));
+  gap: var(--ab-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-page .ab-step {
+  position: relative;
+  padding-top: 2.4rem;
+  border-top: 1px solid var(--ab-card-border);
+}
+
+.about-page .ab-step__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  margin-bottom: 1.6rem;
+  border-radius: 999px;
+  background: var(--ab-accent);
+  color: var(--ab-ink);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.about-page .ab-step__media {
+  margin: 0 0 1.6rem;
+  overflow: hidden;
+  border-radius: var(--ab-radius);
+  aspect-ratio: 3 / 2;
+  background: var(--ab-accent);
+}
+
+.about-page .ab-step__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about-page .ab-step__title {
+  margin: 0;
+  color: var(--ab-ink);
+  font-family: var(--font-heading--family);
+  font-size: var(--ab-card-title-size, 2.1rem);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.about-page .ab-step__text {
+  margin: 1rem 0 0;
+  color: var(--ab-muted);
+  font-size: var(--ab-card-text-size, 1.5rem);
+  line-height: 1.7;
+}
+
+/* ------------------------------------------------------------------ features */
+
+/*
+  The long chapters - the global team, our future - each given the picture it is
+  about, alternating sides down the page so the eye keeps moving.
+*/
+.about-page .ab-feature {
+  display: grid;
+  gap: var(--ab-gap);
+  align-items: center;
+}
+
+.about-page .ab-feature + .ab-feature {
+  margin-top: var(--ab-band-gap, 7.2rem);
+}
+
+.about-page .ab-feature__media {
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--ab-radius);
+  background: var(--ab-accent);
+}
+
+.about-page .ab-feature__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: var(--ab-feature-ratio, 3 / 2);
+  object-fit: cover;
+}
+
+.about-page .ab-feature__copy > .ab-eyebrow {
+  margin-bottom: 1.6rem;
+}
+
+/* ----------------------------------------------------------------------- CTA */
+
+.about-page .ab-cta {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  padding: 4.8rem 2.8rem;
+  border-radius: var(--ab-radius);
+  background: var(--ab-cta-bg, var(--ab-accent));
+  color: var(--ab-cta-ink, var(--ab-ink));
+  text-align: center;
+}
+
+.about-page .ab-cta__media,
+.about-page .ab-cta__media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.about-page .ab-cta__media img {
+  object-fit: cover;
+}
+
+.about-page .ab-cta__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--ab-cta-scrim, rgba(23, 23, 20, 0.45));
+}
+
+.about-page .ab-cta__copy {
+  position: relative;
+  margin-inline: auto;
+  max-width: 60rem;
+}
+
+.about-page .ab-cta__heading {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: var(--ab-cta-heading-size, 2.8rem);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.about-page .ab-cta__text {
+  margin: 1.2rem 0 0;
+  font-size: 1.55rem;
+  line-height: 1.7;
+  opacity: 0.85;
+}
+
+.about-page .ab-cta__text > :first-child { margin-top: 0; }
+.about-page .ab-cta__text > :last-child { margin-bottom: 0; }
+
+.about-page .ab-cta__actions {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.2rem;
+}
+
+.about-page .ab-cta__button--primary {
+  border-color: var(--ab-btn-bg, var(--ab-ink));
+  background: var(--ab-btn-bg, var(--ab-ink));
+  color: var(--ab-btn-ink, #ffffff);
+}
+
+.about-page .ab-cta__button--secondary {
+  border-color: var(--ab-btn2-ink, var(--ab-ink));
+  background: transparent;
+  color: var(--ab-btn2-ink, var(--ab-ink));
+}
+
+@media (hover: hover) {
+  .about-page .ab-cta__button--primary:hover {
+    background: transparent;
+    color: var(--ab-btn-bg, var(--ab-ink));
+  }
+
+  .about-page .ab-cta__button--secondary:hover {
+    background: var(--ab-btn2-ink, var(--ab-ink));
+    color: var(--ab-btn2-bg, #ffffff);
+  }
+}
+
+/* ------------------------------------------------------- the page's own text */
+
+/*
+  Kept for a merchant who would rather write in the page editor than in the theme
+  editor; off by default, because the section's own fields say it better.
+*/
+.about-page .ab-content {
+  margin-inline: auto;
+  color: var(--ab-muted);
+  font-size: var(--ab-body-size, 1.65rem);
+  line-height: 1.75;
+}
+
+.about-page .ab-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--ab-radius);
+}
+
+/* --------------------------------------------------------------- breakpoints */
+
+@media screen and (max-width: 749px) {
+  .about-page {
+    --ab-gap: 1.6rem;
+    --ab-band-gap: 4.8rem;
+  }
+
+  .about-page .ab-shell {
+    padding-inline: 1.6rem;
+  }
+
+  .about-page .ab-hero__inner {
+    padding: 4.8rem 2rem;
+  }
+
+  .about-page .ab-cta {
+    padding: 3.6rem 2rem;
+  }
+
+  /* A row of buttons becomes a stack rather than two half-width stubs. */
+  .about-page .ab-actions .eden-action,
+  .about-page .ab-cta__actions .eden-action {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .about-page {
+    --ab-pillar-columns: var(--ab-pillar-columns-tablet, 2);
+    --ab-stat-columns: var(--ab-stat-columns-tablet, 2);
+    --ab-step-columns: 2;
+  }
+
+  .about-page .ab-hero {
+    min-height: var(--ab-hero-height, 54rem);
+  }
+
+  .about-page .ab-story {
+    grid-template-columns: var(--ab-story-media-col, 42%) minmax(0, 1fr);
+    gap: clamp(3.2rem, 5vw, 6.4rem);
+  }
+
+  .about-page .ab-story--flipped .ab-story__media {
+    order: 2;
+  }
+
+  .about-page .ab-story__media {
+    position: sticky;
+    top: 3.2rem;
+  }
+
+  .about-page .ab-feature {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(3.2rem, 5vw, 6.4rem);
+  }
+
+  .about-page .ab-feature--flipped .ab-feature__media {
+    order: 2;
+  }
+
+  .about-page .ab-section-head--centred {
+    max-width: 68rem;
+  }
+
+  .about-page .ab-stats {
+    padding-inline: 4rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .about-page {
+    --ab-pillar-columns: var(--ab-pillar-columns-desktop, 3);
+    --ab-stat-columns: var(--ab-stat-columns-desktop, 4);
+    --ab-step-columns: var(--ab-step-columns-desktop, 4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-page .ab-pillar__media img,
+  .about-page .ab-pillar__arrow {
+    transition: none;
+  }
+}

@@ -1,0 +1,174 @@
+{%- doc -%}
+  Lays out the rich text a merchant typed in the admin editor.
+
+  Rendered literally, these guides are a single column with a full-width photo
+  dropped in every few lines, which reads as a scrapbook. This pairs each picture
+  with the words it belongs to, in two columns, alternating sides down the page.
+
+  The pages were not all written the same way, so there are two shapes to handle:
+
+    the articles   <h2> heading, a paragraph or two, then the diagram
+    the guides     the photo first, then the paragraphs explaining it
+
+  So a run of "<h2>" chapters is paired chapter by chapter, and anything before
+  the first heading - which is the whole document on a page that has no headings -
+  pairs each picture with the text that follows it. Either way a picture with no
+  words beside it, and words with no picture, stay full width.
+
+  @param {string} content - article.content or page.content
+  @param {boolean} [split_sections] - pair pictures with their words. Default false.
+  @param {boolean} [scroll_tables] - let a wide table scroll in its own box. Default false.
+  @param {string} [featured_src] - the lead photo's URL. A picture in the content with
+    the same file name is dropped, so the page does not open on the same photograph twice.
+  @param {string} [lead_html] - a run of HTML to cut from the front of the content. The
+    banner hero lifts the opening paragraph onto the photograph and passes it here, so
+    the reader is not given the same sentence twice, once over the picture and once under it.
+
+  Usage:
+  {%- render 'editorial-content', content: article.content, split_sections: true -%}
+{%- enddoc -%}
+
+{%- liquid
+  assign html = content
+
+  # Whatever the banner already said, said once.
+  if lead_html != blank
+    assign html = html | remove_first: lead_html
+  endif
+
+  if scroll_tables
+    assign html = html | replace: '<table', '<div class="gp-table-scroll"><table' | replace: '</table>', '</table></div>'
+  endif
+
+  # Nothing the editor writes carries loading="lazy", and these run to six photographs.
+  assign html = html | replace: '<img ', '<img loading="lazy" '
+
+  assign featured_file = ''
+  if featured_src != blank
+    assign featured_file = featured_src | split: '?' | first | split: '/' | last
+  endif
+
+  assign chapters = html | split: '<h2'
+  assign intro = chapters[0]
+
+  # The lead photo repeated as the first thing in the body is the commonest shape
+  # here: the editor was pasted the same file the article was given.
+  if featured_file != blank and intro contains featured_file
+    assign intro_pieces = intro | split: '<img'
+    assign intro_rebuilt = intro_pieces[0]
+    for piece in intro_pieces offset: 1
+      assign piece_attrs = piece | split: '>' | first
+      if piece_attrs contains featured_file
+        assign piece_body = piece | remove_first: piece_attrs | remove_first: '>'
+        assign intro_rebuilt = intro_rebuilt | append: piece_body
+      else
+        assign intro_rebuilt = intro_rebuilt | append: '<img' | append: piece
+      endif
+    endfor
+    assign intro = intro_rebuilt
+  endif
+
+  assign flipped = false
+-%}
+
+{%- capture formatted -%}
+{%- comment -%}
+  Before the first heading. On a page with no headings at all this is the whole
+  document, so this is where the guides get their layout: picture, then the words
+  that explain it.
+{%- endcomment -%}
+{%- if split_sections and intro contains '<img' -%}
+  {%- assign intro_blocks = intro | split: '<img' -%}
+  {{- intro_blocks[0] -}}
+
+  {%- for block in intro_blocks offset: 1 -%}
+    {%- liquid
+      assign block_attrs = block | split: '>' | first
+      assign block_media = '<img' | append: block_attrs | append: '>'
+      assign block_text = block | remove_first: block_attrs | remove_first: '>'
+      assign block_words = block_text | strip_html | strip
+    -%}
+
+    {%- if block_words != blank -%}
+      <div class="gp-split{% if flipped %} gp-split--flipped{% endif %}">
+        <div class="gp-split__text">{{ block_text }}</div>
+        <figure class="gp-split__media">{{ block_media }}</figure>
+      </div>
+      {%- liquid
+        if flipped
+          assign flipped = false
+        else
+          assign flipped = true
+        endif
+      -%}
+    {%- else -%}
+      {{- block_media }}{{ block_text -}}
+    {%- endif -%}
+  {%- endfor -%}
+{%- else -%}
+  {{- intro -}}
+{%- endif -%}
+
+{%- comment -%}
+  Each "<h2>" chapter: the heading and its paragraphs on one side, the diagram the
+  chapter ends on against them.
+{%- endcomment -%}
+{%- for chapter_body in chapters offset: 1 -%}
+  {%- liquid
+    assign chapter = '<h2' | append: chapter_body
+    assign chapter_media = ''
+    assign chapter_text = chapter
+
+    if split_sections and chapter contains '<img'
+      assign image_pieces = chapter | split: '<img'
+      assign chapter_text = image_pieces[0]
+
+      # The attributes run to the first ">", which holds for anything the admin
+      # rich-text editor writes.
+      assign media_attrs = image_pieces[1] | split: '>' | first
+      assign chapter_media = '<img' | append: media_attrs | append: '>'
+      assign media_tail = image_pieces[1] | remove_first: media_attrs | remove_first: '>'
+      assign chapter_text = chapter_text | append: media_tail
+
+      # A chapter with more than one picture keeps the rest inline, below the words.
+      for extra_piece in image_pieces offset: 2
+        assign chapter_text = chapter_text | append: '<img' | append: extra_piece
+      endfor
+    endif
+  -%}
+
+  {%- if chapter_media != blank -%}
+    <div class="gp-split{% if flipped %} gp-split--flipped{% endif %}">
+      <div class="gp-split__text">{{ chapter_text }}</div>
+      <figure class="gp-split__media">{{ chapter_media }}</figure>
+    </div>
+    {%- liquid
+      if flipped
+        assign flipped = false
+      else
+        assign flipped = true
+      endif
+    -%}
+  {%- else -%}
+    {{- chapter -}}
+  {%- endif -%}
+{%- endfor -%}
+{%- endcapture -%}
+
+{%- liquid
+  comment
+    Emptied paragraphs, cleaned here rather than up front because most of them are
+    made by the split itself: the editor wrote "<p><img></p>", so cutting at the
+    picture leaves a dangling "<p>" on the words and a "</p>" at the head of what
+    follows, and the two meet as an empty paragraph. One blank line of body text
+    each, and in a two-column row they push the words out of line with the picture.
+    The lone non-breaking space is a real character in the source, not "&nbsp;".
+  endcomment
+  assign cleaned = formatted
+  assign cleaned = cleaned | replace: '<p class=""></p>', '' | replace: '<p class="p1"></p>', ''
+  assign cleaned = cleaned | replace: '<p> </p>', '' | replace: '<p>&nbsp;</p>', '' | replace: '<p> </p>', ''
+  assign cleaned = cleaned | replace: '<p><br></p>', '' | replace: '<p><br/></p>', '' | replace: '<p><br /></p>', ''
+  assign cleaned = cleaned | replace: '<p></p>', ''
+-%}
+
+{{- cleaned -}}

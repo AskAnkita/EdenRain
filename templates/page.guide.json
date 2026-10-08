@@ -1,27 +1,69 @@
 {
   "sections": {
-    "article": {
-      "type": "article-editorial",
+    "guide": {
+      "type": "guide-page",
+      "blocks": {
+        "gemstones": {
+          "type": "guide",
+          "settings": {
+            "title": "Lab-grown gemstones",
+            "text": "Sapphires, rubies and emeralds with the same properties as mined stones.",
+            "image_asset": "featured-diamonds-gemstones.jpg",
+            "link": "/pages/gemstones",
+            "link_label": "Read the guide"
+          }
+        },
+        "ring_size": {
+          "type": "guide",
+          "settings": {
+            "title": "Find your ring size",
+            "text": "A printable sizer, a conversion chart, and how to buy a surprise.",
+            "image_asset": "featured-diamonds-sizing.jpg",
+            "link": "/pages/er-sizing",
+            "link_label": "Read the guide"
+          }
+        },
+        "wrist_size": {
+          "type": "guide",
+          "settings": {
+            "title": "Find your wrist size",
+            "text": "How to measure at home for a bracelet or bangle, and how much room to leave.",
+            "image_asset": "lifestyle-bracelet.jpg",
+            "link": "/pages/wrist-sizer-guide",
+            "link_label": "Read the guide"
+          }
+        },
+        "care": {
+          "type": "guide",
+          "settings": {
+            "title": "Jewellery care & cleaning",
+            "text": "Cleaning at home, when to have a setting checked, and habits that keep it secure.",
+            "image_asset": "featured-diamonds-care.jpg",
+            "link": "/pages/jewellery-care",
+            "link_label": "Read the guide"
+          }
+        }
+      },
+      "block_order": [
+        "gemstones",
+        "ring_size",
+        "wrist_size",
+        "care"
+      ],
       "settings": {
-        "show_eyebrow": true,
-        "eyebrow": "",
-        "show_meta": true,
-        "show_author": true,
-        "show_image": true,
+        "eyebrow": "Education & guides",
+        "eyebrow_link": "/pages/education-guides",
+        "heading": "",
+        "subheading": "",
         "scroll_tables": true,
-        "show_prev_next": true,
-        "prev_label": "Previous",
-        "next_label": "Next",
         "show_more": true,
-        "more_heading": "Keep reading",
-        "more_limit": 4,
+        "more_heading": "More guides",
         "columns": 3,
         "show_images": true,
-        "image_ratio": "3 / 2",
-        "link_label": "Read more",
+        "image_ratio": "1 / 1",
         "card_gap": 24,
         "card_radius": 20,
-        "heading_size": 42,
+        "heading_size": 44,
         "body_size": 17,
         "card_title_size": 19,
         "card_text_size": 14,
@@ -65,10 +107,13 @@
         "hero_button_text_color": "#171714",
         "hero_button_label": "",
         "hero_button_link": "",
-        "hero_text": "",
+        "hero_image_asset": "",
+        "hero_image_source": "lift",
         "hero_text_source": "lift",
         "hero_split_ratio": 50,
         "hero_split_flip": false,
+        "hero_split_fit": "contain",
+        "hero_split_media_background": "#f0ebe7",
         "hero_split_mobile": "words",
         "hero_split_background": "#22211e",
         "hero_split_media_height": 340,
@@ -77,6 +122,6 @@
     }
   },
   "order": [
-    "article"
+    "guide"
   ]
 }

@@ -159,3 +159,59 @@ node scripts/shopify/inspect-product-options.mjs --limit=500 --examples=5
 It prints the option names in use (the engagement rings call theirs **Jewelry material**), how many
 products carry metal/shape values as options vs tags, and — the part that matters for clicking —
 how many have per-variant images.
+
+## Put the About page on its story template
+
+`/pages/about-er` was rendering through the default page template: the title and one block of rich
+text at the full width of the browser. `templates/page.about-er.json` lays the same story out with a
+hero, the founder's letter beside a portrait, the figures, what we make, how a piece is made and a
+closing panel — but a template only takes effect once the page is pointed at it, which is this.
+
+```bash
+node scripts/shopify/set-about-template.mjs            # preview, writes nothing
+node scripts/shopify/set-about-template.mjs --apply    # write
+```
+
+Push the theme first (`shopify theme push`), or the page asks for a template the live theme hasn't
+got yet. The page's current template is saved to `backups/` before anything is written, and
+`ABOUT_TEMPLATE= node scripts/shopify/set-about-template.mjs --apply` puts it back on the default
+one. `ABOUT_HANDLE` points the same script at another page.
+
+## Fill an empty guide page
+
+The Education & Guides hub links to four guides. Two of them — Gemstones and Jewellery Care — were
+pages with the `guide` template already set and a body of nought characters, so they rendered as a
+bare heading over an empty hero. These write the body.
+
+```bash
+node scripts/shopify/update-gemstones-page.mjs              # preview, writes nothing
+node scripts/shopify/update-gemstones-page.mjs --apply      # write
+
+node scripts/shopify/update-jewellery-care-page.mjs         # preview, writes nothing
+node scripts/shopify/update-jewellery-care-page.mjs --apply # write
+```
+
+Both write the shape `sections/guide-page.liquid` reads: an opening photograph, which is lifted
+into the split hero, a lead paragraph, which becomes the hero's subtitle, and then `<h2>` chapters.
+A chapter carrying one picture is laid out as a two-column row that alternates side down the page;
+a chapter of words or a table runs the full measure. Don't hand-wrap a table in
+`<div class="gp-table-scroll">` — `snippets/editorial-content.liquid` adds that itself.
+
+Pictures come from `assets/`, and are uploaded to Content > Files on `--apply`, because a page body
+can only point at a `/files/` URL: a theme asset has no such URL until something puts it there. A
+file already up there under the same name is reused, so re-running is cheap.
+
+The care guide looks for four photographs and stands in an existing one for each it can't find:
+
+| Slot | Looks for | Stands in |
+| --- | --- | --- |
+| hero | `assets/care-hero.jpg` | `bespoke-jewellery-1.jpg`, already in Files |
+| everyday wear | `assets/care-everyday.jpg` | `assets/lifestyle-bracelet.jpg` |
+| cleaning | `assets/care-cleaning.jpg` | `assets/featured-diamonds-care.jpg` |
+| storage | `assets/care-storage.jpg` | `assets/lifestyle-necklace.jpg` |
+
+Drop a photograph in under the name in the middle column and re-run with `--apply` to use it. The
+page's current body is saved to `backups/` before either script writes.
+
+The dev server caches page content, so a guide can still look empty after a run — reload with a
+query string (`?x=1`) to see it.

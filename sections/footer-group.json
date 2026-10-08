@@ -86,8 +86,6 @@
           "type": "link_list",
           "settings": {
             "menu": "help",
-            "extra_link_label": "Education & Guides",
-            "extra_link_url": "/pages/education-guides",
             "show_social": false
           }
         },

@@ -132,3 +132,89 @@ export async function gql(cfg, query, variables = {}, mutationField) {
   }
   throw new Error('Shopify kept throttling the request; try again in a minute.');
 }
+
+// Puts a local image into Shopify's Content > Files and hands back its CDN URL, so a page body
+// written by a script can point at it. A file of the same name already up there is reused rather
+// than uploaded twice - these scripts are meant to be re-run.
+//
+// Shopify takes an upload in three steps: ask for a signed target, POST the bytes to it, then
+// tell Shopify to make a file out of what landed there. The CDN URL only exists once the image
+// has been processed, which takes a few seconds, so the last step polls for it.
+export async function uploadImage(cfg, localPath, filename, mimeType = 'image/jpeg') {
+  if (!existsSync(localPath)) return null;
+
+  const existing = await gql(
+    cfg,
+    `query($q: String!) {
+      files(first: 5, query: $q) {
+        nodes {
+          ... on MediaImage { image { url } }
+          ... on GenericFile { url }
+        }
+      }
+    }`,
+    { q: `filename:${filename}` }
+  );
+
+  const foundUrl = existing.files?.nodes?.[0]?.image?.url || existing.files?.nodes?.[0]?.url;
+  if (foundUrl) {
+    console.log(`  = Already in Shopify: ${filename}`);
+    return foundUrl;
+  }
+
+  console.log(`  + Staging upload for ${filename}...`);
+  const stagedRes = await gql(
+    cfg,
+    `mutation($input: [StagedUploadInput!]!) {
+      stagedUploadsCreate(input: $input) {
+        stagedTargets { url resourceUrl parameters { name value } }
+        userErrors { field message }
+      }
+    }`,
+    { input: [{ filename, mimeType, resource: 'IMAGE', httpMethod: 'POST' }] },
+    'stagedUploadsCreate'
+  );
+
+  const target = stagedRes.stagedUploadsCreate?.stagedTargets?.[0];
+  if (!target) throw new Error(`Could not stage an upload for ${filename}`);
+
+  const formData = new FormData();
+  for (const param of target.parameters) formData.append(param.name, param.value);
+  formData.append('file', new Blob([readFileSync(localPath)], { type: mimeType }), filename);
+
+  const uploadRes = await fetch(target.url, { method: 'POST', body: formData });
+  if (!uploadRes.ok) {
+    throw new Error(`Upload of ${filename} failed (${uploadRes.status}): ${(await uploadRes.text()).slice(0, 200)}`);
+  }
+
+  const createRes = await gql(
+    cfg,
+    `mutation($files: [FileCreateInput!]!) {
+      fileCreate(files: $files) {
+        files { id fileStatus ... on MediaImage { image { url } } }
+        userErrors { field message }
+      }
+    }`,
+    {
+      files: [
+        {
+          originalSource: target.resourceUrl,
+          contentType: 'IMAGE',
+          alt: filename.replace(/[-_.]/g, ' ').replace(/\s+(jpg|jpeg|png|webp)$/i, ''),
+        },
+      ],
+    },
+    'fileCreate'
+  );
+
+  const fileId = createRes.fileCreate?.files?.[0]?.id;
+  for (let i = 0; i < 6; i++) {
+    await sleep(2000);
+    const check = await gql(cfg, `query($id: ID!) { node(id: $id) { ... on MediaImage { image { url } } } }`, { id: fileId });
+    if (check.node?.image?.url) {
+      console.log(`  + Uploaded: ${check.node.image.url}`);
+      return check.node.image.url;
+    }
+  }
+  return target.resourceUrl;
+}

@@ -1,0 +1,254 @@
+{
+  "sections": {
+    "about": {
+      "type": "about-page",
+      "blocks": {
+        "stat_founded": {
+          "type": "stat",
+          "settings": {
+            "value": "1957",
+            "label": "A family of jewellers since"
+          }
+        },
+        "stat_places": {
+          "type": "stat",
+          "settings": {
+            "value": "Three",
+            "label": "Homes for our craft: the UK, India and Dubai"
+          }
+        },
+        "stat_method": {
+          "type": "stat",
+          "settings": {
+            "value": "Hand & CAD",
+            "label": "Traditional techniques, modern design"
+          }
+        },
+        "stat_care": {
+          "type": "stat",
+          "settings": {
+            "value": "Every piece",
+            "label": "Set, finished and checked by hand"
+          }
+        },
+        "pillar_collection": {
+          "type": "pillar",
+          "settings": {
+            "title": "The Eden Raine collection",
+            "text": "Fine jewellery that reflects timeless elegance - handmade craftsmanship and the precision of CAD technology, so each piece is unique, high quality and made to last.",
+            "image_asset": "featured-engagement-signature.jpg",
+            "link": "/collections/all",
+            "link_label": "Shop the collection"
+          }
+        },
+        "pillar_design": {
+          "type": "pillar",
+          "settings": {
+            "title": "Craft and precision",
+            "text": "From the first sketch to the final polish, every step is a blend of artistry and innovation - traditional handmade technique with the precision of CAD.",
+            "image_asset": "featured-diamonds-education.jpg",
+            "link": "/pages/education-guides",
+            "link_label": "Read our guides"
+          }
+        },
+        "pillar_care": {
+          "type": "pillar",
+          "settings": {
+            "title": "We care",
+            "text": "Every piece we create has meaning, and hearing your stories keeps us crafting with love. If there is ever an issue, we are here to put it right.",
+            "image_asset": "featured-diamonds-care.jpg",
+            "link": "/pages/contact",
+            "link_label": "Talk to us"
+          }
+        },
+        "step_sketch": {
+          "type": "step",
+          "settings": {
+            "title": "The sketch",
+            "text": "Every piece starts as a drawing: the stone, the setting and the proportions, settled before anything is made."
+          }
+        },
+        "step_cad": {
+          "type": "step",
+          "settings": {
+            "title": "The CAD",
+            "text": "The drawing becomes a precise three-dimensional model, so every millimetre is right before a single gram of gold is cut."
+          }
+        },
+        "step_making": {
+          "type": "step",
+          "settings": {
+            "title": "The making",
+            "text": "Skilled makers in our workshop build the piece by hand, the way the trade has done it in our family since 1957."
+          }
+        },
+        "step_setting": {
+          "type": "step",
+          "settings": {
+            "title": "The setting",
+            "text": "Stone setters place each stone by hand and check it twice, because a setting is what keeps a piece safe for a lifetime."
+          }
+        },
+        "step_polish": {
+          "type": "step",
+          "settings": {
+            "title": "The polish",
+            "text": "A final hand polish and a last inspection, then your piece is packed and sent to you."
+          }
+        },
+        "feature_team": {
+          "type": "feature",
+          "settings": {
+            "eyebrow": "Our global team",
+            "title": "Designed in the UK, made by hands we know",
+            "text": "<p>As Eden Raine has grown, so has our team. Our designs are created in the UK, and our production is brought to life by skilled artisans in our workshop in India and our trusted partners in Dubai. From expert makers to stone setters, each person brings their own craft to make sure every piece meets the same standard.</p>",
+            "image_asset": "lifestyle-bracelet.jpg",
+            "flip": false
+          }
+        },
+        "feature_future": {
+          "type": "feature",
+          "settings": {
+            "eyebrow": "Our future",
+            "title": "A family tradition, still being written",
+            "text": "<p>With decades of experience and a commitment to quality, we keep innovating - combining our family's rich tradition with new designs and techniques. We look forward to creating more timeless, handmade jewellery that holds a special place in your life.</p>",
+            "image_asset": "lifestyle-earring.jpg",
+            "flip": false,
+            "button_label": "Explore the collection",
+            "button_link": "/collections/all",
+            "button_background": "#171714",
+            "button_text_color": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "stat_founded",
+        "stat_places",
+        "stat_method",
+        "stat_care",
+        "pillar_collection",
+        "pillar_design",
+        "pillar_care",
+        "step_sketch",
+        "step_cad",
+        "step_making",
+        "step_setting",
+        "step_polish",
+        "feature_team",
+        "feature_future"
+      ],
+      "settings": {
+        "show_hero": true,
+        "hero_eyebrow": "Our story",
+        "hero_eyebrow_link": "",
+        "hero_heading": "About Eden Raine",
+        "hero_text": "<p>A family of jewellers since 1957, and a house named after a daughter. Fine jewellery made by hand, designed in the UK.</p>",
+        "hero_image_asset": "lifestyle-necklace.jpg",
+        "hero_width": "full",
+        "hero_align": "centre",
+        "hero_focal": "center",
+        "hero_height": 560,
+        "hero_height_mobile": 420,
+        "hero_radius": 20,
+        "hero_heading_size": 56,
+        "hero_text_size": 18,
+        "hero_overlay": 50,
+        "hero_wash": 25,
+        "hero_overlay_color": "#171714",
+        "hero_text_color": "#ffffff",
+        "hero_fallback_color": "#ead9d1",
+        "hero_eyebrow_background": "#ffffff",
+        "hero_eyebrow_opacity": 20,
+        "hero_eyebrow_text_color": "#ffffff",
+        "hero_button_label": "Explore the collection",
+        "hero_button_link": "/collections/all",
+        "hero_button_background": "#ffffff",
+        "hero_button_text_color": "#171714",
+        "hero_button_2_label": "Talk to us",
+        "hero_button_2_link": "/pages/contact",
+        "hero_button_2_text_color": "#ffffff",
+        "hero_button_2_background": "#171714",
+        "show_story": true,
+        "story_eyebrow": "A letter from our founder",
+        "story_heading": "Jewellery has always been more than a passion for me",
+        "story_text": "<p>It is part of my family's legacy. Growing up in a family of jewellers since 1957, I was surrounded by the art of creating timeless pieces. But when my daughter, Eden, was born, she became my true inspiration to build something special. I wanted to design jewellery that connects people to their cherished memories and moments, just as I feel connected to her.</p><p>That is how Eden Raine was born. We combine traditional handmade techniques with modern CAD design, ensuring that each piece is hand crafted with precision and care. From the initial sketch to the final polish, every step of our process is a blend of artistry and innovation.</p>",
+        "story_image_asset": "lifestyle-heart-necklace.jpg",
+        "story_caption": "",
+        "story_flip": false,
+        "story_media_width": 42,
+        "story_image_ratio": "4 / 5",
+        "signature_name": "Nathan",
+        "signature_role": "Founder, Eden Raine",
+        "story_button_label": "",
+        "story_button_link": "",
+        "story_button_background": "#171714",
+        "show_stats": true,
+        "stat_columns": 4,
+        "stat_columns_tablet": 2,
+        "stats_padding": 40,
+        "stat_size": 32,
+        "stat_label_size": 14,
+        "stats_background": "#fdf9f7",
+        "stats_text_color": "#171714",
+        "stats_label_color": "#5c5a55",
+        "show_pillars": true,
+        "pillars_eyebrow": "What we do",
+        "pillars_heading": "Made by hand, drawn by CAD",
+        "pillars_text": "<p>Three things we are asked about most - what we make, how it is made, and what happens afterwards.</p>",
+        "pillars_align": "centre",
+        "show_pillar_images": true,
+        "pillar_columns": 3,
+        "pillar_columns_tablet": 2,
+        "image_ratio": "4 / 5",
+        "show_steps": true,
+        "steps_eyebrow": "From sketch to polish",
+        "steps_heading": "How your piece is made",
+        "steps_text": "",
+        "steps_align": "left",
+        "show_step_images": false,
+        "step_columns": 5,
+        "show_features": true,
+        "features_alternate": true,
+        "feature_image_ratio": "3 / 2",
+        "show_page_content": false,
+        "content_measure": true,
+        "show_cta": true,
+        "cta_heading": "Looking for something in particular?",
+        "cta_text": "<p>Our team can help you choose the right stone, setting and size, and answer anything you want to know before you buy.</p>",
+        "cta_image_asset": "gemstones-hero.jpg",
+        "cta_overlay": 60,
+        "cta_overlay_color": "#171714",
+        "cta_background": "#ead9d1",
+        "cta_text_color": "#ffffff",
+        "cta_heading_size": 36,
+        "cta_button_label": "Shop the collection",
+        "cta_button_link": "/collections/all",
+        "cta_button_background": "#ffffff",
+        "cta_button_text_color": "#171714",
+        "cta_button_2_label": "Talk to us",
+        "cta_button_2_link": "/pages/contact",
+        "cta_button_2_text_color": "#171714",
+        "cta_button_2_background": "#ead9d1",
+        "heading_size": 38,
+        "body_size": 17,
+        "card_title_size": 21,
+        "card_text_size": 16,
+        "color_scheme": "scheme-1",
+        "background": "#ffffff",
+        "text_color": "#171714",
+        "muted_text_color": "#5c5a55",
+        "accent_color": "#ead9d1",
+        "card_background": "#fdf9f7",
+        "card_border_color": "#ebe4df",
+        "corner_radius": 20,
+        "grid_gap": 24,
+        "band_gap": 72,
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "about"
+  ]
+}

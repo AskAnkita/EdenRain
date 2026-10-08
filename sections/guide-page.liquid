@@ -1,0 +1,943 @@
+{% comment %}
+  A single guide page - the ring sizer, the wrist sizer, gemstones, jewellery care.
+
+  The guides are ordinary Shopify pages: a title and a block of rich text, with a
+  photo and, on the ring guide, an international conversion chart. The default page
+  template rendered that at full browser width with no measure and no table styling,
+  which is what made them hard to read.
+
+  This gives the same content a hero that matches the Education & Guides hub, a
+  readable column, and a row of sibling guides at the foot so a reader always has
+  somewhere to go next. A card whose link points at the page being viewed drops out,
+  so a guide never offers itself.
+
+  Looks come from assets/editorial-cards.css, shared with the hub and the blog.
+{% endcomment %}
+
+{{ 'editorial-cards.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'editorial-downloads.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign stts = section.settings
+  assign columns = stts.columns | default: 3
+
+  assign columns_tablet = 2
+  if columns < 2
+    assign columns_tablet = columns
+  endif
+
+  assign heading = stts.heading | default: page.title
+
+  comment
+    The banner hero. A guide's picture can come from the admin (image_picker) or
+    from the theme's own files (image_asset), the same pair the cards below use,
+    so a guide drawn from theme assets gets a banner too.
+  endcomment
+  assign hero_image = stts.hero_image
+  assign hero_asset = blank
+  if hero_image == blank
+    assign hero_asset = stts.hero_image_asset | strip
+  endif
+
+  comment
+    Nothing picked and nothing named in assets: borrow the page's own opening
+    photograph. These guides were all written the same way - the picture first,
+    the words beneath it - so the shot the editor already chose is the right one,
+    and lifting it saves hand-setting a banner on every guide. It is cut from the
+    body below (featured_src) so the reader is not shown it twice.
+  endcomment
+  assign hero_lift_src = ''
+  assign hero_lift_alt = ''
+  if hero_image == blank and hero_asset == blank and stts.hero_image_source == 'lift'
+    assign img_tags = page.content | split: '<img'
+    if img_tags.size > 1
+      assign first_attrs = img_tags[1] | split: '>' | first
+      assign src_parts = first_attrs | split: 'src="'
+      if src_parts.size > 1
+        assign hero_lift_src = src_parts[1] | split: '"' | first
+      endif
+      assign alt_parts = first_attrs | split: 'alt="'
+      if alt_parts.size > 1
+        assign hero_lift_alt = alt_parts[1] | split: '"' | first
+      endif
+    endif
+  endif
+
+  comment
+    The CDN takes a width through the query string. Every file URL Shopify writes
+    already carries "?v=", but one pasted in by hand may not.
+  endcomment
+  assign lift_join = '&'
+  unless hero_lift_src contains '?'
+    assign lift_join = '?'
+  endunless
+
+  assign has_hero_media = false
+  if hero_image != blank or hero_asset != blank or hero_lift_src != blank
+    assign has_hero_media = true
+  endif
+
+  comment
+    Whichever of the three the header ended up with, the body is told to drop it.
+  endcomment
+  assign featured_src = hero_image.src | default: hero_lift_src
+
+  assign banner_class = 'eg-banner eg-banner--' | append: stts.hero_width
+  case stts.hero_align
+    when 'left'
+      assign banner_class = banner_class | append: ' eg-banner--left'
+    when 'bottom'
+      assign banner_class = banner_class | append: ' eg-banner--bottom'
+    when 'bottom-left'
+      assign banner_class = banner_class | append: ' eg-banner--bottom eg-banner--left'
+  endcase
+  unless has_hero_media
+    assign banner_class = banner_class | append: ' eg-banner--plain'
+  endunless
+
+  comment
+    Find the opening paragraph: the first "<p>...</p>" carrying actual words,
+    looked for in the first few paragraph-sized chunks rather than only at
+    character nought, because a page may open on a heading, a stray wrapper or
+    a picture. Only the paragraph itself is lifted - whatever sits in front of
+    it is left exactly where the editor put it.
+  endcomment
+  assign lead_html = ''
+  assign lead_words = ''
+  if stts.subheading == blank and stts.hero_text_source == 'lift'
+    assign lead_chunks = page.content | split: '</p>'
+    for chunk in lead_chunks limit: 4
+      assign chunk_parts = chunk | split: '<p'
+      if chunk_parts.size < 2
+        continue
+      endif
+      assign para_tail = chunk_parts | last
+      assign para_html = '<p' | append: para_tail | append: '</p>'
+      assign para_words = para_html | strip_html | replace: '&nbsp;', ' ' | replace: ' ', ' ' | strip
+      if para_words != blank
+        assign lead_html = para_html
+        assign lead_words = para_words
+        break
+      endif
+    endfor
+  endif
+
+  assign media_sizes = '100vw'
+  if stts.hero_style == 'split'
+    assign media_sizes = '(min-width: 850px) 50vw, 100vw'
+  endif
+
+  assign split_class = 'eg-hero-split eg-hero-split--' | append: stts.hero_width
+  if stts.hero_split_flip
+    assign split_class = split_class | append: ' eg-hero-split--flipped'
+  endif
+  if stts.hero_split_mobile == 'picture'
+    assign split_class = split_class | append: ' eg-hero-split--picture-first'
+  endif
+  unless has_hero_media
+    assign split_class = split_class | append: ' eg-hero-split--solo'
+  endunless
+
+  assign scrim_alpha = stts.hero_overlay | divided_by: 100.0
+  assign wash_alpha = stts.hero_wash | divided_by: 100.0
+  assign pill_alpha = stts.hero_eyebrow_opacity | divided_by: 100.0
+-%}
+
+{%- style -%}
+  #guide-page-{{ section.id }} {
+    --eg-columns-desktop: {{ columns }};
+    --eg-columns-tablet: {{ columns_tablet }};
+    --eg-ink: {{ stts.text_color }};
+    --eg-muted: {{ stts.muted_text_color }};
+    --eg-card-bg: {{ stts.card_background }};
+    --eg-card-border: {{ stts.card_border_color }};
+    --eg-accent: {{ stts.accent_color }};
+    --eg-radius: {{ stts.card_radius }}px;
+    --eg-gap: {{ stts.card_gap | divided_by: 10.0 }}rem;
+    --eg-ratio: {{ stts.image_ratio }};
+    --gp-text-col: {{ stts.split_text_width | default: 36 }}%;
+    --eg-heading-size: {{ stts.heading_size | divided_by: 10.0 }}rem;
+    --eg-body-size: {{ stts.body_size | divided_by: 10.0 }}rem;
+    --eg-card-title-size: {{ stts.card_title_size | divided_by: 10.0 }}rem;
+    --eg-card-text-size: {{ stts.card_text_size | divided_by: 10.0 }}rem;
+    --eg-banner-height: {{ stts.hero_height | divided_by: 10.0 }}rem;
+    --eg-banner-height-mobile: {{ stts.hero_height_mobile | divided_by: 10.0 }}rem;
+    --eg-banner-radius: {{ stts.hero_radius }}px;
+    --eg-banner-ink: {{ stts.hero_text_color }};
+    --eg-banner-focus: {{ stts.hero_focal }};
+    --eg-banner-scrim: {{ stts.hero_overlay_color | color_modify: 'alpha', scrim_alpha }};
+    --eg-banner-wash: {{ stts.hero_overlay_color | color_modify: 'alpha', wash_alpha }};
+    --eg-banner-fallback: {{ stts.hero_fallback_color }};
+    --eg-banner-pill-bg: {{ stts.hero_eyebrow_background | color_modify: 'alpha', pill_alpha }};
+    --eg-banner-pill-ink: {{ stts.hero_eyebrow_text_color }};
+    --eg-banner-btn-bg: {{ stts.hero_button_background }};
+    --eg-banner-btn-ink: {{ stts.hero_button_text_color }};
+    --eg-split-text: {{ stts.hero_split_ratio }}%;
+    --eg-split-bg: {{ stts.hero_split_background }};
+    --eg-split-ink: {{ stts.hero_text_color }};
+    --eg-split-media-height: {{ stts.hero_split_media_height | divided_by: 10.0 }}rem;
+    --eg-split-fit: {{ stts.hero_split_fit | default: 'cover' }};
+    --eg-split-media-bg: {{ stts.hero_split_media_background | default: stts.hero_split_background }};
+    --eg-banner-heading-size: {{ stts.hero_heading_size | divided_by: 10.0 }}rem;
+    --eg-banner-text-size: {{ stts.hero_text_size | divided_by: 10.0 }}rem;
+    --eg-cta-bg: {{ stts.cta_background }};
+    --eg-cta-ink: {{ stts.cta_text_color }};
+    --eg-btn-bg: {{ stts.cta_button_background }};
+    --eg-btn-ink: {{ stts.cta_button_text_color }};
+    background: {{ stts.background }};
+    color: {{ stts.text_color }};
+    padding-block: {{ stts.padding_top }}px {{ stts.padding_bottom }}px;
+  }
+{%- endstyle -%}
+
+<section
+  id="guide-page-{{ section.id }}"
+  class="editorial-cards color-{{ stts.color_scheme }}"
+>
+  <div class="eg-shell">
+    {%- comment -%}
+      The eyebrow, title and line are the same words whichever shape the header
+      takes, so they are written once here and placed by each shape below.
+    {%- endcomment -%}
+    {%- capture hero_copy -%}
+      {%- if stts.eyebrow != blank -%}
+        {%- if stts.eyebrow_link != blank -%}
+          <a class="eg-eyebrow" href="{{ stts.eyebrow_link }}">{{ stts.eyebrow | escape }}</a>
+        {%- else -%}
+          <p class="eg-eyebrow">{{ stts.eyebrow | escape }}</p>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if heading != blank -%}
+        <h1 class="eg-heading">{{ heading | escape }}</h1>
+      {%- endif -%}
+
+      {%- if stts.subheading != blank -%}
+        <div class="eg-banner__text rte">{{ stts.subheading }}</div>
+      {%- elsif lead_words != blank -%}
+        <p class="eg-banner__text">{{ lead_words }}</p>
+      {%- endif -%}
+
+      {%- if stts.hero_button_label != blank and stts.hero_button_link != blank -%}
+        <a class="eg-banner__button eden-action eden-action--solid" href="{{ stts.hero_button_link }}">
+          {{- stts.hero_button_label | escape -}}
+        </a>
+      {%- endif -%}
+    {%- endcapture -%}
+
+    {%- capture hero_media -%}
+      {%- if hero_image != blank -%}
+        {{
+          hero_image
+          | image_url: width: 2400
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '600, 900, 1200, 1600, 2000, 2400',
+            sizes: media_sizes,
+            alt: heading
+        }}
+      {%- elsif hero_asset != blank -%}
+        <img
+          src="{{ hero_asset | asset_img_url: '2400x' }}"
+          srcset="
+            {{ hero_asset | asset_img_url: '900x' }} 900w,
+            {{ hero_asset | asset_img_url: '1600x' }} 1600w,
+            {{ hero_asset | asset_img_url: '2400x' }} 2400w
+          "
+          sizes="{{ media_sizes }}"
+          alt="{{ heading | escape }}"
+          width="2400"
+          height="1350"
+          loading="eager"
+          fetchpriority="high"
+          data-gp-asset
+        >
+      {%- else -%}
+        <img
+          src="{{ hero_lift_src }}{{ lift_join }}width=1600"
+          srcset="
+            {{ hero_lift_src }}{{ lift_join }}width=900 900w,
+            {{ hero_lift_src }}{{ lift_join }}width=1600 1600w,
+            {{ hero_lift_src }}{{ lift_join }}width=2400 2400w
+          "
+          sizes="{{ media_sizes }}"
+          alt="{{ hero_lift_alt | default: heading | escape }}"
+          width="1600"
+          height="900"
+          loading="eager"
+          fetchpriority="high"
+        >
+      {%- endif -%}
+    {%- endcapture -%}
+
+    {%- if stts.hero_style == 'split' -%}
+      {%- comment -%}
+        Words one side against a flat panel, the photograph whole on the other.
+        These guides are shot on white, so a title laid over the picture has to
+        fight it for contrast; here it does not have to.
+      {%- endcomment -%}
+      <div class="{{ split_class }}">
+        <div class="eg-hero-split__copy">{{ hero_copy }}</div>
+
+        {%- if has_hero_media -%}
+          <div class="eg-hero-split__media">{{ hero_media }}</div>
+        {%- endif -%}
+      </div>
+    {%- elsif stts.hero_style == 'banner' -%}
+      {%- comment -%}
+        The picture is the header: the guide's title sits in the middle of it.
+      {%- endcomment -%}
+      <div class="{{ banner_class }}">
+        {%- if has_hero_media -%}
+          <div class="eg-banner__media">{{ hero_media }}</div>
+          <span class="eg-banner__scrim" aria-hidden="true"></span>
+        {%- endif -%}
+
+        <div class="eg-banner__inner">{{ hero_copy }}</div>
+      </div>
+    {%- else -%}
+      <div class="gp-hero">{{ hero_copy }}</div>
+    {%- endif -%}
+
+    <div class="gp-content rte"{% if stts.force_downloads %} data-editorial-downloads{% endif %}>
+      {%- render 'editorial-content',
+        content: page.content,
+        split_sections: stts.split_sections,
+        scroll_tables: stts.scroll_tables,
+        featured_src: featured_src,
+        lead_html: lead_html
+      -%}
+    </div>
+
+    {%- if stts.show_more and section.blocks.size > 0 -%}
+      {%- liquid
+        comment
+          A card pointing at the page being read is dropped, so a guide never offers
+          itself. Compared on the path alone, because a block's link is stored as a
+          relative URL while page.url carries no query or anchor either.
+        endcomment
+        assign current_path = page.url
+        assign more_count = 0
+        for block in section.blocks
+          if block.settings.title == blank
+            continue
+          endif
+          if block.settings.link == current_path
+            continue
+          endif
+          assign more_count = more_count | plus: 1
+        endfor
+      -%}
+
+      {%- if more_count > 0 -%}
+        <div class="gp-more">
+          {%- if stts.more_heading != blank -%}
+            <h2 class="gp-more__heading">{{ stts.more_heading | escape }}</h2>
+          {%- endif -%}
+
+          <ul class="eg-grid" role="list">
+            {%- for block in section.blocks -%}
+              {%- liquid
+                assign title = block.settings.title
+                if title == blank
+                  continue
+                endif
+                if block.settings.link == current_path
+                  continue
+                endif
+
+                assign picture = block.settings.image
+                assign picture_asset = blank
+                if picture == blank
+                  assign picture_asset = block.settings.image_asset | strip
+                endif
+
+                assign has_media = false
+                if stts.show_images
+                  if picture != blank or picture_asset != blank
+                    assign has_media = true
+                  endif
+                endif
+
+                assign has_link = false
+                if block.settings.link != blank
+                  assign has_link = true
+                endif
+              -%}
+
+              <li class="eg-card" {{ block.shopify_attributes }}>
+                {%- if has_link -%}
+                  <a class="eg-card__link eden-action-host" href="{{ block.settings.link }}">
+                {%- else -%}
+                  <div class="eg-card__link">
+                {%- endif -%}
+
+                  {%- if has_media -%}
+                    <div class="eg-card__media">
+                      {%- if picture != blank -%}
+                        {{
+                          picture
+                          | image_url: width: 900
+                          | image_tag:
+                            loading: 'lazy',
+                            sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
+                            alt: title
+                        }}
+                      {%- else -%}
+                        <img
+                          src="{{ picture_asset | asset_img_url: '900x' }}"
+                          srcset="
+                            {{ picture_asset | asset_img_url: '450x' }} 450w,
+                            {{ picture_asset | asset_img_url: '900x' }} 900w
+                          "
+                          sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
+                          alt="{{ title | escape }}"
+                          width="900"
+                          height="900"
+                          loading="lazy"
+                          data-gp-asset
+                        >
+                      {%- endif -%}
+                    </div>
+                  {%- endif -%}
+
+                  <div class="eg-card__body">
+                    <h3 class="eg-card__title">{{ title | escape }}</h3>
+
+                    {%- if block.settings.text != blank -%}
+                      <p class="eg-card__text">{{ block.settings.text | escape }}</p>
+                    {%- endif -%}
+
+                    {%- if has_link -%}
+                      <span class="eg-card__action">
+                        {{- block.settings.link_label | default: 'Read the guide' | escape -}}
+                        <span class="eg-card__arrow" aria-hidden="true">&rarr;</span>
+                      </span>
+                    {%- endif -%}
+                  </div>
+
+                {%- if has_link -%}
+                  </a>
+                {%- else -%}
+                  </div>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- if stts.show_cta and stts.cta_heading != blank -%}
+      <div class="eg-cta">
+        <div class="eg-cta__copy">
+          <p class="eg-cta__heading">{{ stts.cta_heading | escape }}</p>
+          {%- if stts.cta_text != blank -%}
+            <div class="eg-cta__text rte">{{ stts.cta_text }}</div>
+          {%- endif -%}
+        </div>
+        {%- if stts.cta_button_label != blank and stts.cta_button_link != blank -%}
+          <a class="eg-cta__button eden-action eden-action--outline" href="{{ stts.cta_button_link }}">
+            {{- stts.cta_button_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{%- comment -%}
+  A card can name a file under assets/ the shop has not uploaded. Rather than leave a
+  broken frame the picture is dropped and the card carries on as type.
+{%- endcomment -%}
+<script>
+  (() => {
+    const root = document.getElementById('guide-page-{{ section.id }}');
+    if (!root) return;
+    root.querySelectorAll('img[data-gp-asset]').forEach((img) => {
+      img.addEventListener('error', () => img.closest('.eg-card__media')?.remove());
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Guide page",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero"
+    },
+    {
+      "type": "select",
+      "id": "hero_style",
+      "label": "Header style",
+      "options": [
+        { "value": "split", "label": "Split - words one side, photo the other" },
+        { "value": "banner", "label": "Banner - title over the photo" },
+        { "value": "stacked", "label": "Stacked - title on the page background" }
+      ],
+      "default": "split",
+      "info": "The banner puts the guide's title in the middle of a full photo, with one line of copy beneath it."
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Education & guides"
+    },
+    {
+      "type": "url",
+      "id": "eyebrow_link",
+      "label": "Eyebrow link",
+      "info": "Usually the guides hub, so a reader can get back to the list."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Leave empty to use the page's own title."
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Standfirst"
+    },
+    { "type": "header", "content": "Banner" },
+    {
+      "type": "select",
+      "id": "hero_text_source",
+      "label": "When no subheading is typed",
+      "options": [
+        { "value": "lift", "label": "Move the opening paragraph onto the photo" },
+        { "value": "none", "label": "Show nothing under the title" }
+      ],
+      "default": "lift",
+      "info": "Moving it takes the paragraph out of the body as well, so it is not read twice."
+    },
+    {
+      "type": "select",
+      "id": "hero_image_source",
+      "label": "When no photo is set below",
+      "options": [
+        { "value": "lift", "label": "Use the page's own first picture" },
+        { "value": "none", "label": "Show no photo" }
+      ],
+      "default": "lift",
+      "info": "Taking it moves the picture out of the body as well, so it is not seen twice."
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Banner photo"
+    },
+    {
+      "type": "text",
+      "id": "hero_image_asset",
+      "label": "Banner photo from the theme files",
+      "info": "A file name in assets, e.g. guide-rings.jpg. Used only when no photo is picked above."
+    },
+    { "type": "text", "id": "hero_button_label", "label": "Button label", "info": "Leave empty for no button." },
+    { "type": "url", "id": "hero_button_link", "label": "Button link" },
+    { "type": "header", "content": "Split header" },
+    {
+      "type": "range",
+      "id": "hero_split_ratio",
+      "label": "The words' share",
+      "min": 30,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "info": "The rest goes to the photo, so a lower number makes the photo bigger."
+    },
+    { "type": "checkbox", "id": "hero_split_flip", "label": "Put the photo on the left", "default": false },
+    {
+      "type": "select",
+      "id": "hero_split_fit",
+      "label": "How the photo fills its half",
+      "options": [
+        { "value": "cover", "label": "Fill the panel, cropping to fit" },
+        { "value": "contain", "label": "Show the whole picture" }
+      ],
+      "default": "cover",
+      "info": "A guide shot wide on white usually wants the whole picture, so nothing is cut off the ends."
+    },
+    {
+      "type": "color",
+      "id": "hero_split_media_background",
+      "label": "Behind the photo",
+      "default": "#22211e",
+      "info": "Seen around the picture when it is shown whole."
+    },
+    {
+      "type": "select",
+      "id": "hero_split_mobile",
+      "label": "On a phone, show first",
+      "options": [
+        { "value": "words", "label": "The words" },
+        { "value": "picture", "label": "The photo" }
+      ],
+      "default": "words"
+    },
+    { "type": "color", "id": "hero_split_background", "label": "Panel colour", "default": "#22211e" },
+    {
+      "type": "range",
+      "id": "hero_split_media_height",
+      "label": "Photo height on a phone",
+      "min": 200,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 340
+    },
+    { "type": "header", "content": "Banner and split" },
+    {
+      "type": "select",
+      "id": "hero_width",
+      "label": "Header width",
+      "options": [
+        { "value": "wide", "label": "Wide - inside the page" },
+        { "value": "full", "label": "Full - edge to edge" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "select",
+      "id": "hero_align",
+      "label": "Where the words sit",
+      "options": [
+        { "value": "center", "label": "Middle" },
+        { "value": "left", "label": "Middle left" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "bottom-left", "label": "Bottom left" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "hero_focal",
+      "label": "Part of the photo to keep",
+      "options": [
+        { "value": "center", "label": "Middle" },
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center",
+      "info": "What stays in frame when the banner crops the photo."
+    },
+    { "type": "range", "id": "hero_height", "label": "Banner height", "min": 280, "max": 800, "step": 10, "unit": "px", "default": 520 },
+    { "type": "range", "id": "hero_height_mobile", "label": "Banner height on a phone", "min": 240, "max": 640, "step": 10, "unit": "px", "default": 400 },
+    { "type": "range", "id": "hero_radius", "label": "Banner corner rounding", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 20 },
+    { "type": "range", "id": "hero_heading_size", "label": "Banner title size", "min": 28, "max": 88, "step": 1, "unit": "px", "default": 56 },
+    { "type": "range", "id": "hero_text_size", "label": "Banner line size", "min": 13, "max": 28, "step": 1, "unit": "px", "default": 18 },
+    { "type": "range", "id": "hero_overlay", "label": "Shade behind the words", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 45 },
+    { "type": "range", "id": "hero_wash", "label": "Shade across the whole photo", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 20 },
+    { "type": "color", "id": "hero_overlay_color", "label": "Shade colour", "default": "#171714" },
+    { "type": "color", "id": "hero_text_color", "label": "Banner and panel text", "default": "#ffffff" },
+    { "type": "color", "id": "hero_fallback_color", "label": "Banner colour with no photo", "default": "#ead9d1" },
+    { "type": "color", "id": "hero_eyebrow_background", "label": "Banner pill background", "default": "#ffffff" },
+    { "type": "range", "id": "hero_eyebrow_opacity", "label": "Banner pill see-through", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 20 },
+    { "type": "color", "id": "hero_eyebrow_text_color", "label": "Banner pill text", "default": "#ffffff" },
+    { "type": "color", "id": "hero_button_background", "label": "Banner button background", "default": "#ffffff" },
+    { "type": "color", "id": "hero_button_text_color", "label": "Banner button text", "default": "#171714" },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "checkbox",
+      "id": "split_sections",
+      "label": "Pair each heading with its picture",
+      "default": true,
+      "info": "Lays each section out in two columns - words one side, picture the other - alternating down the page. A section with no picture stays full width."
+    },
+    {
+      "type": "range",
+      "id": "split_text_width",
+      "label": "Words' share of a two-column section",
+      "min": 28,
+      "max": 55,
+      "step": 1,
+      "unit": "%",
+      "default": 36,
+      "info": "The rest goes to the picture, so a lower number makes the pictures bigger."
+    },
+    {
+      "type": "checkbox",
+      "id": "scroll_tables",
+      "label": "Let wide tables scroll",
+      "default": true,
+      "info": "Keeps a conversion chart inside its own box instead of pushing the page sideways on a phone."
+    },
+    {
+      "type": "checkbox",
+      "id": "force_downloads",
+      "label": "Make file links download",
+      "default": true,
+      "info": "A link to a PDF or an image - the printable sizer, say - saves the file instead of opening it in a tab."
+    },
+    {
+      "type": "header",
+      "content": "More guides"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_more",
+      "label": "Show the other guides",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "more_heading",
+      "label": "Heading",
+      "default": "More guides"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Guides across on desktop",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "show_images",
+      "label": "Show pictures",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Picture shape",
+      "options": [
+        { "value": "4 / 3", "label": "Landscape (4:3)" },
+        { "value": "3 / 2", "label": "Landscape (3:2)" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 5", "label": "Portrait (4:5)" },
+        { "value": "16 / 9", "label": "Wide (16:9)" }
+      ],
+      "default": "1 / 1"
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Space between cards",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Corner rounding",
+      "min": 0,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Type sizes"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 24,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Body text size",
+      "min": 13,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "label": "Card title size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 19
+    },
+    {
+      "type": "range",
+      "id": "card_text_size",
+      "label": "Card text size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Section background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Headings and titles",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Body text",
+      "default": "#5c5a55"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#fdf9f7"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Card border",
+      "default": "#ebe4df"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Pills, quotes and table header",
+      "default": "#ead9d1"
+    },
+    {
+      "type": "header",
+      "content": "Closing panel"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show the closing panel",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_heading",
+      "label": "Heading",
+      "default": "Still deciding? Talk it through with us."
+    },
+    {
+      "type": "richtext",
+      "id": "cta_text",
+      "label": "Text",
+      "default": "<p>Our team can walk you through stones, settings and sizing, and help you choose with confidence.</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_label",
+      "label": "Button label",
+      "default": "Get in touch"
+    },
+    {
+      "type": "url",
+      "id": "cta_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "color",
+      "id": "cta_background",
+      "label": "Panel background",
+      "default": "#ead9d1"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Panel text",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_background",
+      "label": "Button background",
+      "default": "#171714"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "guide",
+      "name": "Guide",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "text", "label": "Description" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "Image file name",
+          "info": "A file under assets/, used only when no image is chosen above."
+        },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "text", "id": "link_label", "label": "Link text", "default": "Read the guide" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Guide page" }
+  ]
+}
+{% endschema %}

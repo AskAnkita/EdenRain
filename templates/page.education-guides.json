@@ -11,16 +11,6 @@
     "education_guides": {
       "type": "education-guides",
       "blocks": {
-        "four_cs": {
-          "type": "topic",
-          "settings": {
-            "title": "The 4 C's",
-            "text": "Cut, colour, clarity and carat weight are what decide a diamond's beauty and its price. Of the four, cut does the most for sparkle.",
-            "image_asset": "featured-diamonds-education.jpg",
-            "link": "/blogs/education-guides/4cs",
-            "link_label": "Read the guide"
-          }
-        },
         "gemstones": {
           "type": "topic",
           "settings": {
@@ -63,7 +53,6 @@
         }
       },
       "block_order": [
-        "four_cs",
         "gemstones",
         "ring_size",
         "wrist_size",
