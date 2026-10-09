@@ -1,249 +1,722 @@
 {% comment %}
-  Signature collection grid: one large feature (video or image) on the left, up to four product cards in a 2x2 grid on the right.
-  Placeholder media/titles are used only when no Shopify media or product is selected.
+  Signature collection: an editorial campaign grid.
+  Each tile is a full-bleed image with overlaid text - a display line, an italic line,
+  an optional outlined word, a small call to action and four corner captions.
 {% endcomment %}
 
 {%- liquid
-  assign feature_link = section.settings.feature_link
+  assign transparent = 'rgba(0,0,0,0)'
+  assign root_class = 'signature-editorial-' | append: section.id
 -%}
 
+{%- capture root_style -%}
+  --sig-gap: {{ section.settings.gap }}px;
+  --sig-ratio: {{ section.settings.aspect_ratio }};
+  --sig-ratio-w: {{ section.settings.aspect_ratio | split: '/' | first }};
+  --sig-ratio-h: {{ section.settings.aspect_ratio | split: '/' | last }};
+  --sig-pad: {{ section.settings.tile_padding }}px;
+  --sig-columns: {{ section.settings.columns_desktop }};
+  --sig-columns-tablet: {{ section.settings.columns_tablet }};
+  --sig-columns-mobile: {{ section.settings.columns_mobile }};
+  --sig-display-size: {{ section.settings.display_size }}px;
+  --sig-subtitle-size: {{ section.settings.subtitle_size }}px;
+  --sig-script-size: {{ section.settings.script_size }}px;
+  --sig-meta-size: {{ section.settings.meta_size }}px;
+  --sig-button-size: {{ section.settings.button_size }}px;
+  --sig-boxed-size: {{ section.settings.boxed_size }}px;
+  {% if section.settings.section_background != blank and section.settings.section_background != transparent %}--sig-section-bg: {{ section.settings.section_background }};{% endif %}
+  {% if section.settings.heading_color != blank and section.settings.heading_color != transparent %}--sig-heading-color: {{ section.settings.heading_color }};{% endif %}
+  {% if section.settings.description_color != blank and section.settings.description_color != transparent %}--sig-description-color: {{ section.settings.description_color }};{% endif %}
+  {% if section.settings.heading_size > 0 %}--sig-heading-size: {{ section.settings.heading_size }}px;{% endif %}
+  {% if section.settings.description_size > 0 %}--sig-description-size: {{ section.settings.description_size }}px;{% endif %}
+  --sig-padding-top: {{ section.settings.padding_top }}px;
+  --sig-padding-bottom: {{ section.settings.padding_bottom }}px;
+  --sig-page-padding: {{ section.settings.page_padding }}px;
+  --sig-ratio-stacked: {{ section.settings.stacked_ratio }};
+  --sig-intro-gap: {{ section.settings.intro_gap }}px;
+  --sig-description-width: {{ section.settings.description_width }}%;
+  --sig-viewport-height: {{ section.settings.viewport_height }}svh;
+{%- endcapture -%}
+
 {% style %}
-  .signature-grid-{{ section.id }} {
-    padding: {{ section.settings.padding_top }}px 30px {{ section.settings.padding_bottom }}px;
+  .{{ root_class }} {
+    padding: var(--sig-padding-top) var(--sig-page-padding) var(--sig-padding-bottom);
+    background: var(--sig-section-bg, transparent);
   }
 
-  .signature-grid-{{ section.id }} .signature-grid__heading {
-    margin: 0 auto;
-    text-align: center;
-    max-width: 90rem;
-  }
-
-  .signature-grid-{{ section.id }} .signature-grid__description {
-    margin: 1.6rem auto 0;
-    text-align: center;
+  .{{ root_class }} .signature-editorial__intro {
     max-width: 72rem;
+    margin: 0 auto 3.2rem;
+    text-align: {{ section.settings.heading_alignment }};
   }
 
-  .signature-grid-{{ section.id }} .signature-grid__layout {
+  .{{ root_class }} .signature-editorial__eyebrow {
+    margin: 0 0 1rem;
+    font-size: var(--sig-meta-size);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sig-description-color, inherit);
+  }
+
+  {%- comment -%}
+    The intro keeps the theme's own h2 and rte typography unless a setting overrides it:
+    "Theme default" case and 0% tracking emit nothing, so --font-h2--case/-letter-spacing
+    still win and the heading matches every other section heading on the page.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__heading {
+    margin: 0;
+    color: var(--sig-heading-color, inherit);
+    {% if section.settings.heading_transform != 'theme' %}text-transform: {{ section.settings.heading_transform }};{% endif %}
+    {% if section.settings.heading_tracking > 0 %}letter-spacing: {{ section.settings.heading_tracking | divided_by: 100.0 }}em;{% endif %}
+    {% if section.settings.heading_weight != 'inherit' %}font-weight: {{ section.settings.heading_weight }};{% endif %}
+    {% if section.settings.heading_line_height > 0 %}line-height: {{ section.settings.heading_line_height | divided_by: 100.0 }};{% endif %}
+    {% if section.settings.heading_size > 0 %}font-size: clamp(1.4rem, 4vw, var(--sig-heading-size));{% endif %}
+  }
+
+  .{{ root_class }} .signature-editorial__description {
+    margin: var(--sig-intro-gap) auto 0;
+    max-width: var(--sig-description-width);
+    color: var(--sig-description-color, inherit);
+    {% if section.settings.description_tracking > 0 %}letter-spacing: {{ section.settings.description_tracking | divided_by: 100.0 }}em;{% endif %}
+    {% if section.settings.description_line_height > 0 %}line-height: {{ section.settings.description_line_height | divided_by: 100.0 }};{% endif %}
+    {% if section.settings.description_size > 0 %}font-size: var(--sig-description-size);{% endif %}
+  }
+
+  .{{ root_class }} .signature-editorial__grid {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
-    gap: {{ section.settings.gap }}px;
-    margin-top: {% if section.settings.heading != blank or section.settings.description != blank %}4rem{% else %}0{% endif %};
+    grid-template-columns: repeat(var(--sig-columns), minmax(0, 1fr));
+    gap: var(--sig-gap);
   }
 
-  .signature-grid-{{ section.id }} .signature-grid__feature {
-    grid-row: span 2;
+  {%- comment -%}
+    "One screen" mode: the grid itself is given the screen height and its rows split it
+    equally, so the tiles stop taking their height from an aspect ratio. Anything above the
+    grid (an intro, the section's own padding) adds to that, which is why this pairs with
+    zero padding when the grid is meant to be exactly one screen. Phones keep the aspect
+    ratios - six tiles squeezed into one screen would be unreadable - so this starts at the
+    desktop breakpoint - a two-column tablet grid would have five rows to fit into one
+    screen, which leaves every tile a letterbox.
+  {%- endcomment -%}
+  @media screen and (min-width: 990px) {
+    .{{ root_class }}.signature-editorial--viewport .signature-editorial__grid {
+      min-height: var(--sig-viewport-height);
+      grid-auto-rows: minmax(0, 1fr);
+    }
+
+    .{{ root_class }}.signature-editorial--viewport .signature-editorial__tile {
+      aspect-ratio: auto;
+      height: 100%;
+      min-height: 0;
+    }
+  }
+
+  .{{ root_class }} .signature-editorial__tile {
     position: relative;
-    overflow: hidden;
-    background: {{ section.settings.card_background }};
-    /* Stretch to the height of the two card rows so top and bottom edges line up */
-    min-height: 100%;
     display: block;
+    aspect-ratio: var(--sig-ratio);
+    overflow: hidden;
+    background: var(--sig-tile-bg, #e9e5e0);
+    color: var(--sig-text, #ffffff);
+    isolation: isolate;
   }
 
-  .signature-grid-{{ section.id }} .signature-grid__feature video,
-  .signature-grid-{{ section.id }} .signature-grid__feature img {
+  .{{ root_class }} .signature-editorial__tile--product {
+    display: flex;
+    flex-direction: column;
+    align-self: start;
+    aspect-ratio: auto;
+    background: #ffffff;
+    color: #1a1a1a;
+  }
+
+  .{{ root_class }} .signature-editorial__product-image-link {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #f7f7f6;
+  }
+
+  .{{ root_class }} .signature-editorial__product-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 8%;
+    box-sizing: border-box;
+    object-fit: contain;
+    transition: transform 0.45s ease;
+  }
+
+  .{{ root_class }} .signature-editorial__tile--product:hover .signature-editorial__product-image {
+    transform: scale(1.04);
+  }
+
+  .{{ root_class }} .signature-editorial__product-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 1.6rem 1.8rem 1.8rem;
+  }
+
+  .{{ root_class }} .signature-editorial__product-title {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1.45rem, 1.5vw, 1.8rem);
+    line-height: 1.35;
+    font-weight: var(--font-heading--weight, 400);
+  }
+
+  .{{ root_class }} .signature-editorial__product-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .{{ root_class }} .signature-editorial__product-title a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .{{ root_class }} .signature-editorial__product-price {
+    margin: 0;
+    font-size: 1.4rem;
+    line-height: 1.4;
+  }
+
+  .{{ root_class }} .signature-editorial__product-action {
+    display: inline-block;
+    margin-top: 0.25rem;
+    color: inherit;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    text-decoration: underline;
+    text-underline-offset: 0.35em;
+    text-transform: uppercase;
+  }
+
+  {%- comment -%}
+    Mosaic: a tile can take two columns, two rows or both. A spanning tile drops its own
+    aspect ratio and takes its height from the rows the plain 1-up tiles have already set,
+    so a 2x2 hero next to two stacked squares lines up exactly.
+  {%- endcomment -%}
+  {%- if section.settings.columns_desktop > 1 %}
+  .{{ root_class }} .signature-editorial__tile--wide,
+  .{{ root_class }} .signature-editorial__tile--feature {
+    grid-column: span 2;
+  }
+
+  .{{ root_class }} .signature-editorial__tile--tall,
+  .{{ root_class }} .signature-editorial__tile--feature {
+    grid-row: span 2;
+  }
+
+  {%- comment -%}
+    A spanning tile states its own shape rather than leaning on its neighbours: a row holding
+    nothing but the hero (which is what happens at tablet width) would otherwise collapse.
+    Two columns and two rows keep the base shape; wide and tall double one side of it.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__tile--wide {
+    aspect-ratio: calc(var(--sig-ratio-w) * 2) / var(--sig-ratio-h);
+  }
+
+  .{{ root_class }} .signature-editorial__tile--tall {
+    aspect-ratio: var(--sig-ratio-w) / calc(var(--sig-ratio-h) * 2);
+  }
+  {%- endif %}
+
+  .{{ root_class }} .signature-editorial__image {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: var(--sig-object-position, center);
+    z-index: 0;
+    transform: scale(var(--sig-image-scale, 1));
+    transform-origin: var(--sig-object-position, center);
+    transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .signature-grid-{{ section.id }} .signature-grid__card {
-    background: {{ section.settings.card_background }};
-    aspect-ratio: 1 / 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 2.4rem 2rem 3.2rem;
-    text-decoration: none;
-    color: inherit;
+  {%- if section.settings.hover_zoom -%}
+  .{{ root_class }} .signature-editorial__tile:hover .signature-editorial__image,
+  .{{ root_class }} .signature-editorial__tile:focus-within .signature-editorial__image {
+    transform: scale(calc(var(--sig-image-scale, 1) * 1.05));
+  }
+  {%- endif -%}
+
+  .{{ root_class }} .signature-editorial__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: var(--sig-scrim, var(--sig-overlay, #000000));
+    opacity: var(--sig-overlay-opacity, 0);
+    pointer-events: none;
   }
 
-  .signature-grid-{{ section.id }} .signature-grid__card-media {
-    flex: 1;
-    width: 100%;
-    min-height: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .signature-grid-{{ section.id }} .signature-grid__card-media img {
-    max-width: 80%;
-    max-height: 100%;
-    object-fit: contain;
-    /* No mix-blend-mode here. The renders are on #f8f8f6, not white, so blending
-       them into the card colour darkened each photo to #f1f1f0 and left a visible
-       rectangle inside the lighter card -- the picture only covers 80% of it. */
-    transition: transform 0.4s ease;
-  }
-
-  .signature-grid-{{ section.id }} .signature-grid__card:hover .signature-grid__card-media img {
-    transform: scale(1.04);
-  }
-
-  .signature-grid-{{ section.id }} .signature-grid__card-title {
-    position: relative;
-    margin-top: 1.6rem;
-    padding-bottom: 0.6rem;
-    font-size: 1.3rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    text-align: center;
-    line-height: 1.8;
-    max-width: 100%;
-    flex-shrink: 0;
-    /* Long product names wrap to two lines; the last line stays on the shared baseline */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+  .{{ root_class }} .signature-editorial__link {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: block;
+    text-indent: -9999px;
     overflow: hidden;
   }
 
-  .signature-grid-{{ section.id }} .signature-grid__card-title::before,
-  .signature-grid-{{ section.id }} .signature-grid__card-title::after {
+  .{{ root_class }} .signature-editorial__meta {
     position: absolute;
-    bottom: 0;
-    width: 50%;
-    height: 1px;
-    background: currentColor;
-    content: "";
-    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 3;
+    margin: 0;
+    max-width: 50%;
+    font-size: var(--sig-tile-meta-size, var(--sig-meta-size));
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+    color: var(--sig-meta-color, var(--sig-text, #ffffff));
+    pointer-events: none;
   }
 
-  .signature-grid-{{ section.id }} .signature-grid__card-title::before {
-    left: 0;
-    transform-origin: right center;
+  .{{ root_class }} .signature-editorial__meta--tl { top: var(--sig-pad); left: var(--sig-pad); }
+  .{{ root_class }} .signature-editorial__meta--tr { top: var(--sig-pad); right: var(--sig-pad); text-align: right; }
+  .{{ root_class }} .signature-editorial__meta--bl { bottom: var(--sig-pad); left: var(--sig-pad); }
+  .{{ root_class }} .signature-editorial__meta--br { bottom: var(--sig-pad); right: var(--sig-pad); text-align: right; }
+
+  .{{ root_class }} .signature-editorial__content {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    padding: calc(var(--sig-pad) * 2.2) var(--sig-pad);
+    box-sizing: border-box;
+    pointer-events: none;
   }
 
-  .signature-grid-{{ section.id }} .signature-grid__card-title::after {
-    right: 0;
-    transform-origin: left center;
+  .{{ root_class }} .signature-editorial__content > div {
+    width: var(--sig-content-width, 74%);
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
   }
 
-  .signature-grid-{{ section.id }} .signature-grid__card:hover .signature-grid__card-title::before,
-  .signature-grid-{{ section.id }} .signature-grid__card:focus-visible .signature-grid__card-title::before,
-  .signature-grid-{{ section.id }} .signature-grid__card:hover .signature-grid__card-title::after,
-  .signature-grid-{{ section.id }} .signature-grid__card:focus-visible .signature-grid__card-title::after {
-    transform: scaleX(0);
+  .{{ root_class }} .signature-editorial__content a {
+    pointer-events: auto;
+  }
+
+  .{{ root_class }} .signature-editorial__content.is-top > div { align-self: start; }
+  .{{ root_class }} .signature-editorial__content.is-middle > div { align-self: center; }
+  .{{ root_class }} .signature-editorial__content.is-bottom > div { align-self: end; }
+  .{{ root_class }} .signature-editorial__content.is-left > div { justify-self: start; align-items: flex-start; text-align: left; }
+  .{{ root_class }} .signature-editorial__content.is-center > div { justify-self: center; align-items: center; text-align: center; }
+  .{{ root_class }} .signature-editorial__content.is-right > div { justify-self: end; align-items: flex-end; text-align: right; }
+
+  .{{ root_class }} .signature-editorial__display {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight, 400);
+    font-size: clamp(1.6rem, 4.2vw, calc(var(--sig-tile-display-size, var(--sig-display-size)) * var(--sig-text-scale, 1)));
+    line-height: 1.05;
+    letter-spacing: var(--sig-display-tracking, 0.06em);
+    text-transform: var(--sig-display-transform, uppercase);
+  }
+
+  .{{ root_class }} .signature-editorial__subtitle {
+    margin: -0.6rem 0 0;
+    font-family: var(--font-heading--family);
+    font-size: clamp(1rem, 1.8vw, calc(var(--sig-tile-subtitle-size, var(--sig-subtitle-size)) * var(--sig-text-scale, 1)));
+    line-height: 1.3;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .{{ root_class }} .signature-editorial__script {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.4vw, calc(var(--sig-tile-script-size, var(--sig-script-size)) * var(--sig-text-scale, 1)));
+    line-height: 1.35;
+    letter-spacing: 0.01em;
+  }
+
+  .{{ root_class }} .signature-editorial__boxed {
+    display: inline-block;
+    padding: 0.35em 0.75em;
+    border: 1px solid var(--sig-box-border, currentColor);
+    background: var(--sig-box-background, transparent);
+    color: var(--sig-box-color, inherit);
+    font-family: var(--font-heading--family);
+    font-size: clamp(1rem, 2.2vw, calc(var(--sig-tile-boxed-size, var(--sig-boxed-size)) * var(--sig-text-scale, 1)));
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+  }
+
+  .{{ root_class }} .signature-editorial__button {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 0;
+    text-decoration: none;
+    font-size: var(--sig-tile-button-size, var(--sig-button-size));
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1;
+    transition: opacity 0.25s ease;
+  }
+
+  .{{ root_class }} .signature-editorial__button:hover {
+    opacity: 0.82;
+  }
+
+  .{{ root_class }} .signature-editorial__button-label {
+    padding: 0.85em 1.4em;
+    background: var(--sig-button-bg, #ffffff);
+    color: var(--sig-button-text, #1a1a1a);
+    white-space: nowrap;
+  }
+
+  .{{ root_class }} .signature-editorial__button-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.9em;
+    padding: 0 0.6em;
+    background: var(--sig-button-icon-bg, #1a1a1a);
+    color: var(--sig-button-icon-text, #ffffff);
+  }
+
+  .{{ root_class }} .signature-editorial__button-icon svg {
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  {%- comment -%}
+    The plain alternative to the two-tone button: the label alone, underlined, in the tile's
+    own text colour. The arrow and both blocks of colour go, so the tile reads as one line of
+    text and one link.
+  {%- endcomment -%}
+  .{{ root_class }}.signature-editorial--cta-link .signature-editorial__button {
+    display: inline-block;
+    color: inherit;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-link .signature-editorial__button-label {
+    display: inline-block;
+    padding: 0;
+    background: none;
+    color: inherit;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 0.3em;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-link .signature-editorial__button-icon {
+    display: none;
   }
 
   @media screen and (max-width: 989px) {
-    .signature-grid-{{ section.id }} .signature-grid__layout {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    .{{ root_class }} .signature-editorial__grid {
+      grid-template-columns: repeat(var(--sig-columns-tablet), minmax(0, 1fr));
     }
 
-    .signature-grid-{{ section.id }} .signature-grid__feature {
-      grid-column: span 2;
-      grid-row: auto;
-      aspect-ratio: 1 / 1;
-      min-height: 0;
+    .{{ root_class }} .signature-editorial__tile {
+      --sig-pad: 16px;
     }
+
+    {%- if section.settings.columns_tablet < 2 %}
+    .{{ root_class }} .signature-editorial__tile--wide,
+    .{{ root_class }} .signature-editorial__tile--tall,
+    .{{ root_class }} .signature-editorial__tile--feature {
+      grid-column: auto;
+      grid-row: auto;
+      aspect-ratio: var(--sig-ratio-stacked);
+      height: auto;
+    }
+    {%- endif %}
   }
 
   @media screen and (max-width: 749px) {
-    .signature-grid-{{ section.id }} {
-      padding-inline: 12px;
-      padding-bottom: 20px;
+    .{{ root_class }} {
+      padding-inline: min(var(--sig-page-padding), 16px);
     }
 
-    .signature-grid-{{ section.id }} .signature-grid__layout {
-      gap: 10px;
+    .{{ root_class }} .signature-editorial__grid {
+      grid-template-columns: repeat(var(--sig-columns-mobile), minmax(0, 1fr));
+      gap: max(8px, calc(var(--sig-gap) / 2));
     }
 
-    .signature-grid-{{ section.id }} .signature-grid__card {
-      /* Minimal side padding so the product name has the full card width to sit on one line */
-      padding: 1.2rem 0.4rem 1.6rem;
+    .{{ root_class }} .signature-editorial__content > div {
+      width: min(100%, calc(var(--sig-content-width, 74%) + 18%));
+      gap: 0.9rem;
     }
 
-    .signature-grid-{{ section.id }} .signature-grid__card-media img {
-      max-width: 100%;
+    .{{ root_class }} .signature-editorial__meta {
+      font-size: max(9px, calc(var(--sig-tile-meta-size, var(--sig-meta-size)) * 0.85));
     }
 
-    .signature-grid-{{ section.id }} .signature-grid__card-title {
-      /* Scales with the viewport so names like "THE KRISTINA - 17 1/3 CTW" stay on a single line */
-      font-size: clamp(0.78rem, 2.5vw, 1.15rem);
-      letter-spacing: 0.03em;
-      line-height: 1.6;
-      white-space: nowrap;
-      display: block;
-      -webkit-line-clamp: none;
-      text-overflow: ellipsis;
+    .{{ root_class }} .signature-editorial__button {
+      font-size: max(9px, calc(var(--sig-tile-button-size, var(--sig-button-size)) * 0.9));
     }
+
+    .{{ root_class }} .signature-editorial__product-info {
+      padding: 1.2rem;
+    }
+
+    .{{ root_class }} .signature-editorial__product-title {
+      font-size: 1.35rem;
+    }
+
+    {%- comment -%}
+      One column on a phone, so the mosaic flattens: every tile takes the stacked shape and
+      the text goes back to full size - nothing is "small" when it fills the screen.
+    {%- endcomment -%}
+    {%- if section.settings.columns_mobile < 2 %}
+    .{{ root_class }} .signature-editorial__tile--wide,
+    .{{ root_class }} .signature-editorial__tile--tall,
+    .{{ root_class }} .signature-editorial__tile--feature {
+      grid-column: auto;
+      grid-row: auto;
+      aspect-ratio: var(--sig-ratio-stacked);
+      height: auto;
+    }
+
+    .{{ root_class }} .signature-editorial__tile {
+      --sig-text-scale: 1;
+    }
+    {%- endif %}
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .signature-grid-{{ section.id }} .signature-grid__card-media img,
-    .signature-grid-{{ section.id }} .signature-grid__card-title::before,
-    .signature-grid-{{ section.id }} .signature-grid__card-title::after {
+    .{{ root_class }} .signature-editorial__image {
       transition: none;
     }
   }
 {% endstyle %}
 
-<div class="signature-grid-{{ section.id }} color-{{ section.settings.color_scheme }}">
-  {%- if section.settings.heading != blank -%}
-    <h2 class="signature-grid__heading h2">{{ section.settings.heading }}</h2>
-  {%- endif -%}
-  {%- if section.settings.description != blank -%}
-    <div class="signature-grid__description rte">{{ section.settings.description }}</div>
-  {%- endif -%}
-
-  <div class="signature-grid__layout">
-    {%- liquid
-      assign feature_video_src = section.settings.feature_video.sources[1].url
-      assign feature_poster = section.settings.feature_image | image_url: width: 1600
-      if section.settings.feature_video == blank and section.settings.placeholder_video_url != blank
-        assign feature_video_src = section.settings.placeholder_video_url
-      endif
-      if section.settings.feature_image == blank
-        assign feature_poster = section.settings.placeholder_poster_url
-      endif
-    -%}
-    <a class="signature-grid__feature" {% if feature_link != blank %}href="{{ feature_link }}"{% endif %}>
-      {%- if feature_video_src != blank -%}
-        <video autoplay muted loop playsinline preload="metadata" {% if feature_poster != blank %}poster="{{ feature_poster }}"{% endif %}>
-          <source src="{{ feature_video_src }}" type="video/mp4">
-        </video>
-      {%- elsif section.settings.feature_image != blank -%}
-        {{ section.settings.feature_image | image_url: width: 1600 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 50vw, 100vw' }}
-      {%- elsif feature_poster != blank -%}
-        <img src="{{ feature_poster }}" alt="" width="1600" height="1600" loading="lazy">
+{%- comment -%}
+  The theme lays every section out on a three-column grid - margin, page width, margin -
+  and drops the section's content in the middle column. "force-full-width" is the theme's
+  own hook for spanning all three (assets/base.css), so "Full width" runs the grid to the
+  edges of the screen and only "Side padding" holds it off them.
+{%- endcomment -%}
+<div class="{{ root_class }} signature-editorial color-{{ section.settings.color_scheme }}{% if section.settings.height_mode == 'viewport' %} signature-editorial--viewport{% endif %}{% if section.settings.cta_style == 'link' %} signature-editorial--cta-link{% endif %}{% if section.settings.width == 'full' %} force-full-width{% endif %}" style="{{ root_style | strip_newlines }}">
+  {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.description != blank -%}
+    <div class="signature-editorial__intro">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="signature-editorial__eyebrow">{{ section.settings.eyebrow | escape }}</p>
       {%- endif -%}
-    </a>
+      {%- if section.settings.heading != blank -%}
+        <h2 class="signature-editorial__heading h2">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.description != blank -%}
+        <div class="signature-editorial__description rte">{{ section.settings.description }}</div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
 
+  <div class="signature-editorial__grid">
     {%- for block in section.blocks -%}
       {%- liquid
-        assign card_product = block.settings.product
-        if card_product == blank and block.settings.collection != blank
-          assign card_product = block.settings.collection.products.first
+        assign tile_product = block.settings.product
+        assign tile_image = block.settings.image
+        if tile_image == blank and tile_product != blank
+          assign tile_image = tile_product.featured_image
         endif
-        assign card_image = block.settings.image | default: card_product.featured_image
-        assign card_title = block.settings.title | default: card_product.title
-        assign card_link = block.settings.link | default: card_product.url
-        assign card_placeholder = false
-        if card_image == blank and card_title == blank
-          assign card_placeholder = true
-          assign card_title = block.settings.placeholder_title
+        assign tile_image_url = block.settings.image_url
+        if tile_image == blank and block.settings.image_asset != blank
+          assign tile_image_url = block.settings.image_asset | asset_url
+        endif
+        if tile_image == blank and tile_image_url == blank
+          assign tile_image = section.settings.default_image
+          if tile_image == blank and section.settings.default_image_asset != blank
+            assign tile_image_url = section.settings.default_image_asset | asset_url
+          endif
+        endif
+
+        assign tile_link = block.settings.link
+        if tile_link == blank and tile_product != blank
+          assign tile_link = tile_product.url
+        endif
+
+        assign tile_alt = block.settings.image_alt
+        if tile_alt == blank
+          assign tile_alt = block.settings.display_text | default: block.settings.script_text
+        endif
+
+        assign meta_tl = block.settings.meta_top_left
+        assign meta_tr = block.settings.meta_top_right
+        if block.settings.use_section_meta
+          assign meta_tl = meta_tl | default: section.settings.default_meta_left
+          assign meta_tr = meta_tr | default: section.settings.default_meta_right
+        endif
+
+        assign text_color = block.settings.text_color
+        if text_color == blank or text_color == transparent
+          if block.settings.text_theme == 'dark'
+            assign text_color = '#1a1a1a'
+          else
+            assign text_color = '#ffffff'
+          endif
+        endif
+
+        comment
+          Only the tiles that take extra room keep the full type size; the 1-up tiles step
+          down to the section's "smaller tile text" so six tiles don't all shout at once.
+        endcomment
+        comment
+          A picked product fills the tile's picture and link. Showing it as a card instead -
+          cropped image, title, price, "View product" - is a choice per tile, because a card
+          cannot carry the overlaid headline or take a mosaic tile's extra columns.
+        endcomment
+        assign show_product_card = false
+        if tile_product != blank and block.settings.product_card
+          assign show_product_card = true
+        endif
+
+        assign tile_size = block.settings.tile_size
+        assign text_scale = section.settings.small_text_scale | divided_by: 100.0
+        if tile_size != 'normal'
+          assign text_scale = 1
+        endif
+
+        comment
+          The scrim is either the old flat wash or a gradient that only darkens (or lightens)
+          the edge the text sits on, so the photograph stays clean everywhere else.
+        endcomment
+        assign scrim_opacity = block.settings.overlay_opacity
+        assign scrim_image = blank
+        if block.settings.scrim_style == 'none'
+          assign scrim_opacity = 0
+        elsif block.settings.scrim_style == 'gradient'
+          assign scrim_opacity = scrim_opacity | times: 24 | divided_by: 10 | at_most: 85
+          case block.settings.position_vertical
+            when 'top'
+              assign scrim_direction = 'to bottom'
+            when 'bottom'
+              assign scrim_direction = 'to top'
+            else
+              case block.settings.position_horizontal
+                when 'left'
+                  assign scrim_direction = 'to right'
+                when 'right'
+                  assign scrim_direction = 'to left'
+                else
+                  assign scrim_direction = 'to top'
+              endcase
+          endcase
+          assign scrim_image = 'linear-gradient(' | append: scrim_direction | append: ', ' | append: block.settings.overlay_color | append: ' 0%, ' | append: block.settings.overlay_color | append: ' 22%, transparent 72%)'
         endif
       -%}
-      {%- if card_image != blank or card_title != blank -%}
-        <a class="signature-grid__card" {% if card_link != blank %}href="{{ card_link }}"{% endif %} {{ block.shopify_attributes }}>
-          <div class="signature-grid__card-media">
-            {%- if card_image != blank -%}
-              {{ card_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, 50vw', alt: card_title }}
-            {%- elsif card_placeholder and block.settings.placeholder_image_url != blank -%}
-              <img src="{{ block.settings.placeholder_image_url }}" alt="{{ card_title | escape }}" width="900" height="900" loading="lazy">
+
+      {%- capture tile_style -%}
+        --sig-text: {{ text_color }};
+        --sig-object-position: {{ block.settings.object_position }};
+        --sig-image-scale: {{ block.settings.image_scale | divided_by: 100.0 }};
+        --sig-content-width: {{ block.settings.content_width }}%;
+        --sig-display-transform: {{ block.settings.display_transform }};
+        --sig-display-tracking: {{ block.settings.display_tracking | divided_by: 100.0 }}em;
+        {% if block.settings.meta_color != blank and block.settings.meta_color != transparent %}--sig-meta-color: {{ block.settings.meta_color }};{% endif %}
+        {% if block.settings.tile_background != blank and block.settings.tile_background != transparent %}--sig-tile-bg: {{ block.settings.tile_background }};{% endif %}
+        {% if block.settings.overlay_color != blank and block.settings.overlay_color != transparent %}--sig-overlay: {{ block.settings.overlay_color }};{% endif %}
+        --sig-overlay-opacity: {{ scrim_opacity | divided_by: 100.0 }};
+        {% if scrim_image != blank %}--sig-scrim: {{ scrim_image }};{% endif %}
+        --sig-text-scale: {{ text_scale }};
+        {% if block.settings.display_size > 0 %}--sig-tile-display-size: {{ block.settings.display_size }}px;{% endif %}
+        {% if block.settings.subtitle_size > 0 %}--sig-tile-subtitle-size: {{ block.settings.subtitle_size }}px;{% endif %}
+        {% if block.settings.script_size > 0 %}--sig-tile-script-size: {{ block.settings.script_size }}px;{% endif %}
+        {% if block.settings.boxed_size > 0 %}--sig-tile-boxed-size: {{ block.settings.boxed_size }}px;{% endif %}
+        {% if block.settings.meta_size > 0 %}--sig-tile-meta-size: {{ block.settings.meta_size }}px;{% endif %}
+        {% if block.settings.button_size > 0 %}--sig-tile-button-size: {{ block.settings.button_size }}px;{% endif %}
+        {% if block.settings.box_border_color != blank and block.settings.box_border_color != transparent %}--sig-box-border: {{ block.settings.box_border_color }};{% endif %}
+        {% if block.settings.box_background != blank and block.settings.box_background != transparent %}--sig-box-background: {{ block.settings.box_background }};{% endif %}
+        {% if block.settings.box_text_color != blank and block.settings.box_text_color != transparent %}--sig-box-color: {{ block.settings.box_text_color }};{% endif %}
+        {% if block.settings.button_background != blank and block.settings.button_background != transparent %}--sig-button-bg: {{ block.settings.button_background }};{% endif %}
+        {% if block.settings.button_text_color != blank and block.settings.button_text_color != transparent %}--sig-button-text: {{ block.settings.button_text_color }};{% endif %}
+        {% if block.settings.button_icon_background != blank and block.settings.button_icon_background != transparent %}--sig-button-icon-bg: {{ block.settings.button_icon_background }};{% endif %}
+        {% if block.settings.button_icon_color != blank and block.settings.button_icon_color != transparent %}--sig-button-icon-text: {{ block.settings.button_icon_color }};{% endif %}
+      {%- endcapture -%}
+
+      <article class="signature-editorial__tile{% if show_product_card %} signature-editorial__tile--product{% else %}{% unless tile_size == 'normal' %} signature-editorial__tile--{{ tile_size }}{% endunless %}{% endif %}" style="{{ tile_style | strip_newlines }}" {{ block.shopify_attributes }}>
+        {%- if show_product_card -%}
+          <a class="signature-editorial__product-image-link" href="{{ tile_product.url }}" aria-label="View {{ tile_product.title | escape }}">
+            {%- if tile_image != blank -%}
+              {{
+                tile_image
+                | image_url: width: 1200
+                | image_tag:
+                  loading: 'lazy',
+                  class: 'signature-editorial__product-image',
+                  sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
+                  widths: '400, 600, 800, 1000, 1200',
+                  alt: tile_product.title
+              }}
+            {%- endif -%}
+          </a>
+          <div class="signature-editorial__product-info">
+            <h3 class="signature-editorial__product-title"><a href="{{ tile_product.url }}">{{ tile_product.title | escape }}</a></h3>
+            {%- if tile_product.price_min > 0 -%}
+              <p class="signature-editorial__product-price">From {{ tile_product.price_min | money }}</p>
+            {%- endif -%}
+            <a class="signature-editorial__product-action" href="{{ tile_product.url }}">View product</a>
+          </div>
+        {%- else -%}
+        {%- if tile_image != blank -%}
+          {{
+            tile_image
+            | image_url: width: 1400
+            | image_tag:
+              loading: 'lazy',
+              class: 'signature-editorial__image',
+              sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
+              widths: '400, 600, 800, 1000, 1400',
+              alt: tile_alt
+          }}
+        {%- elsif tile_image_url != blank -%}
+          <img
+            class="signature-editorial__image"
+            src="{{ tile_image_url }}"
+            alt="{{ tile_alt | escape }}"
+            width="1200"
+            height="1200"
+            loading="lazy"
+          >
+        {%- endif -%}
+
+        <span class="signature-editorial__scrim"></span>
+
+        {%- if tile_link != blank -%}
+          <a class="signature-editorial__link" href="{{ tile_link }}">{{ tile_alt | default: 'View' | escape }}</a>
+        {%- endif -%}
+
+        {%- if meta_tl != blank -%}<p class="signature-editorial__meta signature-editorial__meta--tl">{{ meta_tl | escape }}</p>{%- endif -%}
+        {%- if meta_tr != blank -%}<p class="signature-editorial__meta signature-editorial__meta--tr">{{ meta_tr | escape }}</p>{%- endif -%}
+        {%- if block.settings.meta_bottom_left != blank -%}<p class="signature-editorial__meta signature-editorial__meta--bl">{{ block.settings.meta_bottom_left | escape }}</p>{%- endif -%}
+        {%- if block.settings.meta_bottom_right != blank -%}<p class="signature-editorial__meta signature-editorial__meta--br">{{ block.settings.meta_bottom_right | escape }}</p>{%- endif -%}
+
+        <div class="signature-editorial__content is-{{ block.settings.position_vertical }} is-{{ block.settings.position_horizontal }}">
+          <div>
+            {%- if block.settings.display_text != blank -%}
+              <p class="signature-editorial__display">{{ block.settings.display_text | escape }}</p>
+            {%- endif -%}
+            {%- if block.settings.subtitle_text != blank -%}
+              <p class="signature-editorial__subtitle">{{ block.settings.subtitle_text | escape }}</p>
+            {%- endif -%}
+            {%- if block.settings.script_text != blank -%}
+              <p class="signature-editorial__script">{{ block.settings.script_text | escape | newline_to_br }}</p>
+            {%- endif -%}
+            {%- if block.settings.boxed_text != blank -%}
+              <span class="signature-editorial__boxed">{{ block.settings.boxed_text | escape }}</span>
+            {%- endif -%}
+            {%- if block.settings.button_label != blank -%}
+              <a class="signature-editorial__button" href="{{ block.settings.button_link | default: tile_link | default: '#' }}">
+                <span class="signature-editorial__button-label">{{ block.settings.button_label | escape }}</span>
+                <span class="signature-editorial__button-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square"/>
+                  </svg>
+                </span>
+              </a>
             {%- endif -%}
           </div>
-          {%- if card_title != blank -%}
-            <span class="signature-grid__card-title">{{ card_title | escape }}</span>
-          {%- endif -%}
-        </a>
-      {%- endif -%}
+        </div>
+        {%- endif -%}
+      </article>
     {%- endfor -%}
   </div>
 </div>
@@ -253,145 +726,134 @@
   "name": "Signature collection grid",
   "tag": "section",
   "class": "section",
-  "max_blocks": 4,
+  "max_blocks": 12,
   "settings": [
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading"
-    },
-    {
-      "type": "richtext",
-      "id": "description",
-      "label": "Description"
-    },
-    {
-      "type": "header",
-      "content": "Feature (left)"
-    },
-    {
-      "type": "video",
-      "id": "feature_video",
-      "label": "Video"
-    },
-    {
-      "type": "image_picker",
-      "id": "feature_image",
-      "label": "Image",
-      "info": "Used as the video poster, or on its own when no video is picked"
-    },
-    {
-      "type": "url",
-      "id": "feature_link",
-      "label": "Link"
-    },
-    {
-      "type": "url",
-      "id": "placeholder_video_url",
-      "label": "Placeholder video URL",
-      "info": "Used only when no video is picked."
-    },
-    {
-      "type": "url",
-      "id": "placeholder_poster_url",
-      "label": "Placeholder poster image URL",
-      "info": "Used only when no image is picked."
-    },
-    {
-      "type": "header",
-      "content": "Layout"
-    },
-    {
-      "type": "color",
-      "id": "card_background",
-      "label": "Card background",
-      "default": "#f8f8f8"
-    },
-    {
-      "type": "range",
-      "id": "gap",
-      "label": "Gap",
-      "min": 0,
-      "max": 60,
-      "step": 2,
-      "unit": "px",
-      "default": 40
-    },
-    {
-      "type": "range",
-      "id": "padding_top",
-      "label": "Top padding",
-      "min": 0,
-      "max": 120,
-      "step": 4,
-      "unit": "px",
-      "default": 40
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "label": "Bottom padding",
-      "min": 0,
-      "max": 120,
-      "step": 4,
-      "unit": "px",
-      "default": 60
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Color scheme",
-      "default": "scheme-1"
-    }
+    { "type": "header", "content": "Intro" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "richtext", "id": "description", "label": "Description" },
+    { "type": "select", "id": "heading_alignment", "label": "Intro alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centre" }, { "value": "right", "label": "Right" } ], "default": "center" },
+    { "type": "color", "id": "heading_color", "label": "Heading colour", "default": "rgba(0,0,0,0)", "info": "Clear a colour to use the theme default." },
+    { "type": "color", "id": "description_color", "label": "Eyebrow and description colour", "default": "rgba(0,0,0,0)" },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 0, "max": 80, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the theme default." },
+    { "type": "range", "id": "description_size", "label": "Description size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the theme default." },
+    { "type": "select", "id": "heading_weight", "label": "Heading weight", "default": "inherit", "options": [ { "value": "inherit", "label": "Theme default" }, { "value": "400", "label": "Regular" }, { "value": "500", "label": "Medium" }, { "value": "600", "label": "Semibold" }, { "value": "700", "label": "Bold" } ] },
+    { "type": "range", "id": "heading_line_height", "label": "Heading line height", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 0, "info": "0 keeps the theme default." },
+    { "type": "range", "id": "description_width", "label": "Description width", "min": 20, "max": 100, "step": 1, "unit": "%", "default": 100 },
+    { "type": "range", "id": "description_tracking", "label": "Description letter spacing", "min": 0, "max": 12, "step": 1, "unit": "%", "default": 0 },
+    { "type": "range", "id": "description_line_height", "label": "Description line height", "min": 0, "max": 220, "step": 5, "unit": "%", "default": 0 },
+    { "type": "range", "id": "intro_gap", "label": "Space under the heading", "min": 0, "max": 60, "step": 2, "unit": "px", "default": 22 },
+    { "type": "select", "id": "heading_transform", "label": "Heading case", "options": [ { "value": "theme", "label": "Theme default" }, { "value": "uppercase", "label": "UPPERCASE" }, { "value": "none", "label": "As typed" }, { "value": "capitalize", "label": "Title Case" } ], "default": "theme" },
+    { "type": "range", "id": "heading_tracking", "label": "Heading letter spacing", "min": 0, "max": 24, "step": 1, "unit": "%", "default": 0, "info": "0 keeps the theme default." },
+
+    { "type": "header", "content": "Grid" },
+    { "type": "range", "id": "columns_desktop", "label": "Columns (desktop)", "min": 1, "max": 4, "step": 1, "default": 3 },
+    { "type": "range", "id": "columns_tablet", "label": "Columns (tablet)", "min": 1, "max": 4, "step": 1, "default": 2 },
+    { "type": "range", "id": "columns_mobile", "label": "Columns (mobile)", "min": 1, "max": 4, "step": 1, "default": 1 },
+    { "type": "select", "id": "aspect_ratio", "label": "Tile shape", "options": [ { "value": "1/1", "label": "Square" }, { "value": "4/5", "label": "Portrait (4:5)" }, { "value": "3/4", "label": "Tall (3:4)" }, { "value": "5/4", "label": "Landscape (5:4)" }, { "value": "16/9", "label": "Wide (16:9)" } ], "default": "1/1" },
+    { "type": "select", "id": "stacked_ratio", "label": "Tile shape when stacked", "info": "Used for the big tiles once the grid drops to one column.", "options": [ { "value": "1/1", "label": "Square" }, { "value": "4/5", "label": "Portrait (4:5)" }, { "value": "3/4", "label": "Tall (3:4)" }, { "value": "5/4", "label": "Landscape (5:4)" } ], "default": "4/5" },
+    { "type": "range", "id": "gap", "label": "Gap between tiles", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 10 },
+    { "type": "range", "id": "tile_padding", "label": "Inner padding", "min": 8, "max": 60, "step": 2, "unit": "px", "default": 24 },
+    { "type": "checkbox", "id": "hover_zoom", "label": "Zoom image on hover", "default": true },
+
+    { "type": "header", "content": "Default corner captions", "info": "Used for the top corners of any tile that leaves them empty." },
+    { "type": "text", "id": "default_meta_left", "label": "Top left caption", "default": "edenraine.co.uk" },
+    { "type": "text", "id": "default_meta_right", "label": "Top right caption", "default": "2025" },
+
+    { "type": "header", "content": "Default text sizes", "info": "Each tile can override these." },
+    { "type": "range", "id": "display_size", "label": "Display line", "min": 16, "max": 96, "step": 1, "unit": "px", "default": 44 },
+    { "type": "range", "id": "subtitle_size", "label": "Subtitle", "min": 8, "max": 48, "step": 1, "unit": "px", "default": 17 },
+    { "type": "range", "id": "script_size", "label": "Italic line", "min": 10, "max": 60, "step": 1, "unit": "px", "default": 22 },
+    { "type": "range", "id": "boxed_size", "label": "Outlined text", "min": 10, "max": 48, "step": 1, "unit": "px", "default": 20 },
+    { "type": "range", "id": "meta_size", "label": "Corner captions", "min": 8, "max": 24, "step": 1, "unit": "px", "default": 11 },
+    { "type": "range", "id": "button_size", "label": "Button text", "min": 8, "max": 24, "step": 1, "unit": "px", "default": 10 },
+    { "type": "select", "id": "cta_style", "label": "Call to action style", "default": "button", "info": "A link drops the arrow and both button colours and underlines the label instead.", "options": [ { "value": "button", "label": "Button with an arrow" }, { "value": "link", "label": "Underlined text link" } ] },
+    { "type": "range", "id": "small_text_scale", "label": "Text size on 1-up tiles", "min": 50, "max": 100, "step": 2, "unit": "%", "default": 100, "info": "Tiles set to a bigger size keep 100%, which is what gives the grid its hierarchy." },
+
+    { "type": "header", "content": "Images" },
+    { "type": "image_picker", "id": "default_image", "label": "Fallback image", "info": "Used by any tile with no image of its own." },
+    { "type": "text", "id": "default_image_asset", "label": "Fallback image file name", "info": "A file in the theme's assets folder. Only used when no fallback image is picked." },
+
+    { "type": "header", "content": "Section layout" },
+    { "type": "color", "id": "section_background", "label": "Section background", "default": "rgba(0,0,0,0)" },
+    { "type": "select", "id": "width", "label": "Section width", "default": "page", "info": "Full width runs the grid to the edges of the screen; \"Side padding\" below is then the only margin.", "options": [ { "value": "page", "label": "Page width" }, { "value": "full", "label": "Full width" } ] },
+    { "type": "range", "id": "page_padding", "label": "Side padding", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 30 },
+    { "type": "select", "id": "height_mode", "label": "Section height", "default": "auto", "info": "One screen gives the grid the full height of the screen and the tiles fill it instead of holding their shape. Any intro text and the section padding sit on top of that height. Below 990px the tile shape is used instead.", "options": [ { "value": "auto", "label": "From the tile shape" }, { "value": "viewport", "label": "One screen" } ] },
+    { "type": "range", "id": "viewport_height", "label": "Screen height to fill", "min": 60, "max": 100, "step": 5, "unit": "%", "default": 100, "info": "Under 100% leaves a sliver of the next section showing." },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 60 },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" }
   ],
   "blocks": [
     {
       "type": "card",
-      "name": "Product card",
+      "name": "Editorial tile",
       "settings": [
-        {
-          "type": "product",
-          "id": "product",
-          "label": "Product",
-          "info": "Fills the image, title and link automatically"
-        },
-        {
-          "type": "collection",
-          "id": "collection",
-          "label": "Or: collection",
-          "info": "Shows the first product of this collection when no product is picked"
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Image (overrides product image)"
-        },
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Title (overrides product title)"
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Link (overrides product link)"
-        },
-        {
-          "type": "header",
-          "content": "Placeholder"
-        },
-        {
-          "type": "url",
-          "id": "placeholder_image_url",
-          "label": "Placeholder image URL",
-          "info": "Used only when no product, collection or image is selected."
-        },
-        {
-          "type": "text",
-          "id": "placeholder_title",
-          "label": "Placeholder title",
-          "info": "Used only when no product or title is selected."
-        }
+        { "type": "header", "content": "Size" },
+        { "type": "select", "id": "tile_size", "label": "Tile size", "info": "Bigger tiles need at least two columns; on one column every tile stacks the same.", "options": [ { "value": "normal", "label": "1 column x 1 row" }, { "value": "wide", "label": "2 columns x 1 row" }, { "value": "tall", "label": "1 column x 2 rows" }, { "value": "feature", "label": "Hero - 2 columns x 2 rows" } ], "default": "normal" },
+
+        { "type": "header", "content": "Image" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_asset", "label": "Image file name (fallback)", "info": "A file already in the theme's assets folder, e.g. style-halo-hover.jpg. Only used when no image is picked." },
+        { "type": "text", "id": "image_url", "label": "Image URL (fallback)", "info": "Only used when neither of the two above is set." },
+        { "type": "text", "id": "image_alt", "label": "Image alt text" },
+        { "type": "range", "id": "image_scale", "label": "Image zoom", "min": 100, "max": 220, "step": 5, "unit": "%", "default": 100, "info": "Zooms out from the side chosen below, which is how a centred product shot is pushed clear of the text." },
+        { "type": "select", "id": "object_position", "label": "Image focus", "options": [ { "value": "center", "label": "Centre" }, { "value": "top", "label": "Top" }, { "value": "bottom", "label": "Bottom" }, { "value": "left", "label": "Left" }, { "value": "right", "label": "Right" } ], "default": "center" },
+        { "type": "color", "id": "tile_background", "label": "Tile background", "default": "rgba(0,0,0,0)", "info": "Shows behind the image while it loads." },
+
+        { "type": "header", "content": "Link" },
+        { "type": "product", "id": "product", "label": "Product", "info": "Fills the image and link when nothing above is set." },
+        { "type": "checkbox", "id": "product_card", "label": "Show the product as a card", "default": false, "info": "Off: the product only supplies the tile's picture, and the tile keeps its headline and mosaic size. On: the tile becomes a product card with the title, price and a link." },
+        { "type": "url", "id": "link", "label": "Tile link" },
+
+        { "type": "header", "content": "Text" },
+        { "type": "text", "id": "display_text", "label": "Display line", "info": "Large uppercase line, e.g. LUXURY." },
+        { "type": "select", "id": "display_transform", "label": "Display line case", "options": [ { "value": "uppercase", "label": "UPPERCASE" }, { "value": "none", "label": "As typed" }, { "value": "capitalize", "label": "Title Case" } ], "default": "uppercase" },
+        { "type": "range", "id": "display_tracking", "label": "Display line letter spacing", "min": -2, "max": 24, "step": 1, "unit": "%", "default": 6 },
+        { "type": "text", "id": "subtitle_text", "label": "Subtitle", "info": "Spaced line under the display line." },
+        { "type": "textarea", "id": "script_text", "label": "Italic line", "info": "Line breaks are kept." },
+        { "type": "text", "id": "boxed_text", "label": "Outlined text", "info": "A word or phrase inside a thin box." },
+
+        { "type": "header", "content": "Text placement" },
+        { "type": "select", "id": "position_vertical", "label": "Vertical position", "options": [ { "value": "top", "label": "Top" }, { "value": "middle", "label": "Middle" }, { "value": "bottom", "label": "Bottom" } ], "default": "middle" },
+        { "type": "select", "id": "position_horizontal", "label": "Horizontal position", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centre" }, { "value": "right", "label": "Right" } ], "default": "left" },
+        { "type": "range", "id": "content_width", "label": "Text block width", "min": 30, "max": 100, "step": 2, "unit": "%", "default": 74 },
+
+        { "type": "header", "content": "Text colours and sizes", "info": "Set a size to 0 to use the section default." },
+        { "type": "select", "id": "text_theme", "label": "Text colour preset", "options": [ { "value": "light", "label": "Light text (dark image)" }, { "value": "dark", "label": "Dark text (light image)" } ], "default": "light" },
+        { "type": "color", "id": "text_color", "label": "Text colour", "default": "rgba(0,0,0,0)", "info": "Overrides the preset above." },
+        { "type": "color", "id": "meta_color", "label": "Corner caption colour", "default": "rgba(0,0,0,0)" },
+        { "type": "range", "id": "display_size", "label": "Display line size", "min": 0, "max": 96, "step": 1, "unit": "px", "default": 0 },
+        { "type": "range", "id": "subtitle_size", "label": "Subtitle size", "min": 0, "max": 48, "step": 1, "unit": "px", "default": 0 },
+        { "type": "range", "id": "script_size", "label": "Italic line size", "min": 0, "max": 60, "step": 1, "unit": "px", "default": 0 },
+        { "type": "range", "id": "boxed_size", "label": "Outlined text size", "min": 0, "max": 48, "step": 1, "unit": "px", "default": 0 },
+        { "type": "range", "id": "meta_size", "label": "Corner caption size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+
+        { "type": "header", "content": "Outlined text style" },
+        { "type": "color", "id": "box_border_color", "label": "Border", "default": "rgba(0,0,0,0)" },
+        { "type": "color", "id": "box_background", "label": "Background", "default": "rgba(0,0,0,0)" },
+        { "type": "color", "id": "box_text_color", "label": "Text", "default": "rgba(0,0,0,0)" },
+
+        { "type": "header", "content": "Button" },
+        { "type": "text", "id": "button_label", "label": "Button label", "info": "Leave empty to hide the button." },
+        { "type": "url", "id": "button_link", "label": "Button link" },
+        { "type": "color", "id": "button_background", "label": "Button background", "default": "rgba(0,0,0,0)" },
+        { "type": "color", "id": "button_text_color", "label": "Button text", "default": "rgba(0,0,0,0)" },
+        { "type": "color", "id": "button_icon_background", "label": "Arrow background", "default": "rgba(0,0,0,0)" },
+        { "type": "color", "id": "button_icon_color", "label": "Arrow colour", "default": "rgba(0,0,0,0)" },
+        { "type": "range", "id": "button_size", "label": "Button text size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+
+        { "type": "header", "content": "Corner captions" },
+        { "type": "checkbox", "id": "use_section_meta", "label": "Use the section's default top captions", "default": true },
+        { "type": "text", "id": "meta_top_left", "label": "Top left" },
+        { "type": "text", "id": "meta_top_right", "label": "Top right" },
+        { "type": "text", "id": "meta_bottom_left", "label": "Bottom left" },
+        { "type": "text", "id": "meta_bottom_right", "label": "Bottom right" },
+
+        { "type": "header", "content": "Image overlay" },
+        { "type": "select", "id": "scrim_style", "label": "Overlay style", "info": "A gradient sits only behind the text; a wash covers the whole photograph.", "options": [ { "value": "wash", "label": "Even wash" }, { "value": "gradient", "label": "Gradient behind the text" }, { "value": "none", "label": "None" } ], "default": "wash" },
+        { "type": "color", "id": "overlay_color", "label": "Overlay colour", "default": "#000000" },
+        { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 80, "step": 1, "unit": "%", "default": 0 }
       ]
     }
   ],
@@ -399,6 +861,8 @@
     {
       "name": "Signature collection grid",
       "blocks": [
+        { "type": "card" },
+        { "type": "card" },
         { "type": "card" },
         { "type": "card" },
         { "type": "card" },

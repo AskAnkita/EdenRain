@@ -32,8 +32,10 @@
     padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
   }
 
+  /* "Full width" runs the row to the edges of the screen, with only the gutter the arrows need
+     (they sit half outside the row, so the gutter is never smaller than half an arrow). */
   #category-tiles-{{ section.id }} .ct-inner {
-    max-width: var(--page-width, 160rem);
+    max-width: {% if section.settings.width == 'page' %}var(--page-width, 160rem){% else %}none{% endif %};
     margin: 0 auto;
     padding-inline: max(2.4rem, calc(var(--ct-arrow-size) / 2 + 0.8rem));
   }
@@ -54,7 +56,13 @@
   #category-tiles-{{ section.id }} .ct-track {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: calc((100% - {{ section.settings.per_row | minus: 1 }} * 2rem) / {{ section.settings.per_row }});
+    /* The tiles share the whole width between them, so on a wide screen the tile grows rather
+       than another tile joining the row - four across stays four across, just bigger. The floor
+       is "Smallest tile width": below it the row scrolls instead of squeezing. */
+    grid-auto-columns: max(
+      {{ section.settings.min_tile_width | default: 240 }}px,
+      calc((100% - {{ section.settings.per_row | minus: 1 }} * 2rem) / {{ section.settings.per_row }})
+    );
     gap: 2rem;
     margin: 0;
     padding: 0;
@@ -425,13 +433,36 @@
       "label": "Heading"
     },
     {
+      "type": "select",
+      "id": "width",
+      "label": "Section width",
+      "options": [
+        { "value": "page", "label": "Page width" },
+        { "value": "full", "label": "Full width" }
+      ],
+      "default": "page",
+      "info": "Full width runs the tiles to the edges of the screen, leaving only the margin the arrows need."
+    },
+    {
       "type": "range",
       "id": "per_row",
       "label": "Tiles across on desktop",
+      "info": "The tiles share the full width between them, so fewer across means a bigger tile on a wide screen. A half, e.g. 4.5, leaves the next tile peeking at the edge.",
       "min": 3,
-      "max": 6,
-      "step": 1,
+      "max": 8,
+      "step": 0.5,
       "default": 4
+    },
+    {
+      "type": "range",
+      "id": "min_tile_width",
+      "label": "Smallest tile width",
+      "info": "A tile never shrinks below this; on a narrower screen the row scrolls instead.",
+      "min": 180,
+      "max": 480,
+      "step": 20,
+      "unit": "px",
+      "default": 240
     },
     {
       "type": "select",

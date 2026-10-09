@@ -26,7 +26,7 @@
           "settings": {
             "title": "Find your ring size",
             "text": "A printable ring sizer, an international conversion chart, and what to do when you are buying a surprise.",
-            "image_asset": "featured-diamonds-sizing.jpg",
+            "image_asset": "ring-size-guide-original.png",
             "link": "/pages/er-sizing",
             "link_label": "Read the guide"
           }
@@ -50,9 +50,20 @@
             "link": "/pages/jewellery-care",
             "link_label": "Read the guide"
           }
+        },
+        "four_cs": {
+          "type": "topic",
+          "settings": {
+            "title": "The 4 C's",
+            "text": "Cut, colour, clarity and carat weight are what decide a diamond's beauty and its price. Of the four, cut does the most for sparkle.",
+            "image_asset": "featured-diamonds-education.jpg",
+            "link": "/blogs/education-guides/4cs",
+            "link_label": "Read the guide"
+          }
         }
       },
       "block_order": [
+        "four_cs",
         "gemstones",
         "ring_size",
         "wrist_size",

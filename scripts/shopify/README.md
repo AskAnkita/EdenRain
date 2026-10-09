@@ -215,3 +215,118 @@ page's current body is saved to `backups/` before either script writes.
 
 The dev server caches page content, so a guide can still look empty after a run — reload with a
 query string (`?x=1`) to see it.
+
+## Redirects: the broken ones and the missing ones
+
+A redirect into a dead page is worse than no redirect: the visitor still loses, and a search
+engine sees a 301 into a 404. Three of the store's four redirects were doing this — one to a blog
+that holds no articles, one to a collection handle that doesn't exist, and one to a product that
+had been deleted.
+
+The same script also creates the redirects the store is missing, for handles it used to serve and
+no longer does. A pruned collection leaves its old URL in Google's index and in people's
+bookmarks; without a redirect every one of those visits is a 404.
+
+```bash
+node scripts/shopify/fix-redirects.mjs            # preview: every redirect, and what's wrong
+node scripts/shopify/fix-redirects.mjs --apply    # repair the broken ones, create the missing ones
+```
+
+Each target is resolved the way the storefront would resolve it — the product, collection, page,
+blog or article behind the handle has to exist, a product has to be Active, and an article has to
+be in the blog the path names — so re-running keeps catching breakage after a product is renamed
+or `prune-collections.mjs` removes a collection.
+
+Two tables at the top of the script drive it. `FIXES` holds the repairs, keyed by the redirect's
+path, so an existing redirect is only ever corrected in place — never deleted. When the script
+finds a broken redirect with no entry in `FIXES` it names it and moves on, rather than guessing.
+`RETIRED` holds the paths that should exist, each with the live page that now owns the intent and
+the reason that page was chosen; a path already redirected is left exactly as it is, on the
+assumption that whatever is in the store was put there deliberately, and a path that turns out to
+still resolve is reported so it can be dropped from the table. Every target in both tables is
+resolved before it is written, so a table entry that has itself gone stale is skipped rather than
+creating a fresh 301-into-404. All redirects go to `backups/` before anything is written.
+
+`RETIRED` currently covers the twelve collection handles the prune left behind — `18k-gold`,
+`18k-white-gold`, `925-sterling-silver`, `adjustable`, `all-bracelets`, `all-earrings`,
+`all-necklaces`, `dangle`, `ear-cuffs`, `new-arrivals`, `tennis`, `trending-now`. Most map onto an
+obvious successor (`dangle` → Dangles & Drops, `new-arrivals` → New In). Three were a judgement
+call, and the `why` on each entry says what it was: `18k-gold` reads unqualified gold as yellow
+gold, and `adjustable` and `tennis` go to the bracelets category page because the catalogue no
+longer groups anything that way.
+
+A `FIXES` entry marked `force: true` is for a target that resolves but points at the wrong thing,
+which a 404 check can't catch on its own — the wrist sizer redirect landed on the legacy 2021 blog
+article instead of `/pages/wrist-sizer-guide`, the page on the `guide` template that the menus link
+to. Those read as `wrong` rather than `404` in the preview.
+
+The storefront is password-protected, so a redirect can't be checked with an anonymous request:
+the password gate answers 302 to `/password` before redirects are evaluated. Check with this
+script, or in a browser with an admin session.
+
+
+## The Avada SEO app's HTML sitemap pages
+
+Avada SEO Suite generates `/pages/avada-sitemap`, `-collections`, `-products`, `-pages`, `-blogs`
+and `-articles` as ordinary Shopify pages. They are a frozen snapshot of the catalogue at the
+moment the app ran — the ones on this store were written in June 2022 — and they are redundant
+with Shopify's own `/sitemap.xml`, which is generated per request and is always current.
+
+Being a snapshot, they rot. After the collection prune they were still linking to 13 collections
+that no longer existed, 26 dead links in all, on the two pages whose whole purpose is to be
+crawled.
+
+```bash
+node scripts/shopify/cleanup-avada-sitemap.mjs            # preview only, deletes nothing
+node scripts/shopify/cleanup-avada-sitemap.mjs --apply    # delete them
+```
+
+It matches only handles beginning `avada-sitemap`, so a page written by hand is never caught — the
+store's own empty `/pages/sitemap` is left alone. Before it deletes anything it checks every
+navigation menu for links to the pages and refuses to run if it finds one, since deleting a page
+the nav points at just moves the 404. The full record of each page, body HTML included, goes to
+`backups/` first; deleting a page is permanent.
+
+No redirects are created for the deleted URLs. A 404 is the correct answer for a page removed on
+purpose: search engines drop it from the index, and nothing on the store linked to these.
+
+**One step is not scriptable.** The Avada app has no public API for its settings, so the HTML
+sitemap feature has to be turned off in the Avada dashboard by hand. While it is on, the app will
+generate these pages again, and the new snapshot will start going stale the same way.
+
+
+## Blogs nobody posts to
+
+The store carried four blogs and wrote to two of them. `/blogs/news` and
+`/blogs/musings-of-eden-raine` held zero articles each: a live page that says "no posts yet" is a
+dead end for a visitor and a thin page for a crawler, and no menu, section, template or snippet in
+the theme linked to either one. This shop's content lives in pages — the guides are `/pages/*` on
+the `guide` template, and the 2021 blog articles are the legacy import — so there was nothing for
+the two empty blogs to grow into.
+
+```bash
+node scripts/shopify/remove-empty-blogs.mjs                 # preview only, deletes nothing
+node scripts/shopify/remove-empty-blogs.mjs --apply         # delete them and tidy the links
+node scripts/shopify/remove-empty-blogs.mjs --keep=news --apply     # spare these as well
+node scripts/shopify/remove-empty-blogs.mjs --drafts --apply        # also delete unpublished articles
+```
+
+Only a blog holding zero articles is ever a candidate; one with posts in it is listed, with its
+count, and left alone however old they are. A blog whose handle appears anywhere in the theme is
+kept too, the same rule `prune-collections.mjs` uses, because deleting it would turn a live link
+into a 404 — the preview names any it finds.
+
+Links are followed through rather than left behind. After a delete, any page whose body links to a
+blog that has gone has that list entry cut, which on this store was the two Avada sitemap pages
+(`/pages/avada-sitemap` and `-blogs`, two dead links each). A link found outside a list item is
+reported instead of edited, since rewriting a sentence needs a person. URL redirects are left
+alone on purpose: a redirect fires on a path that 404s, so `/blogs/news/wrist-s` keeps working with
+no blog behind it.
+
+Unpublished articles are reported on every run, in whatever blog they sit, because an article that
+is not published 404s for anyone holding its URL. The store has one, `/blogs/about/ethical-gemstones`
+— a 2021 draft whose subject is already covered by the live `/pages/gemstones`. It is left in place
+unless `--drafts` is passed; nothing links to it, so it costs nothing where it is.
+
+Deleting a blog is permanent. Every blog about to go, every article inside it, and the original
+body of every page about to be edited are written to `backups/` before the first write.

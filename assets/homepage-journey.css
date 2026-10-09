@@ -7,12 +7,15 @@
   /* Each var below is written by the section only when the merchant moved that
      setting off its "use the default" value, so an untouched section renders
      the fallback -- the value this file always had. */
-  padding: var(--hj-pad-top, clamp(42px, 6vw, 92px)) clamp(20px, 4vw, 64px) var(--hj-pad-bottom, clamp(42px, 6vw, 92px));
+  padding: var(--hj-pad-top, clamp(42px, 6vw, 92px)) var(--hj-pad-inline, clamp(20px, 4vw, 64px)) var(--hj-pad-bottom, clamp(42px, 6vw, 92px));
 }
 
 .homepage-journey img,
 .homepage-journey svg { display: block; width: 100%; height: 100%; object-fit: cover; }
-.hj-shell { max-width: 1560px; margin: 0 auto; }
+/* The shell caps the content on a wide screen. A section set to full width
+   writes --hj-shell-max: none and the row then tracks the viewport, so it can
+   line up with the full-bleed carousels above it. */
+.hj-shell { max-width: var(--hj-shell-max, 1560px); margin: 0 auto; }
 .hj-discover { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr); align-items: center; gap: clamp(36px, 7vw, 112px); }
 .hj-discover__media { position: relative; min-height: 440px; aspect-ratio: 1.22; overflow: hidden; background: #f1efec; }
 .hj-discover__media img { transition: transform .7s ease; }
@@ -34,6 +37,10 @@
 .hj-products { margin-top: clamp(38px, 5vw, 72px); }
 .hj-products__heading { margin-bottom: 18px; text-align: center; }
 .hj-products__heading h3 { margin: 0; font-family: var(--font-heading--family); font-size: var(--hj-products-heading-size, clamp(2rem, 3vw, 3rem)); font-weight: 600; letter-spacing: var(--letter-spacing--body-loose, .03em); line-height: normal; text-transform: uppercase; }
+/* Sits between the row heading and the cards; the heading's own 18px gap
+   becomes the gap to this line instead, so the row does not grow taller. */
+.hj-products__subheading { max-width: 640px; margin: 10px auto 0; color: var(--hj-text-color, var(--hj-muted)); font-size: var(--hj-products-subheading-size, 1.35rem); line-height: 1.7; letter-spacing: .02em; }
+.hj-products__subheading p { margin: 0; }
 .hj-products__carousel { display: block; }
 .hj-products__grid { margin: 0; padding: 0; }
 .hj-product { height: auto; color: inherit; }
@@ -64,7 +71,11 @@
    the Trending Styles carousel. Desktop only -- the arrows are hidden below
    750px, so the swiper keeps its plain full-bleed clipping there. */
 @media screen and (min-width: 750px) {
-  .hj-products__carousel .swiper:has(.swiper-button) { --arrow-gutter: 2rem; width: calc(100% + var(--arrow-gutter) * 2); padding-inline: var(--arrow-gutter); margin-inline: calc(var(--arrow-gutter) * -1); }
+  /* The arrows hang 2rem outside the swiper, so they need at least that much
+     section padding to sit in. A section given a narrower side padding gets a
+     gutter to match instead, or the arrows would push past the viewport and
+     the page would scroll sideways. Untouched sections keep the flat 2rem. */
+  .hj-products__carousel .swiper:has(.swiper-button) { --arrow-gutter: min(2rem, var(--hj-pad-inline, 2rem)); width: calc(100% + var(--arrow-gutter) * 2); padding-inline: var(--arrow-gutter); margin-inline: calc(var(--arrow-gutter) * -1); }
   /* The arrows centre on the image, not on the card: the controls are made as
      tall as one image and the buttons sit halfway down. Percentage padding goes
      by the containing block's width, so dropping the arrow gutter and the gaps
@@ -141,7 +152,7 @@
 }
 
 @media (max-width: 680px) {
-  .homepage-journey { padding: var(--hj-pad-top, 42px) 20px var(--hj-pad-bottom, 42px); }
+  .homepage-journey { padding: var(--hj-pad-top, 42px) var(--hj-pad-inline, 20px) var(--hj-pad-bottom, 42px); }
   /* The dark panel runs edge to edge on desktop. On mobile it keeps only a thin
      strip of the panel colour around the photo -- spelled out here so it reads
      as a decision rather than a side effect of the rule above overriding

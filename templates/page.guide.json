@@ -42,9 +42,20 @@
             "link": "/pages/jewellery-care",
             "link_label": "Read the guide"
           }
+        },
+        "four_cs": {
+          "type": "guide",
+          "settings": {
+            "title": "The 4 C's",
+            "text": "Cut, colour, clarity and carat weight, what each one changes, and where it is worth spending.",
+            "image_asset": "featured-diamonds-education.jpg",
+            "link": "/blogs/education-guides/4cs",
+            "link_label": "Read the guide"
+          }
         }
       },
       "block_order": [
+        "four_cs",
         "gemstones",
         "ring_size",
         "wrist_size",

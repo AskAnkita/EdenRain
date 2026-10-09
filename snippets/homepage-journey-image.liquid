@@ -1,15 +1,18 @@
 {%- comment -%}
   One image slot for the Homepage journey section.
 
-  A picked image wins; the plain URL field is the fallback so the homepage keeps
-  the images it was set up with before the picker existed. With neither, the
-  theme placeholder keeps the layout from collapsing in the editor.
+  A picked image wins; next a file that already sits in the theme's own assets/
+  folder, which is how the rest of this shop seeds its defaults; then the plain
+  URL field, so the homepage keeps the images it was set up with before the
+  picker existed. With none of the three, the theme placeholder keeps the layout
+  from collapsing in the editor.
 
-  Accepts: image (image_picker), image_url (string), alt (string),
-  placeholder (string), width, height.
+  Accepts: image (image_picker), asset (string, a file name under assets/),
+  image_url (string), alt (string), placeholder (string), width, height.
 {%- endcomment -%}
 
 {%- liquid
+  assign asset_file = asset | default: '' | strip
   assign placeholder_name = placeholder | default: 'lifestyle-1'
   assign fallback_width = width | default: 1600
   assign fallback_height = height | default: 1200
@@ -26,6 +29,20 @@
       alt: image_alt,
       class: 'hj-image'
   }}
+{%- elsif asset_file != blank -%}
+  <img
+    src="{{ asset_file | asset_img_url: '1600x' }}"
+    srcset="
+      {{ asset_file | asset_img_url: '480x' }} 480w,
+      {{ asset_file | asset_img_url: '900x' }} 900w,
+      {{ asset_file | asset_img_url: '1600x' }} 1600w
+    "
+    alt="{{ alt | escape }}"
+    loading="lazy"
+    width="{{ fallback_width }}"
+    height="{{ fallback_height }}"
+    class="hj-image"
+  >
 {%- elsif image_url != blank -%}
   <img src="{{ image_url | escape }}" alt="{{ alt | escape }}" loading="lazy" width="{{ fallback_width }}" height="{{ fallback_height }}" class="hj-image">
 {%- else -%}

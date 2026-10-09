@@ -227,7 +227,7 @@
 
   .ai-collection-carousel-heading-{{ ai_gen_id }} {
     text-align: {{ block.settings.heading_alignment }};
-    margin: 0 0 {{ block.settings.heading_spacing }}px;
+    margin: 0 0 {% if block.settings.subheading != blank %}{{ block.settings.subheading_spacing }}{% else %}{{ block.settings.heading_spacing }}{% endif %}px;
     color: {{ block.settings.heading_color }};
     font-family: var(--font-{{ block.settings.heading_font_family }}--family);
     font-weight: var(--font-{{ block.settings.heading_font_family }}--weight);
@@ -235,6 +235,32 @@
     line-height: {{ block.settings.heading_line_height }};
     letter-spacing: {{ block.settings.heading_letter_spacing }}em;
     text-transform: {{ block.settings.heading_text_transform }};
+  }
+
+  /* The supporting line under the heading. It takes the heading's own
+     alignment -- a centred heading with left aligned copy under it reads as a
+     mistake -- and owns the gap down to the cards, so the heading's "Bottom
+     spacing" keeps meaning the gap to whatever comes next. */
+  .ai-collection-carousel-subheading-{{ ai_gen_id }} {
+    max-width: {{ block.settings.subheading_max_width }}px;
+    margin: 0 0 {{ block.settings.heading_spacing }}px;
+    {% if block.settings.heading_alignment == 'center' %}margin-inline: auto;{% elsif block.settings.heading_alignment == 'right' %}margin-inline: auto 0;{% endif %}
+    text-align: {{ block.settings.heading_alignment }};
+    color: {{ block.settings.subheading_color }};
+    font-family: var(--font-{{ block.settings.subheading_font_family }}--family);
+    font-size: {{ block.settings.subheading_font_size }}px;
+    line-height: {{ block.settings.subheading_line_height }};
+    letter-spacing: {{ block.settings.subheading_letter_spacing | divided_by: 100.0 }}em;
+  }
+
+  .ai-collection-carousel-subheading-{{ ai_gen_id }} p {
+    margin: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-collection-carousel-subheading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subheading_font_size | times: 0.9 }}px;
+    }
   }
 
   .ai-collection-carousel-wrapper-{{ ai_gen_id }} {
@@ -262,9 +288,17 @@
     cursor: grab;
   }
 
+  /* The desktop column count sizes a card, but never past "Largest card width": on a wide screen
+     the count alone would blow each card up to 600px and show four of them, so the cap takes over
+     and more cards fit instead. On a laptop the count is still what decides, because the width it
+     works out to is under the cap. */
   .ai-collection-carousel-item-{{ ai_gen_id }} {
-    flex: 0 0 calc((100% - ({{ block.settings.columns_desktop | minus: 1 }} * {{ block.settings.item_gap_desktop }}px)) / {{ block.settings.columns_desktop }});
-    max-width: calc((100% - ({{ block.settings.columns_desktop | minus: 1 }} * {{ block.settings.item_gap_desktop }}px)) / {{ block.settings.columns_desktop }});
+    --ai-card-width: min(
+      calc((100% - ({{ block.settings.columns_desktop | minus: 1 }} * {{ block.settings.item_gap_desktop }}px)) / {{ block.settings.columns_desktop }}),
+      {{ block.settings.item_max_width_desktop | default: 460 }}px
+    );
+    flex: 0 0 var(--ai-card-width);
+    max-width: var(--ai-card-width);
     position: relative;
   }
 
@@ -607,6 +641,17 @@
     }
   }
 
+  {% comment %}
+    "Find Your Style" and "Find Your Shape" sit directly above/below each other on the homepage,
+    so they share one full-bleed container: the page-width cap would make the shape row narrower
+    than the style row and the two would not line up.
+  {% endcomment %}
+  {% if block.settings.heading == 'FIND YOUR STYLE' or block.settings.heading == 'Find Your Shape' %}
+    .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-container-{{ ai_gen_id }} {
+      max-width: none;
+    }
+  {% endif %}
+
   {% if block.settings.heading == 'FIND YOUR STYLE' %}
     /* The shared .is-diamond-shape scale (0.86) is tuned for the diamond photos in "Find Your
        Shape", which carry almost no white margin of their own. The ring photos here do, so at
@@ -634,11 +679,6 @@
 
       .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-track-{{ ai_gen_id }} {
         gap: 12px;
-      }
-
-      .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-item-{{ ai_gen_id }} {
-        flex: 0 0 72%;
-        max-width: 72%;
       }
 
       .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }} {
@@ -679,6 +719,9 @@
   <div class="ai-collection-carousel-container-{{ ai_gen_id }}">
     {% if block.settings.heading != blank %}
       <h2 class="ai-collection-carousel-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+    {% endif %}
+    {% if block.settings.subheading != blank %}
+      <div class="ai-collection-carousel-subheading-{{ ai_gen_id }}">{{ block.settings.subheading }}</div>
     {% endif %}
 
     <div class="ai-collection-carousel-wrapper-{{ ai_gen_id }}">
@@ -897,6 +940,15 @@
         const width = window.innerWidth;
         if (width <= 749) return this.settings.mobileColumns;
         if (width <= 989) return this.settings.tabletColumns;
+        // A card is capped at "Largest card width", so on a wide screen more of them fit than
+        // "Desktop columns" asks for. Measure what is actually on screen, or the arrows and the
+        // progress bar would count slides that aren't there. The setting is the fallback for
+        // the first pass, before the cards have been laid out.
+        const card = this.visibleItems[0] || this.items[0];
+        const trackGap = this.track ? parseInt(getComputedStyle(this.track).gap) || 0 : 0;
+        if (card && card.offsetWidth && this.wrapper && this.wrapper.clientWidth) {
+          return Math.max(1, (this.wrapper.clientWidth + trackGap) / (card.offsetWidth + trackGap));
+        }
         return this.settings.desktopColumns;
       }
 
@@ -1348,6 +1400,83 @@
     },
     {
       "type": "header",
+      "content": "Supporting text"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Text under the heading",
+      "info": "Leave empty to hide it."
+    },
+    {
+      "type": "select",
+      "id": "subheading_font_family",
+      "label": "Font",
+      "options": [
+        { "value": "body", "label": "Body" },
+        { "value": "heading", "label": "Heading" },
+        { "value": "subheading", "label": "Subheading" }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "range",
+      "id": "subheading_font_size",
+      "label": "Text size",
+      "min": 11,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "subheading_line_height",
+      "label": "Line height",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "default": 1.7
+    },
+    {
+      "type": "range",
+      "id": "subheading_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "unit": "%",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "subheading_max_width",
+      "label": "Maximum width",
+      "info": "Keeps the line from running the full width of a big screen.",
+      "min": 320,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 640
+    },
+    {
+      "type": "range",
+      "id": "subheading_spacing",
+      "label": "Space between heading and text",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Text colour",
+      "default": "#5f5f5f"
+    },
+    {
+      "type": "header",
       "content": "Carousel layout"
     },
     {
@@ -1358,6 +1487,17 @@
       "max": 8,
       "step": 0.5,
       "default": 4.5
+    },
+    {
+      "type": "range",
+      "id": "item_max_width_desktop",
+      "label": "Largest card width",
+      "info": "A card never grows past this, so a wide screen shows more cards rather than bigger ones.",
+      "min": 240,
+      "max": 720,
+      "step": 20,
+      "unit": "px",
+      "default": 460
     },
     {
       "type": "range",

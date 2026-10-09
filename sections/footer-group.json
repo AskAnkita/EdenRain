@@ -255,7 +255,7 @@
           "type": "text",
           "settings": {
             "heading": "Write to us",
-            "text": "<p><a href=\"mailto:info@heatherneedhamsilver.com\" title=\"mailto:info@heatherneedhamsilver.com\">info@heatherneedhamsilver.com</a></p><p><a href=\"https://www.instagram.com/heatherneedhamsilver/\" target=\"_blank\" title=\"Instagram\">Instagram</a></p>"
+            "text": "<p><a href=\"mailto:hello@edenraine.co.uk\" title=\"mailto:hello@edenraine.co.uk\">hello@edenraine.co.uk</a></p>"
           }
         }
       },
@@ -1466,7 +1466,7 @@
                           "type": "text",
                           "name": "Text",
                           "settings": {
-                            "text": "<p><a href=\"mailto:info@heatherneedhamsilver.com\" title=\"mailto:info@heatherneedhamsilver.com\">info@heatherneedhamsilver.com</a></p>",
+                            "text": "<p><a href=\"mailto:hello@edenraine.co.uk\" title=\"mailto:hello@edenraine.co.uk\">hello@edenraine.co.uk</a></p>",
                             "collection_description_only": false,
                             "collapse_text": false,
                             "typing_text": false,
@@ -3531,7 +3531,7 @@
                           "type": "text",
                           "name": "Text",
                           "settings": {
-                            "text": "<p><a href=\"mailto:info@heatherneedhamsilver.com\" title=\"mailto:info@heatherneedhamsilver.com\">info@heatherneedhamsilver.com</a></p>",
+                            "text": "<p><a href=\"mailto:hello@edenraine.co.uk\" title=\"mailto:hello@edenraine.co.uk\">hello@edenraine.co.uk</a></p>",
                             "collection_description_only": false,
                             "collapse_text": false,
                             "typing_text": false,
