@@ -595,13 +595,32 @@
 }
 
 /* Beats the generic .gp-content img rule, which carries the stacked layout's
-   own margin and rounding. */
+   own margin and rounding. No ratio is forced here: the sizers, the conversion
+   charts and the 4 C's diagrams are each a different shape, and a crop to a
+   common box cuts the measurements off the edge. */
 .editorial-cards .gp-split__media img {
   display: block;
   width: 100%;
   height: auto;
   margin: 0;
   border-radius: 0;
+}
+
+/* Keep the jewellery-care photos compact without changing other guide pages. */
+.guide-page--jewellery-care .gp-split {
+  margin-block: 3.2rem;
+}
+
+.guide-page--jewellery-care .gp-split__media {
+  width: 78%;
+  justify-self: center;
+}
+
+.guide-page--jewellery-care .gp-split__media img {
+  aspect-ratio: 1 / 1;
+  height: auto;
+  object-fit: cover;
+  object-position: center;
 }
 
 .editorial-cards .gp-content > :first-child { margin-top: 0; }
@@ -656,6 +675,27 @@
   height: auto;
   margin: 3.2rem 0;
   border-radius: var(--eg-radius);
+}
+
+.editorial-cards .gp-sizer-download {
+  display: block;
+  width: fit-content;
+  margin: 1.6rem auto 0;
+  padding: 1.2rem 2.4rem;
+  border: 1px solid var(--eg-ink);
+  background: transparent;
+  color: var(--eg-ink);
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.editorial-cards .gp-sizer-download:hover {
+  background: var(--eg-ink);
+  color: #ffffff;
 }
 
 .editorial-cards .gp-content blockquote {
@@ -1345,6 +1385,16 @@
 
   .editorial-cards .eg-banner__text {
     font-size: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 849px) {
+  .guide-page--jewellery-care .gp-split {
+    margin-block: 2.4rem;
+  }
+
+  .guide-page--jewellery-care .gp-split__media {
+    width: min(100%, 48rem);
   }
 }
 

@@ -34,9 +34,14 @@
     updates both src and srcset variants while preserving the editor's layout.
   endcomment
   assign guide_content = page.content
+  assign sizer_download_image = blank
   for content_guide in section.blocks
     if content_guide.settings.link != page.url
       continue
+    endif
+
+    if page.handle == 'wrist-sizer-guide' and content_guide.settings.body_image_3 != blank
+      assign sizer_download_image = content_guide.settings.body_image_3 | image_url
     endif
 
     for image_number in (1..5)
@@ -270,7 +275,7 @@
 
 <section
   id="guide-page-{{ section.id }}"
-  class="editorial-cards color-{{ stts.color_scheme }}"
+  class="editorial-cards guide-page{% if page.handle == 'jewellery-care' %} guide-page--jewellery-care{% endif %} color-{{ stts.color_scheme }}"
 >
   <div class="eg-shell">
     {%- comment -%}
@@ -378,7 +383,13 @@
       <div class="gp-hero">{{ hero_copy }}</div>
     {%- endif -%}
 
-    <div class="gp-content rte"{% if stts.force_downloads %} data-editorial-downloads{% endif %}>
+    <div
+      class="gp-content rte"
+      {% if stts.force_downloads %}data-editorial-downloads{% endif %}
+      {% if page.handle == 'er-sizing' %}data-sizer-download="finger"
+      {% elsif page.handle == 'wrist-sizer-guide' %}data-sizer-download="wrist"{% endif %}
+      {% if sizer_download_image != blank %}data-sizer-download-src="{{ sizer_download_image }}"{% endif %}
+    >
       {%- render 'editorial-content',
         content: guide_content,
         split_sections: stts.split_sections,
