@@ -11,6 +11,10 @@
 
   The cards themselves come from 'menu-featured-cards'. Nothing is output when that snippet
   lists none for this menu, which leaves the tab empty rather than half-built.
+
+  Both the picture and the video of every card can be replaced without touching the theme,
+  in Theme settings > Mega menu featured media. The names there are hard-wired to the four
+  menus that have cards, through image_setting_prefix below.
 {% endcomment %}
 
 {%- liquid
@@ -45,7 +49,10 @@
               assign image_setting_prefix = 'mm_dia_learn'
           endcase
           assign image_setting_key = image_setting_prefix | append: '_' | append: forloop.index
-          assign selected_card_image = settings[image_setting_key]
+          assign selected_card_image = ''
+          if image_setting_prefix != ''
+            assign selected_card_image = settings[image_setting_key]
+          endif
           if selected_card_image != blank
             assign card_image_src = selected_card_image | image_url: width: 800
             capture card_image_srcset
@@ -63,11 +70,50 @@
               echo ' 800w'
             endcapture
           endif
+
+          comment
+            The video is chosen in Theme settings > Mega menu featured media, as the name of a
+            file uploaded under Content > Files, or as that file's full URL. "none" turns a
+            card's video off and leaves the picture, which is how a card that ships with a
+            video loses one. An empty field falls back to the name in 'menu-featured-cards'.
+          endcomment
+          assign video_setting_key = image_setting_prefix | append: '_video_' | append: forloop.index
+          assign chosen_card_video = ''
+          if image_setting_prefix != ''
+            assign chosen_card_video = settings[video_setting_key] | default: '' | strip
+          endif
+
+          assign card_video_url = ''
+          if chosen_card_video != ''
+            assign video_switch = chosen_card_video | downcase
+            unless video_switch == 'none'
+              if chosen_card_video contains '//'
+                assign card_video_url = chosen_card_video
+              else
+                assign card_video_url = chosen_card_video | file_url
+              endif
+            endunless
+          elsif card_video != blank
+            assign card_video_url = card_video | file_url
+          endif
+
+          comment
+            A <source> whose type does not match the file is skipped by the browser, so the
+            type follows the extension rather than assuming mp4.
+          endcomment
+          assign card_video_type = 'video/mp4'
+          if card_video_url contains '.webm'
+            assign card_video_type = 'video/webm'
+          elsif card_video_url contains '.ogv'
+            assign card_video_type = 'video/ogg'
+          elsif card_video_url contains '.mov'
+            assign card_video_type = 'video/quicktime'
+          endif
         -%}
         <li class="menu-drawer-desktop__feature">
           <a class="menu-drawer-desktop__feature-link" href="{{ card_url }}">
             <span class="menu-drawer-desktop__feature-media">
-              {%- if card_video != blank -%}
+              {%- if card_video_url != blank -%}
                 {%- comment -%}
                   The video lives in Content > Files, not in the theme. It is left unplayed
                   until its tab is opened (see menu-drawer-desktop.js), so a menu that is
@@ -84,7 +130,7 @@
                   aria-hidden="true"
                   tabindex="-1"
                 >
-                  <source src="{{ card_video | file_url }}" type="video/mp4">
+                  <source src="{{ card_video_url }}" type="{{ card_video_type }}">
                 </video>
               {%- else -%}
                 <img
@@ -101,7 +147,7 @@
             <span class="menu-drawer-desktop__feature-caption">{{ card_caption | escape }}</span>
           </a>
 
-          {%- if card_video != blank -%}
+          {%- if card_video_url != blank -%}
             <button
               type="button"
               class="menu-drawer-desktop__feature-toggle is-paused"

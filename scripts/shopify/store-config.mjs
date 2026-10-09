@@ -63,8 +63,6 @@ export const collections = [
   { handle: 'eternity-rings', title: 'Eternity Rings', rule: tag('style:eternity') },
   { handle: 'curved-wedding-bands', title: 'Curved Wedding Bands', rule: tag('style:curved') },
   { handle: 'stackable-rings', title: 'Stackable Rings', rule: tag('style:stackable') },
-  { handle: 'mens-rings', title: "Men's Wedding Bands" },
-  { handle: 'mens-engagement-rings', title: "Men's Engagement Rings" },
 
   // Jewelry. The four top-level groups, each a manual collection that was holding a fraction of
   // what the shop sells — Earrings listed 56 of 209, Rings 14 of 38, Bracelets 2 of 18. Same
@@ -224,14 +222,6 @@ export const menu = {
             { title: 'Curved', collection: 'curved-wedding-bands' },
             { title: 'Stackable', collection: 'stackable-rings' },
             { title: 'Bridal Sets', collection: 'bridal-sets' },
-          ],
-        },
-        {
-          title: "Men's",
-          collection: 'mens-rings',
-          items: [
-            { title: "Men's Wedding Bands", collection: 'mens-rings' },
-            { title: "Men's Engagement Rings", collection: 'mens-engagement-rings' },
           ],
         },
         { title: 'Shop by Metal', collection: 'wedding-bands', items: metalItems },

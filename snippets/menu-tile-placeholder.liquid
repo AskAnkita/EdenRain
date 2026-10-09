@@ -34,7 +34,7 @@
 
 {%- liquid
   assign style_handles = 'solitaire,side-stone,halo,hidden-halo,three-stone,bridal-sets,vintage,nature-inspired,toi-et-moi,promise' | split: ','
-  assign tile_handles = 'wedding-bands,anniversary-rings,eternity-rings,plain-metal-wedding-bands,curved-wedding-bands,stackable-rings,mens-rings,new-in,ready-to-ship,best-sellers,studs,hoops-huggies,dangles-drops,climbers-jackets-cuffs,signature-earrings,tennis-necklaces,pendants,fashion-necklaces,signature-necklaces,tennis-bracelets,bangles-cuffs,fashion-bracelets,signature-bracelets' | split: ','
+  assign tile_handles = 'wedding-bands,anniversary-rings,eternity-rings,plain-metal-wedding-bands,curved-wedding-bands,stackable-rings,new-in,ready-to-ship,best-sellers,studs,hoops-huggies,dangles-drops,climbers-jackets-cuffs,signature-earrings,tennis-necklaces,pendants,fashion-necklaces,signature-necklaces,tennis-bracelets,bangles-cuffs,fashion-bracelets,signature-bracelets' | split: ','
   assign diamond_shapes = 'round,oval,emerald,cushion,marquise,radiant,pear,princess,asscher,heart' | split: ','
 
   assign placeholder = ''
@@ -131,8 +131,6 @@
       assign placeholder = 'menu-tile-anniversary-rings.png'
     elsif handle contains 'plain-metal'
       assign placeholder = 'menu-tile-plain-metal-wedding-bands.png'
-    elsif handle contains 'mens' or handle contains 'men'
-      assign placeholder = 'menu-tile-mens-rings.png'
     endif
   endif
 

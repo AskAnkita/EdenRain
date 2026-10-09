@@ -59,9 +59,9 @@
       echo '::Round|round-engagement-rings~Oval|oval-engagement-rings~Cushion|cushion-engagement-rings~Emerald|emerald-engagement-rings~Pear|pear-engagement-rings~Princess|princess-engagement-rings~Radiant|radiant-engagement-rings~Marquise|marquise-engagement-rings~Asscher|asscher-engagement-rings'
     when 'wedding/by-style' or 'wedding/womens'
       echo '::Wedding|wedding-bands~Anniversary|anniversary-rings~Eternity|eternity-rings~Plain Metal|plain-metal-wedding-bands'
-      echo ";;Featured Collections::Curved|curved-wedding-bands~Stackable|stackable-rings~Men's|mens-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship"
-    when 'wedding/featured' or 'wedding/mens'
-      echo "::Curved|curved-wedding-bands~Stackable|stackable-rings~Men's|mens-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship"
+      echo ';;Featured Collections::Curved|curved-wedding-bands~Stackable|stackable-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship'
+    when 'wedding/featured'
+      echo '::Curved|curved-wedding-bands~Stackable|stackable-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship'
     when 'diamonds/lab-grown-diamonds'
       echo '::Round|round-diamonds~Oval|oval-diamonds~Emerald|emerald-diamonds~Cushion|cushion-diamonds~Marquise|marquise-diamonds~Radiant|radiant-diamonds~Pear|pear-diamonds~Princess|princess-diamonds~Asscher|asscher-diamonds~Heart|heart-diamonds'
     when 'diamonds/learn'
