@@ -1,15 +1,39 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "guide": {
       "type": "guide-page",
       "blocks": {
+        "four_cs": {
+          "type": "guide",
+          "settings": {
+            "title": "The 4 C's",
+            "text": "Cut, colour, clarity and carat weight, what each one changes, and where it is worth spending.",
+            "image": "shopify://shop_images/Unknown-14.png",
+            "image_asset": "featured-diamonds-education.jpg",
+            "hero_image_asset": "featured-diamonds-education.jpg",
+            "hero_use_page_image": false,
+            "link": "/blogs/education-guides/4cs",
+            "link_label": "Read the guide"
+          }
+        },
         "gemstones": {
           "type": "guide",
           "settings": {
             "title": "Lab-grown gemstones",
             "text": "Sapphires, rubies and emeralds with the same properties as mined stones.",
+            "image": "shopify://shop_images/Unknown-12.png",
             "image_asset": "featured-diamonds-gemstones.jpg",
             "hero_image_asset": "gemstones-hero.jpg",
+            "hero_use_page_image": false,
             "link": "/pages/gemstones",
             "link_label": "Read the guide"
           }
@@ -19,7 +43,9 @@
           "settings": {
             "title": "Find your ring size",
             "text": "A printable sizer, a conversion chart, and how to buy a surprise.",
+            "image": "shopify://shop_images/Unknown-13.png",
             "image_asset": "ring-size-guide-original.png",
+            "hero_image_asset": "",
             "hero_use_page_image": true,
             "link": "/pages/er-sizing",
             "link_label": "Read the guide"
@@ -30,7 +56,9 @@
           "settings": {
             "title": "Find your wrist size",
             "text": "How to measure at home for a bracelet or bangle, and how much room to leave.",
+            "image": "shopify://shop_images/d9fbc738efc022872b39b048ea5f9124.jpg",
             "image_asset": "lifestyle-bracelet.jpg",
+            "hero_image_asset": "",
             "hero_use_page_image": true,
             "link": "/pages/wrist-sizer-guide",
             "link_label": "Read the guide"
@@ -41,20 +69,11 @@
           "settings": {
             "title": "Jewellery care & cleaning",
             "text": "Cleaning at home, when to have a setting checked, and habits that keep it secure.",
+            "image": "shopify://shop_images/Unknown-11.png",
             "image_asset": "featured-diamonds-care.jpg",
             "hero_image_asset": "featured-diamonds-care.jpg",
+            "hero_use_page_image": false,
             "link": "/pages/jewellery-care",
-            "link_label": "Read the guide"
-          }
-        },
-        "four_cs": {
-          "type": "guide",
-          "settings": {
-            "title": "The 4 C's",
-            "text": "Cut, colour, clarity and carat weight, what each one changes, and where it is worth spending.",
-            "image_asset": "featured-diamonds-education.jpg",
-            "hero_image_asset": "featured-diamonds-education.jpg",
-            "link": "/blogs/education-guides/4cs",
             "link_label": "Read the guide"
           }
         }
@@ -67,11 +86,45 @@
         "care"
       ],
       "settings": {
+        "hero_style": "banner",
         "eyebrow": "Education & guides",
         "eyebrow_link": "/pages/education-guides",
         "heading": "",
         "subheading": "",
+        "hero_text_source": "lift",
+        "hero_image_source": "lift",
+        "hero_image_asset": "",
+        "hero_button_label": "",
+        "hero_button_link": "",
+        "hero_split_ratio": 50,
+        "hero_split_flip": false,
+        "hero_split_fit": "contain",
+        "hero_split_media_background": "#f0ebe7",
+        "hero_split_mobile": "words",
+        "hero_split_background": "#22211e",
+        "hero_split_media_height": 340,
+        "hero_width": "full",
+        "hero_align": "center",
+        "hero_focal": "center",
+        "hero_height": 520,
+        "hero_height_mobile": 420,
+        "hero_radius": 0,
+        "hero_heading_size": 56,
+        "hero_text_size": 18,
+        "hero_overlay": 68,
+        "hero_wash": 38,
+        "hero_overlay_color": "#171714",
+        "hero_text_color": "#ffffff",
+        "hero_fallback_color": "#ead9d1",
+        "hero_eyebrow_background": "#ffffff",
+        "hero_eyebrow_opacity": 20,
+        "hero_eyebrow_text_color": "#ffffff",
+        "hero_button_background": "#ffffff",
+        "hero_button_text_color": "#171714",
+        "split_sections": true,
+        "split_text_width": 36,
         "scroll_tables": true,
+        "force_downloads": true,
         "show_more": true,
         "more_heading": "More guides",
         "more_heading_align": "center",
@@ -101,40 +154,7 @@
         "cta_button_background": "#171714",
         "cta_button_text_color": "#ffffff",
         "padding_top": 0,
-        "padding_bottom": 80,
-        "split_text_width": 36,
-        "hero_style": "banner",
-        "hero_width": "full",
-        "hero_align": "center",
-        "hero_focal": "center",
-        "hero_height": 520,
-        "hero_height_mobile": 420,
-        "hero_radius": 0,
-        "hero_heading_size": 56,
-        "hero_text_size": 18,
-        "hero_overlay": 68,
-        "hero_wash": 38,
-        "hero_overlay_color": "#171714",
-        "hero_text_color": "#ffffff",
-        "hero_fallback_color": "#ead9d1",
-        "hero_eyebrow_background": "#ffffff",
-        "hero_eyebrow_opacity": 20,
-        "hero_eyebrow_text_color": "#ffffff",
-        "hero_button_background": "#ffffff",
-        "hero_button_text_color": "#171714",
-        "hero_button_label": "",
-        "hero_button_link": "",
-        "hero_image_asset": "",
-        "hero_image_source": "lift",
-        "hero_text_source": "lift",
-        "hero_split_ratio": 50,
-        "hero_split_flip": false,
-        "hero_split_fit": "contain",
-        "hero_split_media_background": "#f0ebe7",
-        "hero_split_mobile": "words",
-        "hero_split_background": "#22211e",
-        "hero_split_media_height": 340,
-        "force_downloads": true
+        "padding_bottom": 80
       }
     }
   },

@@ -3552,6 +3552,20 @@
     ]
   },
   {
+    "name": "Education guide images",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "These are the shared images for guide cards across the education hub, guide pages and article recommendations. Change an image here once to update it everywhere."
+      },
+      { "type": "image_picker", "id": "guide_image_four_cs", "label": "The 4 C's" },
+      { "type": "image_picker", "id": "guide_image_gemstones", "label": "Lab-grown gemstones" },
+      { "type": "image_picker", "id": "guide_image_ring_size", "label": "Ring size guide" },
+      { "type": "image_picker", "id": "guide_image_wrist_size", "label": "Wrist size guide" },
+      { "type": "image_picker", "id": "guide_image_care", "label": "Jewellery care & cleaning" }
+    ]
+  },
+  {
     "name": "Metal swatches",
     "settings": [
       {

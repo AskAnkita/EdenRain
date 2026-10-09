@@ -372,6 +372,24 @@
                   assign picture_asset = block.settings.image_asset | strip
                 endif
 
+                assign shared_picture = blank
+                case block.settings.link
+                  when '/blogs/education-guides/4cs'
+                    assign shared_picture = settings.guide_image_four_cs
+                  when '/pages/gemstones'
+                    assign shared_picture = settings.guide_image_gemstones
+                  when '/pages/er-sizing'
+                    assign shared_picture = settings.guide_image_ring_size
+                  when '/pages/wrist-sizer-guide'
+                    assign shared_picture = settings.guide_image_wrist_size
+                  when '/pages/jewellery-care'
+                    assign shared_picture = settings.guide_image_care
+                endcase
+                if shared_picture != blank
+                  assign picture = shared_picture
+                  assign picture_asset = blank
+                endif
+
                 assign has_media = false
                 if stts.show_images
                   if picture != blank or picture_asset != blank
@@ -718,8 +736,8 @@
       "settings": [
         { "type": "text", "id": "title", "label": "Title" },
         { "type": "textarea", "id": "text", "label": "Description" },
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "image_asset", "label": "Image file name", "info": "A file under assets/. Used only when no image is selected." },
+        { "type": "image_picker", "id": "image", "label": "Fallback card image", "info": "Used only when the shared image in Theme settings > Education guide images is empty." },
+        { "type": "text", "id": "image_asset", "label": "Fallback image file name", "info": "Used only when the shared image is empty and no fallback image is selected above." },
         { "type": "image_picker", "id": "hero_image", "label": "Banner image", "info": "Optional wide image for this guide's top banner. Falls back to its card image." },
         { "type": "text", "id": "hero_image_asset", "label": "Banner image file name", "info": "A file under assets/, used only when no banner image is selected." },
         { "type": "url", "id": "link", "label": "Guide page link" },

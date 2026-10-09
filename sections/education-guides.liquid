@@ -103,6 +103,24 @@
               assign picture_asset = block.settings.image_asset | strip
             endif
 
+            assign shared_picture = blank
+            case block.settings.link
+              when '/blogs/education-guides/4cs'
+                assign shared_picture = settings.guide_image_four_cs
+              when '/pages/gemstones'
+                assign shared_picture = settings.guide_image_gemstones
+              when '/pages/er-sizing'
+                assign shared_picture = settings.guide_image_ring_size
+              when '/pages/wrist-sizer-guide'
+                assign shared_picture = settings.guide_image_wrist_size
+              when '/pages/jewellery-care'
+                assign shared_picture = settings.guide_image_care
+            endcase
+            if shared_picture != blank
+              assign picture = shared_picture
+              assign picture_asset = blank
+            endif
+
             assign has_link = false
             if block.settings.link != blank
               assign has_link = true
@@ -505,12 +523,13 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Image"
+          "label": "Fallback card image",
+          "info": "For the five main guides, use Theme settings > Education guide images. This image is only a fallback."
         },
         {
           "type": "text",
           "id": "image_asset",
-          "label": "Image file name",
+          "label": "Fallback image file name",
           "info": "A file under assets/, e.g. featured-diamonds-education.jpg. Used only when no image is chosen above, and ignored if the file is missing."
         },
         {

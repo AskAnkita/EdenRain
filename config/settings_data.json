@@ -204,6 +204,11 @@
     "brand_headline": "",
     "brand_description": "<p></p>",
     "brand_image_width": 100,
+    "guide_image_four_cs": "shopify://shop_images/Unknown-14.png",
+    "guide_image_gemstones": "shopify://shop_images/Unknown-12.png",
+    "guide_image_ring_size": "shopify://shop_images/Unknown-13.png",
+    "guide_image_wrist_size": "shopify://shop_images/d9fbc738efc022872b39b048ea5f9124.jpg",
+    "guide_image_care": "shopify://shop_images/Unknown-11.png",
     "sections": {
       "main-password-header": {
         "type": "main-password-header",

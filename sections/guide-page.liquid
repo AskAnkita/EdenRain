@@ -29,6 +29,44 @@
   assign heading = stts.heading | default: page.title
 
   comment
+    Keep the page copy in Shopify's page editor, but let each guide block replace
+    the first five body photos from the theme editor. Replacing the image URL path
+    updates both src and srcset variants while preserving the editor's layout.
+  endcomment
+  assign guide_content = page.content
+  for content_guide in section.blocks
+    if content_guide.settings.link != page.url
+      continue
+    endif
+
+    for image_number in (1..5)
+      assign body_image_setting = 'body_image_' | append: image_number
+      assign body_image = content_guide.settings[body_image_setting]
+      if body_image == blank
+        continue
+      endif
+
+      assign content_images = guide_content | split: '<img'
+      if content_images.size <= image_number
+        continue
+      endif
+
+      assign content_image_attrs = content_images[image_number] | split: '>' | first
+      assign content_image_src_parts = content_image_attrs | split: 'src="'
+      if content_image_src_parts.size < 2
+        continue
+      endif
+
+      assign content_image_src = content_image_src_parts[1] | split: '"' | first
+      assign content_image_path = content_image_src | split: '?' | first
+      assign body_image_url = body_image | image_url: width: 1600
+      assign body_image_path = body_image_url | split: '?' | first
+      assign guide_content = guide_content | replace: content_image_path, body_image_path
+    endfor
+    break
+  endfor
+
+  comment
     The banner hero. A guide's picture can come from the admin (image_picker) or
     from the theme's own files (image_asset), the same pair the cards below use,
     so a guide drawn from theme assets gets a banner too.
@@ -88,7 +126,7 @@
   assign hero_lift_src = ''
   assign hero_lift_alt = ''
   if hero_image == blank and hero_asset == blank and stts.hero_image_source == 'lift'
-    assign img_tags = page.content | split: '<img'
+    assign img_tags = guide_content | split: '<img'
     if img_tags.size > 1
       assign first_attrs = img_tags[1] | split: '>' | first
       assign src_parts = first_attrs | split: 'src="'
@@ -144,7 +182,7 @@
   assign lead_html = ''
   assign lead_words = ''
   if stts.subheading == blank and stts.hero_text_source == 'lift'
-    assign lead_chunks = page.content | split: '</p>'
+    assign lead_chunks = guide_content | split: '</p>'
     for chunk in lead_chunks limit: 4
       assign chunk_parts = chunk | split: '<p'
       if chunk_parts.size < 2
@@ -342,7 +380,7 @@
 
     <div class="gp-content rte"{% if stts.force_downloads %} data-editorial-downloads{% endif %}>
       {%- render 'editorial-content',
-        content: page.content,
+        content: guide_content,
         split_sections: stts.split_sections,
         scroll_tables: stts.scroll_tables,
         featured_src: featured_src,
@@ -391,6 +429,24 @@
                 assign picture_asset = blank
                 if picture == blank
                   assign picture_asset = block.settings.image_asset | strip
+                endif
+
+                assign shared_picture = blank
+                case block.settings.link
+                  when '/blogs/education-guides/4cs'
+                    assign shared_picture = settings.guide_image_four_cs
+                  when '/pages/gemstones'
+                    assign shared_picture = settings.guide_image_gemstones
+                  when '/pages/er-sizing'
+                    assign shared_picture = settings.guide_image_ring_size
+                  when '/pages/wrist-sizer-guide'
+                    assign shared_picture = settings.guide_image_wrist_size
+                  when '/pages/jewellery-care'
+                    assign shared_picture = settings.guide_image_care
+                endcase
+                if shared_picture != blank
+                  assign picture = shared_picture
+                  assign picture_asset = blank
                 endif
 
                 assign has_media = false
@@ -982,12 +1038,19 @@
       "settings": [
         { "type": "text", "id": "title", "label": "Title" },
         { "type": "textarea", "id": "text", "label": "Description" },
-        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "header", "content": "Guide body photos" },
+        { "type": "image_picker", "id": "body_image_1", "label": "First body photo", "info": "Replaces the first photo in this guide's page content." },
+        { "type": "image_picker", "id": "body_image_2", "label": "Second body photo", "info": "Replaces the second photo in this guide's page content." },
+        { "type": "image_picker", "id": "body_image_3", "label": "Third body photo", "info": "Replaces the third photo in this guide's page content." },
+        { "type": "image_picker", "id": "body_image_4", "label": "Fourth body photo", "info": "Replaces the fourth photo in this guide's page content." },
+        { "type": "image_picker", "id": "body_image_5", "label": "Fifth body photo", "info": "Replaces the fifth photo in this guide's page content." },
+        { "type": "header", "content": "Guide cards and banner" },
+        { "type": "image_picker", "id": "image", "label": "Fallback card image", "info": "Used only when the shared image in Theme settings > Education guide images is empty." },
         {
           "type": "text",
           "id": "image_asset",
-          "label": "Image file name",
-          "info": "A file under assets/, used only when no image is chosen above."
+          "label": "Fallback image file name",
+          "info": "Used only when the shared image is empty and no fallback image is chosen above."
         },
         { "type": "image_picker", "id": "hero_image", "label": "Banner image", "info": "Optional wide image for this guide's top banner. Falls back to its card image." },
         { "type": "text", "id": "hero_image_asset", "label": "Banner image file name", "info": "A file under assets/, used only when no banner image is selected." },

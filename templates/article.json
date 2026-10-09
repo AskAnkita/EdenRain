@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "article": {
@@ -19,6 +28,7 @@
           "settings": {
             "title": "Lab-grown gemstones",
             "text": "Sapphires, rubies and emeralds with the same properties as mined stones.",
+            "image": "shopify://shop_images/Unknown-12.png",
             "image_asset": "featured-diamonds-gemstones.jpg",
             "hero_image_asset": "gemstones-hero.jpg",
             "link": "/pages/gemstones",
@@ -30,6 +40,7 @@
           "settings": {
             "title": "Find your ring size",
             "text": "A printable sizer, a conversion chart, and how to buy a surprise.",
+            "image": "shopify://shop_images/Unknown-13.png",
             "image_asset": "ring-size-guide-original.png",
             "hero_image_asset": "ring-size-guide-original.png",
             "link": "/pages/er-sizing",
@@ -41,6 +52,7 @@
           "settings": {
             "title": "Find your wrist size",
             "text": "How to measure at home for a bracelet or bangle, and how much room to leave.",
+            "image": "shopify://shop_images/d9fbc738efc022872b39b048ea5f9124.jpg",
             "image_asset": "lifestyle-bracelet.jpg",
             "hero_image_asset": "lifestyle-bracelet.jpg",
             "link": "/pages/wrist-sizer-guide",
@@ -52,6 +64,7 @@
           "settings": {
             "title": "Jewellery care & cleaning",
             "text": "Cleaning at home, when to have a setting checked, and habits that keep it secure.",
+            "image": "shopify://shop_images/Unknown-11.png",
             "image_asset": "featured-diamonds-care.jpg",
             "hero_image_asset": "featured-diamonds-care.jpg",
             "link": "/pages/jewellery-care",
@@ -59,14 +72,51 @@
           }
         }
       },
-      "block_order": ["four_cs", "gemstones", "ring_size", "wrist_size", "care"],
+      "block_order": [
+        "four_cs",
+        "gemstones",
+        "ring_size",
+        "wrist_size",
+        "care"
+      ],
       "settings": {
+        "hero_style": "banner",
         "show_eyebrow": true,
         "eyebrow": "",
         "show_meta": true,
         "show_author": true,
         "show_image": true,
+        "hero_text": "",
+        "hero_text_source": "none",
+        "hero_button_label": "",
+        "hero_button_link": "",
+        "hero_split_ratio": 50,
+        "hero_split_flip": false,
+        "hero_split_mobile": "words",
+        "hero_split_background": "#22211e",
+        "hero_split_media_height": 340,
+        "hero_width": "full",
+        "hero_align": "center",
+        "hero_focal": "center",
+        "hero_height": 520,
+        "hero_height_mobile": 420,
+        "hero_radius": 0,
+        "hero_heading_size": 56,
+        "hero_text_size": 18,
+        "hero_overlay": 68,
+        "hero_wash": 38,
+        "hero_overlay_color": "#171714",
+        "hero_text_color": "#ffffff",
+        "hero_fallback_color": "#ead9d1",
+        "hero_eyebrow_background": "#ffffff",
+        "hero_eyebrow_opacity": 20,
+        "hero_eyebrow_text_color": "#ffffff",
+        "hero_button_background": "#ffffff",
+        "hero_button_text_color": "#171714",
+        "split_sections": true,
+        "split_text_width": 36,
         "scroll_tables": true,
+        "force_downloads": true,
         "show_prev_next": true,
         "prev_label": "Previous",
         "next_label": "Next",
@@ -99,37 +149,7 @@
         "cta_button_background": "#171714",
         "cta_button_text_color": "#ffffff",
         "padding_top": 0,
-        "padding_bottom": 80,
-        "split_text_width": 36,
-        "hero_style": "banner",
-        "hero_width": "full",
-        "hero_align": "center",
-        "hero_focal": "center",
-        "hero_height": 520,
-        "hero_height_mobile": 420,
-        "hero_radius": 0,
-        "hero_heading_size": 56,
-        "hero_text_size": 18,
-        "hero_overlay": 68,
-        "hero_wash": 38,
-        "hero_overlay_color": "#171714",
-        "hero_text_color": "#ffffff",
-        "hero_fallback_color": "#ead9d1",
-        "hero_eyebrow_background": "#ffffff",
-        "hero_eyebrow_opacity": 20,
-        "hero_eyebrow_text_color": "#ffffff",
-        "hero_button_background": "#ffffff",
-        "hero_button_text_color": "#171714",
-        "hero_button_label": "",
-        "hero_button_link": "",
-        "hero_text": "",
-        "hero_text_source": "none",
-        "hero_split_ratio": 50,
-        "hero_split_flip": false,
-        "hero_split_mobile": "words",
-        "hero_split_background": "#22211e",
-        "hero_split_media_height": 340,
-        "force_downloads": true
+        "padding_bottom": 80
       }
     }
   },
