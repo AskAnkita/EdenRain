@@ -1506,8 +1506,13 @@
             "subtitle_size": 22,
             "tile_size": "feature",
             "scrim_style": "gradient",
-            "image_scale": 125,
+            "image_scale": 100,
             "image_url": "https://cdn.shopify.com/s/files/1/0423/9668/0352/files/AJLR379-Y1.png?v=1791124951&width=1600",
+            "video_url": "https://cdn.shopify.com/videos/c/o/v/a44d0c0308f5486c9329c4ca6df1d823.mp4",
+            "video_autoplay": true,
+            "video_loop": true,
+            "video_muted": true,
+            "video_controls": false,
             "boxed_text": "",
             "script_text": "New collection"
           }

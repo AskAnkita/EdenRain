@@ -248,6 +248,12 @@
     transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
+  .{{ root_class }} .signature-editorial__video {
+    display: block;
+    border: 0;
+    background: var(--sig-tile-bg, transparent);
+  }
+
   {%- if section.settings.hover_zoom -%}
   .{{ root_class }} .signature-editorial__tile:hover .signature-editorial__image,
   .{{ root_class }} .signature-editorial__tile:focus-within .signature-editorial__image {
@@ -540,6 +546,34 @@
           endif
         endif
 
+        comment
+          A video stands in for the image rather than beside it, so the image settings above
+          are still read: whichever one resolves becomes the poster frame.
+        endcomment
+        assign tile_video = block.settings.video
+        assign tile_video_url = block.settings.video_url | strip
+        assign tile_has_video = false
+        if tile_video != blank or tile_video_url != blank
+          assign tile_has_video = true
+        endif
+        assign tile_poster = ''
+        if tile_has_video
+          if tile_image != blank
+            assign tile_poster = tile_image | image_url: width: 1400
+          elsif tile_asset != blank
+            assign tile_poster = tile_asset | asset_img_url: '1400x'
+          elsif tile_image_url != blank
+            assign tile_poster = tile_image_url
+          elsif tile_video != blank
+            assign tile_poster = tile_video.preview_image | image_url: width: 1400
+          endif
+        endif
+        assign tile_video_autoplay = block.settings.video_autoplay
+        assign tile_video_muted = block.settings.video_muted
+        if tile_video_autoplay
+          assign tile_video_muted = true
+        endif
+
         assign tile_link = block.settings.link
         if tile_link == blank and tile_product != blank
           assign tile_link = tile_product.url
@@ -668,7 +702,33 @@
             <a class="signature-editorial__product-action" href="{{ tile_product.url }}">View product</a>
           </div>
         {%- else -%}
-        {%- if tile_image != blank -%}
+        {%- if tile_has_video -%}
+          <video
+            class="signature-editorial__image signature-editorial__video"
+            {% if tile_poster != blank %}poster="{{ tile_poster }}"{% endif %}
+            {% if tile_video_autoplay %}autoplay{% endif %}
+            {% if tile_video_muted %}muted{% endif %}
+            {% if block.settings.video_loop %}loop{% endif %}
+            {% if block.settings.video_controls %}controls{% endif %}
+            playsinline
+            preload="{% if tile_video_autoplay %}auto{% else %}metadata{% endif %}"
+            width="1200"
+            height="1200"
+            aria-label="{{ tile_alt | escape }}"
+          >
+            {%- if tile_video != blank -%}
+              {%- comment -%} mp4 is put first: it is the one source every browser here can play. {%- endcomment -%}
+              {%- for source in tile_video.sources -%}
+                {%- if source.format == 'mp4' -%}<source src="{{ source.url }}" type="{{ source.mime_type }}">{%- endif -%}
+              {%- endfor -%}
+              {%- for source in tile_video.sources -%}
+                {%- unless source.format == 'mp4' -%}<source src="{{ source.url }}" type="{{ source.mime_type }}">{%- endunless -%}
+              {%- endfor -%}
+            {%- else -%}
+              <source src="{{ tile_video_url }}" type="video/mp4">
+            {%- endif -%}
+          </video>
+        {%- elsif tile_image != blank -%}
           {{
             tile_image
             | image_url: width: 1400
@@ -824,6 +884,15 @@
         { "type": "range", "id": "image_scale", "label": "Image zoom", "min": 100, "max": 220, "step": 5, "unit": "%", "default": 100, "info": "Zooms out from the side chosen below, which is how a centred product shot is pushed clear of the text." },
         { "type": "select", "id": "object_position", "label": "Image focus", "options": [ { "value": "center", "label": "Centre" }, { "value": "top", "label": "Top" }, { "value": "bottom", "label": "Bottom" }, { "value": "left", "label": "Left" }, { "value": "right", "label": "Right" } ], "default": "center" },
         { "type": "color", "id": "tile_background", "label": "Tile background", "default": "rgba(0,0,0,0)", "info": "Shows behind the image while it loads." },
+
+        { "type": "header", "content": "Video" },
+        { "type": "paragraph", "content": "A video takes the image's place on this tile. The image above is still worth setting: it is used as the poster frame while the video loads." },
+        { "type": "video", "id": "video", "label": "Video" },
+        { "type": "text", "id": "video_url", "label": "Video URL (fallback)", "info": "A direct .mp4 link, e.g. a Shopify Files URL. Only used when no video is picked above." },
+        { "type": "checkbox", "id": "video_autoplay", "label": "Play automatically", "default": true, "info": "An autoplaying video is always muted; browsers block it otherwise." },
+        { "type": "checkbox", "id": "video_loop", "label": "Loop", "default": true },
+        { "type": "checkbox", "id": "video_muted", "label": "Mute", "default": true },
+        { "type": "checkbox", "id": "video_controls", "label": "Show playback controls", "default": false, "info": "Leave off for a background video; the tile link sits over the whole tile and would swallow the controls." },
 
         { "type": "header", "content": "Link" },
         { "type": "product", "id": "product", "label": "Product", "info": "Fills the image and link when nothing above is set." },
