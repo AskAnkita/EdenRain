@@ -51,6 +51,18 @@
   assign chapters = html | split: '<h2'
   assign intro = chapters[0]
 
+  assign opening_media = ''
+  assign opening_has_words = intro | strip_html | replace: '&nbsp;', ' ' | strip
+  assign pair_opening_media = false
+  if split_sections and intro contains '<img' and opening_has_words == blank
+    assign opening_image_parts = intro | split: '<img'
+    if opening_image_parts.size > 1
+      assign opening_image_attrs = opening_image_parts[1] | split: '>' | first
+      assign opening_media = '<img' | append: opening_image_attrs | append: '>'
+      assign pair_opening_media = true
+    endif
+  endif
+
   # The lead photo repeated as the first thing in the body is the commonest shape
   # here: the editor was pasted the same file the article was given.
   if featured_file != blank and intro contains featured_file
@@ -68,6 +80,11 @@
     assign intro = intro_rebuilt
   endif
 
+  if pair_opening_media and featured_file != blank and opening_media contains featured_file
+    assign opening_media = ''
+    assign pair_opening_media = false
+  endif
+
   assign flipped = false
 -%}
 
@@ -77,7 +94,9 @@
   document, so this is where the guides get their layout: picture, then the words
   that explain it.
 {%- endcomment -%}
-{%- if split_sections and intro contains '<img' -%}
+{%- if pair_opening_media -%}
+  {{- intro | remove_first: opening_media -}}
+{%- elsif split_sections and intro contains '<img' -%}
   {%- assign intro_blocks = intro | split: '<img' -%}
   {{- intro_blocks[0] -}}
 
@@ -134,6 +153,8 @@
       for extra_piece in image_pieces offset: 2
         assign chapter_text = chapter_text | append: '<img' | append: extra_piece
       endfor
+    elsif split_sections and pair_opening_media and forloop.first
+      assign chapter_media = opening_media
     endif
   -%}
 

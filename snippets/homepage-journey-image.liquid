@@ -8,14 +8,40 @@
   from collapsing in the editor.
 
   Accepts: image (image_picker), asset (string, a file name under assets/),
-  image_url (string), alt (string), placeholder (string), width, height.
+  image_url (string), alt (string), placeholder (string), sizes (string), width, height.
 {%- endcomment -%}
 
 {%- liquid
-  assign asset_file = asset | default: '' | strip
+  assign asset_file = asset | strip
   assign placeholder_name = placeholder | default: 'lifestyle-1'
   assign fallback_width = width | default: 1600
   assign fallback_height = height | default: 1200
+
+  comment
+    Without `sizes` a browser assumes the picture fills the window and takes the widest
+    candidate on offer, which on this page is three times what the slot actually shows.
+  endcomment
+  assign image_sizes = sizes | default: '(min-width: 990px) 50vw, 100vw'
+
+  comment
+    A file under assets/ can go through the CDN resizer and carry a srcset; a pasted URL can
+    only be printed as it was given. They differ in src and srcset alone, so they share one img.
+  endcomment
+  assign fallback_src = ''
+  assign fallback_srcset = ''
+  if asset_file != blank
+    assign fallback_src = asset_file | asset_img_url: '1600x'
+    capture fallback_srcset
+      echo asset_file | asset_img_url: '480x'
+      echo ' 480w, '
+      echo asset_file | asset_img_url: '900x'
+      echo ' 900w, '
+      echo asset_file | asset_img_url: '1600x'
+      echo ' 1600w'
+    endcapture
+  elsif image_url != blank
+    assign fallback_src = image_url | escape
+  endif
 -%}
 
 {%- if image != blank -%}
@@ -26,25 +52,23 @@
     | image_tag:
       loading: 'lazy',
       widths: '480, 660, 900, 1200, 1500, 1800',
+      sizes: image_sizes,
       alt: image_alt,
       class: 'hj-image'
   }}
-{%- elsif asset_file != blank -%}
+{%- elsif fallback_src != blank -%}
   <img
-    src="{{ asset_file | asset_img_url: '1600x' }}"
-    srcset="
-      {{ asset_file | asset_img_url: '480x' }} 480w,
-      {{ asset_file | asset_img_url: '900x' }} 900w,
-      {{ asset_file | asset_img_url: '1600x' }} 1600w
-    "
+    src="{{ fallback_src }}"
+    {%- if fallback_srcset != blank %}
+    srcset="{{ fallback_srcset }}"
+    sizes="{{ image_sizes }}"
+    {%- endif %}
     alt="{{ alt | escape }}"
     loading="lazy"
     width="{{ fallback_width }}"
     height="{{ fallback_height }}"
     class="hj-image"
   >
-{%- elsif image_url != blank -%}
-  <img src="{{ image_url | escape }}" alt="{{ alt | escape }}" loading="lazy" width="{{ fallback_width }}" height="{{ fallback_height }}" class="hj-image">
 {%- else -%}
   {{ placeholder_name | placeholder_svg_tag: 'hj-placeholder' }}
 {%- endif -%}

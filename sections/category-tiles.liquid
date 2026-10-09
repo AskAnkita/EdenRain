@@ -60,7 +60,7 @@
        than another tile joining the row - four across stays four across, just bigger. The floor
        is "Smallest tile width": below it the row scrolls instead of squeezing. */
     grid-auto-columns: max(
-      {{ section.settings.min_tile_width | default: 240 }}px,
+      {{ section.settings.min_tile_width }}px,
       calc((100% - {{ section.settings.per_row | minus: 1 }} * 2rem) / {{ section.settings.per_row }})
     );
     gap: 2rem;

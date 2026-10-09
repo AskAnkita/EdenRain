@@ -18,9 +18,7 @@
 // scripts/shopify/backups/ (git-ignored), so the set can be rebuilt by hand if need be.
 // The products themselves are never touched; only the grouping goes.
 
-import { mkdirSync, writeFileSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { resolve, join } from 'node:path';
-import { config, gql } from './lib.mjs';
+import { config, gql, themeLinkedHandles, writeBackup } from './lib.mjs';
 import { collections as wantedCollections } from './store-config.mjs';
 
 const args = process.argv.slice(2);
@@ -32,38 +30,6 @@ const cfg = config();
 const log = (...m) => console.log(...m);
 
 const ALWAYS_KEEP = ['frontpage'];
-
-// ---------- what the theme links to ----------
-
-// A handle written into the theme is a live link somewhere — a nav item, a section setting, a
-// hard-coded href. Scanning the theme folders is cruder than reading the menu, but it also catches
-// links the menu doesn't know about, which is exactly what a delete would break.
-const THEME_DIRS = ['sections', 'blocks', 'snippets', 'templates', 'config', 'layout', 'locales'];
-
-function themeLinkedHandles() {
-  const found = new Set();
-  const walk = (dir) => {
-    let entries;
-    try {
-      entries = readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return; // folder not in this theme
-    }
-    for (const e of entries) {
-      const full = join(dir, e.name);
-      if (e.isDirectory()) {
-        walk(full);
-        continue;
-      }
-      if (statSync(full).size > 2_000_000) continue;
-      const text = readFileSync(full, 'utf8');
-      for (const m of text.matchAll(/collections\/([a-z0-9][a-z0-9-]*)/gi)) found.add(m[1].toLowerCase());
-    }
-  };
-  for (const d of THEME_DIRS) walk(resolve(cfg.repoRoot, d));
-  found.delete('all'); // /collections/all is built in, not a collection you can delete
-  return found;
-}
 
 // ---------- the store ----------
 
@@ -103,7 +69,7 @@ async function deleteCollection(id) {
 // ---------- run ----------
 
 const wanted = new Set(wantedCollections.map((c) => c.handle.toLowerCase()));
-const themed = themeLinkedHandles();
+const themed = themeLinkedHandles(cfg, 'collections');
 const spared = new Set([...ALWAYS_KEEP, ...extraKeep.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean)]);
 
 log(`\nStore          ${cfg.domain}`);
@@ -151,11 +117,7 @@ if (!apply) {
   process.exit(0);
 }
 
-const dir = resolve(cfg.repoRoot, 'scripts', 'shopify', 'backups');
-mkdirSync(dir, { recursive: true });
-const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-const backup = join(dir, `collections-before-prune-${stamp}.json`);
-writeFileSync(backup, JSON.stringify({ store: cfg.domain, deleted: remove }, null, 2));
+const backup = writeBackup(cfg, 'collections-before-prune', { store: cfg.domain, deleted: remove });
 log(`\nBacked up to ${backup}`);
 
 let done = 0;

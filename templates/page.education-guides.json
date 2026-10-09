@@ -1,9 +1,31 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "breadcrumb": {
       "type": "breadcrumb",
       "settings": {
+        "separator": "slash",
+        "horizontal_alignment": "start",
+        "gap": 12,
+        "font_size": "1.6rem",
         "section_width": "page-width",
+        "page_width_custom": 1570,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
         "padding-block-start": 24,
         "padding-block-end": 0
       }
@@ -11,12 +33,26 @@
     "education_guides": {
       "type": "education-guides",
       "blocks": {
+        "four_cs": {
+          "type": "topic",
+          "settings": {
+            "title": "The 4 C's",
+            "text": "Cut, colour, clarity and carat weight are what decide a diamond's beauty and its price. Of the four, cut does the most for sparkle.",
+            "image": "shopify://shop_images/11df089e8fef1cc667bfb7c1bbd5c0ae.jpg",
+            "image_asset": "featured-diamonds-education.jpg",
+            "badge": "",
+            "link": "/blogs/education-guides/4cs",
+            "link_label": "Read the guide"
+          }
+        },
         "gemstones": {
           "type": "topic",
           "settings": {
             "title": "Lab-grown gemstones",
             "text": "Real sapphires, rubies and emeralds with the same properties as their mined counterparts, in colours that are hard to find in nature.",
+            "image": "shopify://shop_images/Unknown-12.png",
             "image_asset": "featured-diamonds-gemstones.jpg",
+            "badge": "",
             "link": "/pages/gemstones",
             "link_label": "Read the guide"
           }
@@ -26,7 +62,9 @@
           "settings": {
             "title": "Find your ring size",
             "text": "A printable ring sizer, an international conversion chart, and what to do when you are buying a surprise.",
+            "image": "shopify://shop_images/Unknown-13.png",
             "image_asset": "ring-size-guide-original.png",
+            "badge": "",
             "link": "/pages/er-sizing",
             "link_label": "Read the guide"
           }
@@ -36,7 +74,9 @@
           "settings": {
             "title": "Find your wrist size",
             "text": "How to measure your wrist at home for a bracelet or bangle, and how much room to leave for a comfortable fit.",
+            "image": "shopify://shop_images/d9fbc738efc022872b39b048ea5f9124.jpg",
             "image_asset": "lifestyle-bracelet.jpg",
+            "badge": "",
             "link": "/pages/wrist-sizer-guide",
             "link_label": "Read the guide"
           }
@@ -46,18 +86,10 @@
           "settings": {
             "title": "Jewellery care & cleaning",
             "text": "How to clean your pieces at home, when to have them checked, and the habits that keep a setting secure for years.",
+            "image": "shopify://shop_images/Unknown-11.png",
             "image_asset": "featured-diamonds-care.jpg",
+            "badge": "",
             "link": "/pages/jewellery-care",
-            "link_label": "Read the guide"
-          }
-        },
-        "four_cs": {
-          "type": "topic",
-          "settings": {
-            "title": "The 4 C's",
-            "text": "Cut, colour, clarity and carat weight are what decide a diamond's beauty and its price. Of the four, cut does the most for sparkle.",
-            "image_asset": "featured-diamonds-education.jpg",
-            "link": "/blogs/education-guides/4cs",
             "link_label": "Read the guide"
           }
         }
@@ -77,6 +109,9 @@
         "card_gap": 24,
         "card_radius": 20,
         "show_images": true,
+        "thumb_width": 150,
+        "row_padding": 28,
+        "row_gap": 32,
         "image_ratio": "1 / 1",
         "show_numbers": true,
         "heading_size": 44,
@@ -89,7 +124,10 @@
         "muted_text_color": "#5c5a55",
         "card_background": "#ffffff",
         "card_border_color": "#ebe4df",
+        "number_color": "#5c5a55",
+        "hover_color": "#faf7f5",
         "accent_color": "#ead9d1",
+        "panel_radius": 0,
         "show_cta": true,
         "cta_heading": "Still deciding? Talk it through with us.",
         "cta_text": "<p>Our team can walk you through stones, settings and sizing, and help you choose with confidence.</p>",
@@ -108,7 +146,9 @@
       "settings": {
         "menu": "category",
         "heading": "Shop the collection",
+        "width": "page",
         "per_row": 5,
+        "min_tile_width": 240,
         "ratio": "3 / 4",
         "color_scheme": "scheme-1",
         "padding_top": 0,

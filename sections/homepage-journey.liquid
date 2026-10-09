@@ -14,6 +14,7 @@
   assign heading_size_mobile = section.settings.heading_size_mobile | plus: 0
   assign text_size = section.settings.text_size | plus: 0
   assign products_heading_size = section.settings.products_heading_size | plus: 0
+  assign products_subheading_size = section.settings.products_subheading_size | plus: 0
   assign button_size = section.settings.button_size | plus: 0
   assign pad_top = section.settings.padding_top | plus: 0
   assign pad_bottom = section.settings.padding_bottom | plus: 0
@@ -62,6 +63,7 @@
   {%- if heading_size_mobile > 0 -%}--hj-heading-size-mobile: {{ heading_size_mobile }}px;{%- endif -%}
   {%- if text_size > 0 -%}--hj-text-size: {{ text_size }}px;{%- endif -%}
   {%- if products_heading_size > 0 -%}--hj-products-heading-size: {{ products_heading_size }}px;{%- endif -%}
+  {%- if products_subheading_size > 0 -%}--hj-products-subheading-size: {{ products_subheading_size }}px;{%- endif -%}
 
   {%- if section.settings.button_background != blank and section.settings.button_background != transparent -%}
     --hj-btn-bg: {{ section.settings.button_background }};
@@ -300,6 +302,7 @@
               image_url: section.settings.image_url,
               alt: section.settings.image_alt,
               placeholder: 'lifestyle-1',
+              sizes: '(min-width: 990px) 25vw, 100vw',
               width: 1200,
               height: 800
             %}
@@ -319,6 +322,7 @@
               image_url: section.settings.second_image_url,
               alt: section.settings.second_image_alt,
               placeholder: 'lifestyle-2',
+              sizes: '(min-width: 990px) 25vw, 100vw',
               width: 1200,
               height: 800
             %}
@@ -392,6 +396,7 @@
     { "type": "collection", "id": "collection", "label": "Featured products collection" },
     { "type": "text", "id": "products_heading", "label": "Products heading", "default": "The pieces to know" },
     { "type": "richtext", "id": "products_subheading", "label": "Text under the products heading", "info": "Leave empty to hide it." },
+    { "type": "range", "id": "products_subheading_size", "label": "Text under the products heading - size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the stylesheet default." },
     { "type": "checkbox", "id": "vary_metals", "label": "Vary metal colour across the cards", "info": "Shows a different metal on each card instead of every product's default photo.", "default": true },
     { "type": "text", "id": "metal_rotation", "label": "Metal rotation order", "info": "Comma separated, repeated across the row. Use yellow, white, rose, platinum or silver.", "default": "yellow, white, rose" },
 

@@ -11,7 +11,6 @@
 
 {%- capture root_style -%}
   --sig-gap: {{ section.settings.gap }}px;
-  --sig-ratio: {{ section.settings.aspect_ratio }};
   --sig-ratio-w: {{ section.settings.aspect_ratio | split: '/' | first }};
   --sig-ratio-h: {{ section.settings.aspect_ratio | split: '/' | last }};
   --sig-pad: {{ section.settings.tile_padding }}px;
@@ -27,8 +26,6 @@
   {% if section.settings.section_background != blank and section.settings.section_background != transparent %}--sig-section-bg: {{ section.settings.section_background }};{% endif %}
   {% if section.settings.heading_color != blank and section.settings.heading_color != transparent %}--sig-heading-color: {{ section.settings.heading_color }};{% endif %}
   {% if section.settings.description_color != blank and section.settings.description_color != transparent %}--sig-description-color: {{ section.settings.description_color }};{% endif %}
-  {% if section.settings.heading_size > 0 %}--sig-heading-size: {{ section.settings.heading_size }}px;{% endif %}
-  {% if section.settings.description_size > 0 %}--sig-description-size: {{ section.settings.description_size }}px;{% endif %}
   --sig-padding-top: {{ section.settings.padding_top }}px;
   --sig-padding-bottom: {{ section.settings.padding_bottom }}px;
   --sig-page-padding: {{ section.settings.page_padding }}px;
@@ -70,7 +67,7 @@
     {% if section.settings.heading_tracking > 0 %}letter-spacing: {{ section.settings.heading_tracking | divided_by: 100.0 }}em;{% endif %}
     {% if section.settings.heading_weight != 'inherit' %}font-weight: {{ section.settings.heading_weight }};{% endif %}
     {% if section.settings.heading_line_height > 0 %}line-height: {{ section.settings.heading_line_height | divided_by: 100.0 }};{% endif %}
-    {% if section.settings.heading_size > 0 %}font-size: clamp(1.4rem, 4vw, var(--sig-heading-size));{% endif %}
+    {% if section.settings.heading_size > 0 %}font-size: clamp(1.4rem, 4vw, {{ section.settings.heading_size }}px);{% endif %}
   }
 
   .{{ root_class }} .signature-editorial__description {
@@ -79,7 +76,7 @@
     color: var(--sig-description-color, inherit);
     {% if section.settings.description_tracking > 0 %}letter-spacing: {{ section.settings.description_tracking | divided_by: 100.0 }}em;{% endif %}
     {% if section.settings.description_line_height > 0 %}line-height: {{ section.settings.description_line_height | divided_by: 100.0 }};{% endif %}
-    {% if section.settings.description_size > 0 %}font-size: var(--sig-description-size);{% endif %}
+    {% if section.settings.description_size > 0 %}font-size: {{ section.settings.description_size }}px;{% endif %}
   }
 
   .{{ root_class }} .signature-editorial__grid {
@@ -113,7 +110,7 @@
   .{{ root_class }} .signature-editorial__tile {
     position: relative;
     display: block;
-    aspect-ratio: var(--sig-ratio);
+    aspect-ratio: var(--sig-ratio-w) / var(--sig-ratio-h);
     overflow: hidden;
     background: var(--sig-tile-bg, #e9e5e0);
     color: var(--sig-text, #ffffff);
@@ -196,6 +193,19 @@
   }
 
   {%- comment -%}
+    A tile holding one cell drops to the section's smaller tile text, so six of them don't all
+    shout at once; a tile that spans keeps full size. Which is to say: "is this tile small?" is
+    the span class, so CSS answers it and the markup doesn't work a number out per tile.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__tile {
+    --sig-text-scale: {{ section.settings.small_text_scale | divided_by: 100.0 }};
+  }
+
+  .{{ root_class }} .signature-editorial__tile--span {
+    --sig-text-scale: 1;
+  }
+
+  {%- comment -%}
     Mosaic: a tile can take two columns, two rows or both. A spanning tile drops its own
     aspect ratio and takes its height from the rows the plain 1-up tiles have already set,
     so a 2x2 hero next to two stacked squares lines up exactly.
@@ -249,7 +259,7 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: var(--sig-scrim, var(--sig-overlay, #000000));
+    background: var(--sig-scrim, #000000);
     opacity: var(--sig-overlay-opacity, 0);
     pointer-events: none;
   }
@@ -420,9 +430,7 @@
     }
 
     {%- if section.settings.columns_tablet < 2 %}
-    .{{ root_class }} .signature-editorial__tile--wide,
-    .{{ root_class }} .signature-editorial__tile--tall,
-    .{{ root_class }} .signature-editorial__tile--feature {
+    .{{ root_class }} .signature-editorial__tile--span {
       grid-column: auto;
       grid-row: auto;
       aspect-ratio: var(--sig-ratio-stacked);
@@ -467,9 +475,7 @@
       the text goes back to full size - nothing is "small" when it fills the screen.
     {%- endcomment -%}
     {%- if section.settings.columns_mobile < 2 %}
-    .{{ root_class }} .signature-editorial__tile--wide,
-    .{{ root_class }} .signature-editorial__tile--tall,
-    .{{ root_class }} .signature-editorial__tile--feature {
+    .{{ root_class }} .signature-editorial__tile--span {
       grid-column: auto;
       grid-row: auto;
       aspect-ratio: var(--sig-ratio-stacked);
@@ -518,14 +524,19 @@
         if tile_image == blank and tile_product != blank
           assign tile_image = tile_product.featured_image
         endif
+        comment
+          A file name under assets/ is kept apart from a pasted URL: the first can go through
+          the CDN resizer and carry a srcset, the second can only be printed as it was given.
+        endcomment
         assign tile_image_url = block.settings.image_url
+        assign tile_asset = ''
         if tile_image == blank and block.settings.image_asset != blank
-          assign tile_image_url = block.settings.image_asset | asset_url
+          assign tile_asset = block.settings.image_asset | strip
         endif
-        if tile_image == blank and tile_image_url == blank
+        if tile_image == blank and tile_asset == blank and tile_image_url == blank
           assign tile_image = section.settings.default_image
           if tile_image == blank and section.settings.default_image_asset != blank
-            assign tile_image_url = section.settings.default_image_asset | asset_url
+            assign tile_asset = section.settings.default_image_asset | strip
           endif
         endif
 
@@ -570,37 +581,40 @@
         endif
 
         assign tile_size = block.settings.tile_size
-        assign text_scale = section.settings.small_text_scale | divided_by: 100.0
-        if tile_size != 'normal'
-          assign text_scale = 1
-        endif
 
         comment
-          The scrim is either the old flat wash or a gradient that only darkens (or lightens)
-          the edge the text sits on, so the photograph stays clean everywhere else.
+          The scrim is one paint: either a flat wash of the overlay colour or a gradient that
+          only darkens (or lightens) the edge the text sits on, so the photograph stays clean
+          everywhere else. Liquid already knows which was chosen, so it writes one property.
         endcomment
         assign scrim_opacity = block.settings.overlay_opacity
-        assign scrim_image = blank
+        assign scrim_paint = block.settings.overlay_color
+        if scrim_paint == transparent
+          assign scrim_paint = ''
+        endif
         if block.settings.scrim_style == 'none'
           assign scrim_opacity = 0
         elsif block.settings.scrim_style == 'gradient'
           assign scrim_opacity = scrim_opacity | times: 24 | divided_by: 10 | at_most: 85
-          case block.settings.position_vertical
+          comment
+            The gradient fades in from the edge the text sits on. The vertical position names
+            that edge, except when the text is centred vertically, when the horizontal one does.
+          endcomment
+          assign scrim_edge = block.settings.position_vertical
+          if scrim_edge == 'middle'
+            assign scrim_edge = block.settings.position_horizontal
+          endif
+          case scrim_edge
             when 'top'
               assign scrim_direction = 'to bottom'
-            when 'bottom'
-              assign scrim_direction = 'to top'
+            when 'left'
+              assign scrim_direction = 'to right'
+            when 'right'
+              assign scrim_direction = 'to left'
             else
-              case block.settings.position_horizontal
-                when 'left'
-                  assign scrim_direction = 'to right'
-                when 'right'
-                  assign scrim_direction = 'to left'
-                else
-                  assign scrim_direction = 'to top'
-              endcase
+              assign scrim_direction = 'to top'
           endcase
-          assign scrim_image = 'linear-gradient(' | append: scrim_direction | append: ', ' | append: block.settings.overlay_color | append: ' 0%, ' | append: block.settings.overlay_color | append: ' 22%, transparent 72%)'
+          assign scrim_paint = 'linear-gradient(' | append: scrim_direction | append: ', ' | append: block.settings.overlay_color | append: ' 0%, ' | append: block.settings.overlay_color | append: ' 22%, transparent 72%)'
         endif
       -%}
 
@@ -613,10 +627,8 @@
         --sig-display-tracking: {{ block.settings.display_tracking | divided_by: 100.0 }}em;
         {% if block.settings.meta_color != blank and block.settings.meta_color != transparent %}--sig-meta-color: {{ block.settings.meta_color }};{% endif %}
         {% if block.settings.tile_background != blank and block.settings.tile_background != transparent %}--sig-tile-bg: {{ block.settings.tile_background }};{% endif %}
-        {% if block.settings.overlay_color != blank and block.settings.overlay_color != transparent %}--sig-overlay: {{ block.settings.overlay_color }};{% endif %}
         --sig-overlay-opacity: {{ scrim_opacity | divided_by: 100.0 }};
-        {% if scrim_image != blank %}--sig-scrim: {{ scrim_image }};{% endif %}
-        --sig-text-scale: {{ text_scale }};
+        {% if scrim_paint != blank %}--sig-scrim: {{ scrim_paint }};{% endif %}
         {% if block.settings.display_size > 0 %}--sig-tile-display-size: {{ block.settings.display_size }}px;{% endif %}
         {% if block.settings.subtitle_size > 0 %}--sig-tile-subtitle-size: {{ block.settings.subtitle_size }}px;{% endif %}
         {% if block.settings.script_size > 0 %}--sig-tile-script-size: {{ block.settings.script_size }}px;{% endif %}
@@ -632,7 +644,7 @@
         {% if block.settings.button_icon_color != blank and block.settings.button_icon_color != transparent %}--sig-button-icon-text: {{ block.settings.button_icon_color }};{% endif %}
       {%- endcapture -%}
 
-      <article class="signature-editorial__tile{% if show_product_card %} signature-editorial__tile--product{% else %}{% unless tile_size == 'normal' %} signature-editorial__tile--{{ tile_size }}{% endunless %}{% endif %}" style="{{ tile_style | strip_newlines }}" {{ block.shopify_attributes }}>
+      <article class="signature-editorial__tile{% if show_product_card %} signature-editorial__tile--product{% else %}{% unless tile_size == 'normal' %} signature-editorial__tile--span signature-editorial__tile--{{ tile_size }}{% endunless %}{% endif %}" style="{{ tile_style | strip_newlines }}" {{ block.shopify_attributes }}>
         {%- if show_product_card -%}
           <a class="signature-editorial__product-image-link" href="{{ tile_product.url }}" aria-label="View {{ tile_product.title | escape }}">
             {%- if tile_image != blank -%}
@@ -667,6 +679,18 @@
               widths: '400, 600, 800, 1000, 1400',
               alt: tile_alt
           }}
+        {%- elsif tile_asset != blank -%}
+          {%- comment -%} A tile fills a third of a row at most, so the original is never what gets served. {%- endcomment -%}
+          <img
+            class="signature-editorial__image"
+            src="{{ tile_asset | asset_img_url: '900x' }}"
+            srcset="{{ tile_asset | asset_img_url: '400x' }} 400w, {{ tile_asset | asset_img_url: '600x' }} 600w, {{ tile_asset | asset_img_url: '900x' }} 900w, {{ tile_asset | asset_img_url: '1400x' }} 1400w"
+            sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
+            alt="{{ tile_alt | escape }}"
+            width="1200"
+            height="1200"
+            loading="lazy"
+          >
         {%- elsif tile_image_url != blank -%}
           <img
             class="signature-editorial__image"

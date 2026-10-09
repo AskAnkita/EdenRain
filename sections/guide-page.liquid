@@ -19,7 +19,7 @@
 
 {%- liquid
   assign stts = section.settings
-  assign columns = stts.columns | default: 3
+  assign columns = stts.columns | default: 4
 
   assign columns_tablet = 2
   if columns < 2
@@ -33,10 +33,49 @@
     from the theme's own files (image_asset), the same pair the cards below use,
     so a guide drawn from theme assets gets a banner too.
   endcomment
-  assign hero_image = stts.hero_image
+  assign section_hero_image = stts.hero_image
+  assign section_hero_asset = stts.hero_image_asset | strip
+  assign hero_image = blank
   assign hero_asset = blank
-  if hero_image == blank
-    assign hero_asset = stts.hero_image_asset | strip
+
+  comment
+    This template serves several guides. Use the matching guide block's banner
+    image so each page gets its own subject without duplicating the template.
+    A dedicated banner image wins; the card image is the fallback.
+  endcomment
+  assign use_page_image = false
+  for guide_block in section.blocks
+    if guide_block.settings.link != page.url
+      continue
+    endif
+
+    if guide_block.settings.hero_use_page_image
+      assign use_page_image = true
+      break
+    endif
+
+    assign hero_image = guide_block.settings.hero_image
+    if hero_image == blank
+      assign hero_asset = guide_block.settings.hero_image_asset | strip
+    endif
+    if hero_image == blank and hero_asset == blank
+      assign hero_image = guide_block.settings.image
+    endif
+    if hero_image == blank and hero_asset == blank
+      assign hero_asset = guide_block.settings.image_asset | strip
+    endif
+    break
+  endfor
+
+  comment
+    Guide-specific choices take priority. Section-wide choices are a fallback
+    for a page with no matching guide image configured on its block.
+  endcomment
+  if hero_image == blank and hero_asset == blank and use_page_image == false
+    assign hero_image = section_hero_image
+    if hero_image == blank
+      assign hero_asset = section_hero_asset
+    endif
   endif
 
   comment
@@ -155,6 +194,7 @@
     --eg-radius: {{ stts.card_radius }}px;
     --eg-gap: {{ stts.card_gap | divided_by: 10.0 }}rem;
     --eg-ratio: {{ stts.image_ratio }};
+    --gp-more-align: {{ stts.more_heading_align }};
     --gp-text-col: {{ stts.split_text_width | default: 36 }}%;
     --eg-heading-size: {{ stts.heading_size | divided_by: 10.0 }}rem;
     --eg-body-size: {{ stts.body_size | divided_by: 10.0 }}rem;
@@ -251,7 +291,7 @@
           height="1350"
           loading="eager"
           fetchpriority="high"
-          data-gp-asset
+          data-gp-hero-asset
         >
       {%- else -%}
         <img
@@ -336,7 +376,7 @@
             <h2 class="gp-more__heading">{{ stts.more_heading | escape }}</h2>
           {%- endif -%}
 
-          <ul class="eg-grid" role="list">
+          <ul class="eg-grid eg-grid--flat" role="list">
             {%- for block in section.blocks -%}
               {%- liquid
                 assign title = block.settings.title
@@ -410,7 +450,7 @@
                     {%- endif -%}
 
                     {%- if has_link -%}
-                      <span class="eg-card__action">
+                      <span class="eg-card__cta eden-link">
                         {{- block.settings.link_label | default: 'Read the guide' | escape -}}
                         <span class="eg-card__arrow" aria-hidden="true">&rarr;</span>
                       </span>
@@ -455,8 +495,14 @@
   (() => {
     const root = document.getElementById('guide-page-{{ section.id }}');
     if (!root) return;
-    root.querySelectorAll('img[data-gp-asset]').forEach((img) => {
-      img.addEventListener('error', () => img.closest('.eg-card__media')?.remove());
+    root.querySelectorAll('img[data-gp-asset], img[data-gp-hero-asset]').forEach((img) => {
+      img.addEventListener('error', () => {
+        const media = img.closest('.eg-card__media, .eg-banner__media');
+        media?.remove();
+        if (img.hasAttribute('data-gp-hero-asset')) {
+          root.querySelector('.eg-banner')?.classList.add('eg-banner--plain');
+        }
+      });
     });
   })();
 </script>
@@ -698,13 +744,24 @@
       "default": "More guides"
     },
     {
+      "type": "select",
+      "id": "more_heading_align",
+      "label": "Heading position",
+      "options": [
+        { "value": "start", "label": "Left" },
+        { "value": "center", "label": "Centre" }
+      ],
+      "default": "center"
+    },
+    {
       "type": "range",
       "id": "columns",
       "label": "Guides across on desktop",
       "min": 1,
       "max": 4,
       "step": 1,
-      "default": 3
+      "default": 4,
+      "info": "Four fits the five guides exactly: the one being read drops out, leaving a single full row."
     },
     {
       "type": "checkbox",
@@ -743,7 +800,8 @@
       "max": 36,
       "step": 2,
       "unit": "px",
-      "default": 20
+      "default": 0,
+      "info": "The theme's own button, card and input radius is 0. Leave this at 0 unless you are changing all of them."
     },
     {
       "type": "header",
@@ -931,6 +989,9 @@
           "label": "Image file name",
           "info": "A file under assets/, used only when no image is chosen above."
         },
+        { "type": "image_picker", "id": "hero_image", "label": "Banner image", "info": "Optional wide image for this guide's top banner. Falls back to its card image." },
+        { "type": "text", "id": "hero_image_asset", "label": "Banner image file name", "info": "A file under assets/, used only when no banner image is selected." },
+        { "type": "checkbox", "id": "hero_use_page_image", "label": "Use the first image from this guide's page content", "default": false, "info": "Useful when the guide already has a topic-specific image in its content." },
         { "type": "url", "id": "link", "label": "Link" },
         { "type": "text", "id": "link_label", "label": "Link text", "default": "Read the guide" }
       ]

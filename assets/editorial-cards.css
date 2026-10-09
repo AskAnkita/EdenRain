@@ -45,20 +45,21 @@
 }
 
 /*
-  A pill rather than letter-spaced capitals on their own: the rounded shape is
-  the single cheapest way to make the top of the page feel welcoming.
+  Letter-spaced capitals on their own. It was a rounded pill, which was the one
+  thing on these pages the theme's own settings do not do: every radius in
+  settings_data.json is 0. Over a hero photo it still takes a chip, but a
+  square one - see .eg-banner .eg-eyebrow below.
 */
 .editorial-cards .eg-eyebrow {
   display: inline-block;
   margin: 0 0 2rem;
-  padding: 0.7rem 1.6rem;
-  border-radius: 999px;
-  background: var(--eg-accent);
-  color: var(--eg-ink);
+  border-radius: 0;
+  color: var(--eg-muted);
   font-size: 1.2rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-weight: 500;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
 .editorial-cards .eg-heading {
@@ -516,16 +517,15 @@
 /* ------------------------------------------------------------- content */
 
 /*
-  A three-track grid rather than a plain centred column. Prose sits in the middle
-  track, which is the 65-75 character line the guides need; a two-column chapter
-  (.gp-split) spans the whole thing and so runs wider without any viewport maths,
-  negative margins or transforms.
+  A three-track grid rather than a plain centred column. Text sections use the
+  same broad measure as tables, while a two-column chapter (.gp-split) spans the
+  whole grid and pairs the copy with its picture.
 */
 .editorial-cards .gp-content {
   display: grid;
   grid-template-columns:
     [wide-start] minmax(0, 1fr)
-    [text-start] minmax(0, 76rem)
+    [text-start] minmax(0, 120rem)
     [text-end] minmax(0, 1fr)
     [wide-end];
   max-width: 140rem;
@@ -783,7 +783,243 @@
   font-family: var(--font-heading--family);
   font-size: clamp(2rem, 2vw, 2.4rem);
   font-weight: 400;
-  text-align: center;
+  text-align: var(--gp-more-align, start);
+}
+
+/* --------------------------------------------------------- flat card grid */
+
+/*
+  The "More guides" row at the foot of a guide page (sections/guide-page.liquid).
+
+  The same cards as the blog's, with the decoration taken off: square corners,
+  a hairline instead of a drop shadow, and the theme's own underlined link in
+  place of a bare arrow. Hover darkens the rule rather than lifting the card,
+  so nothing floats off a page that has no other floating thing on it.
+
+  Scoped to the modifier, because the blog's cards are still the softer kind.
+*/
+
+.editorial-cards .eg-grid--flat .eg-card__link {
+  border-radius: 0;
+  transition: border-color 0.3s ease;
+}
+
+@media (hover: hover) {
+  .editorial-cards .eg-grid--flat a.eg-card__link:hover {
+    transform: none;
+    border-color: var(--eg-ink);
+    box-shadow: none;
+  }
+}
+
+/* Sits on the bottom edge, so a short card lines up with a tall one. */
+.editorial-cards .eg-grid--flat .eg-card__cta {
+  margin-top: auto;
+  padding-top: 1.8rem;
+}
+
+/* ------------------------------------------------------------ guides index */
+
+/*
+  The other guides at the foot of a guide page are a contents list, not a shelf
+  of cards: one row each, divided by hairlines, with a small picture on the
+  right. Square throughout, because every radius in the theme's settings is 0
+  and a rounded card here is the one thing on the page that does not match the
+  cart, the buttons or the inputs.
+
+  Numbering is information in this layout and nowhere else. A row says where
+  that guide sits in the whole set, so the number survives the current page
+  being dropped from the list: a reader on guide 02 sees 01, 03, 04, 05.
+
+  Sizes, colours and the picture's shape all arrive as custom properties from
+  the section's schema; the values below are only the fallbacks.
+*/
+
+.editorial-cards .eg-index {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--eg-index-rule, var(--eg-card-border));
+}
+
+.editorial-cards .eg-index__item {
+  border-bottom: 1px solid var(--eg-index-rule, var(--eg-card-border));
+}
+
+/*
+  Three tracks: the number, the words, the picture. A row with the number or
+  the picture switched off drops that track rather than leaving a blank column,
+  which is why the modifiers below restate grid-template-columns in full.
+*/
+.editorial-cards .eg-index__link {
+  display: grid;
+  grid-template-columns: var(--eg-index-number-width, 4.4rem) minmax(0, 1fr) var(--eg-index-thumb, 15rem);
+  align-items: center;
+  gap: var(--eg-gap, 3.2rem);
+  padding: var(--eg-index-pad, 2.6rem) 1.6rem;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.3s ease, padding-inline 0.3s ease;
+}
+
+.editorial-cards .eg-index--unnumbered .eg-index__link {
+  grid-template-columns: minmax(0, 1fr) var(--eg-index-thumb, 15rem);
+}
+
+.editorial-cards .eg-index--plain .eg-index__link {
+  grid-template-columns: var(--eg-index-number-width, 4.4rem) minmax(0, 1fr);
+}
+
+.editorial-cards .eg-index--plain.eg-index--unnumbered .eg-index__link {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.editorial-cards .eg-index__number {
+  color: var(--eg-index-number, var(--eg-muted));
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.16em;
+}
+
+.editorial-cards .eg-index__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.editorial-cards .eg-index__title {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: var(--eg-card-title-size, 2.1rem);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.3;
+  text-transform: none;
+}
+
+.editorial-cards .eg-index__text {
+  margin: 0;
+  max-width: 58ch;
+  color: var(--eg-muted);
+  font-size: var(--eg-card-text-size, 1.5rem);
+  line-height: 1.7;
+}
+
+/*
+  The call to action is held back until the row is hovered, because five of them
+  stacked down the page reads as noise. Where there is no hover to give - a
+  phone, a tablet - it is simply always there.
+*/
+.editorial-cards .eg-index__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.4rem;
+  color: var(--eg-ink);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(-0.4rem);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.editorial-cards .eg-index__arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.editorial-cards .eg-index__media {
+  overflow: hidden;
+  aspect-ratio: var(--eg-ratio, 1 / 1);
+  max-width: 100%;
+  background: var(--eg-accent);
+}
+
+.editorial-cards .eg-index__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+/* Only a row that leads somewhere reacts; a guide with no link yet sits still. */
+@media (hover: hover) {
+  .editorial-cards a.eg-index__link:hover {
+    background: var(--eg-index-tint, rgba(23, 23, 20, 0.025));
+    padding-inline: 2.4rem 0.8rem;
+  }
+
+  .editorial-cards a.eg-index__link:hover .eg-index__cta {
+    opacity: 1;
+    transform: none;
+  }
+
+  .editorial-cards a.eg-index__link:hover .eg-index__arrow {
+    transform: translateX(4px);
+  }
+
+  .editorial-cards a.eg-index__link:hover .eg-index__media img {
+    transform: scale(1.06);
+  }
+}
+
+@media (hover: none) {
+  .editorial-cards .eg-index__cta {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.editorial-cards a.eg-index__link:focus-visible {
+  outline: 2px solid var(--eg-ink);
+  outline-offset: -4px;
+}
+
+.editorial-cards a.eg-index__link:focus-visible .eg-index__cta {
+  opacity: 1;
+  transform: none;
+}
+
+/* The picture leads on a narrow screen and the number goes: a single column is
+   already its own running order, so the digits would only be furniture. */
+@media screen and (max-width: 749px) {
+  .editorial-cards .eg-index__link,
+  .editorial-cards .eg-index--unnumbered .eg-index__link,
+  .editorial-cards .eg-index--plain .eg-index__link,
+  .editorial-cards .eg-index--plain.eg-index--unnumbered .eg-index__link {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4rem;
+    padding-inline: 0;
+  }
+
+  .editorial-cards .eg-index__number {
+    display: none;
+  }
+
+  .editorial-cards .eg-index__media {
+    order: -1;
+    aspect-ratio: 16 / 9;
+  }
+
+  @media (hover: hover) {
+    .editorial-cards a.eg-index__link:hover {
+      padding-inline: 0;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorial-cards .eg-index__link,
+  .editorial-cards .eg-index__cta,
+  .editorial-cards .eg-index__arrow,
+  .editorial-cards .eg-index__media img {
+    transition: none;
+  }
 }
 
 @media screen and (max-width: 749px) {
@@ -1027,6 +1263,7 @@
 
 .editorial-cards .eg-banner .eg-eyebrow {
   margin-bottom: 1.8rem;
+  padding: 0.7rem 1.6rem;
   background: var(--eg-banner-pill-bg, rgba(255, 255, 255, 0.18));
   color: var(--eg-banner-pill-ink, #ffffff);
   -webkit-backdrop-filter: blur(6px);
@@ -1043,16 +1280,9 @@
   text-shadow: none;
 }
 
-/* The copy under the title. This is the article's own opening paragraph lifted
-   out of the body, so it needs the room a sentence fragment did not; the clamp is
-   a backstop against a runaway first paragraph, not the normal case, and the
-   banner's height is a minimum so a long one grows the banner instead of
-   being cut off. */
+/* The copy under the title stays fully visible. The banner's height is a minimum,
+   so a longer introduction gives the words more room instead of clipping them. */
 .editorial-cards .eg-banner__text {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 7;
-  overflow: hidden;
   max-width: 74rem;
   margin: 1.8rem auto 0;
   color: inherit;
@@ -1212,6 +1442,7 @@
 
 .editorial-cards .eg-hero-split .eg-eyebrow {
   margin-bottom: 2rem;
+  padding: 0.7rem 1.6rem;
   background: var(--eg-banner-pill-bg, rgba(255, 255, 255, 0.18));
   color: var(--eg-banner-pill-ink, #ffffff);
 }

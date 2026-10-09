@@ -21,9 +21,7 @@
 // original body of every page it is about to edit go to scripts/shopify/backups/ (git-ignored)
 // before the first write.
 
-import { mkdirSync, writeFileSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { resolve, join } from 'node:path';
-import { config, gql } from './lib.mjs';
+import { config, gql, paginate, themeLinkedHandles, writeBackup } from './lib.mjs';
 
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');
@@ -40,100 +38,53 @@ const keep = new Set(
     .filter(Boolean)
 );
 
-// ---------- what the theme links to ----------
-
-// A blog handle written anywhere in the theme is a live link - a nav item, a section setting, a
-// hard-coded href - and a delete would break it. locales/ is scanned too, but the stock theme
-// translations carry an example "/blogs/writing-blogs" that no store has, which simply won't match
-// a real blog.
-const THEME_DIRS = ['sections', 'blocks', 'snippets', 'templates', 'config', 'layout', 'locales'];
-
-function themeLinkedHandles() {
-  const found = new Set();
-  const walk = (dir) => {
-    let entries;
-    try {
-      entries = readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return; // folder not in this theme
-    }
-    for (const e of entries) {
-      const full = join(dir, e.name);
-      if (e.isDirectory()) {
-        walk(full);
-        continue;
-      }
-      if (statSync(full).size > 2_000_000) continue;
-      for (const m of readFileSync(full, 'utf8').matchAll(/blogs\/([a-z0-9][a-z0-9-]*)/gi)) {
-        found.add(m[1].toLowerCase());
-      }
-    }
-  };
-  for (const d of THEME_DIRS) walk(resolve(cfg.repoRoot, d));
-  return found;
-}
-
 // ---------- the store ----------
 
-async function allBlogs() {
-  const out = [];
-  let after = null;
-  for (;;) {
-    const d = await gql(
-      cfg,
-      `query($after: String) {
-        blogs(first: 50, after: $after) {
-          nodes {
-            id
-            handle
-            title
-            templateSuffix
-            articles(first: 250) {
-              nodes { id handle title isPublished publishedAt body }
-            }
+const allBlogs = () =>
+  paginate(
+    cfg,
+    `query($after: String) {
+      blogs(first: 50, after: $after) {
+        nodes {
+          id
+          handle
+          title
+          templateSuffix
+          articles(first: 250) {
+            nodes { id handle title isPublished publishedAt body }
           }
-          pageInfo { hasNextPage endCursor }
         }
-      }`,
-      { after }
-    );
-    out.push(...d.blogs.nodes);
-    if (!d.blogs.pageInfo.hasNextPage) return out;
-    after = d.blogs.pageInfo.endCursor;
-  }
-}
+        pageInfo { hasNextPage endCursor }
+      }
+    }`,
+    'blogs'
+  );
 
 // Pages are fetched whole (body included) so a link to a doomed blog can be found and cut.
-async function allPages() {
-  const out = [];
-  let after = null;
-  for (;;) {
-    const d = await gql(
-      cfg,
-      `query($after: String) {
-        pages(first: 50, after: $after) {
-          nodes { id handle title body }
-          pageInfo { hasNextPage endCursor }
-        }
-      }`,
-      { after }
-    );
-    out.push(...d.pages.nodes);
-    if (!d.pages.pageInfo.hasNextPage) return out;
-    after = d.pages.pageInfo.endCursor;
-  }
-}
+const allPages = () =>
+  paginate(
+    cfg,
+    `query($after: String) {
+      pages(first: 250, after: $after) {
+        nodes { id handle title body }
+        pageInfo { hasNextPage endCursor }
+      }
+    }`,
+    'pages'
+  );
 
 // Cuts every list entry whose link points into one of the deleted blogs. The sitemap pages these
 // come from are one `<li><a href="...">Title</a></li>` per line, so the whole <li> goes rather
 // than leaving a bullet with no link in it. Anything that isn't in a list item is reported
 // instead of edited - a link inside a sentence needs a human to rewrite the sentence.
-function stripBlogLinks(body, handles) {
+function blogLinkStripper(handles) {
   const pattern = handles.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
   const inListItem = new RegExp(`[ \\t]*<li\\b[^>]*>(?:(?!</li>).)*?/blogs/(?:${pattern})(?:[/?#][^"']*)?["'](?:(?!</li>).)*?</li>\\s*`, 'gis');
-  const cleaned = body.replace(inListItem, '');
-  const leftover = new RegExp(`/blogs/(?:${pattern})(?:[/?#]|["'<\\s]|$)`, 'i').test(cleaned);
-  return { cleaned, changed: cleaned !== body, leftover };
+  const anyLink = new RegExp(`/blogs/(?:${pattern})(?:[/?#]|["'<\\s]|$)`, 'i');
+  return (body) => {
+    const cleaned = body.replace(inListItem, '');
+    return { cleaned, changed: cleaned !== body, leftover: anyLink.test(cleaned) };
+  };
 }
 
 // ---------- run ----------
@@ -142,7 +93,7 @@ async function main() {
   log(apply ? 'Removing empty blogs...\n' : 'Preview only - nothing will be changed. Add --apply to write.\n');
 
   const blogs = await allBlogs();
-  const themeLinked = themeLinkedHandles();
+  const themeLinked = themeLinkedHandles(cfg, 'blogs');
 
   const doomed = [];
   const kept = [];
@@ -184,9 +135,10 @@ async function main() {
   const doomedHandles = doomed.map((b) => b.handle);
   const pageEdits = [];
   if (doomedHandles.length) {
+    const stripBlogLinks = blogLinkStripper(doomedHandles);
     for (const p of await allPages()) {
       if (!p.body) continue;
-      const { cleaned, changed, leftover } = stripBlogLinks(p.body, doomedHandles);
+      const { cleaned, changed, leftover } = stripBlogLinks(p.body);
       if (changed || leftover) pageEdits.push({ page: p, cleaned, changed, leftover });
     }
     if (pageEdits.length) {
@@ -206,23 +158,12 @@ async function main() {
 
   // ---------- back up, then write ----------
 
-  const dir = resolve(cfg.repoRoot, 'scripts/shopify/backups');
-  mkdirSync(dir, { recursive: true });
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const file = join(dir, `blogs-before-remove-${stamp}.json`);
-  writeFileSync(
-    file,
-    JSON.stringify(
-      {
-        deletedBlogs: doomed,
-        deletedArticles: drafts ? draftArticles.map(({ blog, article }) => ({ blogHandle: blog.handle, ...article })) : [],
-        editedPages: pageEdits.filter((e) => e.changed).map((e) => ({ id: e.page.id, handle: e.page.handle, bodyBefore: e.page.body })),
-        keptBlogs: kept.map((b) => ({ handle: b.handle, title: b.title, reason: b.reason, articles: b.count })),
-      },
-      null,
-      2
-    )
-  );
+  const file = writeBackup(cfg, 'blogs-before-remove', {
+    deletedBlogs: doomed,
+    deletedArticles: drafts ? draftArticles.map(({ blog, article }) => ({ blogHandle: blog.handle, ...article })) : [],
+    editedPages: pageEdits.filter((e) => e.changed).map((e) => ({ id: e.page.id, handle: e.page.handle, bodyBefore: e.page.body })),
+    keptBlogs: kept.map((b) => ({ handle: b.handle, title: b.title, reason: b.reason, articles: b.count })),
+  });
   log(`Backed up to ${file}\n`);
 
   for (const b of doomed) {

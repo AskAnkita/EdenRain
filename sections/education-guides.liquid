@@ -1,21 +1,23 @@
 {% comment %}
-  Education & Guides - the friendly Learn page.
+  Education & Guides - the guides index.
 
-  Same guides and the same copy as 'learn-hub', re-dressed: a picture at the top
-  of each card, soft rounded corners on a cream field, a pill in place of the
-  bare number, sentence-case titles, a nudging arrow, and a closing panel that
-  offers a person once the reading is done.
+  A contents list, not a shelf of cards: one row per guide, divided by
+  hairlines, with the number on the left and a small picture on the right.
+  Square throughout, because every radius in the theme's settings is 0.
 
-  Where a card's picture comes from, in order:
+  Numbering is real information here - a row says where that guide sits in the
+  whole set - which is the one reason these rows carry digits and the blog's
+  cards do not.
+
+  Where a row's picture comes from, in order:
     1. "Image" on the block, chosen in the theme editor;
     2. "Image file name" on the block, a file under assets/ (the shipped guides
        reuse the mega menu's pictures, e.g. featured-diamonds-education.jpg);
-    3. nothing - the card keeps its tint and reads as type, and a file name that
-       does not resolve hides the picture rather than leaving a broken frame.
+    3. nothing - the frame keeps its tint, and a file name that does not
+       resolve drops the picture rather than leaving a broken frame.
 
-  Every look is a setting: colours, type sizes, corner radius, columns, image
-  ratio and the closing panel's button all come from the schema below and are
-  written out as custom properties. assets/editorial-cards.css holds the shape, shared with the blog.
+  Shape comes from .eg-index in assets/editorial-cards.css, shared with the
+  "More guides" list at the foot of every guide page, so the two read alike.
 {% endcomment %}
 
 {{ 'editorial-cards.css' | asset_url | stylesheet_tag }}
@@ -23,54 +25,33 @@
 {%- liquid
   assign stts = section.settings
   assign topics = section.blocks
-  assign columns = stts.columns | default: 3
 
-  comment
-    A tablet never shows more than two across, and never more than the desktop
-    count, so a single-column choice stays single all the way up.
-  endcomment
-  assign columns_tablet = 2
-  if columns < 2
-    assign columns_tablet = columns
-  endif
-
-  comment
-    An arbitrary file under assets/ has no size the theme can know, so the img
-    declares the frame's own proportions instead: the ratio chosen in the editor
-    at a nominal 900px wide. .eg-card__media crops to the same ratio, so the
-    declared size is what the picture actually occupies and nothing shifts while
-    it loads. A picture chosen with the image picker carries its real size via
-    image_tag and skips all of this.
-  endcomment
-  assign ratio_parts = stts.image_ratio | split: '/'
-  assign ratio_w = ratio_parts[0] | strip | times: 1
-  assign ratio_h = ratio_parts[1] | strip | times: 1
-  if ratio_w < 1
-    assign ratio_w = 1
-  endif
-  if ratio_h < 1
-    assign ratio_h = 1
-  endif
-  assign asset_width = 900
-  assign asset_height = asset_width | times: ratio_h | divided_by: ratio_w
+  assign index_class = 'eg-index'
+  unless stts.show_numbers
+    assign index_class = index_class | append: ' eg-index--unnumbered'
+  endunless
+  unless stts.show_images
+    assign index_class = index_class | append: ' eg-index--plain'
+  endunless
 -%}
 
 {%- style -%}
   #education-guides-{{ section.id }} {
-    --eg-columns-desktop: {{ columns }};
-    --eg-columns-tablet: {{ columns_tablet }};
     --eg-ink: {{ stts.text_color }};
     --eg-muted: {{ stts.muted_text_color }};
-    --eg-card-bg: {{ stts.card_background }};
-    --eg-card-border: {{ stts.card_border_color }};
     --eg-accent: {{ stts.accent_color }};
-    --eg-radius: {{ stts.card_radius }}px;
-    --eg-gap: {{ stts.card_gap | divided_by: 10.0 }}rem;
-    --eg-ratio: {{ stts.image_ratio }};
+    --eg-radius: {{ stts.panel_radius }}px;
     --eg-heading-size: {{ stts.heading_size | divided_by: 10.0 }}rem;
     --eg-body-size: {{ stts.body_size | divided_by: 10.0 }}rem;
     --eg-card-title-size: {{ stts.card_title_size | divided_by: 10.0 }}rem;
     --eg-card-text-size: {{ stts.card_text_size | divided_by: 10.0 }}rem;
+    --eg-ratio: {{ stts.image_ratio }};
+    --eg-gap: {{ stts.row_gap | divided_by: 10.0 }}rem;
+    --eg-index-rule: {{ stts.card_border_color }};
+    --eg-index-number: {{ stts.number_color }};
+    --eg-index-tint: {{ stts.hover_color }};
+    --eg-index-thumb: {{ stts.thumb_width | divided_by: 10.0 }}rem;
+    --eg-index-pad: {{ stts.row_padding | divided_by: 10.0 }}rem;
     --eg-cta-bg: {{ stts.cta_background }};
     --eg-cta-ink: {{ stts.cta_text_color }};
     --eg-btn-bg: {{ stts.cta_button_background }};
@@ -103,7 +84,7 @@
     {%- if topics.size == 0 -%}
       <p class="eg-empty">Add a guide to this section in the theme editor.</p>
     {%- else -%}
-      <ul class="eg-grid" role="list">
+      <ol class="{{ index_class }}" role="list">
         {%- for block in topics -%}
           {%- liquid
             assign title = block.settings.title
@@ -111,15 +92,9 @@
               continue
             endif
 
-            assign badge = block.settings.badge
-            if badge == blank
-              assign badge = forloop.index | prepend: '0' | slice: -2, 2
-            endif
-
-            assign label = block.settings.link_label | default: 'Learn more'
-            assign has_link = false
-            if block.settings.link != blank
-              assign has_link = true
+            assign number = block.settings.badge | strip
+            if number == blank
+              assign number = forloop.index | prepend: '0' | slice: -2, 2
             endif
 
             assign picture = block.settings.image
@@ -128,82 +103,70 @@
               assign picture_asset = block.settings.image_asset | strip
             endif
 
-            comment
-              Spelt out as nested conditions rather than one `and`/`or` line,
-              because Liquid has no parentheses and reads such a line right to left.
-            endcomment
-            assign has_media = false
-            if stts.show_images
-              if picture != blank or picture_asset != blank
-                assign has_media = true
-              endif
+            assign has_link = false
+            if block.settings.link != blank
+              assign has_link = true
             endif
           -%}
 
-          <li class="eg-card" {{ block.shopify_attributes }}>
+          <li class="eg-index__item" {{ block.shopify_attributes }}>
             {%- if has_link -%}
-              <a class="eg-card__link eden-action-host" href="{{ block.settings.link }}">
+              <a class="eg-index__link" href="{{ block.settings.link }}">
             {%- else -%}
-              <div class="eg-card__link">
+              <div class="eg-index__link">
             {%- endif -%}
 
-              {%- if has_media -%}
-                <div class="eg-card__media">
+              {%- if stts.show_numbers -%}
+                <span class="eg-index__number" aria-hidden="true">{{ number | escape }}</span>
+              {%- endif -%}
+
+              <div class="eg-index__copy">
+                <h2 class="eg-index__title">{{ title | escape }}</h2>
+
+                {%- if block.settings.text != blank -%}
+                  <p class="eg-index__text">{{ block.settings.text | escape }}</p>
+                {%- endif -%}
+
+                {%- if has_link -%}
+                  <span class="eg-index__cta">
+                    {{- block.settings.link_label | default: 'Read the guide' | escape -}}
+                    <span class="eg-index__arrow" aria-hidden="true">&rarr;</span>
+                  </span>
+                {%- endif -%}
+              </div>
+
+              {%- comment -%}
+                The picture is decoration here: the title beside it already names
+                the guide, so an alt would only be read out twice.
+              {%- endcomment -%}
+              {%- if stts.show_images -%}
+                <div class="eg-index__media">
                   {%- if picture != blank -%}
                     {{
                       picture
-                      | image_url: width: 900
+                      | image_url: width: 480
                       | image_tag:
                         loading: 'lazy',
-                        sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
-                        alt: title
+                        sizes: '(min-width: 750px) 15rem, 100vw',
+                        alt: ''
                     }}
-                  {%- else -%}
-                    {%- comment -%}
-                      A file under assets/, resized by the CDN. No intrinsic size is
-                      known for an arbitrary file, so the ratio on .eg-card__media
-                      holds the space and the script below hides a 404.
-                    {%- endcomment -%}
+                  {%- elsif picture_asset != blank -%}
                     <img
-                      src="{{ picture_asset | asset_img_url: '900x' }}"
+                      src="{{ picture_asset | asset_img_url: '480x' }}"
                       srcset="
-                        {{ picture_asset | asset_img_url: '450x' }} 450w,
-                        {{ picture_asset | asset_img_url: '700x' }} 700w,
-                        {{ picture_asset | asset_img_url: '900x' }} 900w
+                        {{ picture_asset | asset_img_url: '240x' }} 240w,
+                        {{ picture_asset | asset_img_url: '480x' }} 480w
                       "
-                      sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
-                      alt="{{ title | escape }}"
-                      width="{{ asset_width }}"
-                      height="{{ asset_height }}"
+                      sizes="(min-width: 750px) 15rem, 100vw"
+                      alt=""
+                      width="480"
+                      height="480"
                       loading="lazy"
                       data-eg-asset
                     >
                   {%- endif -%}
-
-                  {%- if stts.show_numbers -%}
-                    <span class="eg-card__badge">{{ badge | escape }}</span>
-                  {%- endif -%}
                 </div>
               {%- endif -%}
-
-              <div class="eg-card__body">
-                {%- if stts.show_numbers and has_media == false -%}
-                  <span class="eg-card__badge">{{ badge | escape }}</span>
-                {%- endif -%}
-
-                <h2 class="eg-card__title">{{ title | escape }}</h2>
-
-                {%- if block.settings.text != blank -%}
-                  <p class="eg-card__text">{{ block.settings.text | escape }}</p>
-                {%- endif -%}
-
-                {%- if has_link -%}
-                  <span class="eg-card__action">
-                    {{- label | escape -}}
-                    <span class="eg-card__arrow" aria-hidden="true">&rarr;</span>
-                  </span>
-                {%- endif -%}
-              </div>
 
             {%- if has_link -%}
               </a>
@@ -212,7 +175,7 @@
             {%- endif -%}
           </li>
         {%- endfor -%}
-      </ul>
+      </ol>
     {%- endif -%}
 
     {%- if stts.show_cta and stts.cta_heading != blank -%}
@@ -234,16 +197,15 @@
 </section>
 
 {%- comment -%}
-  A card can name a file under assets/ that the shop has not uploaded yet. Rather
-  than leave a broken frame, the picture is dropped and the card carries on as
-  type - the same card the "Show pictures" switch produces.
+  A guide can name a file under assets/ the shop has not uploaded. Rather than
+  leave a broken frame the picture is dropped and the row carries on as type.
 {%- endcomment -%}
 <script>
   (() => {
     const root = document.getElementById('education-guides-{{ section.id }}');
     if (!root) return;
     root.querySelectorAll('img[data-eg-asset]').forEach((img) => {
-      img.addEventListener('error', () => img.closest('.eg-card__media')?.remove());
+      img.addEventListener('error', () => img.closest('.eg-index__media')?.remove());
     });
   })();
 </script>
@@ -280,45 +242,45 @@
       "content": "Layout"
     },
     {
-      "type": "range",
-      "id": "columns",
-      "label": "Guides across on desktop",
-      "min": 1,
-      "max": 4,
-      "step": 1,
-      "default": 3,
-      "info": "A tablet shows at most two, and a phone one."
-    },
-    {
-      "type": "range",
-      "id": "card_gap",
-      "label": "Space between cards",
-      "min": 8,
-      "max": 48,
-      "step": 2,
-      "unit": "px",
-      "default": 24
-    },
-    {
-      "type": "range",
-      "id": "card_radius",
-      "label": "Corner rounding",
-      "min": 0,
-      "max": 36,
-      "step": 2,
-      "unit": "px",
-      "default": 20
-    },
-    {
       "type": "checkbox",
       "id": "show_images",
       "label": "Show pictures",
       "default": true
     },
     {
+      "type": "range",
+      "id": "thumb_width",
+      "label": "Picture width",
+      "min": 80,
+      "max": 280,
+      "step": 10,
+      "unit": "px",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "row_padding",
+      "label": "Space above and below each guide",
+      "min": 12,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "label": "Space between number, words and picture",
+      "min": 8,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
       "type": "select",
       "id": "image_ratio",
-      "label": "Picture shape",
+      "label": "Featured image shape",
       "options": [
         { "value": "4 / 3", "label": "Landscape (4:3)" },
         { "value": "3 / 2", "label": "Landscape (3:2)" },
@@ -327,14 +289,14 @@
         { "value": "16 / 9", "label": "Wide (16:9)" }
       ],
       "default": "1 / 1",
-      "info": "The guide pictures are portrait, so a square frame keeps more of each one than a landscape crop."
+      "info": "Each guide's thumbnail crops to this shape."
     },
     {
       "type": "checkbox",
       "id": "show_numbers",
-      "label": "Show the pill on each card",
+      "label": "Show guide numbers",
       "default": true,
-      "info": "Numbers the guides unless a card sets its own pill text."
+      "info": "A guide's number says where it sits in the set. Switch this off and the rows read as a plain list."
     },
     {
       "type": "header",
@@ -363,7 +325,7 @@
     {
       "type": "range",
       "id": "card_title_size",
-      "label": "Card title size",
+      "label": "Guide title size",
       "min": 14,
       "max": 32,
       "step": 1,
@@ -373,7 +335,7 @@
     {
       "type": "range",
       "id": "card_text_size",
-      "label": "Card text size",
+      "label": "Guide description size",
       "min": 12,
       "max": 22,
       "step": 1,
@@ -410,21 +372,38 @@
     },
     {
       "type": "color",
-      "id": "card_background",
-      "label": "Card background",
-      "default": "#ffffff"
-    },
-    {
-      "type": "color",
       "id": "card_border_color",
-      "label": "Card border",
+      "label": "Divider between guides",
       "default": "#ebe4df"
     },
     {
       "type": "color",
+      "id": "number_color",
+      "label": "Guide numbers",
+      "default": "#5c5a55"
+    },
+    {
+      "type": "color",
+      "id": "hover_color",
+      "label": "Guide row on hover",
+      "default": "#faf7f5"
+    },
+    {
+      "type": "color",
       "id": "accent_color",
-      "label": "Pills and picture tint",
+      "label": "Picture tint and closing panel",
       "default": "#ead9d1"
+    },
+    {
+      "type": "range",
+      "id": "panel_radius",
+      "label": "Closing panel corner rounding",
+      "min": 0,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 0,
+      "info": "The theme's own button, card and input radius is 0. Leave this at 0 unless you are changing all of them."
     },
     {
       "type": "header",
@@ -537,8 +516,8 @@
         {
           "type": "text",
           "id": "badge",
-          "label": "Pill text",
-          "info": "Leave empty to number the guide."
+          "label": "Number override",
+          "info": "Optional text shown instead of the automatic number."
         },
         {
           "type": "url",
@@ -596,7 +575,7 @@
           "settings": {
             "title": "Find your ring size",
             "text": "A printable ring sizer, an international conversion chart, and what to do when you are buying a surprise.",
-            "image_asset": "featured-diamonds-sizing.jpg"
+            "image_asset": "ring-size-guide-original.png"
           }
         },
         {

@@ -16,51 +16,33 @@
 // The app itself is not touched. Turn the HTML sitemap feature off in the Avada dashboard or it
 // will generate these pages again on its next run; the script prints that reminder.
 
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { config, gql } from './lib.mjs';
+import { config, gql, paginate, writeBackup } from './lib.mjs';
 
-const here = dirname(fileURLToPath(import.meta.url));
 const apply = process.argv.includes('--apply');
 const cfg = config();
 
 // Only the app's own pages. A page someone wrote by hand never matches this.
 const isAvadaSitemap = (handle) => /^avada-sitemap(-|$)/.test(handle);
 
-async function allPages() {
-  const out = [];
-  let after = null;
-  for (;;) {
-    const d = await gql(
-      cfg,
-      `query($after: String) {
-        pages(first: 250, after: $after) {
-          nodes { id handle title isPublished createdAt updatedAt templateSuffix body bodySummary }
-          pageInfo { hasNextPage endCursor }
-        }
-      }`,
-      { after }
-    );
-    out.push(...d.pages.nodes);
-    if (!d.pages.pageInfo.hasNextPage) return out;
-    after = d.pages.pageInfo.endCursor;
-  }
-}
+const allPages = () =>
+  paginate(
+    cfg,
+    `query($after: String) {
+      pages(first: 250, after: $after) {
+        nodes { id handle title isPublished createdAt updatedAt templateSuffix body }
+        pageInfo { hasNextPage endCursor }
+      }
+    }`,
+    'pages'
+  );
 
 async function liveCollectionHandles() {
-  const out = new Set();
-  let after = null;
-  for (;;) {
-    const d = await gql(
-      cfg,
-      `query($after: String) { collections(first: 250, after: $after) { nodes { handle } pageInfo { hasNextPage endCursor } } }`,
-      { after }
-    );
-    for (const c of d.collections.nodes) out.add(c.handle);
-    if (!d.collections.pageInfo.hasNextPage) return out;
-    after = d.collections.pageInfo.endCursor;
-  }
+  const nodes = await paginate(
+    cfg,
+    `query($after: String) { collections(first: 250, after: $after) { nodes { handle } pageInfo { hasNextPage endCursor } } }`,
+    'collections'
+  );
+  return new Set(nodes.map((c) => c.handle));
 }
 
 // A page linked from the nav would turn into a 404 the moment it is deleted, so the menus are
@@ -120,11 +102,8 @@ if (!apply) {
   process.exit(0);
 }
 
-const dir = resolve(here, 'backups');
-mkdirSync(dir, { recursive: true });
-const backup = resolve(dir, `avada-sitemap-pages-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
-writeFileSync(backup, JSON.stringify(targets, null, 2));
-console.log(`\nFull copy of all ${targets.length} pages, body HTML included, saved to ${backup}`);
+const backupFile = writeBackup(cfg, 'avada-sitemap-pages', targets);
+console.log(`\nFull copy of all ${targets.length} pages, body HTML included, saved to ${backupFile}`);
 
 for (const p of targets) {
   await gql(

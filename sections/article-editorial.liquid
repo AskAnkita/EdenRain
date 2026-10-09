@@ -5,7 +5,7 @@
   placeholder graphic down the left and squeezed the writing into what was left.
   Here the article gets the page: a centred byline, a lead photo wider than the
   text, the body in a readable column, then the previous and next articles and a
-  row of more from the same blog.
+  row of the other education guides.
 
   The body reuses .gp-content from assets/editorial-cards.css, so an article and
   a guide page read exactly the same way.
@@ -16,7 +16,7 @@
 
 {%- liquid
   assign stts = section.settings
-  assign columns = stts.columns | default: 3
+  assign columns = stts.columns | default: 4
 
   assign columns_tablet = 2
   if columns < 2
@@ -34,7 +34,27 @@
     own excerpt cut short when nothing was typed.
   endcomment
   assign hero_image = stts.hero_image
+  assign hero_asset = blank
   if hero_image == blank
+    for guide_block in section.blocks
+      if guide_block.settings.link != article.url
+        continue
+      endif
+
+      assign hero_image = guide_block.settings.hero_image
+      if hero_image == blank
+        assign hero_asset = guide_block.settings.hero_image_asset | strip
+      endif
+      if hero_image == blank and hero_asset == blank
+        assign hero_image = guide_block.settings.image
+      endif
+      if hero_image == blank and hero_asset == blank
+        assign hero_asset = guide_block.settings.image_asset | strip
+      endif
+      break
+    endfor
+  endif
+  if hero_image == blank and hero_asset == blank
     assign hero_image = article.image
   endif
 
@@ -84,7 +104,7 @@
     when 'bottom-left'
       assign banner_class = banner_class | append: ' eg-banner--bottom eg-banner--left'
   endcase
-  if hero_image == blank
+  if hero_image == blank and hero_asset == blank
     assign banner_class = banner_class | append: ' eg-banner--plain'
   endif
 
@@ -95,7 +115,7 @@
   if stts.hero_split_mobile == 'picture'
     assign split_class = split_class | append: ' eg-hero-split--picture-first'
   endif
-  if hero_image == blank
+  if hero_image == blank and hero_asset == blank
     assign split_class = split_class | append: ' eg-hero-split--solo'
   endif
 
@@ -135,6 +155,7 @@
     --eg-radius: {{ stts.card_radius }}px;
     --eg-gap: {{ stts.card_gap | divided_by: 10.0 }}rem;
     --eg-ratio: {{ stts.image_ratio }};
+    --gp-more-align: {{ stts.more_heading_align | default: 'start' }};
     --gp-text-col: {{ stts.split_text_width | default: 36 }}%;
     --eg-heading-size: {{ stts.heading_size | divided_by: 10.0 }}rem;
     --eg-body-size: {{ stts.body_size | divided_by: 10.0 }}rem;
@@ -170,7 +191,7 @@
 
 <section
   id="article-editorial-{{ section.id }}"
-  class="editorial-cards color-{{ stts.color_scheme }}"
+  class="editorial-cards article-editorial color-{{ stts.color_scheme }}"
 >
   {%- comment -%}
     The eyebrow, title, line and byline are the same words whichever shape the
@@ -236,18 +257,36 @@
           so the top of the page carries the piece instead of a pill on white.
         {%- endcomment -%}
         <div class="{{ banner_class }}">
-          {%- if hero_image != blank -%}
+          {%- if hero_image != blank or hero_asset != blank -%}
             <div class="eg-banner__media">
-              {{
-                hero_image
-                | image_url: width: 2400
-                | image_tag:
-                  loading: 'eager',
-                  fetchpriority: 'high',
-                  widths: '600, 900, 1200, 1600, 2000, 2400',
-                  sizes: '100vw',
-                  alt: article.title
-              }}
+              {%- if hero_image != blank -%}
+                {{
+                  hero_image
+                  | image_url: width: 2400
+                  | image_tag:
+                    loading: 'eager',
+                    fetchpriority: 'high',
+                    widths: '600, 900, 1200, 1600, 2000, 2400',
+                    sizes: '100vw',
+                    alt: article.title
+                }}
+              {%- else -%}
+                <img
+                  src="{{ hero_asset | asset_img_url: '2400x' }}"
+                  srcset="
+                    {{ hero_asset | asset_img_url: '900x' }} 900w,
+                    {{ hero_asset | asset_img_url: '1600x' }} 1600w,
+                    {{ hero_asset | asset_img_url: '2400x' }} 2400w
+                  "
+                  sizes="100vw"
+                  alt="{{ article.title | escape }}"
+                  width="2400"
+                  height="1350"
+                  loading="eager"
+                  fetchpriority="high"
+                  data-ap-hero-asset
+                >
+              {%- endif -%}
             </div>
             <span class="eg-banner__scrim" aria-hidden="true"></span>
           {%- endif -%}
@@ -298,56 +337,108 @@
       {%- endif -%}
     {%- endif -%}
 
-    {%- if stts.show_more -%}
+    {%- if stts.show_more and section.blocks.size > 0 -%}
       {%- liquid
+        assign current_path = article.url
         assign more_count = 0
-        for item in blog.articles
-          unless item.id == article.id
-            assign more_count = more_count | plus: 1
-          endunless
+        for block in section.blocks
+          if block.settings.title == blank
+            continue
+          endif
+          if block.settings.link == current_path
+            continue
+          endif
+          assign more_count = more_count | plus: 1
         endfor
       -%}
+
       {%- if more_count > 0 -%}
         <div class="gp-more">
           {%- if stts.more_heading != blank -%}
             <h2 class="gp-more__heading">{{ stts.more_heading | escape }}</h2>
           {%- endif -%}
 
-          <ul class="eg-grid" role="list">
-            {%- for item in blog.articles limit: stts.more_limit -%}
-              {%- if item.id == article.id -%}
-                {%- continue -%}
-              {%- endif -%}
-              <li class="eg-card">
-                <a class="eg-card__link eden-action-host" href="{{ item.url }}">
-                  {%- if stts.show_images and item.image != blank -%}
+          <ul class="eg-grid eg-grid--flat" role="list">
+            {%- for block in section.blocks -%}
+              {%- liquid
+                assign title = block.settings.title
+                if title == blank or block.settings.link == current_path
+                  continue
+                endif
+
+                assign picture = block.settings.image
+                assign picture_asset = blank
+                if picture == blank
+                  assign picture_asset = block.settings.image_asset | strip
+                endif
+
+                assign has_media = false
+                if stts.show_images
+                  if picture != blank or picture_asset != blank
+                    assign has_media = true
+                  endif
+                endif
+
+                assign has_link = false
+                if block.settings.link != blank
+                  assign has_link = true
+                endif
+              -%}
+
+              <li class="eg-card" {{ block.shopify_attributes }}>
+                {%- if has_link -%}
+                  <a class="eg-card__link eden-action-host" href="{{ block.settings.link | escape }}">
+                {%- else -%}
+                  <div class="eg-card__link">
+                {%- endif -%}
+
+                  {%- if has_media -%}
                     <div class="eg-card__media">
-                      {{
-                        item.image
-                        | image_url: width: 900
-                        | image_tag:
-                          loading: 'lazy',
-                          sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
-                          alt: item.title
-                      }}
-                      {%- if stts.show_meta -%}
-                        <span class="eg-card__badge">{{ item.published_at | date: '%b %d, %Y' }}</span>
+                      {%- if picture != blank -%}
+                        {{
+                          picture
+                          | image_url: width: 900
+                          | image_tag:
+                            loading: 'lazy',
+                            sizes: '(min-width: 990px) 25vw, (min-width: 750px) 50vw, 100vw',
+                            alt: title
+                        }}
+                      {%- else -%}
+                        <img
+                          src="{{ picture_asset | asset_img_url: '900x' }}"
+                          srcset="
+                            {{ picture_asset | asset_img_url: '450x' }} 450w,
+                            {{ picture_asset | asset_img_url: '900x' }} 900w
+                          "
+                          sizes="(min-width: 990px) 25vw, (min-width: 750px) 50vw, 100vw"
+                          alt="{{ title | escape }}"
+                          width="900"
+                          height="900"
+                          loading="lazy"
+                          data-ap-guide-asset
+                        >
                       {%- endif -%}
                     </div>
                   {%- endif -%}
 
                   <div class="eg-card__body">
-                    <h3 class="eg-card__title">{{ item.title | escape }}</h3>
-                    {%- assign item_excerpt = item.excerpt_or_content | strip_html | truncatewords: 20 -%}
-                    {%- if item_excerpt != blank -%}
-                      <p class="eg-card__text">{{ item_excerpt }}</p>
+                    <h3 class="eg-card__title">{{ title | escape }}</h3>
+                    {%- if block.settings.text != blank -%}
+                      <p class="eg-card__text">{{ block.settings.text | escape }}</p>
                     {%- endif -%}
-                    <span class="eg-card__action">
-                      {{- stts.link_label | default: 'Read more' | escape -}}
-                      <span class="eg-card__arrow" aria-hidden="true">&rarr;</span>
-                    </span>
+                    {%- if has_link -%}
+                      <span class="eg-card__cta eden-link">
+                        {{- block.settings.link_label | default: 'Read the guide' | escape -}}
+                        <span class="eg-card__arrow" aria-hidden="true">&rarr;</span>
+                      </span>
+                    {%- endif -%}
                   </div>
-                </a>
+
+                {%- if has_link -%}
+                  </a>
+                {%- else -%}
+                  </div>
+                {%- endif -%}
               </li>
             {%- endfor -%}
           </ul>
@@ -372,6 +463,22 @@
     {%- endif -%}
   </div>
 </section>
+
+<script>
+  (() => {
+    const root = document.getElementById('article-editorial-{{ section.id }}');
+    if (!root) return;
+    root.querySelectorAll('img[data-ap-guide-asset]').forEach((img) => {
+      img.addEventListener('error', () => img.closest('.eg-card__media')?.remove());
+    });
+    root.querySelectorAll('img[data-ap-hero-asset]').forEach((img) => {
+      img.addEventListener('error', () => {
+        img.closest('.eg-banner__media')?.remove();
+        root.querySelector('.eg-banner')?.classList.add('eg-banner--plain');
+      });
+    });
+  })();
+</script>
 
 {% schema %}
 {
@@ -546,11 +653,20 @@
     { "type": "checkbox", "id": "show_prev_next", "label": "Show previous and next", "default": true },
     { "type": "text", "id": "prev_label", "label": "Previous label", "default": "Previous" },
     { "type": "text", "id": "next_label", "label": "Next label", "default": "Next" },
-    { "type": "header", "content": "More articles" },
-    { "type": "checkbox", "id": "show_more", "label": "Show the other articles", "default": true },
+    { "type": "header", "content": "More guides" },
+    { "type": "checkbox", "id": "show_more", "label": "Show the other guides", "default": true },
     { "type": "text", "id": "more_heading", "label": "Heading", "default": "Keep reading" },
-    { "type": "range", "id": "more_limit", "label": "How many to pull from", "min": 2, "max": 9, "step": 1, "default": 4 },
-    { "type": "range", "id": "columns", "label": "Across on desktop", "min": 1, "max": 4, "step": 1, "default": 3 },
+    {
+      "type": "select",
+      "id": "more_heading_align",
+      "label": "Heading position",
+      "options": [
+        { "value": "start", "label": "Left" },
+        { "value": "center", "label": "Centre" }
+      ],
+      "default": "center"
+    },
+    { "type": "range", "id": "columns", "label": "Other guides across on desktop", "min": 1, "max": 4, "step": 1, "default": 4 },
     { "type": "checkbox", "id": "show_images", "label": "Show pictures", "default": true },
     {
       "type": "select",
@@ -563,11 +679,10 @@
         { "value": "4 / 5", "label": "Portrait (4:5)" },
         { "value": "16 / 9", "label": "Wide (16:9)" }
       ],
-      "default": "3 / 2"
+      "default": "4 / 3"
     },
-    { "type": "text", "id": "link_label", "label": "Link text", "default": "Read more" },
     { "type": "range", "id": "card_gap", "label": "Space between cards", "min": 8, "max": 48, "step": 2, "unit": "px", "default": 24 },
-    { "type": "range", "id": "card_radius", "label": "Corner rounding", "min": 0, "max": 36, "step": 2, "unit": "px", "default": 20 },
+    { "type": "range", "id": "card_radius", "label": "Corner rounding", "min": 0, "max": 36, "step": 2, "unit": "px", "default": 0 },
     { "type": "header", "content": "Type sizes" },
     { "type": "range", "id": "heading_size", "label": "Title size", "min": 24, "max": 64, "step": 1, "unit": "px", "default": 42 },
     { "type": "range", "id": "body_size", "label": "Body text size", "min": 13, "max": 24, "step": 1, "unit": "px", "default": 17 },
@@ -594,6 +709,23 @@
     { "type": "header", "content": "Spacing" },
     { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 48 },
     { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 }
+  ],
+  "max_blocks": 5,
+  "blocks": [
+    {
+      "type": "guide",
+      "name": "Education guide",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "text", "label": "Description" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_asset", "label": "Image file name", "info": "A file under assets/. Used only when no image is selected." },
+        { "type": "image_picker", "id": "hero_image", "label": "Banner image", "info": "Optional wide image for this guide's top banner. Falls back to its card image." },
+        { "type": "text", "id": "hero_image_asset", "label": "Banner image file name", "info": "A file under assets/, used only when no banner image is selected." },
+        { "type": "url", "id": "link", "label": "Guide page link" },
+        { "type": "text", "id": "link_label", "label": "Link text", "default": "Read the guide" }
+      ]
+    }
   ],
   "presets": [{ "name": "Article" }]
 }

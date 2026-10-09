@@ -1,9 +1,9 @@
 // Shared helpers for the store scripts: reads .env and calls the Shopify Admin GraphQL API.
 // No dependencies; needs Node 18+ (built-in fetch).
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, join } from 'node:path';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -131,6 +131,67 @@ export async function gql(cfg, query, variables = {}, mutationField) {
     return body.data;
   }
   throw new Error('Shopify kept throttling the request; try again in a minute.');
+}
+
+// Walks a cursor-paginated connection to the end and hands back every node. `field` is the
+// connection's name as the query selects it; the query takes an $after variable and selects
+// `nodes` plus `pageInfo { hasNextPage endCursor }`. Every script that reads a whole resource
+// out of the store goes through this rather than spelling the cursor loop out again.
+export async function paginate(cfg, query, field, variables = {}) {
+  const out = [];
+  let after = null;
+  for (;;) {
+    const data = await gql(cfg, query, { ...variables, after });
+    out.push(...data[field].nodes);
+    if (!data[field].pageInfo.hasNextPage) return out;
+    after = data[field].pageInfo.endCursor;
+  }
+}
+
+// Writes a timestamped JSON file into scripts/shopify/backups/ (git-ignored) and hands back its
+// path. Anything that deletes or overwrites live store data saves what it found here first, so
+// the deleted thing can be rebuilt by hand. One definition of where backups live, which is what
+// restore-menu.mjs assumes.
+export function writeBackup(cfg, name, data) {
+  const dir = resolve(cfg.repoRoot, 'scripts', 'shopify', 'backups');
+  mkdirSync(dir, { recursive: true });
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const file = join(dir, `${name}-${stamp}.json`);
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  return file;
+}
+
+// Handles of one resource kind ('collections' or 'blogs') written anywhere in the theme. A handle
+// in the theme is a live link somewhere - a nav item, a section setting, a hard-coded href - and
+// deleting what it points at turns that link into a 404. Scanning the folders is cruder than
+// reading the menu, but it also catches links the menu doesn't know about, which is exactly what
+// a delete would break. locales/ is scanned too; the stock theme translations carry an example
+// "/blogs/writing-blogs" that no real store has, which simply won't match anything.
+const THEME_DIRS = ['sections', 'blocks', 'snippets', 'templates', 'config', 'layout', 'locales'];
+
+export function themeLinkedHandles(cfg, kind) {
+  const found = new Set();
+  const pattern = new RegExp(`${kind}/([a-z0-9][a-z0-9-]*)`, 'gi');
+  const walk = (dir) => {
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return; // folder not in this theme
+    }
+    for (const e of entries) {
+      const full = join(dir, e.name);
+      if (e.isDirectory()) {
+        walk(full);
+        continue;
+      }
+      if (statSync(full).size > 2_000_000) continue;
+      for (const m of readFileSync(full, 'utf8').matchAll(pattern)) found.add(m[1].toLowerCase());
+    }
+  };
+  for (const d of THEME_DIRS) walk(resolve(cfg.repoRoot, d));
+  if (kind === 'collections') found.delete('all'); // /collections/all is built in, not a collection you can delete
+  return found;
 }
 
 // Puts a local image into Shopify's Content > Files and hands back its CDN URL, so a page body

@@ -295,7 +295,7 @@
   .ai-collection-carousel-item-{{ ai_gen_id }} {
     --ai-card-width: min(
       calc((100% - ({{ block.settings.columns_desktop | minus: 1 }} * {{ block.settings.item_gap_desktop }}px)) / {{ block.settings.columns_desktop }}),
-      {{ block.settings.item_max_width_desktop | default: 460 }}px
+      {{ block.settings.item_max_width_desktop }}px
     );
     flex: 0 0 var(--ai-card-width);
     max-width: var(--ai-card-width);

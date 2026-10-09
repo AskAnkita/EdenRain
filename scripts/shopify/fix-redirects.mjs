@@ -13,12 +13,8 @@
 // breakage after a product is renamed or a collection is pruned. A redirect that already exists
 // is never overwritten by RETIRED: whatever is in the store was put there deliberately.
 
-import { writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { config, gql } from './lib.mjs';
+import { config, gql, paginate, writeBackup } from './lib.mjs';
 
-const here = dirname(fileURLToPath(import.meta.url));
 const apply = process.argv.includes('--apply');
 
 // The repairs. Keyed by the redirect's path, so a redirect is only ever corrected in place -
@@ -98,71 +94,53 @@ const RETIRED = {
 
 const cfg = config();
 
-async function allRedirects() {
-  const out = [];
-  let after = null;
-  for (;;) {
-    const d = await gql(
-      cfg,
-      `query($after: String) {
-        urlRedirects(first: 250, after: $after) {
-          nodes { id path target }
-          pageInfo { hasNextPage endCursor }
-        }
-      }`,
-      { after }
-    );
-    out.push(...d.urlRedirects.nodes);
-    if (!d.urlRedirects.pageInfo.hasNextPage) return out;
-    after = d.urlRedirects.pageInfo.endCursor;
-  }
-}
+const allRedirects = () =>
+  paginate(
+    cfg,
+    `query($after: String) {
+      urlRedirects(first: 250, after: $after) {
+        nodes { id path target }
+        pageInfo { hasNextPage endCursor }
+      }
+    }`,
+    'urlRedirects'
+  );
 
 // Handles of everything a redirect can point at, fetched once.
 async function storefront() {
-  const pages = new Set();
-  let after = null;
-  for (;;) {
-    const d = await gql(
-      cfg,
-      `query($after: String) { pages(first: 250, after: $after) { nodes { handle } pageInfo { hasNextPage endCursor } } }`,
-      { after }
-    );
-    for (const p of d.pages.nodes) pages.add(p.handle);
-    if (!d.pages.pageInfo.hasNextPage) break;
-    after = d.pages.pageInfo.endCursor;
-  }
+  const pageNodes = await paginate(
+    cfg,
+    `query($after: String) { pages(first: 250, after: $after) { nodes { handle } pageInfo { hasNextPage endCursor } } }`,
+    'pages'
+  );
 
-  const blogsRes = await gql(cfg, `{ blogs(first: 50) { nodes { handle title } } }`);
-  const blogs = new Map();
-  for (const b of blogsRes.blogs.nodes) {
-    const articles = new Set();
-    let cursor = null;
-    for (;;) {
-      const d = await gql(
-        cfg,
-        `query($q: String!, $after: String) {
-          articles(first: 250, query: $q, after: $after) {
-            nodes { handle isPublished }
-            pageInfo { hasNextPage endCursor }
-          }
-        }`,
-        { q: `blog_title:'${b.title.replace(/'/g, "\\'")}'`, after: cursor }
-      );
-      for (const a of d.articles.nodes) if (a.isPublished) articles.add(a.handle);
-      if (!d.articles.pageInfo.hasNextPage) break;
-      cursor = d.articles.pageInfo.endCursor;
-    }
-    blogs.set(b.handle, articles);
-  }
+  // Each blog's articles come from the parent connection, so this is one request for all of them
+  // rather than a keyword search per blog. 250 articles per blog is the cap; this shop's content
+  // lives in pages, not posts, so no blog is near it.
+  const blogsRes = await gql(
+    cfg,
+    `{ blogs(first: 50) { nodes { handle articles(first: 250) { nodes { handle isPublished } } } } }`
+  );
+  const blogs = new Map(
+    blogsRes.blogs.nodes.map((b) => [b.handle, new Set(b.articles.nodes.filter((a) => a.isPublished).map((a) => a.handle))])
+  );
 
-  return { pages, blogs };
+  return { pages: new Set(pageNodes.map((p) => p.handle)), blogs };
 }
 
 // Static storefront routes that always resolve, so they are never reported as missing.
 const STATIC = new Set(['/', '/collections/all', '/cart', '/search', '/account', '/challenge', '/pages', '/sitemap.xml']);
 
+// A target is resolved once per run: RETIRED checks both the dead path and its destination, and
+// several redirects share a destination, so without this the same handle is fetched repeatedly.
+const checked = new Map();
+
 async function check(target, store) {
+  if (!checked.has(target)) checked.set(target, resolveTarget(target, store));
+  return checked.get(target);
+}
+
+async function resolveTarget(target, store) {
   if (/^https?:\/\//i.test(target)) return { ok: true, note: 'external' };
   const path = target.split(/[?#]/)[0].replace(/\/$/, '') || '/';
   if (STATIC.has(path)) return { ok: true };
@@ -200,8 +178,7 @@ async function check(target, store) {
   return { ok: true, note: 'not a path this script knows how to check' };
 }
 
-const redirects = await allRedirects();
-const store = await storefront();
+const [redirects, store] = await Promise.all([allRedirects(), storefront()]);
 console.log(`\n${redirects.length} redirect${redirects.length === 1 ? '' : 's'} in the store\n`);
 
 const broken = [];
@@ -212,12 +189,12 @@ for (const r of redirects) {
   const mark = (!result.ok ? '404' : retarget ? 'wrong' : 'ok').padEnd(6);
   console.log(`${mark}${r.path}  ->  ${r.target}${result.note ? `   (${result.note})` : ''}`);
 
-  if (result.ok && !(fix?.force && fix.target !== r.target)) {
+  if (result.ok && !retarget) {
     if (fix && fix.target !== r.target) console.log(`      a fix is listed for this path but the target already resolves; left alone`);
     continue;
   }
   if (!fix) {
-    console.log(`      no fix listed - add one to FIXES in ${'scripts/shopify/fix-redirects.mjs'}`);
+    console.log('      no fix listed - add one to FIXES in scripts/shopify/fix-redirects.mjs');
     continue;
   }
   const fixed = await check(fix.target, store);
@@ -233,7 +210,8 @@ for (const r of redirects) {
 
 const have = new Set(redirects.map((r) => r.path));
 const missing = [];
-console.log(`\n${Object.keys(RETIRED).length} retired path${Object.keys(RETIRED).length === 1 ? '' : 's'} listed\n`);
+const retiredCount = Object.keys(RETIRED).length;
+console.log(`\n${retiredCount} retired path${retiredCount === 1 ? '' : 's'} listed\n`);
 for (const [path, { target, why }] of Object.entries(RETIRED)) {
   if (have.has(path)) {
     console.log(`have  ${path}  ->  already redirected, left alone`);
@@ -272,11 +250,8 @@ if (!apply) {
   process.exit(0);
 }
 
-const dir = resolve(here, 'backups');
-mkdirSync(dir, { recursive: true });
-const backup = resolve(dir, `redirects-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
-writeFileSync(backup, JSON.stringify(redirects, null, 2));
-console.log(`\nAll redirects as they were saved to ${backup}`);
+const backupFile = writeBackup(cfg, 'redirects', redirects);
+console.log(`\nAll redirects as they were saved to ${backupFile}`);
 
 for (const r of broken) {
   await gql(
