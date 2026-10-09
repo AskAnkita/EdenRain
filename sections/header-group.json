@@ -106,6 +106,7 @@
       "blocks": {
         "mega_menu_1_hN4fR6": {
           "type": "mega_menu_1",
+          "name": "Engagement",
           "settings": {
             "grid": "5",
             "menu_item": "Engagement",

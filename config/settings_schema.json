@@ -3566,6 +3566,35 @@
     ]
   },
   {
+    "name": "Mega menu featured images",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Choose images for the large cards in each mega menu's Featured or Learn tab. Leave a picker empty to keep the current theme image."
+      },
+      { "type": "header", "content": "Engagement — Featured" },
+      { "type": "image_picker", "id": "mm_eng_featured_1", "label": "The Value Edit" },
+      { "type": "image_picker", "id": "mm_eng_featured_2", "label": "Shop Signature Engagement" },
+      { "type": "image_picker", "id": "mm_eng_featured_3", "label": "New Engagement Arrivals" },
+      { "type": "image_picker", "id": "mm_eng_featured_4", "label": "Shop Bridal Sets" },
+      { "type": "header", "content": "Wedding — Featured" },
+      { "type": "image_picker", "id": "mm_wed_featured_1", "label": "Men's Wedding Bands" },
+      { "type": "image_picker", "id": "mm_wed_featured_2", "label": "The Eternity Collection" },
+      { "type": "image_picker", "id": "mm_wed_featured_3", "label": "New Wedding Arrivals" },
+      { "type": "image_picker", "id": "mm_wed_featured_4", "label": "Shop Anniversary Rings" },
+      { "type": "header", "content": "Jewellery — Featured" },
+      { "type": "image_picker", "id": "mm_jwl_featured_1", "label": "Signature Earrings" },
+      { "type": "image_picker", "id": "mm_jwl_featured_2", "label": "Must-Have Studs" },
+      { "type": "image_picker", "id": "mm_jwl_featured_3", "label": "Tennis Bracelets" },
+      { "type": "image_picker", "id": "mm_jwl_featured_4", "label": "Signature Necklaces" },
+      { "type": "header", "content": "Diamonds — Learn" },
+      { "type": "image_picker", "id": "mm_dia_learn_1", "label": "Education & Guides" },
+      { "type": "image_picker", "id": "mm_dia_learn_2", "label": "Gemstones" },
+      { "type": "image_picker", "id": "mm_dia_learn_3", "label": "Ring Size Guide" },
+      { "type": "image_picker", "id": "mm_dia_learn_4", "label": "Jewellery Care" }
+    ]
+  },
+  {
     "name": "Metal swatches",
     "settings": [
       {

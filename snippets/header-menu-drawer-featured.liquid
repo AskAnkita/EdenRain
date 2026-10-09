@@ -31,6 +31,38 @@
           assign card_url = card_parts[1] | strip
           assign card_image = card_parts[2] | strip
           assign card_video = card_parts[3] | strip
+
+          assign image_setting_prefix = ''
+          assign parent_key = top_title | handle
+          case parent_key
+            when 'engagement'
+              assign image_setting_prefix = 'mm_eng_featured'
+            when 'wedding'
+              assign image_setting_prefix = 'mm_wed_featured'
+            when 'jewellery'
+              assign image_setting_prefix = 'mm_jwl_featured'
+            when 'diamonds'
+              assign image_setting_prefix = 'mm_dia_learn'
+          endcase
+          assign image_setting_key = image_setting_prefix | append: '_' | append: forloop.index
+          assign selected_card_image = settings[image_setting_key]
+          if selected_card_image != blank
+            assign card_image_src = selected_card_image | image_url: width: 800
+            capture card_image_srcset
+              echo selected_card_image | image_url: width: 500
+              echo ' 500w, '
+              echo selected_card_image | image_url: width: 800
+              echo ' 800w'
+            endcapture
+          else
+            assign card_image_src = card_image | asset_img_url: '800x'
+            capture card_image_srcset
+              echo card_image | asset_img_url: '500x'
+              echo ' 500w, '
+              echo card_image | asset_img_url: '800x'
+              echo ' 800w'
+            endcapture
+          endif
         -%}
         <li class="menu-drawer-desktop__feature">
           <a class="menu-drawer-desktop__feature-link" href="{{ card_url }}">
@@ -43,7 +75,7 @@
                 {%- endcomment -%}
                 <video
                   class="menu-drawer-desktop__feature-video"
-                  poster="{{ card_image | asset_img_url: '800x' }}"
+                  poster="{{ card_image_src }}"
                   preload="none"
                   muted
                   loop
@@ -56,8 +88,8 @@
                 </video>
               {%- else -%}
                 <img
-                  src="{{ card_image | asset_img_url: '800x' }}"
-                  srcset="{{ card_image | asset_img_url: '500x' }} 500w, {{ card_image | asset_img_url: '800x' }} 800w"
+                  src="{{ card_image_src }}"
+                  srcset="{{ card_image_srcset }}"
                   sizes="20vw"
                   alt="{{ card_caption | escape }}"
                   width="800"
