@@ -36,7 +36,7 @@
           "settings": {
             "title": "The Eden Raine collection",
             "text": "Fine jewellery that reflects timeless elegance - handmade craftsmanship and the precision of CAD technology, so each piece is unique, high quality and made to last.",
-            "image_asset": "featured-engagement-signature.jpg",
+            "image_asset": "about-collection-grey.png",
             "link": "/collections/all",
             "link_label": "Shop the collection"
           }
@@ -46,7 +46,7 @@
           "settings": {
             "title": "Craft and precision",
             "text": "From the first sketch to the final polish, every step is a blend of artistry and innovation - traditional handmade technique with the precision of CAD.",
-            "image_asset": "featured-diamonds-education.jpg",
+            "image_asset": "about-craft-workshop.png",
             "link": "/pages/education-guides",
             "link_label": "Read our guides"
           }
@@ -56,7 +56,7 @@
           "settings": {
             "title": "We care",
             "text": "Every piece we create has meaning, and hearing your stories keeps us crafting with love. If there is ever an issue, we are here to put it right.",
-            "image_asset": "featured-diamonds-care.jpg",
+            "image_asset": "category-rings-grey.png",
             "link": "/pages/contact",
             "link_label": "Talk to us"
           }

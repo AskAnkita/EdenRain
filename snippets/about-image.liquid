@@ -2,13 +2,14 @@
   One picture on the About page, from either place a merchant can put one.
 
   A photograph may be uploaded in the theme editor (an image_picker) or already
-  sit in the theme's own files (a filename under assets/, which is how the rest
-  of this shop seeds its defaults). This renders whichever of the two is there,
-  responsively, and marks an asset-file picture so the section can drop the frame
-  if the file was never uploaded.
+  sit in Shopify's Content > Files (a file name, which is how the rest of this
+  shop seeds its defaults - the pictures live in the shop's media rather than in
+  the theme, so they can be swapped in the admin). This renders whichever of the
+  two is there, responsively, and marks a file-name picture so the section can
+  drop the frame if the file was never uploaded.
 
   @param {object} [image] - the image_picker setting
-  @param {string} [asset] - a file name under assets/, used when no image is picked
+  @param {string} [asset] - a file name in Content > Files, used when no image is picked
   @param {string} alt - alternative text
   @param {string} [sizes] - the sizes attribute. Default '100vw'.
   @param {string} [loading] - 'lazy' or 'eager'. Default 'lazy'.
@@ -52,13 +53,17 @@
     }}
   {%- endif -%}
 {%- elsif file != blank -%}
+  {%- comment -%}
+    file_url already carries a ?v= cache key, so each width goes on with an ampersand.
+  {%- endcomment -%}
+  {%- assign file_src = file | file_url -%}
   <img
-    src="{{ file | asset_img_url: '1600x' }}"
+    src="{{ file_src }}&width=1600"
     srcset="
-      {{ file | asset_img_url: '600x' }} 600w,
-      {{ file | asset_img_url: '900x' }} 900w,
-      {{ file | asset_img_url: '1600x' }} 1600w,
-      {{ file | asset_img_url: '2400x' }} 2400w
+      {{ file_src }}&width=600 600w,
+      {{ file_src }}&width=900 900w,
+      {{ file_src }}&width=1600 1600w,
+      {{ file_src }}&width=2400 2400w
     "
     sizes="{{ img_sizes }}"
     alt="{{ alt | escape }}"

@@ -4,7 +4,7 @@
   Where a tile's picture comes from, in order:
     1. a "Picture for a tile" block in the theme editor, matched to the menu item;
     2. the TILE PICTURES list below, which is the place to set pictures in code;
-    3. assets/category-<menu item>.png, e.g. category-rings.png for a link titled Rings.
+    3. category-<menu item>.png in Content > Files, e.g. category-rings.png for a link titled Rings.
   A menu item with none of the three is dropped (the script below removes the tile).
 {% endcomment %}
 
@@ -17,11 +17,13 @@
 
   # ------------------------------------------------------------------
   # TILE PICTURES - the one place to change a tile's picture in code.
-  # One "menu item: file under assets/" pair per tile, comma separated.
-  # Swap a file name to swap that tile's picture. A picture chosen in the
-  # theme editor always wins over this list, so a tile never ignores it.
+  # One "menu item: file name" pair per tile, comma separated. The files
+  # live in Shopify's Content > Files, not in the theme, so a picture can
+  # also be replaced in the admin by uploading a new file of the same
+  # name. A picture chosen in the theme editor always wins over this
+  # list, so a tile never ignores it.
   # ------------------------------------------------------------------
-  assign tile_pictures = 'Rings: category-rings.png, Earrings: category-earrings.png, Necklaces: category-necklaces.png, Bracelets: category-bracelets.png, Best Sellers: category-best-sellers.png'
+  assign tile_pictures = 'Rings: category-rings-grey.png, Earrings: category-earrings-grey.png, Necklaces: category-necklaces-grey.png, Bracelets: category-bracelets-grey.png, Best Sellers: category-best-sellers-grey.png'
   assign tile_picture_pairs = tile_pictures | split: ','
 -%}
 
@@ -319,9 +321,9 @@
               endfor
 
               # Otherwise the TILE PICTURES list at the top of this file, and failing that
-              # the assets/category-<menu item>.png naming convention. A menu item with no
-              # picture of any kind is hidden (the script below drops the tile), rather
-              # than falling back to the collection photo.
+              # the category-<menu item>.png naming convention in Content > Files. A menu
+              # item with no picture of any kind is hidden (the script below drops the
+              # tile), rather than falling back to the collection photo.
               assign tile_asset = blank
               if tile_image == blank
                 for pair in tile_picture_pairs
@@ -339,10 +341,14 @@
             <li class="ct-tile">
               <a class="ct-link eden-action-host" href="{{ link.url }}">
                 {%- if tile_asset != blank -%}
-                  {%- comment -%} The shipped pictures are 1122x1402; the CDN resizes them here. {%- endcomment -%}
+                  {%- comment -%}
+                    The uploaded pictures are 1122x1402; the CDN resizes them here. file_url
+                    already carries a ?v= cache key, so the width goes on with an ampersand.
+                  {%- endcomment -%}
+                  {%- assign tile_src = tile_asset | file_url -%}
                   <img
-                    src="{{ tile_asset | asset_img_url: '900x' }}"
-                    srcset="{{ tile_asset | asset_img_url: '450x' }} 450w, {{ tile_asset | asset_img_url: '700x' }} 700w, {{ tile_asset | asset_img_url: '900x' }} 900w, {{ tile_asset | asset_img_url: '1200x' }} 1200w"
+                    src="{{ tile_src }}&width=900"
+                    srcset="{{ tile_src }}&width=450 450w, {{ tile_src }}&width=700 700w, {{ tile_src }}&width=900 900w, {{ tile_src }}&width=1200 1200w"
                     sizes="(min-width: 990px) 25vw, 100vw"
                     alt="{{ link.title | escape }}"
                     width="1122"
@@ -396,7 +402,7 @@
       return tileWidth * Math.max(1, Math.floor(track.clientWidth / tileWidth));
     };
 
-    // A tile asks for assets/category-<menu item>.png. Until the shop adds that picture, the
+    // A tile asks for category-<menu item>.png in Content > Files. Until the shop adds that picture, the
     // whole tile is dropped rather than shown empty; adding the file brings the tile back.
     root.querySelectorAll('.ct-link img[data-ct-asset]').forEach((img) => {
       img.addEventListener('error', () => {
@@ -425,7 +431,7 @@
       "type": "link_list",
       "id": "menu",
       "label": "Menu",
-      "info": "One tile per menu item. A tile's picture comes from a \"Picture for a tile\" block below, or from the TILE PICTURES list at the top of sections/category-tiles.liquid, or from assets/category-<menu item>.png."
+      "info": "One tile per menu item. A tile's picture comes from a \"Picture for a tile\" block below, or from the TILE PICTURES list at the top of sections/category-tiles.liquid, or from category-<menu item>.png in Content > Files."
     },
     {
       "type": "text",
