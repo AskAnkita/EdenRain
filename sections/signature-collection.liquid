@@ -359,9 +359,8 @@
   }
 
   {%- comment -%}
-    The words and the call to action are two groups rather than one list, which is what
-    lets the "circle arrow" style put the heading on one side of the tile and the button
-    on the other without the markup changing per tile.
+    The words and the call to action are two groups rather than one list, so a style can
+    space them or align them apart from each other without the markup changing per tile.
   {%- endcomment -%}
   .{{ root_class }} .signature-editorial__text {
     display: flex;
@@ -599,64 +598,32 @@
   }
 
   {%- comment -%}
-    The third call to action: no words at all, just a ringed arrow in the opposite bottom
-    corner from the text. The tile's content row turns horizontal for it, which is the only
-    time the words and the button sit side by side rather than stacked.
+    The third call to action: none at all. A photograph tile carries no written button and
+    no ring - the whole tile is already the link, so the caption alone does the asking, set
+    across the middle of the tile with its rule under it. The button is left out of the
+    markup rather than hidden here, so there is nothing to style for a picture tile.
   {%- endcomment -%}
   .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__content {
     padding: calc(var(--sig-pad) * 2.2) var(--sig-pad) var(--sig-pad);
   }
 
-  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__content > div {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__content > div {
+    width: 100%;
+    justify-self: center;
+    align-items: center;
+    text-align: center;
     gap: 1.2rem;
   }
 
-  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__button {
-    width: clamp(37px, 3.45vw, 48px);
-    height: clamp(37px, 3.45vw, 48px);
-    flex: none;
-    display: grid;
-    place-items: center;
-    border: 1px solid currentColor;
-    border-radius: 50%;
-    color: inherit;
-    transition: background 0.2s ease, color 0.2s ease;
-  }
-
-  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__button-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__button-icon {
-    min-width: 0;
-    padding: 0;
-    background: none;
-    color: inherit;
-  }
-
-  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__button-icon svg {
-    width: 19px;
-    height: 19px;
-  }
-
-  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__button:hover {
-    opacity: 1;
-    background: var(--sig-button-bg, var(--sig-text, #ffffff));
-    color: var(--sig-button-text, var(--sig-button-contrast, #1a1a1a));
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__text {
+    width: 100%;
+    align-items: center;
+    text-align: center;
   }
 
   {%- comment -%}
-    A text card has no photograph to put a ring on, so it keeps the written button and
-    stacks its content as usual even when the photo tiles are using the circle.
+    A text card is the exception: it has no photograph behind it, so it keeps its written
+    button and its left-aligned stack even while the picture tiles are running caption only.
   {%- endcomment -%}
   .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile--text .signature-editorial__content > div {
     flex-direction: column;
@@ -776,34 +743,6 @@
 
     .{{ root_class }} .signature-editorial__product-info {
       padding: 1.2rem;
-    }
-
-    {%- comment -%}
-      A phone has no room for the ring beside the words - side by side it squeezes the
-      caption into a narrow column. So on mobile the circle goes (the whole tile is a link
-      of its own) and the caption takes the full width, centred, with its rule centred under
-      it. A second written link, if the tile has one, stays and keeps the row.
-    {%- endcomment -%}
-    .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__button {
-      display: none;
-    }
-
-    .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__actions:not(:has(.signature-editorial__link-2)) {
-      display: none;
-    }
-
-    .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__content > div {
-      width: 100%;
-      flex-direction: column;
-      align-items: center;
-      justify-self: center;
-      text-align: center;
-    }
-
-    .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__text {
-      width: 100%;
-      align-items: center;
-      text-align: center;
     }
 
     .{{ root_class }} .signature-editorial__product-title {
@@ -1384,25 +1323,26 @@
                 <span class="signature-editorial__boxed">{{ block.settings.boxed_text | escape }}</span>
               {%- endif -%}
             </div>
-            {%- if block.settings.button_label != blank or block.settings.button_2_label != blank -%}
+            {%- comment -%}
+              The caption-only style drops the written button from the picture tiles
+              altogether - they are a link end to end already - and keeps it on a text card,
+              which has no photograph to click.
+            {%- endcomment -%}
+            {%- assign show_cta_button = false -%}
+            {%- if block.settings.button_label != blank -%}
+              {%- if section.settings.cta_style != 'circle' or is_text_card -%}
+                {%- assign show_cta_button = true -%}
+              {%- endif -%}
+            {%- endif -%}
+            {%- if show_cta_button or block.settings.button_2_label != blank -%}
               <div class="signature-editorial__actions">
-                {%- if block.settings.button_label != blank -%}
+                {%- if show_cta_button -%}
                   <a class="signature-editorial__button" href="{{ block.settings.button_link | default: tile_link | default: '#' }}">
                     <span class="signature-editorial__button-label">{{ block.settings.button_label | escape }}</span>
                     <span class="signature-editorial__button-icon" aria-hidden="true">
-                      {%- comment -%}
-                        The circle style wants an arrow leaving the corner, every other style a
-                        plain one pointing on; same box either way, so only the path changes.
-                      {%- endcomment -%}
-                      {%- if section.settings.cta_style == 'circle' -%}
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M5 19 19 5M8 5h11v11"/>
-                        </svg>
-                      {%- else -%}
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                          <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square"/>
-                        </svg>
-                      {%- endif -%}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square"/>
+                      </svg>
                     </span>
                   </a>
                 {%- endif -%}
@@ -1477,7 +1417,7 @@
     { "type": "range", "id": "boxed_size", "label": "Outlined text", "min": 10, "max": 48, "step": 1, "unit": "px", "default": 20 },
     { "type": "range", "id": "meta_size", "label": "Corner captions", "min": 8, "max": 24, "step": 1, "unit": "px", "default": 11 },
     { "type": "range", "id": "button_size", "label": "Button text", "min": 8, "max": 24, "step": 1, "unit": "px", "default": 10 },
-    { "type": "select", "id": "cta_style", "label": "Call to action style", "default": "button", "info": "A link drops the arrow and both button colours and underlines the label instead. The circle hides the label altogether and puts a ringed arrow in the tile's other bottom corner, opposite the text; a text card keeps the written button either way.", "options": [ { "value": "button", "label": "Button with an arrow" }, { "value": "link", "label": "Underlined text link" }, { "value": "circle", "label": "Circle arrow icon" } ] },
+    { "type": "select", "id": "cta_style", "label": "Call to action style", "default": "button", "info": "A link drops the arrow and both button colours and underlines the label instead. Caption only drops the button from the picture tiles altogether and centres the caption across the tile, which is a link end to end anyway; a text card keeps the written button either way.", "options": [ { "value": "button", "label": "Button with an arrow" }, { "value": "link", "label": "Underlined text link" }, { "value": "circle", "label": "Caption only, centred" } ] },
     { "type": "range", "id": "small_text_scale", "label": "Text size on 1-up tiles", "min": 50, "max": 100, "step": 2, "unit": "%", "default": 100, "info": "Tiles set to a bigger size keep 100%, which is what gives the grid its hierarchy." },
 
     { "type": "header", "content": "Images" },
