@@ -177,6 +177,20 @@ got yet. The page's current template is saved to `backups/` before anything is w
 `ABOUT_TEMPLATE= node scripts/shopify/set-about-template.mjs --apply` puts it back on the default
 one. `ABOUT_HANDLE` points the same script at another page.
 
+The same script puts /pages/design-your-own on the Design Studio template
+(`templates/page.design-your-own.json`, rendered by `sections/design-studio.liquid`):
+
+```bash
+ABOUT_HANDLE=design-your-own ABOUT_TEMPLATE=design-your-own \
+  node scripts/shopify/set-about-template.mjs --apply
+```
+
+The page already exists and the header already links to it; it was rendering through the default
+page template, which is a title over an empty body. The design tool itself is an app block added to
+that section in the theme editor, so the template carries everything around it — hero, how it works,
+the questions, the closing panel — and the enquiry card stands in the tool's frame until the app
+block is there.
+
 ## Fill an empty guide page
 
 The Education & Guides hub links to four guides. Two of them — Gemstones and Jewellery Care — were

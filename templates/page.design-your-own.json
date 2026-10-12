@@ -1,0 +1,147 @@
+{
+  "sections": {
+    "studio": {
+      "type": "design-studio",
+      "blocks": {
+        "step_design": {
+          "type": "step",
+          "settings": {
+            "label": "",
+            "heading": "Design it",
+            "text": "<p>Pick a setting, a stone shape and a metal in the studio above, or send us a reference and we will draw it with you.</p>",
+            "image_asset": "featured-diamonds-education.jpg",
+            "image_alt": "Choosing a lab-grown diamond"
+          }
+        },
+        "step_approve": {
+          "type": "step",
+          "settings": {
+            "label": "",
+            "heading": "See it before it exists",
+            "text": "<p>We come back with a 3D view and a firm price. Change the stone, the band, the setting height \u2014 as many times as you need \u2014 until it is right.</p>",
+            "image_asset": "featured-engagement-value.jpg",
+            "image_alt": "A 3D view of a made-to-order ring"
+          }
+        },
+        "step_make": {
+          "type": "step",
+          "settings": {
+            "label": "",
+            "heading": "We make it",
+            "text": "<p>Your piece is cast, set and finished by hand, then checked and sent to you insured. We will confirm the date with your quote.</p>",
+            "image_asset": "about-craft-workshop.png",
+            "image_alt": "A jeweller finishing a ring at the bench"
+          }
+        },
+        "faq_cost": {
+          "type": "faq",
+          "settings": {
+            "question": "What does a bespoke piece cost?",
+            "answer": "<p>The studio prices every change as you make it, so you always see the number before you commit. For a design that starts from scratch we quote once we have the drawing \u2014 the stone, the metal and the work involved set the price.</p>",
+            "open": true
+          }
+        },
+        "faq_time": {
+          "type": "faq",
+          "settings": {
+            "question": "How long does it take?",
+            "answer": "<p>Making begins once you approve the design and the quote. We confirm the date in writing with your quote, so you know before you pay.</p>",
+            "open": false
+          }
+        },
+        "faq_changes": {
+          "type": "faq",
+          "settings": {
+            "question": "Can I change the design after I have seen it?",
+            "answer": "<p>Yes. Nothing is cut or cast until you have approved the 3D view, and changes before that point cost nothing.</p>",
+            "open": false
+          }
+        },
+        "faq_stones": {
+          "type": "faq",
+          "settings": {
+            "question": "Can you use my own stone?",
+            "answer": "<p>Often, yes \u2014 an heirloom diamond or a stone from a piece you no longer wear can be reset. Send us a photo and any certificate you have and we will tell you what is possible.</p>",
+            "open": false
+          }
+        },
+        "faq_pieces": {
+          "type": "faq",
+          "settings": {
+            "question": "Is it only rings?",
+            "answer": "<p>No. Engagement rings and wedding bands are the most common, but we make necklaces, earrings and bracelets to order as well.</p>",
+            "open": false
+          }
+        }
+      },
+      "block_order": [
+        "step_design",
+        "step_approve",
+        "step_make",
+        "faq_cost",
+        "faq_time",
+        "faq_changes",
+        "faq_stones",
+        "faq_pieces"
+      ],
+      "settings": {
+        "show_hero": true,
+        "show_builder": true,
+        "show_steps": true,
+        "show_gallery": false,
+        "show_faqs": true,
+        "show_cta": true,
+        "eyebrow": "DESIGN STUDIO",
+        "heading": "Design your own",
+        "heading_is_h1": true,
+        "intro": "<p>Start from one of our settings or from a sketch of your own. Build the piece in 3D, watch the price move as you change it, and we will make it for you.</p>",
+        "notes": "No design fee | Free 3D preview | Made to order",
+        "hero_alignment": "left",
+        "primary_label": "Start designing",
+        "primary_link": "",
+        "secondary_label": "Talk to a designer",
+        "secondary_link": "/pages/bespoke-jewellery-request",
+        "hero_image_asset": "featured-engagement-signature.jpg",
+        "hero_image_alt": "A lab-grown diamond ring made to order in our studio",
+        "hero_ratio": "1.1",
+        "hero_ratio_mobile": "1.05",
+        "builder_heading": "Build it in 3D",
+        "builder_intro": "<p>Choose a setting, a stone and a metal. Every change is priced as you go, and what you see is what we make.</p>",
+        "embed_url": "",
+        "embed_title": "Design your own jewellery",
+        "builder_note": "",
+        "fallback_heading": "Designed with you, by hand",
+        "fallback_text": "<p>Tell us what you have in mind \u2014 a stone, a setting, a piece you want remade \u2014 and we will come back with a sketch and a price.</p>",
+        "fallback_label": "Start a bespoke enquiry",
+        "fallback_link": "/pages/bespoke-jewellery-request",
+        "frame_height": 760,
+        "frame_height_mobile": 560,
+        "steps_heading": "How it works",
+        "steps_intro": "<p>Three steps from an idea to a finished piece.</p>",
+        "number_steps": true,
+        "step_word": "Step",
+        "steps_wash": true,
+        "gallery_heading": "Made for someone",
+        "gallery_intro": "<p>A few of the pieces that started as a conversation.</p>",
+        "gallery_columns": 3,
+        "gallery_columns_mobile": 2,
+        "tile_ratio": "1",
+        "faqs_heading": "Questions",
+        "faqs_wash": false,
+        "cta_heading": "Not sure where to start?",
+        "cta_text": "<p>Send us the idea, however rough. One of our designers will come back with what is possible, what it would cost and how long it would take.</p>",
+        "cta_label": "Talk to a designer",
+        "cta_link": "/pages/bespoke-jewellery-request",
+        "full_width": false,
+        "content_width": 0,
+        "padding_horizontal": 0,
+        "custom_padding": false,
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
+    }
+  },
+  "order": [
+    "studio"
+  ]
+}

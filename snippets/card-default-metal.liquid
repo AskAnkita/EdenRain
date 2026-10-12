@@ -8,6 +8,12 @@
   opens on the same metal (nothing shifts between page loads, filters or pagination)
   while neighbouring cards land on different ones.
 
+  A metal filter beats the rotation. When the shopper has narrowed the grid to one metal
+  — from the menu's Shop by Metal, which links at a filtered collection
+  ('menu-static-items'), or from the Metal group in the filter drawer — every card opens
+  on that metal instead, so the grid shows the metal the shopper asked for rather than
+  shuffling a rose gold card into a Yellow Gold result.
+
   Outputs "<option index>||<option value>" for the chosen metal, or nothing when the
   product has no metal option or sells only one metal — callers then keep the product's
   own featured image.
@@ -41,10 +47,58 @@
 
   assign metal_values_raw = metal_source | split: '||'
 
+  # The metal the grid is filtered to, if any. Liquid cannot read the query string, so
+  # this comes from the filters Shopify reports as applied: a tag filter carries the
+  # "metal:<colour>" tags tag-products.mjs writes, an option filter carries the option
+  # value ("14K Yellow Gold"). Other groups are skipped by name, or a Rose Quartz stone
+  # filter would turn the whole grid rose gold. With two metals filtered at once the
+  # first of them wins for every card, which is as close as one photo can get.
+  assign applied_filters = collection.filters
+  if applied_filters == blank
+    assign applied_filters = search.filters
+  endif
+
+  assign filtered_tone = ''
+  for applied_filter in applied_filters
+    assign filter_label = applied_filter.label | downcase
+    assign filter_names_metal = false
+    if filter_label contains 'metal' or filter_label contains 'finish' or filter_label contains 'material'
+      assign filter_names_metal = true
+    endif
+
+    for applied_value in applied_filter.active_values
+      assign filter_text = applied_value.value | downcase
+      unless filter_names_metal or filter_text contains 'metal:'
+        continue
+      endunless
+      if filter_text contains 'rose' or filter_text contains 'pink'
+        assign filtered_tone = 'rg'
+      elsif filter_text contains 'white'
+        assign filtered_tone = 'wg'
+      elsif filter_text contains 'yellow'
+        assign filtered_tone = 'yg'
+      elsif filter_text contains 'platinum'
+        assign filtered_tone = 'pl'
+      elsif filter_text contains 'silver'
+        assign filtered_tone = 'ss'
+      elsif filter_text contains 'gold'
+        assign filtered_tone = 'yg'
+      endif
+      if filtered_tone != ''
+        break
+      endif
+    endfor
+
+    if filtered_tone != ''
+      break
+    endif
+  endfor
+
   # Same collapsing as the metals row: every karat of white gold is one dot, and the
   # first value of each tone is kept because that is the one with a variant behind it.
   assign seen_tones = '|'
   assign metal_unique = ''
+  assign filtered_pick = ''
   for value in metal_values_raw
     assign dedupe_text = value | strip | downcase
     if dedupe_text contains 'rose' or dedupe_text contains 'pink'
@@ -66,12 +120,24 @@
     unless seen_tones contains tone_key
       assign seen_tones = seen_tones | append: dedupe_tone | append: '|'
       assign metal_unique = metal_unique | append: '||' | append: value
+      # The filtered metal is read off the same pass rather than tested again below:
+      # this is the first value of its tone, so it is the one with a variant behind it.
+      if dedupe_tone == filtered_tone and filtered_pick == ''
+        assign filtered_pick = value | strip
+      endif
     endunless
   endfor
 
   assign metal_values = metal_unique | remove_first: '||' | split: '||'
 -%}
-{%- if metal_index >= 0 and metal_values.size > 1 -%}
+{%- if metal_index >= 0 and filtered_pick != '' -%}
+  {%- comment -%}
+    No seed and no size test: the shopper asked for this metal, so a product that sells
+    it opens on it even when it sells nothing else — the one metal it has is still worth
+    pointing the photo and the link at, rather than falling back to the featured image.
+  {%- endcomment -%}
+  {{- metal_index }}||{{ filtered_pick -}}
+{%- elsif metal_index >= 0 and metal_values.size > 1 -%}
   {%- liquid
     # The product id alone is no good as a seed: this catalogue was imported in bulk, so
     # Shopify handed out ids in a regular stride and every one of them leaves the same

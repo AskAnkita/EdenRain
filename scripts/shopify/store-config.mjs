@@ -140,12 +140,25 @@ export const collections = [
 // Platinum is not in the menu: the shop stocks none, and a tile that opens an empty page is the
 // problem this set was written to fix. Sterling silver takes its place and is the largest of the
 // four. The platinum collection still exists, ready for the first platinum piece.
-const metalItems = [
-  { title: 'Yellow Gold', collection: 'yellow-gold-jewelry' },
-  { title: 'White Gold', collection: 'white-gold-jewelry' },
-  { title: 'Rose Gold', collection: 'rose-gold-jewelry' },
-  { title: 'Sterling Silver', collection: 'sterling-silver-jewelry' },
-];
+//
+// A metal is a filter, not a destination. These used to link at the <metal>-jewelry collections,
+// whose Image in admin is a colour swatch - a gold disc on white - which the collection hero drew
+// across the full width of the page. So a metal links at the panel's own collection with the metal
+// filter applied, which also keeps the context: Yellow Gold under Engagement means yellow-gold
+// engagement rings, not every yellow-gold piece in the shop. The tags are the ones
+// tag-products.mjs writes and snippets/static-filters.liquid filters on; the menu in the theme
+// builds the same links in snippets/menu-static-items.liquid - keep the two in step. The
+// <metal>-jewelry collections still exist and still work; nothing in the menu points at them.
+//
+// Needs the tag filter switched on in Search & Discovery, or the link lands on the collection
+// unfiltered - the same condition the Metal group in the filter drawer is under.
+const metalItems = (base) =>
+  [
+    ['Yellow Gold', 'yellow-gold'],
+    ['White Gold', 'white-gold'],
+    ['Rose Gold', 'rose-gold'],
+    ['Sterling Silver', 'sterling-silver'],
+  ].map(([title, slug]) => ({ title, url: `${base}?filter.p.tag=metal:${slug}` }));
 
 // Shop by Shape and Shop by Stone, shared by the Jewellery panel and the drawer. Only values the
 // catalogue actually carries more than one of; see the collection list above for the rest.
@@ -205,7 +218,7 @@ export const menu = {
             collection: `${shape.toLowerCase()}-engagement-rings`,
           })),
         },
-        { title: 'Shop by Metal', collection: 'engagement-rings', items: metalItems },
+        { title: 'Shop by Metal', collection: 'engagement-rings', items: metalItems('/collections/engagement-rings') },
       ],
     },
     {
@@ -224,7 +237,7 @@ export const menu = {
             { title: 'Bridal Sets', collection: 'bridal-sets' },
           ],
         },
-        { title: 'Shop by Metal', collection: 'wedding-bands', items: metalItems },
+        { title: 'Shop by Metal', collection: 'wedding-bands', items: metalItems('/collections/wedding-bands') },
       ],
     },
     {
@@ -261,7 +274,7 @@ export const menu = {
         { title: 'Rings', collection: 'rings', items: [{ title: 'All Rings', collection: 'rings' }] },
         { title: 'Shop by Shape', url: '/collections/all', items: shapeItems },
         { title: 'Shop by Stone', url: '/collections/all', items: stoneItems },
-        { title: 'Shop by Metal', url: '/collections/all', items: metalItems },
+        { title: 'Shop by Metal', url: '/collections/all', items: metalItems('/collections/all') },
         {
           title: 'Featured',
           collection: 'new-in',
@@ -273,6 +286,7 @@ export const menu = {
       ],
     },
     { title: 'Diamonds', collection: 'lab-grown-diamonds' },
+    { title: 'Design Studio', url: '/pages/design-your-own' },
     // Shown on the right of the header (theme setting "right_menu_items")
     { title: 'Learn', url: '/pages/education-guides' },
     { title: 'About', url: '/pages/about-er' },

@@ -3415,6 +3415,119 @@
         "padding_bottom": 36
       }
     },
+    "skin_tone_preview": {
+      "type": "skin-tone-preview",
+      "blocks": {
+        "tone_light": {
+          "type": "tone",
+          "settings": {
+            "label": "Light",
+            "swatch": "#ecc4ac",
+            "image_asset": "pear-ring-hand-tone-1.jpg",
+            "image_url": ""
+          }
+        },
+        "tone_light_medium": {
+          "type": "tone",
+          "settings": {
+            "label": "Light medium",
+            "swatch": "#e0b69d",
+            "image_asset": "pear-ring-hand-tone-2.jpg",
+            "image_url": ""
+          }
+        },
+        "tone_medium": {
+          "type": "tone",
+          "settings": {
+            "label": "Medium",
+            "swatch": "#c99a7c",
+            "image_asset": "pear-ring-hand-tone-3.jpg",
+            "image_url": ""
+          }
+        },
+        "tone_medium_deep": {
+          "type": "tone",
+          "settings": {
+            "label": "Medium deep",
+            "swatch": "#ae7e60",
+            "image_asset": "pear-ring-hand-tone-4.jpg",
+            "image_url": ""
+          }
+        },
+        "tone_deep": {
+          "type": "tone",
+          "settings": {
+            "label": "Deep",
+            "swatch": "#8f6145",
+            "image_asset": "pear-ring-hand-tone-5.jpg",
+            "image_url": ""
+          }
+        },
+        "tone_rich_deep": {
+          "type": "tone",
+          "settings": {
+            "label": "Rich deep",
+            "swatch": "#744432",
+            "image_asset": "pear-ring-hand-tone-6.jpg",
+            "image_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "tone_light",
+        "tone_light_medium",
+        "tone_medium",
+        "tone_medium_deep",
+        "tone_deep",
+        "tone_rich_deep"
+      ],
+      "settings": {
+        "sku_match": "AJLR262",
+        "heading": "See it on your hand",
+        "subheading": "Slide through the tones to picture the ring on your own skin.",
+        "caption": "Shown on [tone] skin — for reference only",
+        "image_alt": "[product] worn on a hand with [tone] skin",
+        "track_label": "Skin tone",
+        "default_tone": "",
+        "text_alignment": "center",
+        "heading_size": 30,
+        "heading_weight": 400,
+        "heading_tracking": 4,
+        "heading_transform": "none",
+        "subheading_size": 15,
+        "subheading_style": "normal",
+        "caption_size": 13,
+        "caption_color": "#1c1c1c",
+        "tile_background": "#f4f1ee",
+        "track_background": "#ffffff",
+        "swatch_border": "#d8d2cc",
+        "swatch_active_ring": "#1c1c1c",
+        "aspect_ratio": 1.0,
+        "image_fit": "cover",
+        "image_position": "center",
+        "tile_radius": 0,
+        "fade_duration": 180,
+        "swatch_size": 18,
+        "swatch_gap": 10,
+        "track_radius": 0,
+        "track_inset": 24,
+        "button_label": "",
+        "button_style": "outline",
+        "button_background": "#1c1c1c",
+        "button_text_color": "#ffffff",
+        "button_transform": "uppercase",
+        "button_size": 12,
+        "button_padding_x": 28,
+        "button_padding_y": 14,
+        "button_gap": 24,
+        "width": "narrow",
+        "custom_width": 720,
+        "header_gap": 24,
+        "page_padding": 20,
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
     "section_product_tabs_U8mYg9": {
       "type": "section-product-tabs",
       "blocks": {
@@ -5438,6 +5551,7 @@
   "order": [
     "breadcrumb_NKGGwM",
     "main",
+    "skin_tone_preview",
     "quick_order_list_XTrabM",
     "section_product_tabs_U8mYg9",
     "section_MnWraC",

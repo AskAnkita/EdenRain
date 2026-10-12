@@ -1,0 +1,891 @@
+{% comment %}
+  Skin tone preview.
+
+  The ring photographed on a hand, with a slider that moves that hand through a ladder of
+  skin tones. One block per tone, lightest first; each block carries its own photograph, so
+  a shoot that covers several hands can be wired here directly. Where only one hand was
+  shot, scripts/images/make-skin-tones.py derives the rest from it -- same pose, same
+  lighting, same ring -- and the blocks point at those renders.
+
+  The tile is tied to the pieces it was shot for rather than to the page: "Shown for SKUs"
+  lists SKU fragments, and the section only renders for a product holding one of them.
+  On a merged product -- one design, several stone shapes, the shape in the SKU prefix --
+  skin-tone-preview.js watches the variant and shows the tile only while a matching
+  variant is selected, so the pear hand shot does not turn up over the cushion.
+{% endcomment %}
+
+{%- liquid
+  assign transparent = 'rgba(0,0,0,0)'
+  assign root_class = 'skin-tone-' | append: section.id
+
+  # Which of this product's variants the tile was shot for. Blank matches everything, which
+  # is what a merchant dropping the section on a one-ring page wants.
+  assign sku_terms = section.settings.sku_match | downcase | replace: ' ', '' | split: ','
+
+  assign product_matches = true
+  if section.settings.sku_match != blank
+    assign product_matches = false
+    for variant in product.variants
+      assign variant_sku = variant.sku | downcase
+      for term in sku_terms
+        assign sku_term = term | strip
+        if sku_term != blank and variant_sku contains sku_term
+          assign product_matches = true
+          break
+        endif
+      endfor
+      if product_matches
+        break
+      endif
+    endfor
+  endif
+
+  # The tone the tile opens on: the one the merchant named, else the middle of the ladder,
+  # which puts the shopper halfway along the slider rather than at one end of it.
+  assign default_index = section.blocks.size | divided_by: 2
+  if section.settings.default_tone != blank
+    for block in section.blocks
+      assign block_label = block.settings.label | downcase | strip
+      assign wanted = section.settings.default_tone | downcase | strip
+      if block_label == wanted
+        assign default_index = forloop.index0
+        break
+      endif
+    endfor
+  endif
+-%}
+
+{%- if section.blocks.size > 0 and product_matches -%}
+  {% style %}
+    .{{ root_class }} {
+      --skin-ratio: {{ section.settings.aspect_ratio }};
+      --skin-radius: {{ section.settings.tile_radius }}px;
+      --skin-heading-size: {{ section.settings.heading_size }}px;
+      --skin-heading-tracking: {{ section.settings.heading_tracking | divided_by: 100.0 }}em;
+      --skin-heading-weight: {{ section.settings.heading_weight }};
+      --skin-subheading-size: {{ section.settings.subheading_size }}px;
+      --skin-caption-size: {{ section.settings.caption_size }}px;
+      --skin-swatch-size: {{ section.settings.swatch_size }}px;
+      --skin-swatch-gap: {{ section.settings.swatch_gap }}px;
+      --skin-track-radius: {{ section.settings.track_radius }}px;
+      --skin-track-inset: {{ section.settings.track_inset }}px;
+      --skin-page-padding: {{ section.settings.page_padding }}px;
+      --skin-padding-top: {{ section.settings.padding_top }}px;
+      --skin-padding-bottom: {{ section.settings.padding_bottom }}px;
+      --skin-fade: {{ section.settings.fade_duration }}ms;
+      {% if section.settings.heading_color != blank and section.settings.heading_color != transparent %}--skin-heading-color: {{ section.settings.heading_color }};{% endif %}
+      {% if section.settings.subheading_color != blank and section.settings.subheading_color != transparent %}--skin-subheading-color: {{ section.settings.subheading_color }};{% endif %}
+      {% if section.settings.caption_color != blank and section.settings.caption_color != transparent %}--skin-caption-color: {{ section.settings.caption_color }};{% endif %}
+      {% if section.settings.track_background != blank and section.settings.track_background != transparent %}--skin-track-bg: {{ section.settings.track_background }};{% endif %}
+      {% if section.settings.swatch_border != blank and section.settings.swatch_border != transparent %}--skin-swatch-border: {{ section.settings.swatch_border }};{% endif %}
+      {% if section.settings.swatch_active_ring != blank and section.settings.swatch_active_ring != transparent %}--skin-swatch-ring: {{ section.settings.swatch_active_ring }};{% endif %}
+      {% if section.settings.tile_background != blank and section.settings.tile_background != transparent %}--skin-tile-bg: {{ section.settings.tile_background }};{% endif %}
+      {% if section.settings.section_background != blank and section.settings.section_background != transparent %}--skin-section-bg: {{ section.settings.section_background }};{% endif %}
+      {% if section.settings.button_background != blank and section.settings.button_background != transparent %}--skin-button-bg: {{ section.settings.button_background }};{% endif %}
+      {% if section.settings.button_text_color != blank and section.settings.button_text_color != transparent %}--skin-button-color: {{ section.settings.button_text_color }};{% endif %}
+
+      background: var(--skin-section-bg, transparent);
+      padding: var(--skin-padding-top) var(--skin-page-padding) var(--skin-padding-bottom);
+    }
+
+    .{{ root_class }} .skin-tone__inner {
+      {% if section.settings.width == 'page' %}max-width: var(--page-width, 1440px);{% elsif section.settings.width == 'narrow' %}max-width: {{ section.settings.custom_width }}px;{% endif %}
+      margin-inline: auto;
+    }
+
+    .{{ root_class }} .skin-tone__header {
+      text-align: {{ section.settings.text_alignment }};
+      margin-bottom: {{ section.settings.header_gap }}px;
+    }
+
+    .{{ root_class }} .skin-tone__heading {
+      margin: 0;
+      font-size: var(--skin-heading-size);
+      font-weight: var(--skin-heading-weight);
+      letter-spacing: var(--skin-heading-tracking);
+      line-height: 1.15;
+      {% if section.settings.heading_transform != 'theme' %}text-transform: {{ section.settings.heading_transform }};{% endif %}
+      color: var(--skin-heading-color, inherit);
+    }
+
+    .{{ root_class }} .skin-tone__subheading {
+      margin: .5em 0 0;
+      font-size: var(--skin-subheading-size);
+      font-style: {{ section.settings.subheading_style }};
+      line-height: 1.45;
+      color: var(--skin-subheading-color, inherit);
+    }
+
+    .{{ root_class }} .skin-tone__tile {
+      position: relative;
+      margin: 0;
+      overflow: hidden;
+      aspect-ratio: var(--skin-ratio);
+      border-radius: var(--skin-radius);
+      background: var(--skin-tile-bg, #f4f1ee);
+    }
+
+    /* Two stacked layers: the tone on show, and the one being faded in behind the
+       pointer. Swapping src on a single image flashes the tile white while the next
+       photograph decodes. */
+    .{{ root_class }} .skin-tone__layer {
+      display: block;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: {{ section.settings.image_fit }};
+      object-position: {{ section.settings.image_position }};
+      opacity: 0;
+      transition: opacity var(--skin-fade) linear;
+    }
+
+    .{{ root_class }} .skin-tone__layer.is-shown {
+      opacity: 1;
+    }
+
+    .{{ root_class }} .skin-tone__caption {
+      position: absolute;
+      inset-inline: var(--skin-track-inset);
+      bottom: calc(var(--skin-track-inset) + var(--skin-swatch-size) * 2.2 + var(--skin-swatch-gap));
+      margin: 0;
+      text-align: center;
+      font-size: var(--skin-caption-size);
+      letter-spacing: .06em;
+      line-height: 1.4;
+      color: var(--skin-caption-color, #1c1c1c);
+      pointer-events: none;
+    }
+
+    .{{ root_class }} .skin-tone__track {
+      position: absolute;
+      left: var(--skin-track-inset);
+      right: var(--skin-track-inset);
+      bottom: var(--skin-track-inset);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--skin-swatch-gap);
+      padding: calc(var(--skin-swatch-gap) / 1.5);
+      border-radius: var(--skin-track-radius);
+      background: var(--skin-track-bg, rgba(255,255,255,.86));
+      backdrop-filter: blur(6px);
+      touch-action: pan-y;
+    }
+
+    .{{ root_class }} .skin-tone__swatch {
+      flex: 0 0 auto;
+      width: calc(var(--skin-swatch-size) * 1.6);
+      height: calc(var(--skin-swatch-size) * 1.6);
+      padding: 0;
+      border: 1px solid var(--skin-swatch-border, rgba(28,28,28,.18));
+      border-radius: 50%;
+      background-clip: padding-box;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .{{ root_class }} .skin-tone__swatch:hover {
+      transform: scale(1.08);
+    }
+
+    .{{ root_class }} .skin-tone__swatch.is-active {
+      transform: scale(1.12);
+      box-shadow: 0 0 0 2px var(--skin-track-bg, #fff), 0 0 0 3px var(--skin-swatch-ring, #1c1c1c);
+    }
+
+    .{{ root_class }} .skin-tone__swatch:focus-visible {
+      outline: 2px solid var(--skin-swatch-ring, #1c1c1c);
+      outline-offset: 3px;
+    }
+
+    .{{ root_class }} .skin-tone__button {
+      display: inline-block;
+      margin-top: {{ section.settings.button_gap }}px;
+      padding: {{ section.settings.button_padding_y }}px {{ section.settings.button_padding_x }}px;
+      border: 1px solid var(--skin-button-bg, #1c1c1c);
+      font-size: {{ section.settings.button_size }}px;
+      letter-spacing: .08em;
+      line-height: 1;
+      text-decoration: none;
+      {% if section.settings.button_transform != 'theme' %}text-transform: {{ section.settings.button_transform }};{% endif %}
+      {% if section.settings.button_style == 'outline' %}
+        background: transparent;
+        color: var(--skin-button-bg, #1c1c1c);
+      {% elsif section.settings.button_style == 'link' %}
+        padding-inline: 0;
+        border: 0;
+        border-bottom: 1px solid currentColor;
+        background: transparent;
+        color: var(--skin-button-bg, #1c1c1c);
+      {% else %}
+        background: var(--skin-button-bg, #1c1c1c);
+        color: var(--skin-button-color, #fff);
+      {% endif %}
+    }
+
+    .{{ root_class }} .skin-tone__footer {
+      text-align: {{ section.settings.text_alignment }};
+    }
+
+    @media screen and (max-width: 749px) {
+      .{{ root_class }} {
+        --skin-heading-size: {{ section.settings.heading_size | times: 0.74 | round }}px;
+        --skin-swatch-size: {{ section.settings.swatch_size | times: 0.86 | round }}px;
+        --skin-swatch-gap: {{ section.settings.swatch_gap | times: 0.7 | round }}px;
+        --skin-track-inset: {{ section.settings.track_inset | times: 0.6 | round }}px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .{{ root_class }} .skin-tone__layer,
+      .{{ root_class }} .skin-tone__swatch { transition: none; }
+    }
+  {% endstyle %}
+
+  {%- comment -%}
+    Which variants wear this hand shot. The map is printed even when the section is not
+    gated, so the script can leave the tile alone rather than guess.
+  {%- endcomment -%}
+  {%- capture variant_skus -%}
+    [{%- for variant in product.variants -%}
+      {"id":{{ variant.id }},"sku":{{ variant.sku | default: '' | json }}}
+      {%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}]
+  {%- endcapture -%}
+
+  <div
+    class="skin-tone {{ root_class }}"
+    data-skin-tone
+    data-sku-match="{{ section.settings.sku_match | escape }}"
+    data-caption="{{ section.settings.caption | escape }}"
+    {{ section.shopify_attributes }}
+  >
+    <script type="application/json" data-skin-tone-variants>{{ variant_skus | strip }}</script>
+
+    <div class="skin-tone__inner">
+      {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+        <div class="skin-tone__header">
+          {%- if section.settings.heading != blank -%}
+            <h2 class="skin-tone__heading">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.subheading != blank -%}
+            <p class="skin-tone__subheading">{{ section.settings.subheading | escape }}</p>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <figure class="skin-tone__tile">
+        {%- comment -%}
+          Fall through picker, assets folder, then a plain URL: most of the catalogue's
+          imagery is wired by URL because the products are not published to the Online
+          Store, so a picker alone would leave the tile empty.
+        {%- endcomment -%}
+        {%- assign initial_src = '' -%}
+        {%- assign initial_alt = '' -%}
+        {%- assign initial_label = '' -%}
+        {%- for block in section.blocks -%}
+          {%- capture tone_src -%}
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 1400 }}
+            {%- elsif block.settings.image_asset != blank -%}
+              {{ block.settings.image_asset | asset_url }}
+            {%- else -%}
+              {{ block.settings.image_url }}
+            {%- endif -%}
+          {%- endcapture -%}
+          {%- assign tone_src = tone_src | strip -%}
+          {%- if forloop.index0 == default_index -%}
+            {%- assign initial_src = tone_src -%}
+            {%- assign initial_label = block.settings.label -%}
+            {%- capture initial_alt -%}
+              {{ section.settings.image_alt | replace: '[tone]', block.settings.label | replace: '[product]', product.title }}
+            {%- endcapture -%}
+            {%- assign initial_alt = initial_alt | strip -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        <img
+          class="skin-tone__layer is-shown"
+          data-skin-tone-layer
+          src="{{ initial_src }}"
+          alt="{{ initial_alt | escape }}"
+          width="1254"
+          height="1254"
+          loading="lazy"
+          decoding="async"
+        >
+        <img
+          class="skin-tone__layer"
+          data-skin-tone-layer
+          src="{{ initial_src }}"
+          alt=""
+          aria-hidden="true"
+          width="1254"
+          height="1254"
+          loading="lazy"
+          decoding="async"
+        >
+
+        {%- if section.settings.caption != blank -%}
+          <figcaption class="skin-tone__caption" data-skin-tone-caption>
+            {{- section.settings.caption | replace: '[tone]', initial_label | escape -}}
+          </figcaption>
+        {%- endif -%}
+
+        <div
+          class="skin-tone__track"
+          role="radiogroup"
+          aria-label="{{ section.settings.track_label | escape }}"
+          data-skin-tone-track
+        >
+          {%- for block in section.blocks -%}
+            {%- capture tone_src -%}
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 1400 }}
+              {%- elsif block.settings.image_asset != blank -%}
+                {{ block.settings.image_asset | asset_url }}
+              {%- else -%}
+                {{ block.settings.image_url }}
+              {%- endif -%}
+            {%- endcapture -%}
+            {%- assign tone_src = tone_src | strip -%}
+            {%- assign is_active = false -%}
+            {%- if forloop.index0 == default_index -%}{%- assign is_active = true -%}{%- endif -%}
+            {%- capture tone_alt -%}
+              {{ section.settings.image_alt | replace: '[tone]', block.settings.label | replace: '[product]', product.title }}
+            {%- endcapture -%}
+            <button
+              type="button"
+              class="skin-tone__swatch{% if is_active %} is-active{% endif %}"
+              role="radio"
+              aria-checked="{% if is_active %}true{% else %}false{% endif %}"
+              aria-label="{{ block.settings.label | escape }}"
+              tabindex="{% if is_active %}0{% else %}-1{% endif %}"
+              style="background-color: {{ block.settings.swatch | default: '#c9a089' }};"
+              data-skin-tone-step
+              data-skin-tone-src="{{ tone_src }}"
+              data-skin-tone-label="{{ block.settings.label | escape }}"
+              data-skin-tone-alt="{{ tone_alt | strip | escape }}"
+              {{ block.shopify_attributes }}
+            ></button>
+          {%- endfor -%}
+        </div>
+      </figure>
+
+      {%- if section.settings.button_label != blank -%}
+        <div class="skin-tone__footer">
+          <a class="skin-tone__button" href="{{ section.settings.button_link | default: '#' }}">
+            {{- section.settings.button_label | escape -}}
+          </a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <script src="{{ 'skin-tone-preview.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Skin tone preview",
+  "tag": "section",
+  "class": "section-skin-tone-preview",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Which products"
+    },
+    {
+      "type": "text",
+      "id": "sku_match",
+      "label": "Shown for SKUs",
+      "info": "Comma separated, matched anywhere in a variant's SKU (AJLR262 covers every metal of that ring). Leave empty to show on every product using this template.",
+      "default": "AJLR262"
+    },
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "See it on your hand"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Slide through the tones to picture the ring on your own skin."
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Caption under the photo",
+      "info": "[tone] is replaced with the selected tone's name.",
+      "default": "Shown on [tone] skin — for reference only"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text",
+      "info": "[tone] and [product] are replaced with the tone's name and the product title.",
+      "default": "[product] worn on a hand with [tone] skin"
+    },
+    {
+      "type": "text",
+      "id": "track_label",
+      "label": "Slider label for screen readers",
+      "default": "Skin tone"
+    },
+    {
+      "type": "text",
+      "id": "default_tone",
+      "label": "Tone selected first",
+      "info": "Match a tone's name exactly. Leave empty to open in the middle of the ladder."
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Centre" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 16,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "heading_weight",
+      "label": "Heading weight",
+      "min": 300,
+      "max": 800,
+      "step": 100,
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "heading_tracking",
+      "label": "Heading letter spacing (hundredths of an em)",
+      "min": -5,
+      "max": 30,
+      "step": 1,
+      "unit": "em%",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "heading_transform",
+      "label": "Heading case",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "none", "label": "As typed" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "capitalize", "label": "Capitalised" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "label": "Subheading size",
+      "min": 11,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "select",
+      "id": "subheading_style",
+      "label": "Subheading style",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "italic", "label": "Italic" }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "range",
+      "id": "caption_size",
+      "label": "Caption size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Subheading"
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Caption",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "tile_background",
+      "label": "Tile background",
+      "default": "#f4f1ee"
+    },
+    {
+      "type": "color",
+      "id": "section_background",
+      "label": "Section background"
+    },
+    {
+      "type": "color",
+      "id": "track_background",
+      "label": "Slider background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "swatch_border",
+      "label": "Swatch border",
+      "default": "#d8d2cc"
+    },
+    {
+      "type": "color",
+      "id": "swatch_active_ring",
+      "label": "Selected swatch ring",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "header",
+      "content": "Photo"
+    },
+    {
+      "type": "range",
+      "id": "aspect_ratio",
+      "label": "Tile shape",
+      "info": "Width divided by height. 1 is square.",
+      "min": 0.6,
+      "max": 1.8,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Photo fit",
+      "options": [
+        { "value": "cover", "label": "Fill the tile" },
+        { "value": "contain", "label": "Fit inside the tile" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Photo position",
+      "options": [
+        { "value": "center", "label": "Centre" },
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "tile_radius",
+      "label": "Tile corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "fade_duration",
+      "label": "Fade between tones",
+      "min": 0,
+      "max": 600,
+      "step": 20,
+      "unit": "ms",
+      "default": 180
+    },
+    {
+      "type": "header",
+      "content": "Slider"
+    },
+    {
+      "type": "range",
+      "id": "swatch_size",
+      "label": "Swatch size",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "swatch_gap",
+      "label": "Space between swatches",
+      "min": 2,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "track_radius",
+      "label": "Slider corner radius",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "track_inset",
+      "label": "Slider inset from the tile edge",
+      "min": 8,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "info": "Leave empty to hide the button."
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "filled", "label": "Filled" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "link", "label": "Underlined text" }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "button_transform",
+      "label": "Button case",
+      "options": [
+        { "value": "theme", "label": "Theme default" },
+        { "value": "none", "label": "As typed" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "capitalize", "label": "Capitalised" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "button_size",
+      "label": "Button text size",
+      "min": 10,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_padding_x",
+      "label": "Button padding, sides",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "button_padding_y",
+      "label": "Button padding, top and bottom",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_gap",
+      "label": "Space above the button",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Section width",
+      "options": [
+        { "value": "page", "label": "Page width" },
+        { "value": "narrow", "label": "Custom width" },
+        { "value": "full", "label": "Full width" }
+      ],
+      "default": "narrow"
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "Custom width",
+      "min": 400,
+      "max": 1400,
+      "step": 20,
+      "unit": "px",
+      "default": 720
+    },
+    {
+      "type": "range",
+      "id": "header_gap",
+      "label": "Space under the heading",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "page_padding",
+      "label": "Side padding",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tone",
+      "name": "Skin tone",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Tone name",
+          "default": "Medium"
+        },
+        {
+          "type": "color",
+          "id": "swatch",
+          "label": "Swatch colour",
+          "default": "#c9a089"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Photo"
+        },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "Photo from the theme's assets",
+          "info": "A file name in assets/, used when no photo is picked above."
+        },
+        {
+          "type": "text",
+          "id": "image_url",
+          "label": "Photo URL",
+          "info": "Used when neither of the two above is set."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Skin tone preview",
+      "blocks": [
+        { "type": "tone", "settings": { "label": "Light", "swatch": "#ecc4ac", "image_asset": "pear-ring-hand-tone-1.jpg" } },
+        { "type": "tone", "settings": { "label": "Light medium", "swatch": "#e0b69d", "image_asset": "pear-ring-hand-tone-2.jpg" } },
+        { "type": "tone", "settings": { "label": "Medium", "swatch": "#c99a7c", "image_asset": "pear-ring-hand-tone-3.jpg" } },
+        { "type": "tone", "settings": { "label": "Medium deep", "swatch": "#ae7e60", "image_asset": "pear-ring-hand-tone-4.jpg" } },
+        { "type": "tone", "settings": { "label": "Deep", "swatch": "#8f6145", "image_asset": "pear-ring-hand-tone-5.jpg" } },
+        { "type": "tone", "settings": { "label": "Rich deep", "swatch": "#744432", "image_asset": "pear-ring-hand-tone-6.jpg" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

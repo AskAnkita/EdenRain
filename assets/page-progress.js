@@ -1,19 +1,34 @@
 /*
- * Feedback for the gap between clicking a link and the next page painting.
+ * Feedback for the gap between clicking a link and the next page being ready.
  *
- * The browser gives no progress events for a document navigation, so the bar eases
- * towards a ceiling on a timer and only completes on unload. Clicks that a component
- * handles itself -- facet filters, the cart drawer, anything that calls
- * preventDefault -- have defaultPrevented set by the time the event reaches document,
- * so they never start the bar. A watchdog retracts it for whatever slips through, such
- * as a navigation the browser declines to make.
+ * That wait has two halves, and the bar covers both:
+ *
+ *   1. Click until the browser commits the navigation. The old page is still on
+ *      screen; nothing else says the click registered.
+ *   2. The new document, from its first paint until window load. The old page's bar
+ *      died with it, but the stylesheets, fonts and photos are still arriving.
+ *
+ * Half two is what makes the bar worth having. On a quick server response half one
+ * lasts a few dozen milliseconds -- too short to see, which is why a click-only bar
+ * reads as broken -- while the page it lands on keeps loading for a good while after.
+ *
+ * Neither half reports real progress, so the bar eases towards a ceiling on a timer
+ * and only ever completes when the wait actually ends. Clicks that a component handles
+ * itself -- facet filters, the cart drawer, anything that calls preventDefault -- have
+ * defaultPrevented set by the time the event reaches document, so they never start it.
+ * A watchdog retracts the bar for whatever slips through, such as a navigation the
+ * browser declines to make.
  */
 (() => {
   const CEILING = 0.9;
-  const START_AT = 0.08;
+  const START_AT = 0.12;
   const TICK_MS = 300;
   const WATCHDOG_MS = 8000;
-  const LAND_MS = 400;
+  const LAND_MS = 320;
+  const FADE_MS = 240;
+
+  /* A page that is already warm finishes inside this, and stays quiet. */
+  const LOAD_GRACE_MS = 150;
 
   let root = null;
   let bar = null;
@@ -55,20 +70,15 @@
     stopTimers();
     mount();
 
-    /* Rewind unanimated: a bar that starts again straight after a retract has to look
-       like it begins at the left edge, not like it slides back to it. */
+    /* Opens at a width you can see, in one frame, with the transition off: the bar has
+       to be present the instant it is asked for, not slide in from nothing. */
     bar.style.transition = 'none';
-    progress = 0;
+    progress = START_AT;
     paint();
     root.dataset.state = 'loading';
 
-    /* The zero width is committed in this frame, so the first real step has somewhere
-       to travel from once the transition is back on. */
     requestAnimationFrame(() => {
-      if (root.dataset.state !== 'loading') return;
-      bar.style.transition = '';
-      progress = START_AT;
-      paint();
+      if (root.dataset.state === 'loading') bar.style.transition = '';
     });
 
     tickTimer = setInterval(tick, TICK_MS);
@@ -89,11 +99,14 @@
     if (!root) return;
     delete root.dataset.state;
     progress = 0;
-    /* Width goes back to zero only once the bar has faded out, so the trip back to the
+    /* Width goes back to zero only once the bar has faded, so the trip back to the
        left edge is never on screen. */
     hideTimer = setTimeout(() => {
-      if (!root.dataset.state) paint();
-    }, 240);
+      if (!root.dataset.state) {
+        bar.style.transition = 'none';
+        paint();
+      }
+    }, FADE_MS);
   }
 
   function navigates(link) {
@@ -117,29 +130,76 @@
     return !(samePath && url.hash);
   }
 
-  document.addEventListener('click', (event) => {
-    if (event.defaultPrevented || event.button !== 0) return;
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    if (!(event.target instanceof Element)) return;
+  /* Captured, then decided a tick later.
+   *
+   * Capture is so that a component calling stopPropagation on a card or nav link --
+   * this theme does it in several places -- cannot stop the event reaching here at
+   * all. The deferred check is so preventDefault is still honoured: the facet and
+   * cart-drawer handlers only call it once the event has reached them, which is after
+   * the capture phase, and a task scheduled from capture runs after the whole dispatch
+   * has finished. So both kinds of intercepted click are read correctly. */
+  function decideLater(event, isWanted) {
+    setTimeout(() => {
+      if (!event.defaultPrevented && isWanted()) start();
+    }, 0);
+  }
 
-    const link = event.target.closest('a[href]');
-    if (link && navigates(link)) start();
-  });
+  document.addEventListener(
+    'click',
+    (event) => {
+      if (event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (!(event.target instanceof Element)) return;
+
+      const link = event.target.closest('a[href]');
+      if (link) decideLater(event, () => navigates(link));
+    },
+    true
+  );
 
   /* Search, login and address forms navigate; add-to-cart and facet forms are
-     intercepted by their own handlers and so arrive here already prevented. */
-  document.addEventListener('submit', (event) => {
-    if (event.defaultPrevented) return;
-    const form = event.target;
-    if (form instanceof HTMLFormElement && !('noProgress' in form.dataset)) start();
-  });
+     intercepted by their own handlers, which the deferred check catches. */
+  document.addEventListener(
+    'submit',
+    (event) => {
+      const form = event.target;
+      if (form instanceof HTMLFormElement) {
+        decideLater(event, () => !('noProgress' in form.dataset));
+      }
+    },
+    true
+  );
 
   window.addEventListener('beforeunload', finish);
   window.addEventListener('pagehide', finish);
 
-  /* A back/forward restore brings the DOM back exactly as it was left -- mid-animation
-     or sitting at 100% -- so clear it rather than let the old bar linger. */
+  /* A back/forward restore brings the DOM back exactly as it was left -- mid-creep or
+     sitting at 100% -- so clear it rather than let the old bar linger. */
   window.addEventListener('pageshow', (event) => {
     if (event.persisted) retract();
   });
+
+  function watchThisPage() {
+    if (document.readyState === 'complete') return;
+
+    const grace = setTimeout(() => {
+      if (document.readyState !== 'complete') start();
+    }, LOAD_GRACE_MS);
+
+    window.addEventListener(
+      'load',
+      () => {
+        clearTimeout(grace);
+        finish();
+      },
+      { once: true }
+    );
+  }
+
+  watchThisPage();
+
+  /* A handle for checking this from the console: pageProgress.start() should put the
+     bar on screen straight away, which separates "the bar does not render" from "the
+     click was never seen". */
+  window.pageProgress = { start, finish, retract };
 })();

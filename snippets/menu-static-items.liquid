@@ -33,8 +33,31 @@
   comment
     Platinum is not here: the shop stocks none, so the tile opened an empty page. Sterling silver
     takes its place and is the biggest of the four. Collections: scripts/shopify/store-config.mjs.
+
+    A metal is a filter, not a destination of its own. These used to open the <metal>-jewelry
+    collections, whose Image in admin is a colour swatch - a gold disc on white - which the
+    collection hero then blows up to a full-width circle (templates/collection.json hands
+    `collection.image` to 'main-collection-banner'). So a metal now opens the panel's own
+    collection with the metal filter applied, on the same `metal:<colour>` tags the Metal group
+    in the filter drawer filters on ('static-filters', scripts/shopify/tag-products.mjs). The
+    <metal>-jewelry collections still exist and still work; nothing in the menu points at them.
   endcomment
-  assign metals = '::Yellow Gold|yellow-gold-jewelry~White Gold|white-gold-jewelry~Rose Gold|rose-gold-jewelry~Sterling Silver|sterling-silver-jewelry'
+  assign metal_base = '/collections/all'
+  if parent_key == 'engagement'
+    assign metal_base = '/collections/engagement-rings'
+  elsif parent_key == 'wedding'
+    assign metal_base = '/collections/wedding-bands'
+  endif
+
+  assign metal_entries = 'Yellow Gold|yellow-gold,White Gold|white-gold,Rose Gold|rose-gold,Sterling Silver|sterling-silver' | split: ','
+  assign metals = '::'
+  for metal_entry in metal_entries
+    assign metal_parts = metal_entry | split: '|'
+    unless forloop.first
+      assign metals = metals | append: '~'
+    endunless
+    assign metals = metals | append: metal_parts[0] | append: '|' | append: metal_base | append: '?filter.p.tag=metal:' | append: metal_parts[1]
+  endfor
 
   comment
     Shape and Stone span the whole catalogue - a round stone in a stud counts, not only in a ring -

@@ -5,6 +5,20 @@
   assign color_scheme_image = sec_stts.color_scheme_image
   assign section_height = sec_stts.section_height
   assign collection_image = sec_stts.collection_image
+
+  # The metal collections (yellow-gold-jewelry and friends) carry a colour swatch as their
+  # Image in admin - a gold disc on white - and the template hands `collection.image` to the
+  # setting above, so the hero drew the swatch across the full width of the page. The menu
+  # reaches a metal as a filter now ('menu-static-items'), and a swatch is no hero, so these
+  # pages fall back to the plain tinted band the imageless collections already use.
+  assign metal_collections = 'yellow-gold-jewelry,white-gold-jewelry,rose-gold-jewelry,platinum-jewelry,sterling-silver-jewelry' | split: ','
+  for metal_collection in metal_collections
+    if collection.handle == metal_collection
+      assign collection_image = false
+      break
+    endif
+  endfor
+
   assign image_overlay_opacity = sec_stts.image_overlay_opacity
   assign scroll_reveal = settings.animations_reveal_on_scroll
   assign alignment = sec_stts.alignment
