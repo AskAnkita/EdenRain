@@ -20,6 +20,7 @@
   --sig-display-size: {{ section.settings.display_size }}px;
   --sig-subtitle-size: {{ section.settings.subtitle_size }}px;
   --sig-script-size: {{ section.settings.script_size }}px;
+  --sig-caption-size: {{ section.settings.caption_size | default: 14 }}px;
   --sig-meta-size: {{ section.settings.meta_size }}px;
   --sig-button-size: {{ section.settings.button_size }}px;
   --sig-boxed-size: {{ section.settings.boxed_size }}px;
@@ -33,6 +34,7 @@
   --sig-intro-gap: {{ section.settings.intro_gap }}px;
   --sig-description-width: {{ section.settings.description_width }}%;
   --sig-viewport-height: {{ section.settings.viewport_height }}svh;
+  --sig-radius: {{ section.settings.tile_radius }}px;
   --sig-bento-height: {{ section.settings.bento_height }}px;
   --sig-bento-center: {{ section.settings.bento_center_ratio | divided_by: 100.0 }}fr;
   --sig-bento-right: {{ section.settings.bento_right_ratio | divided_by: 100.0 }}fr;
@@ -110,10 +112,15 @@
     }
   }
 
+  {%- comment -%}
+    The theme is square-cornered everywhere, so this starts at 0 and only rounds when
+    the setting is turned up - the corner stays a decision in the editor, not a default.
+  {%- endcomment -%}
   .{{ root_class }} .signature-editorial__tile {
     position: relative;
     display: block;
     aspect-ratio: var(--sig-ratio-w) / var(--sig-ratio-h);
+    border-radius: var(--sig-radius, 0);
     overflow: hidden;
     background: var(--sig-tile-bg, #e9e5e0);
     color: var(--sig-text, #ffffff);
@@ -294,6 +301,40 @@
     pointer-events: none;
   }
 
+  {%- if section.settings.caption_rule -%}
+  {%- comment -%}
+    A hairline trailing the caption, as in "01 / CURATED ---". Inline-block so it sits on
+    the text's own baseline box rather than needing the caption to become a flex row.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__meta--tl::after {
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 1px;
+    margin-left: 10px;
+    background: currentColor;
+    opacity: 0.6;
+    vertical-align: middle;
+  }
+  {%- endif -%}
+
+  {%- comment -%}
+    A ringed top right caption, for a single glyph rather than words - the box is sized in
+    em so the ring grows with whatever caption size the tile is set to.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__meta--ring {
+    display: grid;
+    place-items: center;
+    width: 2.4em;
+    height: 2.4em;
+    max-width: none;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    opacity: 0.55;
+    text-align: center;
+    line-height: 1;
+  }
+
   .{{ root_class }} .signature-editorial__meta--tl { top: var(--sig-pad); left: var(--sig-pad); }
   .{{ root_class }} .signature-editorial__meta--tr { top: var(--sig-pad); right: var(--sig-pad); text-align: right; }
   .{{ root_class }} .signature-editorial__meta--bl { bottom: var(--sig-pad); left: var(--sig-pad); }
@@ -315,6 +356,67 @@
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
+  }
+
+  {%- comment -%}
+    The words and the call to action are two groups rather than one list, which is what
+    lets the "circle arrow" style put the heading on one side of the tile and the button
+    on the other without the markup changing per tile.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    min-width: 0;
+  }
+
+  .{{ root_class }} .signature-editorial__actions {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2.1vw, 25px);
+    flex-wrap: wrap;
+  }
+
+  {%- comment -%}
+    The rule under the second link is drawn rather than underlined, which is what lets it
+    be animated: it sits there in full, as two halves, and closes into the centre while the
+    link is hovered - the same underline as every other link in the theme.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__link-2 {
+    position: relative;
+    display: inline-block;
+    color: inherit;
+    font-size: var(--sig-tile-button-size, var(--sig-button-size));
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .{{ root_class }} .signature-editorial__link-2::before,
+  .{{ root_class }} .signature-editorial__link-2::after {
+    content: "";
+    position: absolute;
+    bottom: -0.2em;
+    width: 50%;
+    height: 1px;
+    background: currentColor;
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .{{ root_class }} .signature-editorial__link-2::before {
+    left: 0;
+    transform-origin: right center;
+  }
+
+  .{{ root_class }} .signature-editorial__link-2::after {
+    right: 0;
+    transform-origin: left center;
+  }
+
+  .{{ root_class }} .signature-editorial__link-2:hover::before,
+  .{{ root_class }} .signature-editorial__link-2:focus-visible::before,
+  .{{ root_class }} .signature-editorial__link-2:hover::after,
+  .{{ root_class }} .signature-editorial__link-2:focus-visible::after {
+    transform: scaleX(0);
   }
 
   .{{ root_class }} .signature-editorial__content a {
@@ -342,6 +444,11 @@
     The subtitle normally tucks under the display line. "Above" turns it into an eyebrow
     instead - one flex order away, since the two already share a column.
   {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__display em {
+    font-style: italic;
+    font-weight: inherit;
+  }
+
   .{{ root_class }} .signature-editorial__subtitle {
     order: var(--sig-subtitle-order, 0);
     margin: var(--sig-subtitle-margin, -0.6rem) 0 0;
@@ -352,13 +459,93 @@
     text-transform: uppercase;
   }
 
+  {%- comment -%}
+    The theme's own pairing is a display serif for headings and a sans for body copy, so a
+    standfirst under a serif heading wants the body face - this line can take either.
+  {%- endcomment -%}
   .{{ root_class }} .signature-editorial__script {
     margin: 0;
-    font-family: var(--font-heading--family);
+    font-family: var(--sig-script-family, var(--font-heading--family));
     font-style: var(--sig-script-style, italic);
     font-size: clamp(1.1rem, 2.4vw, calc(var(--sig-tile-script-size, var(--sig-script-size)) * var(--sig-text-scale, 1)));
-    line-height: 1.35;
+    line-height: var(--sig-script-leading, 1.35);
     letter-spacing: 0.01em;
+    color: var(--sig-muted, inherit);
+  }
+
+  .{{ root_class }} .signature-editorial__subtitle {
+    color: var(--sig-muted, inherit);
+  }
+
+  {%- comment -%}
+    "Label" caption: the house tile caption, the same uppercase sans the category tiles use,
+    so a photo tile here reads like a photo tile there. Only the picture tiles take it - the
+    text card's line is a standfirst sentence, which would be unreadable set in capitals.
+  {%- endcomment -%}
+  .{{ root_class }}.signature-editorial--caption-label .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__script {
+    font-family: var(--sig-script-family, var(--font-body--family));
+    font-style: normal;
+    font-weight: 600;
+    {%- comment -%}
+      One size for every label, deliberately: it ignores both the tile's own script size and
+      the smaller-tile scale, because a caption that changes size tile to tile stops reading
+      as a set. "Caption size" in the schema moves all of them together.
+    {%- endcomment -%}
+    font-size: var(--sig-caption-size, 14px);
+    letter-spacing: 0.16em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  {%- comment -%}
+    The caption carries the theme's underline: two halves meeting in the middle, drawn in
+    into the centre while the tile is hovered. Inline-block so the rule tracks the words
+    rather than the column, and a wrapping caption keeps the rule under its last line.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__script {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.45em;
+  }
+
+  .{{ root_class }} .signature-editorial__tile--text .signature-editorial__script {
+    display: block;
+    padding-bottom: 0;
+  }
+
+  .{{ root_class }} .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__script::before,
+  .{{ root_class }} .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__script::after {
+    position: absolute;
+    bottom: 0;
+    width: 50%;
+    height: 1px;
+    background: currentColor;
+    content: "";
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .{{ root_class }} .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__script::before {
+    left: 0;
+    transform-origin: right center;
+  }
+
+  .{{ root_class }} .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__script::after {
+    right: 0;
+    transform-origin: left center;
+  }
+
+  .{{ root_class }} .signature-editorial__tile:not(.signature-editorial__tile--text):hover .signature-editorial__script::before,
+  .{{ root_class }} .signature-editorial__tile:not(.signature-editorial__tile--text):focus-within .signature-editorial__script::before,
+  .{{ root_class }} .signature-editorial__tile:not(.signature-editorial__tile--text):hover .signature-editorial__script::after,
+  .{{ root_class }} .signature-editorial__tile:not(.signature-editorial__tile--text):focus-within .signature-editorial__script::after {
+    transform: scaleX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .{{ root_class }} .signature-editorial__script::before,
+    .{{ root_class }} .signature-editorial__script::after {
+      transition: none;
+    }
   }
 
   .{{ root_class }} .signature-editorial__boxed {
@@ -409,6 +596,117 @@
   .{{ root_class }} .signature-editorial__button-icon svg {
     width: 1.1em;
     height: 1.1em;
+  }
+
+  {%- comment -%}
+    The third call to action: no words at all, just a ringed arrow in the opposite bottom
+    corner from the text. The tile's content row turns horizontal for it, which is the only
+    time the words and the button sit side by side rather than stacked.
+  {%- endcomment -%}
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__content {
+    padding: calc(var(--sig-pad) * 2.2) var(--sig-pad) var(--sig-pad);
+  }
+
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__content > div {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.2rem;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__button {
+    width: clamp(37px, 3.45vw, 48px);
+    height: clamp(37px, 3.45vw, 48px);
+    flex: none;
+    display: grid;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    color: inherit;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__button-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__button-icon {
+    min-width: 0;
+    padding: 0;
+    background: none;
+    color: inherit;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__button-icon svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__button:hover {
+    opacity: 1;
+    background: var(--sig-button-bg, var(--sig-text, #ffffff));
+    color: var(--sig-button-text, var(--sig-button-contrast, #1a1a1a));
+  }
+
+  {%- comment -%}
+    A text card has no photograph to put a ring on, so it keeps the written button and
+    stacks its content as usual even when the photo tiles are using the circle.
+  {%- endcomment -%}
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile--text .signature-editorial__content > div {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile--text .signature-editorial__button {
+    width: auto;
+    height: auto;
+    display: inline-block;
+    border: 0;
+    border-radius: 0;
+    text-align: center;
+  }
+
+  {%- comment -%}
+    One solid block of colour with the words centred in it - no arrow and no second tone, so
+    the padding is what gives the button its size.
+  {%- endcomment -%}
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile--text .signature-editorial__button-label {
+    display: block;
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 1.55em 2.8em;
+    overflow: visible;
+    clip-path: none;
+    background: var(--sig-button-bg, #000000);
+    color: var(--sig-button-text, #ffffff);
+    {%- comment -%}
+      The outline is an inset shadow rather than a border so it is already there, under the
+      fill, and hovering only empties the block - the button never changes size.
+    {%- endcomment -%}
+    box-shadow: inset 0 0 0 1px var(--sig-button-bg, #000000);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile--text .signature-editorial__button-icon {
+    display: none;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile--text .signature-editorial__button:hover {
+    opacity: 1;
+    transform: none;
+    background: transparent;
+  }
+
+  .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile--text .signature-editorial__button:hover .signature-editorial__button-label {
+    background-color: transparent;
+    color: var(--sig-button-bg, #000000);
   }
 
   {%- comment -%}
@@ -480,6 +778,34 @@
       padding: 1.2rem;
     }
 
+    {%- comment -%}
+      A phone has no room for the ring beside the words - side by side it squeezes the
+      caption into a narrow column. So on mobile the circle goes (the whole tile is a link
+      of its own) and the caption takes the full width, centred, with its rule centred under
+      it. A second written link, if the tile has one, stays and keeps the row.
+    {%- endcomment -%}
+    .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__button {
+      display: none;
+    }
+
+    .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__actions:not(:has(.signature-editorial__link-2)) {
+      display: none;
+    }
+
+    .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__content > div {
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-self: center;
+      text-align: center;
+    }
+
+    .{{ root_class }}.signature-editorial--cta-circle .signature-editorial__tile:not(.signature-editorial__tile--text) .signature-editorial__text {
+      width: 100%;
+      align-items: center;
+      text-align: center;
+    }
+
     .{{ root_class }} .signature-editorial__product-title {
       font-size: 1.35rem;
     }
@@ -504,6 +830,11 @@
 
   @media (prefers-reduced-motion: reduce) {
     .{{ root_class }} .signature-editorial__image {
+      transition: none;
+    }
+
+    .{{ root_class }} .signature-editorial__link-2::before,
+    .{{ root_class }} .signature-editorial__link-2::after {
       transition: none;
     }
   }
@@ -554,6 +885,33 @@
 
   .{{ root_class }} .signature-editorial__tile--text .signature-editorial__content > div {
     gap: 0.9rem;
+    height: 100%;
+  }
+
+  {%- comment -%}
+    On a text card the button is the last thing in the column, so "margin-top: auto" is all
+    it takes to drop it to the foot of the card and leave the heading at the top.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__tile--text .signature-editorial__actions {
+    margin-top: auto;
+  }
+
+  {%- comment -%}
+    The flourish: one outlined circle bleeding off the top right corner. Decoration only,
+    so it is drawn behind the words and takes no clicks.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__tile--flourish::before {
+    content: "";
+    position: absolute;
+    top: -140px;
+    right: -95px;
+    width: 230px;
+    height: 230px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 1;
   }
 
   @media screen and (min-width: 990px) {
@@ -568,6 +926,14 @@
       aspect-ratio: auto;
       height: 100%;
       min-height: 0;
+    }
+
+    {%- comment -%}
+      "One screen" is written after the bento's own height and with a class more, so the
+      two height settings cannot fight: pick one screen and the bento fills it instead.
+    {%- endcomment -%}
+    .{{ root_class }}.signature-editorial--bento.signature-editorial--viewport .signature-editorial__grid {
+      min-height: var(--sig-viewport-height);
     }
 
     .{{ root_class }} .signature-editorial__tile--bento-left {
@@ -653,7 +1019,7 @@
   own hook for spanning all three (assets/base.css), so "Full width" runs the grid to the
   edges of the screen and only "Side padding" holds it off them.
 {%- endcomment -%}
-<div class="{{ root_class }} signature-editorial color-{{ section.settings.color_scheme }}{% if section.settings.layout_mode == 'bento' %} signature-editorial--bento{% endif %}{% if section.settings.height_mode == 'viewport' %} signature-editorial--viewport{% endif %}{% if section.settings.cta_style == 'link' %} signature-editorial--cta-link{% endif %}{% if section.settings.width == 'full' %} force-full-width{% endif %}" style="{{ root_style | strip_newlines }}">
+<div class="{{ root_class }} signature-editorial color-{{ section.settings.color_scheme }}{% if section.settings.layout_mode == 'bento' %} signature-editorial--bento{% endif %}{% if section.settings.height_mode == 'viewport' %} signature-editorial--viewport{% endif %}{% unless section.settings.cta_style == 'button' %} signature-editorial--cta-{{ section.settings.cta_style }}{% endunless %}{% unless section.settings.caption_style == 'editorial' %} signature-editorial--caption-{{ section.settings.caption_style }}{% endunless %}{% if section.settings.width == 'full' %} force-full-width{% endif %}" style="{{ root_style | strip_newlines }}">
   {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.description != blank -%}
     <div class="signature-editorial__intro">
       {%- if section.settings.eyebrow != blank -%}
@@ -793,6 +1159,19 @@
         endif
 
         comment
+          The circle call to action fills with the tile's ink on hover, so the arrow has to
+          flip to whatever reads against that ink - white on a dark tile, near black on a
+          light one. Working it out here keeps the arrow visible whichever text colour the
+          tile was given.
+        endcomment
+        assign text_brightness = text_color | color_brightness
+        if text_brightness > 150
+          assign button_contrast = '#1a1a1a'
+        else
+          assign button_contrast = '#ffffff'
+        endif
+
+        comment
           Only the tiles that take extra room keep the full type size; the 1-up tiles step
           down to the section's "smaller tile text" so six tiles don't all shout at once.
         endcomment
@@ -841,11 +1220,22 @@
               assign scrim_direction = 'to top'
           endcase
           assign scrim_paint = 'linear-gradient(' | append: scrim_direction | append: ', ' | append: block.settings.overlay_color | append: ' 0%, ' | append: block.settings.overlay_color | append: ' 22%, transparent 72%)'
+        elsif block.settings.scrim_style == 'ends'
+          comment
+            Both ends at once: the photograph is shaded lightly where the corner caption sits
+            and harder where the title sits, and left completely alone through the middle.
+            The top is the same colour at a third of the strength, which is one colour_modify
+            rather than a second picker to keep in step with the first.
+          endcomment
+          assign scrim_opacity = scrim_opacity | times: 24 | divided_by: 10 | at_most: 95
+          assign scrim_top = block.settings.overlay_color | color_modify: 'alpha', 0.38
+          assign scrim_paint = 'linear-gradient(180deg, ' | append: scrim_top | append: ' 0%, transparent 29%, transparent 52%, ' | append: block.settings.overlay_color | append: ' 100%)'
         endif
       -%}
 
       {%- capture tile_style -%}
         --sig-text: {{ text_color }};
+        --sig-button-contrast: {{ button_contrast }};
         --sig-object-position: {{ block.settings.object_position }};
         --sig-image-scale: {{ block.settings.image_scale | divided_by: 100.0 }};
         --sig-content-width: {{ block.settings.content_width }}%;
@@ -853,6 +1243,9 @@
         --sig-display-tracking: {{ block.settings.display_tracking | divided_by: 100.0 }}em;
         --sig-script-style: {{ block.settings.script_style }};
         {% if block.settings.subtitle_position == 'above' %}--sig-subtitle-order: -1; --sig-subtitle-margin: 0;{% endif %}
+        {% if block.settings.script_font == 'body' %}--sig-script-family: var(--font-body--family);{% endif %}
+        {% if block.settings.script_line_height > 0 %}--sig-script-leading: {{ block.settings.script_line_height | divided_by: 100.0 }};{% endif %}
+        {% if block.settings.muted_color != blank and block.settings.muted_color != transparent %}--sig-muted: {{ block.settings.muted_color }};{% endif %}
         {% if block.settings.meta_color != blank and block.settings.meta_color != transparent %}--sig-meta-color: {{ block.settings.meta_color }};{% endif %}
         {% if block.settings.tile_background != blank and block.settings.tile_background != transparent %}--sig-tile-bg: {{ block.settings.tile_background }};{% endif %}
         --sig-overlay-opacity: {{ scrim_opacity | divided_by: 100.0 }};
@@ -872,7 +1265,7 @@
         {% if block.settings.button_icon_color != blank and block.settings.button_icon_color != transparent %}--sig-button-icon-text: {{ block.settings.button_icon_color }};{% endif %}
       {%- endcapture -%}
 
-      <article class="signature-editorial__tile{% if is_text_card %} signature-editorial__tile--text{% endif %}{% if is_bento %} signature-editorial__tile--bento-{{ bento_area }}{% endif %}{% if show_product_card %} signature-editorial__tile--product{% elsif is_bento == false %}{% unless tile_size == 'normal' %} signature-editorial__tile--span signature-editorial__tile--{{ tile_size }}{% endunless %}{% endif %}" style="{{ tile_style | strip_newlines }}" {{ block.shopify_attributes }}>
+      <article class="signature-editorial__tile{% if is_text_card %} signature-editorial__tile--text{% if block.settings.text_card_flourish %} signature-editorial__tile--flourish{% endif %}{% endif %}{% if is_bento %} signature-editorial__tile--bento-{{ bento_area }}{% endif %}{% if show_product_card %} signature-editorial__tile--product{% elsif is_bento == false %}{% unless tile_size == 'normal' %} signature-editorial__tile--span signature-editorial__tile--{{ tile_size }}{% endunless %}{% endif %}" style="{{ tile_style | strip_newlines }}" {{ block.shopify_attributes }}>
         {%- if show_product_card -%}
           <a class="signature-editorial__product-image-link" href="{{ tile_product.url }}" aria-label="View {{ tile_product.title | escape }}">
             {%- if tile_image != blank -%}
@@ -965,33 +1358,58 @@
         {%- endif -%}
 
         {%- if meta_tl != blank -%}<p class="signature-editorial__meta signature-editorial__meta--tl">{{ meta_tl | escape }}</p>{%- endif -%}
-        {%- if meta_tr != blank -%}<p class="signature-editorial__meta signature-editorial__meta--tr">{{ meta_tr | escape }}</p>{%- endif -%}
+        {%- if meta_tr != blank -%}<p class="signature-editorial__meta signature-editorial__meta--tr{% if block.settings.meta_right_ring %} signature-editorial__meta--ring{% endif %}">{{ meta_tr | escape }}</p>{%- endif -%}
         {%- if block.settings.meta_bottom_left != blank -%}<p class="signature-editorial__meta signature-editorial__meta--bl">{{ block.settings.meta_bottom_left | escape }}</p>{%- endif -%}
         {%- if block.settings.meta_bottom_right != blank -%}<p class="signature-editorial__meta signature-editorial__meta--br">{{ block.settings.meta_bottom_right | escape }}</p>{%- endif -%}
 
         <div class="signature-editorial__content is-{{ block.settings.position_vertical }} is-{{ block.settings.position_horizontal }}">
           <div>
-            {%- if block.settings.display_text != blank -%}
-              <p class="signature-editorial__display">{{ block.settings.display_text | escape }}</p>
-            {%- endif -%}
-            {%- if block.settings.subtitle_text != blank -%}
-              <p class="signature-editorial__subtitle">{{ block.settings.subtitle_text | escape }}</p>
-            {%- endif -%}
-            {%- if block.settings.script_text != blank -%}
-              <p class="signature-editorial__script">{{ block.settings.script_text | escape | newline_to_br }}</p>
-            {%- endif -%}
-            {%- if block.settings.boxed_text != blank -%}
-              <span class="signature-editorial__boxed">{{ block.settings.boxed_text | escape }}</span>
-            {%- endif -%}
-            {%- if block.settings.button_label != blank -%}
-              <a class="signature-editorial__button" href="{{ block.settings.button_link | default: tile_link | default: '#' }}">
-                <span class="signature-editorial__button-label">{{ block.settings.button_label | escape }}</span>
-                <span class="signature-editorial__button-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square"/>
-                  </svg>
-                </span>
-              </a>
+            <div class="signature-editorial__text">
+              {%- if block.settings.display_text != blank -%}
+                <p class="signature-editorial__display">
+                  {{- block.settings.display_text | escape -}}
+                  {%- comment -%} The italic line is a second line of the same heading, not a line of its own. {%- endcomment -%}
+                  {%- if block.settings.display_italic != blank -%}
+                    <br><em>{{ block.settings.display_italic | escape }}</em>
+                  {%- endif -%}
+                </p>
+              {%- endif -%}
+              {%- if block.settings.subtitle_text != blank -%}
+                <p class="signature-editorial__subtitle">{{ block.settings.subtitle_text | escape }}</p>
+              {%- endif -%}
+              {%- if block.settings.script_text != blank -%}
+                <p class="signature-editorial__script">{{ block.settings.script_text | escape | newline_to_br }}</p>
+              {%- endif -%}
+              {%- if block.settings.boxed_text != blank -%}
+                <span class="signature-editorial__boxed">{{ block.settings.boxed_text | escape }}</span>
+              {%- endif -%}
+            </div>
+            {%- if block.settings.button_label != blank or block.settings.button_2_label != blank -%}
+              <div class="signature-editorial__actions">
+                {%- if block.settings.button_label != blank -%}
+                  <a class="signature-editorial__button" href="{{ block.settings.button_link | default: tile_link | default: '#' }}">
+                    <span class="signature-editorial__button-label">{{ block.settings.button_label | escape }}</span>
+                    <span class="signature-editorial__button-icon" aria-hidden="true">
+                      {%- comment -%}
+                        The circle style wants an arrow leaving the corner, every other style a
+                        plain one pointing on; same box either way, so only the path changes.
+                      {%- endcomment -%}
+                      {%- if section.settings.cta_style == 'circle' -%}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M5 19 19 5M8 5h11v11"/>
+                        </svg>
+                      {%- else -%}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                          <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square"/>
+                        </svg>
+                      {%- endif -%}
+                    </span>
+                  </a>
+                {%- endif -%}
+                {%- if block.settings.button_2_label != blank -%}
+                  <a class="signature-editorial__link-2" href="{{ block.settings.button_2_link | default: tile_link | default: '#' }}">{{ block.settings.button_2_label | escape }}</a>
+                {%- endif -%}
+              </div>
             {%- endif -%}
           </div>
         </div>
@@ -1042,6 +1460,9 @@
     { "type": "select", "id": "stacked_ratio", "label": "Tile shape when stacked", "info": "Used for the big tiles once the grid drops to one column.", "options": [ { "value": "1/1", "label": "Square" }, { "value": "4/5", "label": "Portrait (4:5)" }, { "value": "3/4", "label": "Tall (3:4)" }, { "value": "5/4", "label": "Landscape (5:4)" } ], "default": "4/5" },
     { "type": "range", "id": "gap", "label": "Gap between tiles", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 10 },
     { "type": "range", "id": "tile_padding", "label": "Inner padding", "min": 8, "max": 60, "step": 2, "unit": "px", "default": 24 },
+    { "type": "range", "id": "tile_radius", "label": "Corner radius", "min": 0, "max": 32, "step": 2, "unit": "px", "default": 0, "info": "The theme is square-cornered, so this starts at 0." },
+    { "type": "checkbox", "id": "caption_rule", "label": "Hairline after the top left caption", "default": false },
+    { "type": "select", "id": "caption_style", "label": "Tile caption style", "default": "label", "info": "The label is the uppercase caption the category tiles use. Editorial keeps the italic serif line. Either way the caption picks up an underline that draws in from both ends while the tile is hovered. A text card's line is a sentence, so it stays as written.", "options": [ { "value": "label", "label": "Uppercase label" }, { "value": "editorial", "label": "Editorial italic" } ] },
     { "type": "checkbox", "id": "hover_zoom", "label": "Zoom image on hover", "default": true },
 
     { "type": "header", "content": "Default corner captions", "info": "Used for the top corners of any tile that leaves them empty." },
@@ -1052,10 +1473,11 @@
     { "type": "range", "id": "display_size", "label": "Display line", "min": 16, "max": 96, "step": 1, "unit": "px", "default": 44 },
     { "type": "range", "id": "subtitle_size", "label": "Subtitle", "min": 8, "max": 48, "step": 1, "unit": "px", "default": 17 },
     { "type": "range", "id": "script_size", "label": "Italic line", "min": 10, "max": 60, "step": 1, "unit": "px", "default": 22 },
+    { "type": "range", "id": "caption_size", "label": "Tile caption (uppercase label)", "min": 10, "max": 24, "step": 1, "unit": "px", "default": 14, "info": "Used by the uppercase label caption style. One size for every tile, so the per-tile italic line size and the 1-up scale are both ignored." },
     { "type": "range", "id": "boxed_size", "label": "Outlined text", "min": 10, "max": 48, "step": 1, "unit": "px", "default": 20 },
     { "type": "range", "id": "meta_size", "label": "Corner captions", "min": 8, "max": 24, "step": 1, "unit": "px", "default": 11 },
     { "type": "range", "id": "button_size", "label": "Button text", "min": 8, "max": 24, "step": 1, "unit": "px", "default": 10 },
-    { "type": "select", "id": "cta_style", "label": "Call to action style", "default": "button", "info": "A link drops the arrow and both button colours and underlines the label instead.", "options": [ { "value": "button", "label": "Button with an arrow" }, { "value": "link", "label": "Underlined text link" } ] },
+    { "type": "select", "id": "cta_style", "label": "Call to action style", "default": "button", "info": "A link drops the arrow and both button colours and underlines the label instead. The circle hides the label altogether and puts a ringed arrow in the tile's other bottom corner, opposite the text; a text card keeps the written button either way.", "options": [ { "value": "button", "label": "Button with an arrow" }, { "value": "link", "label": "Underlined text link" }, { "value": "circle", "label": "Circle arrow icon" } ] },
     { "type": "range", "id": "small_text_scale", "label": "Text size on 1-up tiles", "min": 50, "max": 100, "step": 2, "unit": "%", "default": 100, "info": "Tiles set to a bigger size keep 100%, which is what gives the grid its hierarchy." },
 
     { "type": "header", "content": "Images" },
@@ -1079,6 +1501,7 @@
       "settings": [
         { "type": "header", "content": "Size" },
         { "type": "select", "id": "bento_area", "label": "Bento position", "default": "auto", "info": "Only used when the section layout is set to Editorial bento. Auto fills the five areas in the order the tiles are listed.", "options": [ { "value": "auto", "label": "Auto (by order)" }, { "value": "left", "label": "Left - full height" }, { "value": "center-top", "label": "Middle top - text card" }, { "value": "center-bottom", "label": "Middle bottom - tall media" }, { "value": "right-top", "label": "Right top" }, { "value": "right-bottom", "label": "Right bottom" }, { "value": "extra", "label": "Overflow row underneath" }, { "value": "hidden", "label": "Not shown in the bento" } ] },
+        { "type": "checkbox", "id": "text_card_flourish", "label": "Outlined circle in the corner", "default": false, "info": "Decoration for a text card: one thin ring bleeding off the top right corner." },
         { "type": "checkbox", "id": "text_card", "label": "Text card (no image)", "default": false, "info": "Drops the picture, the video and the overlay, and shows the text on a flat panel of the tile background colour instead." },
         { "type": "select", "id": "tile_size", "label": "Tile size", "info": "Bigger tiles need at least two columns; on one column every tile stacks the same.", "options": [ { "value": "normal", "label": "1 column x 1 row" }, { "value": "wide", "label": "2 columns x 1 row" }, { "value": "tall", "label": "1 column x 2 rows" }, { "value": "feature", "label": "Hero - 2 columns x 2 rows" } ], "default": "normal" },
 
@@ -1108,11 +1531,14 @@
         { "type": "header", "content": "Text" },
         { "type": "text", "id": "display_text", "label": "Display line", "info": "Large uppercase line, e.g. LUXURY." },
         { "type": "select", "id": "display_transform", "label": "Display line case", "options": [ { "value": "uppercase", "label": "UPPERCASE" }, { "value": "none", "label": "As typed" }, { "value": "capitalize", "label": "Title Case" } ], "default": "uppercase" },
-        { "type": "range", "id": "display_tracking", "label": "Display line letter spacing", "min": -2, "max": 24, "step": 1, "unit": "%", "default": 6 },
+        { "type": "range", "id": "display_tracking", "label": "Display line letter spacing", "min": -8, "max": 24, "step": 1, "unit": "%", "default": 6 },
+        { "type": "text", "id": "display_italic", "label": "Display line, second line (italic)", "info": "Set below the first line, in italics, as part of the same heading." },
         { "type": "text", "id": "subtitle_text", "label": "Subtitle", "info": "Spaced line under the display line." },
         { "type": "select", "id": "subtitle_position", "label": "Subtitle position", "default": "below", "options": [ { "value": "below", "label": "Under the display line" }, { "value": "above", "label": "Above the display line (eyebrow)" } ] },
         { "type": "textarea", "id": "script_text", "label": "Italic line", "info": "Line breaks are kept." },
         { "type": "select", "id": "script_style", "label": "Italic line style", "default": "italic", "options": [ { "value": "italic", "label": "Italic" }, { "value": "normal", "label": "Upright" } ] },
+        { "type": "select", "id": "script_font", "label": "Italic line typeface", "default": "heading", "info": "The body face is the one to use when this line is a standfirst under a serif heading.", "options": [ { "value": "heading", "label": "Heading font" }, { "value": "body", "label": "Body font" } ] },
+        { "type": "range", "id": "script_line_height", "label": "Italic line leading", "min": 0, "max": 220, "step": 5, "unit": "%", "default": 0, "info": "0 keeps the default." },
         { "type": "text", "id": "boxed_text", "label": "Outlined text", "info": "A word or phrase inside a thin box." },
 
         { "type": "header", "content": "Text placement" },
@@ -1124,6 +1550,7 @@
         { "type": "select", "id": "text_theme", "label": "Text colour preset", "options": [ { "value": "light", "label": "Light text (dark image)" }, { "value": "dark", "label": "Dark text (light image)" } ], "default": "light" },
         { "type": "color", "id": "text_color", "label": "Text colour", "default": "rgba(0,0,0,0)", "info": "Overrides the preset above." },
         { "type": "color", "id": "meta_color", "label": "Corner caption colour", "default": "rgba(0,0,0,0)" },
+        { "type": "color", "id": "muted_color", "label": "Subtitle and italic line colour", "default": "rgba(0,0,0,0)", "info": "Mutes the two supporting lines against the display line. Clear it to match the main text colour." },
         { "type": "range", "id": "display_size", "label": "Display line size", "min": 0, "max": 96, "step": 1, "unit": "px", "default": 0 },
         { "type": "range", "id": "subtitle_size", "label": "Subtitle size", "min": 0, "max": 48, "step": 1, "unit": "px", "default": 0 },
         { "type": "range", "id": "script_size", "label": "Italic line size", "min": 0, "max": 60, "step": 1, "unit": "px", "default": 0 },
@@ -1143,16 +1570,19 @@
         { "type": "color", "id": "button_icon_background", "label": "Arrow background", "default": "rgba(0,0,0,0)" },
         { "type": "color", "id": "button_icon_color", "label": "Arrow colour", "default": "rgba(0,0,0,0)" },
         { "type": "range", "id": "button_size", "label": "Button text size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+        { "type": "text", "id": "button_2_label", "label": "Second link label", "info": "A plain underlined link beside the button. Hidden by the circle style, which has no room for words." },
+        { "type": "url", "id": "button_2_link", "label": "Second link" },
 
         { "type": "header", "content": "Corner captions" },
         { "type": "checkbox", "id": "use_section_meta", "label": "Use the section's default top captions", "default": true },
         { "type": "text", "id": "meta_top_left", "label": "Top left" },
         { "type": "text", "id": "meta_top_right", "label": "Top right" },
+        { "type": "checkbox", "id": "meta_right_ring", "label": "Ring the top right caption", "default": false, "info": "For a single glyph rather than words." },
         { "type": "text", "id": "meta_bottom_left", "label": "Bottom left" },
         { "type": "text", "id": "meta_bottom_right", "label": "Bottom right" },
 
         { "type": "header", "content": "Image overlay" },
-        { "type": "select", "id": "scrim_style", "label": "Overlay style", "info": "A gradient sits only behind the text; a wash covers the whole photograph.", "options": [ { "value": "wash", "label": "Even wash" }, { "value": "gradient", "label": "Gradient behind the text" }, { "value": "none", "label": "None" } ], "default": "wash" },
+        { "type": "select", "id": "scrim_style", "label": "Overlay style", "info": "A gradient sits only behind the text; a wash covers the whole photograph. Fading both ends shades the caption and the title and leaves the middle of the picture clear.", "options": [ { "value": "wash", "label": "Even wash" }, { "value": "gradient", "label": "Gradient behind the text" }, { "value": "ends", "label": "Fade at the top and bottom" }, { "value": "none", "label": "None" } ], "default": "wash" },
         { "type": "color", "id": "overlay_color", "label": "Overlay colour", "default": "#000000" },
         { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 80, "step": 1, "unit": "%", "default": 0 }
       ]
