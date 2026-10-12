@@ -59,10 +59,48 @@
 /* ---------- Info column: narrow, like MiaDonna's two-fifths column ----------
    Deliberately not sticky: with options, buy button, reassurance grid and two
    accordions the column is taller than the viewport, so sticking it would put
-   its lower half out of reach. */
+   its lower half out of reach.
+
+   This cap only ever narrowed the text inside the column; the column itself
+   stayed at the 2fr the base theme gives it, so the gallery was stuck at half
+   the page with dead space beside the copy. The track sizing below is what
+   actually divides the row -- this stays as the belt-and-braces cap for the
+   990-1199 range, where the base theme sizes the column off 45vw. */
 @media screen and (min-width: 990px) {
-  .template-product .product-information__grid > .product-details {
+  .template-product .product-information__grid .product-details {
     max-width: 52rem;
+  }
+}
+
+/* Base theme splits the row 2fr 2fr from 1200px up. Give the gallery everything
+   the info column does not need: the info column takes just over a third, never
+   wider than the 52rem the content is capped at, and the media column absorbs
+   the remainder -- so on a 1512px screen the gallery goes from ~690px to ~860px. */
+@media screen and (min-width: 1200px) {
+  .template-product .product-information__grid:not(
+      .product-information__grid--half,
+      :has(.product-information__media:empty)
+    ).product-information--media-left {
+    grid-template-columns: minmax(0, 1fr) clamp(40rem, 36%, 52rem);
+  }
+
+  .template-product .product-information__grid:not(
+      .product-information__grid--half,
+      :has(.product-information__media:empty)
+    ).product-information--media-right {
+    grid-template-columns: clamp(40rem, 36%, 52rem) minmax(0, 1fr);
+  }
+}
+
+/* section-main-product.css caps .product-form__input and .product-form__buttons
+   at 44rem, which was narrower than the old half-page column and is narrower
+   than the new one too -- the option rows and the buy button stopped 3.6rem
+   short of the rules and the reassurance grid beside them. The info column is
+   already capped at 52rem, so let the form rows share its right edge. */
+@media screen and (min-width: 990px) {
+  .template-product .product-details .product-form__input,
+  .template-product .product-details .product-form__buttons {
+    max-width: none;
   }
 }
 
@@ -451,9 +489,17 @@
   margin-top: 2.4rem;
 }
 
+/* base.css carries a hand-written `.add-to-cart-button-container
+   .add-to-cart-button-inner .add-to-cart-button { width: 600px !important }`
+   with a max-width:787px override back to 100%. A fixed 600px only ever
+   happened to fit while the info column was half the page; it is wider than
+   the column now and the button spilled past the page edge. The !important
+   below is what it takes to outrank that one -- the button follows its column
+   at every width instead. */
 .template-product .product-details .add-to-cart-button-container .button,
-.template-product .product-details .add-to-cart-button-container button[type='submit'] {
-  width: 100%;
+.template-product .product-details .add-to-cart-button-container button[type='submit'],
+.template-product .product-details .add-to-cart-button-container .add-to-cart-button-inner .add-to-cart-button {
+  width: 100% !important;
   min-height: 5.4rem;
   font-size: 1.4rem;
   font-weight: 600;

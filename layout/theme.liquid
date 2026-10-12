@@ -71,6 +71,12 @@
     {%- if template.name == 'collection' -%}
       {{ 'collection-style-row.css' | asset_url | stylesheet_tag }}
     {%- endif -%}
+    {%- comment -%}
+      Feedback for the wait between clicking a link and the next page painting.
+    {%- endcomment -%}
+    {{ 'page-progress.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'page-progress.js' | asset_url }}" defer="defer"></script>
+
     {%- render 'global-script' -%}
 
     {{ content_for_header }}

@@ -334,9 +334,26 @@ if (!customElements.get('product-info')) {
         };
       }
 
+      /* A variant change is a network round trip with nothing on screen to say so.
+         aria-busy drives the dimmed, click-proof picker in product-loading.css. The
+         token is what keeps it honest: aborting the previous request settles its
+         promise a microtask later, so without it that older request's cleanup would
+         clear the flag the newer one just set. */
+      setBusy(isBusy) {
+        if (isBusy) {
+          this.setAttribute('aria-busy', 'true');
+        } else {
+          this.removeAttribute('aria-busy');
+        }
+      }
+
       renderProductInfo({ requestUrl, targetId, callback, isStickyChanged = false }) {
         this.abortController?.abort();
         this.abortController = new AbortController();
+
+        const requestToken = (this.busyToken || 0) + 1;
+        this.busyToken = requestToken;
+        this.setBusy(true);
 
         fetch(requestUrl, { signal: this.abortController.signal })
           .then((response) => response.text())
@@ -356,6 +373,12 @@ if (!customElements.get('product-info')) {
             } else {
               console.error(error);
             }
+          })
+          .finally(() => {
+            /* On a successful swap this element has already been replaced, so the new
+               markup arrives without the attribute and this is a no-op; it matters for
+               the error path, where the old picker has to become usable again. */
+            if (this.busyToken === requestToken) this.setBusy(false);
           });
       }
 

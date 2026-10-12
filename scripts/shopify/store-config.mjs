@@ -273,7 +273,6 @@ export const menu = {
       ],
     },
     { title: 'Diamonds', collection: 'lab-grown-diamonds' },
-    { title: 'Design Studio', url: '/pages/design-your-own' },
     // Shown on the right of the header (theme setting "right_menu_items")
     { title: 'Learn', url: '/pages/education-guides' },
     { title: 'About', url: '/pages/about-er' },

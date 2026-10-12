@@ -62,6 +62,12 @@
     {{ 'section-main-product.css' | asset_url | stylesheet_tag }}
     {{ 'product-page-luxe.css' | asset_url | stylesheet_tag }}
     {{ 'component-rating.css' | asset_url | stylesheet_tag }}
+    {%- comment -%}
+      Loading feedback: the gallery's own spinner while a photo is being fetched,
+      and a busy state on the picker while a variant change is in flight.
+    {%- endcomment -%}
+    {{ 'product-loading.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'product-loading.js' | asset_url }}" defer="defer"></script>
     {%- if closest.product.quantity_price_breaks_configured? -%}
       {{ 'component-volume-pricing.css' | asset_url | stylesheet_tag }}
     {%- endif -%}

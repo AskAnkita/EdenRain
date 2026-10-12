@@ -1,0 +1,44 @@
+/*
+ * Navigation progress bar.
+ *
+ * A document navigation reports no progress of its own, so the bar is a stand-in for
+ * "still working": page-progress.js eases it towards 90% on a timer and drives it to
+ * 100% as the old page unloads. Fixed to the viewport so it sits above the sticky
+ * header without joining its layout, and non-interactive so it can never swallow a
+ * click meant for the header beneath it.
+ */
+.page-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 10001;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-default, 200ms) ease;
+}
+
+.page-progress[data-state='loading'],
+.page-progress[data-state='done'] {
+  opacity: 1;
+}
+
+.page-progress__bar {
+  height: 100%;
+  width: 0;
+  background: var(--color-foreground, #121212);
+  transition: width 240ms cubic-bezier(0.1, 0.6, 0.3, 1);
+}
+
+/* The last run to 100% is quick, so completion reads as the bar landing rather than
+   as one more step of the creep. */
+.page-progress[data-state='done'] .page-progress__bar {
+  transition-duration: 120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-progress__bar {
+    transition-duration: 0s;
+  }
+}
