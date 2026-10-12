@@ -23,7 +23,7 @@
   # name. A picture chosen in the theme editor always wins over this
   # list, so a tile never ignores it.
   # ------------------------------------------------------------------
-  assign tile_pictures = 'Rings: category-rings-grey.png, Earrings: category-earrings-grey.png, Necklaces: category-necklaces-grey.png, Bracelets: category-bracelets-grey.png, Best Sellers: category-best-sellers-grey.png'
+  assign tile_pictures = 'Rings: category-rings.png, Earrings: category-earrings.png, Necklaces: category-necklaces.png, Bracelets: category-bracelets.png, Best Sellers: category-best-sellers.png'
   assign tile_picture_pairs = tile_pictures | split: ','
 -%}
 
@@ -321,7 +321,7 @@
               endfor
 
               # Otherwise the TILE PICTURES list at the top of this file, and failing that
-              # the category-<menu item>.png naming convention in Content > Files. A menu
+              # the category-<menu item>.png naming convention in assets/. A menu
               # item with no picture of any kind is hidden (the script below drops the
               # tile), rather than falling back to the collection photo.
               assign tile_asset = blank
@@ -341,14 +341,10 @@
             <li class="ct-tile">
               <a class="ct-link eden-action-host" href="{{ link.url }}">
                 {%- if tile_asset != blank -%}
-                  {%- comment -%}
-                    The uploaded pictures are 1122x1402; the CDN resizes them here. file_url
-                    already carries a ?v= cache key, so the width goes on with an ampersand.
-                  {%- endcomment -%}
-                  {%- assign tile_src = tile_asset | file_url -%}
+                  {%- comment -%} The theme pictures are 1122x1402; Shopify's CDN resizes them here. {%- endcomment -%}
                   <img
-                    src="{{ tile_src }}&width=900"
-                    srcset="{{ tile_src }}&width=450 450w, {{ tile_src }}&width=700 700w, {{ tile_src }}&width=900 900w, {{ tile_src }}&width=1200 1200w"
+                    src="{{ tile_asset | asset_img_url: '900x' }}"
+                    srcset="{{ tile_asset | asset_img_url: '450x' }} 450w, {{ tile_asset | asset_img_url: '700x' }} 700w, {{ tile_asset | asset_img_url: '900x' }} 900w, {{ tile_asset | asset_img_url: '1200x' }} 1200w"
                     sizes="(min-width: 990px) 25vw, 100vw"
                     alt="{{ link.title | escape }}"
                     width="1122"

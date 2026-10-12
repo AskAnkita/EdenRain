@@ -33,6 +33,9 @@
   --sig-intro-gap: {{ section.settings.intro_gap }}px;
   --sig-description-width: {{ section.settings.description_width }}%;
   --sig-viewport-height: {{ section.settings.viewport_height }}svh;
+  --sig-bento-height: {{ section.settings.bento_height }}px;
+  --sig-bento-center: {{ section.settings.bento_center_ratio | divided_by: 100.0 }}fr;
+  --sig-bento-right: {{ section.settings.bento_right_ratio | divided_by: 100.0 }}fr;
 {%- endcapture -%}
 
 {% style %}
@@ -335,8 +338,13 @@
     text-transform: var(--sig-display-transform, uppercase);
   }
 
+  {%- comment -%}
+    The subtitle normally tucks under the display line. "Above" turns it into an eyebrow
+    instead - one flex order away, since the two already share a column.
+  {%- endcomment -%}
   .{{ root_class }} .signature-editorial__subtitle {
-    margin: -0.6rem 0 0;
+    order: var(--sig-subtitle-order, 0);
+    margin: var(--sig-subtitle-margin, -0.6rem) 0 0;
     font-family: var(--font-heading--family);
     font-size: clamp(1rem, 1.8vw, calc(var(--sig-tile-subtitle-size, var(--sig-subtitle-size)) * var(--sig-text-scale, 1)));
     line-height: 1.3;
@@ -347,7 +355,7 @@
   .{{ root_class }} .signature-editorial__script {
     margin: 0;
     font-family: var(--font-heading--family);
-    font-style: italic;
+    font-style: var(--sig-script-style, italic);
     font-size: clamp(1.1rem, 2.4vw, calc(var(--sig-tile-script-size, var(--sig-script-size)) * var(--sig-text-scale, 1)));
     line-height: 1.35;
     letter-spacing: 0.01em;
@@ -499,6 +507,144 @@
       transition: none;
     }
   }
+
+  {%- comment -%}
+    Bento: instead of a flow of equal tiles, five named areas on a 3 x 12 grid - a full
+    height tile on the left, a short text card over a tall media tile in the middle, and
+    two unequal tiles on the right. The row counts are settings, so the two splits (where
+    the text card ends, where the right column divides) are moved in the editor; both are
+    written out as plain line numbers here rather than calc() on a custom property, which
+    grid-row does not take everywhere.
+  {%- endcomment -%}
+  {%- if section.settings.layout_mode == 'bento' -%}
+    {%- liquid
+      assign bento_text_rows = section.settings.bento_text_rows
+      assign bento_text_next = bento_text_rows | plus: 1
+      assign bento_right_split = section.settings.bento_right_split
+      assign bento_right_next = bento_right_split | plus: 1
+    -%}
+
+  {%- comment -%}
+    A text card has no photograph to sit on, so its content comes out of the absolute
+    overlay and back into flow: that is what lets the card keep its height once the grid
+    flattens on a phone. Relative, not static, so it still stacks over the tile link.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__tile--text {
+    background: var(--sig-tile-bg, #ece7e1);
+  }
+
+  {%- comment -%}
+    "Smaller tile text" exists to stop six equal tiles all shouting at once. The bento has
+    no equal tiles - the three big areas carry the headlines - so those keep full size and
+    only the two right-hand tiles step down.
+  {%- endcomment -%}
+  .{{ root_class }} .signature-editorial__tile--bento-left,
+  .{{ root_class }} .signature-editorial__tile--bento-center-top,
+  .{{ root_class }} .signature-editorial__tile--bento-center-bottom {
+    --sig-text-scale: 1;
+  }
+
+  .{{ root_class }} .signature-editorial__tile--text .signature-editorial__content {
+    position: relative;
+    inset: auto;
+    z-index: 3;
+    height: 100%;
+    padding: calc(var(--sig-pad) * 1.3) var(--sig-pad);
+  }
+
+  .{{ root_class }} .signature-editorial__tile--text .signature-editorial__content > div {
+    gap: 0.9rem;
+  }
+
+  @media screen and (min-width: 990px) {
+    .{{ root_class }}.signature-editorial--bento .signature-editorial__grid {
+      grid-template-columns: 1fr var(--sig-bento-center) var(--sig-bento-right);
+      grid-template-rows: repeat(12, minmax(0, 1fr));
+      grid-auto-rows: minmax(0, calc(var(--sig-bento-height) / 3));
+      min-height: var(--sig-bento-height);
+    }
+
+    .{{ root_class }}.signature-editorial--bento .signature-editorial__tile {
+      aspect-ratio: auto;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .{{ root_class }} .signature-editorial__tile--bento-left {
+      grid-column: 1;
+      grid-row: 1 / -1;
+    }
+
+    .{{ root_class }} .signature-editorial__tile--bento-center-top {
+      grid-column: 2;
+      grid-row: 1 / {{ bento_text_next }};
+    }
+
+    .{{ root_class }} .signature-editorial__tile--bento-center-bottom {
+      grid-column: 2;
+      grid-row: {{ bento_text_next }} / -1;
+    }
+
+    .{{ root_class }} .signature-editorial__tile--bento-right-top {
+      grid-column: 3;
+      grid-row: 1 / {{ bento_right_next }};
+    }
+
+    .{{ root_class }} .signature-editorial__tile--bento-right-bottom {
+      grid-column: 3;
+      grid-row: {{ bento_right_next }} / -1;
+    }
+
+    {%- comment -%}
+      A sixth tile and beyond has no area of its own, so it drops into an implicit row
+      under the five - a third of the bento's height each - rather than disappearing.
+    {%- endcomment -%}
+    .{{ root_class }} .signature-editorial__tile--bento-extra {
+      grid-column: auto;
+      grid-row: auto;
+    }
+  }
+
+  {%- comment -%}
+    Tablet: three columns of different widths will not fit, so the bento folds to two -
+    the left tile keeps its full height beside the middle pair, and the right pair takes
+    the row underneath.
+  {%- endcomment -%}
+  @media screen and (min-width: 750px) and (max-width: 989px) {
+    .{{ root_class }}.signature-editorial--bento .signature-editorial__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .{{ root_class }}.signature-editorial--bento .signature-editorial__tile--bento-left {
+      grid-column: 1;
+      grid-row: span 2;
+      aspect-ratio: var(--sig-ratio-w) / calc(var(--sig-ratio-h) * 2);
+    }
+
+    .{{ root_class }}.signature-editorial--bento .signature-editorial__tile--bento-center-top,
+    .{{ root_class }}.signature-editorial--bento .signature-editorial__tile--bento-center-bottom {
+      grid-column: 2;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .{{ root_class }}.signature-editorial--bento .signature-editorial__tile {
+      aspect-ratio: var(--sig-ratio-stacked);
+    }
+  }
+
+  {%- comment -%}
+    The text card is the one tile with nothing to hold a shape open, so it takes its
+    height from its own words at every width below the desktop grid.
+  {%- endcomment -%}
+  @media screen and (max-width: 989px) {
+    .{{ root_class }}.signature-editorial--bento .signature-editorial__tile--text {
+      aspect-ratio: auto;
+      height: auto;
+      grid-row: auto;
+    }
+  }
+  {%- endif -%}
 {% endstyle %}
 
 {%- comment -%}
@@ -507,7 +653,7 @@
   own hook for spanning all three (assets/base.css), so "Full width" runs the grid to the
   edges of the screen and only "Side padding" holds it off them.
 {%- endcomment -%}
-<div class="{{ root_class }} signature-editorial color-{{ section.settings.color_scheme }}{% if section.settings.height_mode == 'viewport' %} signature-editorial--viewport{% endif %}{% if section.settings.cta_style == 'link' %} signature-editorial--cta-link{% endif %}{% if section.settings.width == 'full' %} force-full-width{% endif %}" style="{{ root_style | strip_newlines }}">
+<div class="{{ root_class }} signature-editorial color-{{ section.settings.color_scheme }}{% if section.settings.layout_mode == 'bento' %} signature-editorial--bento{% endif %}{% if section.settings.height_mode == 'viewport' %} signature-editorial--viewport{% endif %}{% if section.settings.cta_style == 'link' %} signature-editorial--cta-link{% endif %}{% if section.settings.width == 'full' %} force-full-width{% endif %}" style="{{ root_style | strip_newlines }}">
   {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.description != blank -%}
     <div class="signature-editorial__intro">
       {%- if section.settings.eyebrow != blank -%}
@@ -525,6 +671,52 @@
   <div class="signature-editorial__grid">
     {%- for block in section.blocks -%}
       {%- liquid
+        comment
+          Bento mode places every tile by name. "Auto" takes the name from the block's own
+          position, so the five areas fill in the order the blocks are listed and nothing
+          has to be set by hand; a tile past the fifth drops into the overflow row.
+        endcomment
+        assign is_bento = false
+        if section.settings.layout_mode == 'bento'
+          assign is_bento = true
+        endif
+        assign bento_area = block.settings.bento_area
+        if is_bento and bento_area == 'auto'
+          case forloop.index
+            when 1
+              assign bento_area = 'left'
+            when 2
+              assign bento_area = 'center-top'
+            when 3
+              assign bento_area = 'center-bottom'
+            when 4
+              assign bento_area = 'right-top'
+            when 5
+              assign bento_area = 'right-bottom'
+            else
+              assign bento_area = 'extra'
+          endcase
+        endif
+        if is_bento and bento_area == 'hidden'
+          continue
+        endif
+
+        comment
+          A text card is the bento's one tile with no picture: a flat panel of colour
+          carrying the eyebrow, the heading and a link. It is a choice per tile rather
+          than a block type of its own, so the same tile can go back to being a photo.
+        endcomment
+        assign is_text_card = block.settings.text_card
+        comment
+          A text card puts its content in the flow rather than under the full tile link,
+          so when it has a button of its own the full tile link is dropped: two overlapping
+          links to the same place is one tab stop too many.
+        endcomment
+        assign text_card_linked = false
+        if is_text_card and block.settings.button_label != blank
+          assign text_card_linked = true
+        endif
+
         assign tile_product = block.settings.product
         assign tile_image = block.settings.image
         if tile_image == blank and tile_product != blank
@@ -659,6 +851,8 @@
         --sig-content-width: {{ block.settings.content_width }}%;
         --sig-display-transform: {{ block.settings.display_transform }};
         --sig-display-tracking: {{ block.settings.display_tracking | divided_by: 100.0 }}em;
+        --sig-script-style: {{ block.settings.script_style }};
+        {% if block.settings.subtitle_position == 'above' %}--sig-subtitle-order: -1; --sig-subtitle-margin: 0;{% endif %}
         {% if block.settings.meta_color != blank and block.settings.meta_color != transparent %}--sig-meta-color: {{ block.settings.meta_color }};{% endif %}
         {% if block.settings.tile_background != blank and block.settings.tile_background != transparent %}--sig-tile-bg: {{ block.settings.tile_background }};{% endif %}
         --sig-overlay-opacity: {{ scrim_opacity | divided_by: 100.0 }};
@@ -678,7 +872,7 @@
         {% if block.settings.button_icon_color != blank and block.settings.button_icon_color != transparent %}--sig-button-icon-text: {{ block.settings.button_icon_color }};{% endif %}
       {%- endcapture -%}
 
-      <article class="signature-editorial__tile{% if show_product_card %} signature-editorial__tile--product{% else %}{% unless tile_size == 'normal' %} signature-editorial__tile--span signature-editorial__tile--{{ tile_size }}{% endunless %}{% endif %}" style="{{ tile_style | strip_newlines }}" {{ block.shopify_attributes }}>
+      <article class="signature-editorial__tile{% if is_text_card %} signature-editorial__tile--text{% endif %}{% if is_bento %} signature-editorial__tile--bento-{{ bento_area }}{% endif %}{% if show_product_card %} signature-editorial__tile--product{% elsif is_bento == false %}{% unless tile_size == 'normal' %} signature-editorial__tile--span signature-editorial__tile--{{ tile_size }}{% endunless %}{% endif %}" style="{{ tile_style | strip_newlines }}" {{ block.shopify_attributes }}>
         {%- if show_product_card -%}
           <a class="signature-editorial__product-image-link" href="{{ tile_product.url }}" aria-label="View {{ tile_product.title | escape }}">
             {%- if tile_image != blank -%}
@@ -702,6 +896,7 @@
             <a class="signature-editorial__product-action" href="{{ tile_product.url }}">View product</a>
           </div>
         {%- else -%}
+        {%- unless is_text_card -%}
         {%- if tile_has_video -%}
           <video
             class="signature-editorial__image signature-editorial__video"
@@ -763,8 +958,9 @@
         {%- endif -%}
 
         <span class="signature-editorial__scrim"></span>
+        {%- endunless -%}
 
-        {%- if tile_link != blank -%}
+        {%- if tile_link != blank and text_card_linked == false -%}
           <a class="signature-editorial__link" href="{{ tile_link }}">{{ tile_alt | default: 'View' | escape }}</a>
         {%- endif -%}
 
@@ -830,6 +1026,14 @@
     { "type": "select", "id": "heading_transform", "label": "Heading case", "options": [ { "value": "theme", "label": "Theme default" }, { "value": "uppercase", "label": "UPPERCASE" }, { "value": "none", "label": "As typed" }, { "value": "capitalize", "label": "Title Case" } ], "default": "theme" },
     { "type": "range", "id": "heading_tracking", "label": "Heading letter spacing", "min": 0, "max": 24, "step": 1, "unit": "%", "default": 0, "info": "0 keeps the theme default." },
 
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "layout_mode", "label": "Layout", "default": "mosaic", "info": "Bento is a fixed five-area editorial grid: a full-height tile on the left, a text card over a tall media tile in the middle, and two unequal tiles on the right. The column settings below only apply to the mosaic.", "options": [ { "value": "mosaic", "label": "Mosaic grid" }, { "value": "bento", "label": "Editorial bento" } ] },
+    { "type": "range", "id": "bento_height", "label": "Bento height", "min": 360, "max": 1000, "step": 20, "unit": "px", "default": 620, "info": "Desktop only. The five areas divide this height between them." },
+    { "type": "range", "id": "bento_center_ratio", "label": "Bento middle column width", "min": 80, "max": 260, "step": 5, "unit": "%", "default": 180, "info": "Against the left column, which is always 1." },
+    { "type": "range", "id": "bento_right_ratio", "label": "Bento right column width", "min": 60, "max": 200, "step": 5, "unit": "%", "default": 110 },
+    { "type": "range", "id": "bento_text_rows", "label": "Bento text card height", "min": 2, "max": 8, "step": 1, "default": 4, "info": "Out of 12. The middle media tile takes what is left." },
+    { "type": "range", "id": "bento_right_split", "label": "Bento right column split", "min": 3, "max": 9, "step": 1, "default": 7, "info": "Out of 12. Where the top right tile ends and the bottom right one starts." },
+
     { "type": "header", "content": "Grid" },
     { "type": "range", "id": "columns_desktop", "label": "Columns (desktop)", "min": 1, "max": 4, "step": 1, "default": 3 },
     { "type": "range", "id": "columns_tablet", "label": "Columns (tablet)", "min": 1, "max": 4, "step": 1, "default": 2 },
@@ -874,6 +1078,8 @@
       "name": "Editorial tile",
       "settings": [
         { "type": "header", "content": "Size" },
+        { "type": "select", "id": "bento_area", "label": "Bento position", "default": "auto", "info": "Only used when the section layout is set to Editorial bento. Auto fills the five areas in the order the tiles are listed.", "options": [ { "value": "auto", "label": "Auto (by order)" }, { "value": "left", "label": "Left - full height" }, { "value": "center-top", "label": "Middle top - text card" }, { "value": "center-bottom", "label": "Middle bottom - tall media" }, { "value": "right-top", "label": "Right top" }, { "value": "right-bottom", "label": "Right bottom" }, { "value": "extra", "label": "Overflow row underneath" }, { "value": "hidden", "label": "Not shown in the bento" } ] },
+        { "type": "checkbox", "id": "text_card", "label": "Text card (no image)", "default": false, "info": "Drops the picture, the video and the overlay, and shows the text on a flat panel of the tile background colour instead." },
         { "type": "select", "id": "tile_size", "label": "Tile size", "info": "Bigger tiles need at least two columns; on one column every tile stacks the same.", "options": [ { "value": "normal", "label": "1 column x 1 row" }, { "value": "wide", "label": "2 columns x 1 row" }, { "value": "tall", "label": "1 column x 2 rows" }, { "value": "feature", "label": "Hero - 2 columns x 2 rows" } ], "default": "normal" },
 
         { "type": "header", "content": "Image" },
@@ -904,7 +1110,9 @@
         { "type": "select", "id": "display_transform", "label": "Display line case", "options": [ { "value": "uppercase", "label": "UPPERCASE" }, { "value": "none", "label": "As typed" }, { "value": "capitalize", "label": "Title Case" } ], "default": "uppercase" },
         { "type": "range", "id": "display_tracking", "label": "Display line letter spacing", "min": -2, "max": 24, "step": 1, "unit": "%", "default": 6 },
         { "type": "text", "id": "subtitle_text", "label": "Subtitle", "info": "Spaced line under the display line." },
+        { "type": "select", "id": "subtitle_position", "label": "Subtitle position", "default": "below", "options": [ { "value": "below", "label": "Under the display line" }, { "value": "above", "label": "Above the display line (eyebrow)" } ] },
         { "type": "textarea", "id": "script_text", "label": "Italic line", "info": "Line breaks are kept." },
+        { "type": "select", "id": "script_style", "label": "Italic line style", "default": "italic", "options": [ { "value": "italic", "label": "Italic" }, { "value": "normal", "label": "Upright" } ] },
         { "type": "text", "id": "boxed_text", "label": "Outlined text", "info": "A word or phrase inside a thin box." },
 
         { "type": "header", "content": "Text placement" },

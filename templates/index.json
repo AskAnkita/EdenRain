@@ -1481,14 +1481,14 @@
             "script_text": "New collection",
             "boxed_text": "",
             "position_vertical": "bottom",
-            "position_horizontal": "center",
-            "content_width": 70,
+            "position_horizontal": "left",
+            "content_width": 80,
             "text_theme": "dark",
             "text_color": "rgba(0,0,0,0)",
             "meta_color": "rgba(0,0,0,0)",
             "display_size": 64,
             "subtitle_size": 22,
-            "script_size": 0,
+            "script_size": 30,
             "boxed_size": 0,
             "meta_size": 0,
             "box_border_color": "rgba(0,0,0,0)",
@@ -1508,7 +1508,8 @@
             "meta_bottom_right": "",
             "scrim_style": "gradient",
             "overlay_color": "#ffffff",
-            "overlay_opacity": 25
+            "overlay_opacity": 25,
+            "bento_area": "center-bottom"
           }
         },
         "tile_identity": {
@@ -1519,7 +1520,7 @@
             "image_url": "https://cdn.shopify.com/s/files/1/0423/9668/0352/files/AJLR1170-Y1.png?v=1791365518&width=1600",
             "image_alt": "Radiant cut pink lab-grown gemstone twist engagement ring",
             "image_scale": 120,
-            "object_position": "left",
+            "object_position": "center",
             "tile_background": "rgba(0,0,0,0)",
             "video_url": "",
             "video_autoplay": true,
@@ -1536,14 +1537,14 @@
             "script_text": "Jewellery that reveals who you are",
             "boxed_text": "",
             "position_vertical": "bottom",
-            "position_horizontal": "center",
-            "content_width": 72,
+            "position_horizontal": "left",
+            "content_width": 80,
             "text_theme": "dark",
             "text_color": "rgba(0,0,0,0)",
             "meta_color": "rgba(0,0,0,0)",
             "display_size": 0,
             "subtitle_size": 0,
-            "script_size": 0,
+            "script_size": 26,
             "boxed_size": 0,
             "meta_size": 0,
             "box_border_color": "rgba(0,0,0,0)",
@@ -1563,7 +1564,8 @@
             "meta_bottom_right": "",
             "scrim_style": "gradient",
             "overlay_color": "#ffffff",
-            "overlay_opacity": 20
+            "overlay_opacity": 20,
+            "bento_area": "left"
           }
         },
         "tile_care": {
@@ -1591,9 +1593,9 @@
             "subtitle_text": "",
             "script_text": "How to keep your jewellery always radiant",
             "boxed_text": "",
-            "position_vertical": "middle",
-            "position_horizontal": "right",
-            "content_width": 70,
+            "position_vertical": "bottom",
+            "position_horizontal": "left",
+            "content_width": 86,
             "text_theme": "dark",
             "text_color": "rgba(0,0,0,0)",
             "meta_color": "rgba(0,0,0,0)",
@@ -1619,7 +1621,8 @@
             "meta_bottom_right": "",
             "scrim_style": "gradient",
             "overlay_color": "#ffffff",
-            "overlay_opacity": 15
+            "overlay_opacity": 15,
+            "bento_area": "right-top"
           }
         },
         "tile_making": {
@@ -1649,7 +1652,7 @@
             "boxed_text": "",
             "position_vertical": "bottom",
             "position_horizontal": "left",
-            "content_width": 66,
+            "content_width": 86,
             "text_theme": "dark",
             "text_color": "rgba(0,0,0,0)",
             "meta_color": "rgba(0,0,0,0)",
@@ -1675,7 +1678,8 @@
             "meta_bottom_right": "",
             "scrim_style": "gradient",
             "overlay_color": "#ffffff",
-            "overlay_opacity": 10
+            "overlay_opacity": 10,
+            "bento_area": "right-bottom"
           }
         },
         "tile_style": {
@@ -1687,7 +1691,7 @@
             "image_alt": "Lab-grown diamond coil wrap ring",
             "image_scale": 115,
             "object_position": "bottom",
-            "tile_background": "rgba(0,0,0,0)",
+            "tile_background": "#ebe6e0",
             "video_url": "",
             "video_autoplay": true,
             "video_loop": true,
@@ -1696,27 +1700,27 @@
             "product": "1-32-ctw-lab-grown-diamond-coil-wrap-ring",
             "product_card": false,
             "link": "shopify://collections/rings",
-            "display_text": "",
-            "display_transform": "uppercase",
-            "display_tracking": 6,
+            "display_text": "Jewellery that lasts and adapts",
+            "display_transform": "none",
+            "display_tracking": -2,
             "subtitle_text": "",
-            "script_text": "Jewellery that lasts and adapts",
+            "script_text": "",
             "boxed_text": "",
-            "position_vertical": "bottom",
-            "position_horizontal": "center",
-            "content_width": 86,
+            "position_vertical": "top",
+            "position_horizontal": "left",
+            "content_width": 100,
             "text_theme": "dark",
             "text_color": "rgba(0,0,0,0)",
             "meta_color": "rgba(0,0,0,0)",
-            "display_size": 0,
-            "subtitle_size": 0,
-            "script_size": 0,
+            "display_size": 46,
+            "subtitle_size": 12,
+            "script_size": 16,
             "boxed_size": 0,
             "meta_size": 0,
-            "box_border_color": "#ffffff",
-            "box_background": "#ffffff",
-            "box_text_color": "#1a1a1a",
-            "button_label": "Find your style",
+            "box_border_color": "rgba(0,0,0,0)",
+            "box_background": "rgba(0,0,0,0)",
+            "box_text_color": "rgba(0,0,0,0)",
+            "button_label": "Explore the collection",
             "button_link": "shopify://collections/rings",
             "button_background": "rgba(0,0,0,0)",
             "button_text_color": "rgba(0,0,0,0)",
@@ -1728,9 +1732,13 @@
             "meta_top_right": "",
             "meta_bottom_left": "",
             "meta_bottom_right": "",
-            "scrim_style": "gradient",
+            "scrim_style": "none",
             "overlay_color": "#ffffff",
-            "overlay_opacity": 20
+            "overlay_opacity": 0,
+            "bento_area": "center-top",
+            "text_card": true,
+            "script_style": "normal",
+            "subtitle_position": "above"
           }
         },
         "tile_luxury": {
@@ -1785,16 +1793,17 @@
             "meta_bottom_right": "",
             "scrim_style": "gradient",
             "overlay_color": "#ffffff",
-            "overlay_opacity": 15
+            "overlay_opacity": 15,
+            "bento_area": "hidden"
           }
         }
       },
       "block_order": [
-        "tile_signature",
         "tile_identity",
+        "tile_style",
+        "tile_signature",
         "tile_care",
         "tile_making",
-        "tile_style",
         "tile_luxury"
       ],
       "settings": {
@@ -1840,7 +1849,13 @@
         "viewport_height": 100,
         "padding_top": 40,
         "padding_bottom": 72,
-        "color_scheme": "scheme-1"
+        "color_scheme": "scheme-1",
+        "layout_mode": "bento",
+        "bento_height": 680,
+        "bento_center_ratio": 180,
+        "bento_right_ratio": 110,
+        "bento_text_rows": 4,
+        "bento_right_split": 7
       }
     },
     "178498476563ecd091": {
