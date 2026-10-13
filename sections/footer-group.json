@@ -44,6 +44,7 @@
         "item_value",
         "item_shipping"
       ],
+      "disabled": true,
       "settings": {
         "show_bar": true,
         "background": "#ead9d1",
@@ -63,8 +64,8 @@
         "fc_logo": {
           "type": "logo",
           "settings": {
-            "logo": "shopify://shop_images/Eden_Raine_Icon_black.png",
-            "text": "<p>Eden Raine for Precious Metal Gemstone Jewellery with Elegance &amp; Style.</p>",
+            "logo": "shopify://shop_images/Eden_Raine_Icon_Black_SQ.png",
+            "text": "<p>Eden Raine for Precious Metal Gemstone Jewellery with Elegance & Style.</p>",
             "show_social": true
           }
         },
@@ -72,6 +73,8 @@
           "type": "link_list",
           "settings": {
             "menu": "footer",
+            "extra_link_label": "",
+            "extra_link_url": "",
             "show_social": false
           }
         },
@@ -79,6 +82,8 @@
           "type": "link_list",
           "settings": {
             "menu": "eden-raine",
+            "extra_link_label": "",
+            "extra_link_url": "",
             "show_social": false
           }
         },
@@ -86,6 +91,8 @@
           "type": "link_list",
           "settings": {
             "menu": "help",
+            "extra_link_label": "",
+            "extra_link_url": "",
             "show_social": false
           }
         },
@@ -106,17 +113,20 @@
         "fc_help",
         "fc_newsletter"
       ],
+      "custom_css": [
+        "p {color: white;}"
+      ],
       "settings": {
-        "background": "#faf8f5",
-        "text_color": "#202020",
-        "link_color": "#202020",
+        "background": "#000000",
+        "text_color": "#ffffff",
+        "link_color": "#FFFFFF",
         "link_hover_color": "#8c7d6b",
-        "border_color": "#e8e5df",
+        "border_color": "#FFFFFF",
         "text_size": 13,
         "heading_size": 14,
         "logo_width": 110,
-        "button_background": "#051514",
-        "button_text_color": "#ffffff",
+        "button_background": "#FFFFFF",
+        "button_text_color": "#101010",
         "show_payment_methods": true,
         "credit_text": "Website by",
         "credit_name": "Lionsorbet",

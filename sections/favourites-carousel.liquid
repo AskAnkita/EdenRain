@@ -1,0 +1,487 @@
+{% comment %}
+  Favourites carousel: a text panel on the left (heading, one underlined link and the
+  arrows), then a row of picture panels that scrolls sideways beside it.
+
+  Where a panel's picture comes from, in order:
+    1. the picture chosen on the block in the theme editor;
+    2. "Picture file name" - a file already in the theme's assets folder;
+    3. "Picture URL" - e.g. a Shopify Files link.
+  A panel with none of the three keeps its background and caption rather than
+  showing a broken picture.
+{% endcomment %}
+
+{%- liquid
+  assign slides = section.blocks
+  assign gap = section.settings.gap
+  assign per_row = section.settings.per_row
+-%}
+
+{%- style -%}
+  #fav-{{ section.id }} {
+    /* A custom element has no display of its own, so the section sets one. */
+    display: block;
+    --fav-gap: {{ gap }}px;
+    --fav-card-bg: {{ section.settings.card_background }};
+    padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
+    {%- if section.settings.section_background != blank and section.settings.section_background != 'rgba(0,0,0,0)' %}
+    background-color: {{ section.settings.section_background }};
+    {%- endif %}
+  }
+
+  #fav-{{ section.id }} .fav-inner {
+    max-width: {% if section.settings.width == 'page' %}var(--page-width, 160rem){% else %}none{% endif %};
+    margin: 0 auto;
+    padding-inline: {{ section.settings.page_padding }}px;
+    display: grid;
+    grid-template-columns: minmax(0, {{ section.settings.panel_width }}fr) minmax(0, {{ 100 | minus: section.settings.panel_width }}fr);
+    gap: var(--fav-gap);
+    align-items: stretch;
+  }
+
+  /* The text panel keeps the same shape as a picture panel, so the row reads as one
+     band of equal tiles rather than a caption stuck beside a carousel. */
+  #fav-{{ section.id }} .fav-panel {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: {% if section.settings.panel_alignment == 'left' %}flex-start{% elsif section.settings.panel_alignment == 'right' %}flex-end{% else %}center{% endif %};
+    justify-content: center;
+    gap: 2rem;
+    padding: 3.2rem;
+    text-align: {{ section.settings.panel_alignment }};
+    background-color: {% if section.settings.panel_background != blank and section.settings.panel_background != 'rgba(0,0,0,0)' %}{{ section.settings.panel_background }}{% else %}var(--fav-card-bg){% endif %};
+  }
+
+  #fav-{{ section.id }} .fav-heading {
+    margin: 0;
+    font-family: {% if section.settings.heading_font == 'body' %}var(--font-body--family){% else %}var(--font-heading--family){% endif %};
+    font-size: {{ section.settings.heading_size }}px;
+    font-weight: {{ section.settings.heading_weight }};
+    font-style: {% if section.settings.heading_italic %}italic{% else %}normal{% endif %};
+    line-height: 1.15;
+    letter-spacing: {{ section.settings.heading_tracking | divided_by: 100.0 }}em;
+    {%- if section.settings.heading_color != blank and section.settings.heading_color != 'rgba(0,0,0,0)' %}
+    color: {{ section.settings.heading_color }};
+    {%- endif %}
+  }
+
+  /* The link is a plain underlined label: a rule drawn under the whole label that
+     thickens on hover, rather than a button. */
+  #fav-{{ section.id }} .fav-link {
+    display: inline-block;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid currentColor;
+    color: inherit;
+    font-family: var(--font-body--family);
+    font-size: {{ section.settings.link_size }}px;
+    letter-spacing: {{ section.settings.link_tracking | divided_by: 100.0 }}em;
+    text-transform: {{ section.settings.link_transform }};
+    text-decoration: none;
+    {%- if section.settings.link_color != blank and section.settings.link_color != 'rgba(0,0,0,0)' %}
+    color: {{ section.settings.link_color }};
+    {%- endif %}
+    transition: border-bottom-width 0.2s ease, opacity 0.2s ease;
+  }
+
+  #fav-{{ section.id }} .fav-link:hover {
+    border-bottom-width: 2px;
+  }
+
+  #fav-{{ section.id }} .fav-arrows {
+    display: flex;
+    gap: 2.4rem;
+    margin-top: 1.2rem;
+  }
+
+  /* The script hides the pair when there is nothing to scroll; display: flex above
+     would otherwise win over the hidden attribute. */
+  #fav-{{ section.id }} .fav-arrows[hidden] {
+    display: none;
+  }
+
+  /* Bare chevrons, not the white discs the other rows use: there is no picture
+     behind them here, so a disc would have nothing to lift them off. */
+  #fav-{{ section.id }} .fav-arrow {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: {{ section.settings.arrow_size }}px;
+    height: {{ section.settings.arrow_size }}px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: {% if section.settings.arrow_color != blank and section.settings.arrow_color != 'rgba(0,0,0,0)' %}{{ section.settings.arrow_color }}{% else %}currentColor{% endif %};
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  #fav-{{ section.id }} .fav-arrow svg {
+    width: 60%;
+    height: 60%;
+  }
+
+  #fav-{{ section.id }} .fav-arrow:hover:not(:disabled) {
+    transform: scale(1.12);
+  }
+
+  #fav-{{ section.id }} .fav-arrow:disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  #fav-{{ section.id }} .fav-arrow:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  #fav-{{ section.id }} .fav-track {
+    display: grid;
+    grid-auto-flow: column;
+    /* The panels share the width of the row between them, so a wider screen grows the
+       panel rather than adding another one - three across stays three across. */
+    grid-auto-columns: calc((100% - {{ per_row | minus: 1 }} * var(--fav-gap)) / {{ per_row }});
+    gap: var(--fav-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  #fav-{{ section.id }} .fav-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  #fav-{{ section.id }} .fav-card {
+    scroll-snap-align: start;
+  }
+
+  #fav-{{ section.id }} .fav-media {
+    position: relative;
+    display: block;
+    aspect-ratio: {{ section.settings.ratio }};
+    overflow: hidden;
+    background-color: var(--fav-card-bg);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #fav-{{ section.id }} .fav-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: {{ section.settings.image_fit }};
+    transition: transform 0.6s ease;
+  }
+
+  {%- if section.settings.hover_zoom %}
+  #fav-{{ section.id }} .fav-media:hover img,
+  #fav-{{ section.id }} .fav-media:focus-visible img {
+    transform: scale(1.05);
+  }
+  {%- endif %}
+
+  #fav-{{ section.id }} .fav-media:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
+  }
+
+  /* The badge sits in the top left of the panel, clear of the product shot. */
+  #fav-{{ section.id }} .fav-badge {
+    position: absolute;
+    top: {{ section.settings.badge_offset }}px;
+    left: {{ section.settings.badge_offset }}px;
+    z-index: 1;
+    padding: 0.6rem 1rem;
+    font-family: var(--font-body--family);
+    font-size: {{ section.settings.badge_size }}px;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  #fav-{{ section.id }} .fav-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: {{ section.settings.badge_offset }}px;
+    padding-inline: 1.2rem;
+    font-family: var(--font-body--family);
+    font-size: {{ section.settings.caption_size }}px;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  @media screen and (max-width: 989px) {
+    #fav-{{ section.id }} .fav-inner {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    #fav-{{ section.id }} .fav-panel {
+      padding: 3.2rem 2.4rem;
+      align-items: {% if section.settings.panel_alignment == 'right' %}flex-end{% elsif section.settings.panel_alignment == 'left' %}flex-start{% else %}center{% endif %};
+    }
+
+    #fav-{{ section.id }} .fav-track {
+      grid-auto-columns: calc((100% - var(--fav-gap)) / {{ section.settings.per_row_mobile }});
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #fav-{{ section.id }} .fav-inner {
+      padding-inline: {{ section.settings.page_padding_mobile }}px;
+    }
+
+    #fav-{{ section.id }} .fav-heading {
+      font-size: {{ section.settings.heading_size_mobile }}px;
+    }
+
+    #fav-{{ section.id }} .fav-track {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #fav-{{ section.id }} .fav-card {
+      scroll-snap-stop: always;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #fav-{{ section.id }} .fav-track { scroll-behavior: auto; }
+    #fav-{{ section.id }} .fav-media img,
+    #fav-{{ section.id }} .fav-arrow { transition: none; }
+  }
+{%- endstyle -%}
+
+<script src="{{ 'favourites-carousel.js' | asset_url }}" defer="defer"></script>
+
+<favourites-carousel
+  id="fav-{{ section.id }}"
+  class="favourites-carousel color-{{ section.settings.color_scheme }}"
+  data-loop="{% if section.settings.loop_arrows %}true{% else %}false{% endif %}"
+>
+  <div class="fav-inner">
+    <div class="fav-panel">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="fav-heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.link_label != blank -%}
+        <a class="fav-link" href="{{ section.settings.link_url | default: '#' }}">
+          {{- section.settings.link_label | escape -}}
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.show_arrows -%}
+        <div class="fav-arrows">
+          <button type="button" class="fav-arrow fav-arrow--prev" aria-label="Previous" disabled>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M15 4 7 12l8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
+            </svg>
+          </button>
+          <button type="button" class="fav-arrow fav-arrow--next" aria-label="Next">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M9 4l8 8-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
+            </svg>
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <ul class="fav-track" role="list">
+      {%- for block in slides -%}
+        {%- liquid
+          assign slide_image = block.settings.image
+          assign slide_asset = block.settings.image_asset | strip
+          assign slide_url = block.settings.image_url | strip
+          assign slide_alt = block.settings.image_alt | default: block.settings.caption
+          assign slide_link = block.settings.link
+          if slide_link == blank
+            assign slide_link = section.settings.link_url
+          endif
+
+          # The zoom uses the CSS scale property rather than a transform, so the hover
+          # zoom above can still animate its own transform without undoing it.
+          assign slide_scale = block.settings.image_scale | divided_by: 100.0
+          capture image_style
+            echo 'object-position: ' | append: block.settings.object_position | append: ';'
+            if block.settings.image_scale != 100
+              echo ' scale: ' | append: slide_scale | append: ';'
+            endif
+          endcapture
+        -%}
+        <li class="fav-card" {{ block.shopify_attributes }}>
+          {%- capture slide_body -%}
+            {%- if block.settings.badge != blank -%}
+              <span
+                class="fav-badge"
+                style="
+                  background-color: {{ block.settings.badge_background | default: '#ffffff' }};
+                  color: {{ block.settings.badge_text_color | default: '#1a1a1a' }};
+                "
+              >{{ block.settings.badge | escape }}</span>
+            {%- endif -%}
+
+            {%- if slide_image != blank -%}
+              {{
+                slide_image
+                | image_url: width: 1200
+                | image_tag:
+                  loading: 'lazy',
+                  sizes: '(min-width: 990px) 25vw, 60vw',
+                  widths: '400, 600, 900, 1200',
+                  alt: slide_alt,
+                  style: image_style
+              }}
+            {%- elsif slide_asset != blank -%}
+              {%- comment -%} The width and height only reserve the space; the panel's shape comes from the section. {%- endcomment -%}
+              <img
+                src="{{ slide_asset | asset_img_url: '900x' }}"
+                srcset="{{ slide_asset | asset_img_url: '400x' }} 400w, {{ slide_asset | asset_img_url: '600x' }} 600w, {{ slide_asset | asset_img_url: '900x' }} 900w, {{ slide_asset | asset_img_url: '1200x' }} 1200w"
+                sizes="(min-width: 990px) 25vw, 60vw"
+                alt="{{ slide_alt | escape }}"
+                width="1200"
+                height="1200"
+                loading="lazy"
+                style="{{ image_style }}"
+                data-fav-asset
+              >
+            {%- elsif slide_url != blank -%}
+              <img
+                src="{{ slide_url }}"
+                alt="{{ slide_alt | escape }}"
+                width="1200"
+                height="1200"
+                loading="lazy"
+                style="{{ image_style }}"
+                data-fav-asset
+              >
+            {%- endif -%}
+
+            {%- if block.settings.caption != blank -%}
+              <span
+                class="fav-caption"
+                {% if block.settings.caption_color != blank and block.settings.caption_color != 'rgba(0,0,0,0)' %}
+                  style="color: {{ block.settings.caption_color }};"
+                {% endif %}
+              >{{ block.settings.caption | escape }}</span>
+            {%- endif -%}
+          {%- endcapture -%}
+
+          {%- capture card_style -%}
+            {%- if block.settings.card_background != blank and block.settings.card_background != 'rgba(0,0,0,0)' -%}
+              background-color: {{ block.settings.card_background }};
+            {%- endif -%}
+          {%- endcapture -%}
+
+          {%- if slide_link != blank -%}
+            <a class="fav-media" href="{{ slide_link }}" style="{{ card_style }}">{{ slide_body }}</a>
+          {%- else -%}
+            <div class="fav-media" style="{{ card_style }}">{{ slide_body }}</div>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</favourites-carousel>
+
+
+{% schema %}
+{
+  "name": "Favourites carousel",
+  "class": "section-wrapper",
+  "settings": [
+    { "type": "header", "content": "Text panel" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Tennis Favourites" },
+    { "type": "select", "id": "heading_font", "label": "Heading typeface", "default": "heading", "options": [ { "value": "heading", "label": "Heading font" }, { "value": "body", "label": "Body font" } ] },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 18, "max": 72, "step": 1, "unit": "px", "default": 34 },
+    { "type": "range", "id": "heading_size_mobile", "label": "Heading size on mobile", "min": 16, "max": 56, "step": 1, "unit": "px", "default": 26 },
+    { "type": "select", "id": "heading_weight", "label": "Heading weight", "default": "400", "options": [ { "value": "300", "label": "Light" }, { "value": "400", "label": "Regular" }, { "value": "500", "label": "Medium" }, { "value": "600", "label": "Semi bold" }, { "value": "700", "label": "Bold" } ] },
+    { "type": "checkbox", "id": "heading_italic", "label": "Italic heading", "default": false },
+    { "type": "range", "id": "heading_tracking", "label": "Heading letter spacing", "min": -4, "max": 20, "step": 1, "unit": "%", "default": 0 },
+    { "type": "color", "id": "heading_color", "label": "Heading colour", "default": "rgba(0,0,0,0)", "info": "Leave empty to use the colour scheme." },
+    { "type": "select", "id": "panel_alignment", "label": "Panel alignment", "default": "center", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centre" }, { "value": "right", "label": "Right" } ] },
+    { "type": "range", "id": "panel_width", "label": "Panel width", "min": 15, "max": 50, "step": 1, "unit": "%", "default": 25, "info": "The share of the row the text panel takes; the picture panels fill the rest." },
+    { "type": "color", "id": "panel_background", "label": "Panel background", "default": "#f5f5f5", "info": "Leave it empty to match the picture panels." },
+
+    { "type": "header", "content": "Link" },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "Shop the tennis collection", "info": "Leave empty to hide the link." },
+    { "type": "url", "id": "link_url", "label": "Link", "info": "Also used by any panel with no link of its own." },
+    { "type": "range", "id": "link_size", "label": "Link size", "min": 9, "max": 24, "step": 1, "unit": "px", "default": 13 },
+    { "type": "range", "id": "link_tracking", "label": "Link letter spacing", "min": 0, "max": 30, "step": 1, "unit": "%", "default": 12 },
+    { "type": "select", "id": "link_transform", "label": "Link case", "default": "uppercase", "options": [ { "value": "uppercase", "label": "UPPERCASE" }, { "value": "none", "label": "As typed" }, { "value": "capitalize", "label": "Title Case" } ] },
+    { "type": "color", "id": "link_color", "label": "Link colour", "default": "rgba(0,0,0,0)" },
+
+    { "type": "header", "content": "Arrows" },
+    { "type": "checkbox", "id": "show_arrows", "label": "Show the arrows", "default": true, "info": "The arrows hide themselves when there are too few panels to fill the row - there is nothing to scroll." },
+    { "type": "checkbox", "id": "loop_arrows", "label": "Loop at the ends", "default": false, "info": "On: the next arrow at the end of the row goes back to the first panel. Off: the row stops at the last panel and the arrow greys out." },
+    { "type": "range", "id": "arrow_size", "label": "Arrow size", "min": 20, "max": 64, "step": 2, "unit": "px", "default": 32 },
+    { "type": "color", "id": "arrow_color", "label": "Arrow colour", "default": "rgba(0,0,0,0)" },
+
+    { "type": "header", "content": "Picture panels" },
+    { "type": "range", "id": "per_row", "label": "Panels across on desktop", "min": 2, "max": 6, "step": 1, "default": 3, "info": "The panels share the row between them, so fewer across means a bigger panel on a wide screen." },
+    { "type": "range", "id": "per_row_mobile", "label": "Panels across on mobile", "min": 1, "max": 3, "step": 0.1, "default": 1.4, "info": "A fraction leaves the next panel peeking at the edge." },
+    { "type": "select", "id": "ratio", "label": "Panel shape", "default": "1 / 1", "options": [ { "value": "1 / 1", "label": "Square" }, { "value": "4 / 5", "label": "Portrait (4:5)" }, { "value": "3 / 4", "label": "Tall (3:4)" }, { "value": "5 / 4", "label": "Landscape (5:4)" } ] },
+    { "type": "color", "id": "card_background", "label": "Panel background", "default": "#f5f5f5" },
+    { "type": "select", "id": "image_fit", "label": "How the picture fills a panel", "default": "cover", "options": [ { "value": "cover", "label": "Fill the panel (crop)" }, { "value": "contain", "label": "Fit inside the panel" } ] },
+    { "type": "checkbox", "id": "hover_zoom", "label": "Zoom the picture on hover", "default": true },
+    { "type": "range", "id": "gap", "label": "Gap between panels", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 8 },
+
+    { "type": "header", "content": "Badges and captions" },
+    { "type": "range", "id": "badge_size", "label": "Badge text size", "min": 8, "max": 20, "step": 1, "unit": "px", "default": 11 },
+    { "type": "range", "id": "badge_offset", "label": "Badge inset", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 20, "info": "How far the badge sits in from the corner of the panel. The caption uses the same distance from the bottom." },
+    { "type": "range", "id": "caption_size", "label": "Caption size", "min": 8, "max": 24, "step": 1, "unit": "px", "default": 12 },
+
+    { "type": "header", "content": "Section layout" },
+    { "type": "select", "id": "width", "label": "Section width", "default": "full", "options": [ { "value": "page", "label": "Page width" }, { "value": "full", "label": "Full width" } ] },
+    { "type": "range", "id": "page_padding", "label": "Side padding", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "page_padding_mobile", "label": "Side padding on mobile", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 16 },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 40 },
+    { "type": "color", "id": "section_background", "label": "Section background", "default": "rgba(0,0,0,0)" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Colour scheme", "default": "scheme-1" }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Picture panel",
+      "settings": [
+        { "type": "header", "content": "Picture" },
+        { "type": "image_picker", "id": "image", "label": "Picture" },
+        { "type": "text", "id": "image_asset", "label": "Picture file name (fallback)", "info": "A file already in the theme's assets folder, e.g. menu-tile-tennis-bracelets.png. Only used when no picture is chosen." },
+        { "type": "text", "id": "image_url", "label": "Picture URL (fallback)", "info": "Only used when neither of the two above is set." },
+        { "type": "text", "id": "image_alt", "label": "Picture alt text" },
+        { "type": "range", "id": "image_scale", "label": "Picture zoom", "min": 100, "max": 200, "step": 5, "unit": "%", "default": 100 },
+        { "type": "select", "id": "object_position", "label": "Picture focus", "default": "center", "options": [ { "value": "center", "label": "Centre" }, { "value": "top", "label": "Top" }, { "value": "bottom", "label": "Bottom" }, { "value": "left", "label": "Left" }, { "value": "right", "label": "Right" } ] },
+        { "type": "color", "id": "card_background", "label": "Panel background", "default": "rgba(0,0,0,0)", "info": "Overrides the section's panel background." },
+
+        { "type": "header", "content": "Badge" },
+        { "type": "text", "id": "badge", "label": "Badge", "info": "A short label in the top corner, e.g. New. Leave empty to hide it." },
+        { "type": "color", "id": "badge_background", "label": "Badge background", "default": "#ffffff" },
+        { "type": "color", "id": "badge_text_color", "label": "Badge text", "default": "#1a1a1a" },
+
+        { "type": "header", "content": "Caption and link" },
+        { "type": "text", "id": "caption", "label": "Caption", "info": "Sits along the bottom of the panel." },
+        { "type": "color", "id": "caption_color", "label": "Caption colour", "default": "rgba(0,0,0,0)" },
+        { "type": "url", "id": "link", "label": "Panel link", "info": "Falls back to the section's link." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Favourites carousel",
+      "blocks": [
+        { "type": "slide", "settings": { "image_asset": "menu-tile-tennis-bracelets.png", "image_alt": "Diamond tennis bracelet", "badge": "#1 Best Seller" } },
+        { "type": "slide", "settings": { "image_asset": "menu-tile-tennis-necklaces.png", "image_alt": "Diamond tennis necklace" } },
+        { "type": "slide", "settings": { "image_asset": "menu-tile-signature-bracelets.png", "image_alt": "Signature diamond bracelet", "badge": "New" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

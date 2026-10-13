@@ -17,7 +17,7 @@
           "settings": {
             "placeholder_desktop_video_url": "https://cdn.shopify.com/videos/c/o/v/d104411d81c940fb996fc439f675d3c2.mp4",
             "enable_full_height": true,
-            "desktop_height": 100,
+            "desktop_height": 90,
             "placeholder_mobile_video_url": "https://cdn.shopify.com/videos/c/o/v/a44d0c0308f5486c9329c4ca6df1d823.mp4",
             "mobile_height": 66,
             "enable_autoplay": true,
@@ -1925,6 +1925,121 @@
         "color_scheme": "scheme-1"
       }
     },
+    "favourites_carousel": {
+      "type": "favourites-carousel",
+      "blocks": {
+        "slide_tennis_bracelet": {
+          "type": "slide",
+          "settings": {
+            "image_asset": "menu-tile-tennis-bracelets.png",
+            "image_alt": "Diamond tennis bracelet",
+            "image_scale": 100,
+            "object_position": "center",
+            "badge": "#1 Best Seller",
+            "badge_background": "#ffffff",
+            "badge_text_color": "#1a1a1a",
+            "link": "shopify://collections/tennis-bracelets"
+          }
+        },
+        "slide_tennis_necklace": {
+          "type": "slide",
+          "settings": {
+            "image_asset": "menu-tile-tennis-necklaces.png",
+            "image_alt": "Diamond tennis necklace",
+            "image_scale": 100,
+            "object_position": "center",
+            "link": "shopify://collections/tennis-necklaces"
+          }
+        },
+        "slide_signature_bracelet": {
+          "type": "slide",
+          "settings": {
+            "image_asset": "menu-tile-signature-bracelets.png",
+            "image_alt": "Signature diamond bracelet",
+            "image_scale": 100,
+            "object_position": "center",
+            "badge": "New",
+            "badge_background": "#ffffff",
+            "badge_text_color": "#1a1a1a",
+            "link": "shopify://collections/signature-bracelets"
+          }
+        },
+        "slide_signature_necklace": {
+          "type": "slide",
+          "settings": {
+            "image_asset": "menu-tile-signature-necklaces.png",
+            "image_alt": "Signature diamond necklace",
+            "image_scale": 100,
+            "object_position": "center",
+            "link": "shopify://collections/signature-necklaces"
+          }
+        },
+        "slide_signature_earrings": {
+          "type": "slide",
+          "settings": {
+            "image_asset": "menu-tile-signature-earrings.png",
+            "image_alt": "Signature diamond earrings",
+            "image_scale": 100,
+            "object_position": "center",
+            "link": "shopify://collections/signature-earrings"
+          }
+        },
+        "slide_best_sellers": {
+          "type": "slide",
+          "settings": {
+            "image_asset": "menu-tile-best-sellers.png",
+            "image_alt": "Best selling diamond jewellery",
+            "image_scale": 100,
+            "object_position": "center",
+            "link": "shopify://collections/best-sellers"
+          }
+        }
+      },
+      "block_order": [
+        "slide_tennis_bracelet",
+        "slide_tennis_necklace",
+        "slide_signature_bracelet",
+        "slide_signature_necklace",
+        "slide_signature_earrings",
+        "slide_best_sellers"
+      ],
+      "settings": {
+        "heading": "Tennis Favourites",
+        "heading_font": "heading",
+        "heading_size": 34,
+        "heading_size_mobile": 26,
+        "heading_weight": "400",
+        "heading_italic": false,
+        "heading_tracking": 0,
+        "panel_alignment": "center",
+        "panel_width": 25,
+        "panel_background": "#f5f5f5",
+        "link_label": "Shop the tennis collection",
+        "link_url": "shopify://collections/tennis-bracelets",
+        "link_size": 13,
+        "link_tracking": 12,
+        "link_transform": "uppercase",
+        "show_arrows": true,
+        "loop_arrows": false,
+        "arrow_size": 32,
+        "per_row": 3,
+        "per_row_mobile": 1.4,
+        "ratio": "1 / 1",
+        "card_background": "#f5f5f5",
+        "image_fit": "cover",
+        "hover_zoom": true,
+        "gap": 8,
+        "badge_size": 11,
+        "badge_offset": 20,
+        "caption_size": 12,
+        "width": "full",
+        "page_padding": 0,
+        "page_padding_mobile": 16,
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "color_scheme": "scheme-1"
+      }
+    },
     "178498476563ecd091": {
       "type": "_blocks",
       "blocks": {
@@ -2087,50 +2202,101 @@
       "name": "Find Your Shape",
       "settings": {}
     },
-    "brand_benefits_9Kx2Lm": {
-      "type": "brand-benefits",
+    "service_marquee": {
+      "type": "service-marquee",
       "blocks": {
-        "benefit_guarantee": {
-          "type": "benefit",
+        "service_guarantee": {
+          "type": "service",
           "settings": {
+            "title": "Lifetime guarantee",
             "icon": "diamond",
-            "title": "Lifetime guarantee"
+            "link": ""
           }
         },
-        "benefit_shipping": {
-          "type": "benefit",
+        "service_shipping": {
+          "type": "service",
           "settings": {
+            "title": "Complimentary shipping",
             "icon": "shipping",
-            "title": "Complimentary shipping"
+            "link": ""
           }
         },
-        "benefit_returns": {
-          "type": "benefit",
+        "service_returns": {
+          "type": "service",
           "settings": {
+            "title": "60-day returns",
             "icon": "returns",
-            "title": "60-day returns"
+            "link": ""
           }
         },
-        "benefit_crafted": {
-          "type": "benefit",
+        "service_crafted": {
+          "type": "service",
           "settings": {
+            "title": "Consciously crafted",
             "icon": "crafted",
-            "title": "Consciously crafted"
+            "link": ""
+          }
+        },
+        "service_ethical": {
+          "type": "service",
+          "settings": {
+            "title": "Ethical choice",
+            "icon": "ethical",
+            "link": ""
+          }
+        },
+        "service_worldwide": {
+          "type": "service",
+          "settings": {
+            "title": "Worldwide shipping",
+            "icon": "globe",
+            "link": ""
+          }
+        },
+        "service_value": {
+          "type": "service",
+          "settings": {
+            "title": "Great value",
+            "icon": "value",
+            "link": ""
           }
         }
       },
       "block_order": [
-        "benefit_guarantee",
-        "benefit_shipping",
-        "benefit_returns",
-        "benefit_crafted"
+        "service_guarantee",
+        "service_shipping",
+        "service_returns",
+        "service_crafted",
+        "service_ethical",
+        "service_worldwide",
+        "service_value"
       ],
       "settings": {
-        "heading": "Made for your story",
-        "description": "<p>At Eden Raine, we create elegant engagement rings and fine jewellery set with high-quality lab-grown diamonds. Beautiful statements made to last.</p>",
+        "scroll_duration": 30,
+        "pause_on_hover": true,
         "background_color": "#f4f4f0",
-        "text_color": "#000000",
-        "icon_size": 96
+        "text_color": "#001514",
+        "icon_color": "#A98245",
+        "divider_color": "#c9c9c0",
+        "border_color": "#e4e4dd",
+        "show_top_border": false,
+        "show_bottom_border": false,
+        "hover_opacity": 70,
+        "underline_on_hover": false,
+        "label_font": "body",
+        "font_size": 13,
+        "mobile_font_size": 12,
+        "font_weight": "500",
+        "letter_spacing": 1.2,
+        "uppercase": true,
+        "icon_size": 36,
+        "mobile_icon_size": 20,
+        "icon_stroke": 1.2,
+        "icon_gap": 12,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "mobile_padding_top": 20,
+        "mobile_padding_bottom": 20
       }
     },
     "section_GzhCGT": {
@@ -5256,10 +5422,11 @@
   "order": [
     "17834970463ab381ed",
     "category_tiles",
+    "service_marquee",
     "media_with_text_eLCFDd",
     "signature_grid_Er26Sg",
+    "favourites_carousel",
     "178498476563ecd091",
-    "brand_benefits_9Kx2Lm",
     "section_GzhCGT",
     "blocks_DTAzNP",
     "homepage_discover",

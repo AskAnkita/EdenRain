@@ -102,6 +102,10 @@
     render 'header-message', settings: sec_stts, blocks: section.blocks
   endcapture
 
+  capture consultant
+    render 'header-consultant', sec_stts: sec_stts
+  endcapture
+
   if shop.customer_accounts_enabled
     render 'account-drawer'
   endif
@@ -133,6 +137,9 @@
 
   assign header_actions_order = sec_stts.header_actions_order | default: 'account,search,localization,actions'
   assign order = order | replace: 'account,search,localization,actions', header_actions_order
+
+  # The consultant chip always sits with the utilities, just before them
+  assign order = order | replace_first: 'message', 'message,consultant'
 
   # Handle logo row
   if sec_stts.logo_row == 'bottom'
@@ -316,6 +323,7 @@
           mobile_search: mobile_search,
           multi_tab_menu: multi_tab_menu,
           message: message,
+          consultant: consultant,
           color: scheme
         %}
       {% endcapture %}
@@ -1912,6 +1920,192 @@
       },
       {
         "type": "header",
+        "content": "Consultant"
+      },
+      {
+        "type": "paragraph",
+        "content": "A single call-to-action that sits with the header icons, e.g. \"Meet a Consultant\"."
+      },
+      {
+        "type": "checkbox",
+        "id": "show_consultant",
+        "label": "Show consultant link",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "consultant_text",
+        "label": "Text",
+        "default": "Meet a Consultant",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "url",
+        "id": "consultant_link",
+        "label": "Link",
+        "info": "Defaults to the contact page when left empty.",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "checkbox",
+        "id": "consultant_show_icon",
+        "label": "Show icon",
+        "default": true,
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_font",
+        "label": "t:settings.font",
+        "options": [
+          {
+            "value": "body",
+            "label": "t:options.body"
+          },
+          {
+            "value": "subheading",
+            "label": "t:options.subheading"
+          },
+          {
+            "value": "heading",
+            "label": "t:options.heading"
+          }
+        ],
+        "default": "body",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_font_size",
+        "label": "t:settings.size",
+        "options": [
+          {
+            "value": "1.2rem",
+            "label": "12px"
+          },
+          {
+            "value": "1.3rem",
+            "label": "13px"
+          },
+          {
+            "value": "1.4rem",
+            "label": "14px"
+          },
+          {
+            "value": "1.6rem",
+            "label": "16px"
+          }
+        ],
+        "default": "1.4rem",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_case",
+        "label": "t:settings.case",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:options.uppercase"
+          },
+          {
+            "value": "capitalize",
+            "label": "t:options.capitalize"
+          }
+        ],
+        "default": "none",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "color",
+        "id": "consultant_background",
+        "label": "Background",
+        "default": "#f4f2ef",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "color",
+        "id": "consultant_text_color",
+        "label": "Text",
+        "default": "#000000",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "color",
+        "id": "consultant_hover_background",
+        "label": "Background on hover",
+        "default": "#e8e4de",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "color",
+        "id": "consultant_hover_text_color",
+        "label": "Text on hover",
+        "default": "#000000",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "color",
+        "id": "consultant_border_color",
+        "label": "Border",
+        "default": "#e2ddd6",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "range",
+        "id": "consultant_border_width",
+        "label": "Border thickness",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_position",
+        "label": "t:settings.position",
+        "options": [
+          {
+            "value": "left",
+            "label": "t:options.left"
+          },
+          {
+            "value": "center",
+            "label": "t:options.center"
+          },
+          {
+            "value": "right",
+            "label": "t:options.right"
+          }
+        ],
+        "default": "right",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_row",
+        "label": "t:settings.row",
+        "options": [
+          {
+            "value": "top",
+            "label": "t:options.top"
+          },
+          {
+            "value": "bottom",
+            "label": "t:options.bottom"
+          }
+        ],
+        "default": "top",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "header",
         "content": "t:content.customer_account"
       },
       {
@@ -2058,6 +2252,14 @@
         "step": 0.1,
         "default": 0,
         "visible_if": "{{ section.settings.show_search and settings.search_type == 'inline' and section.settings.search_type == 'underline' }}"
+      },
+      {
+        "type": "text",
+        "id": "search_placeholder",
+        "label": "Placeholder text",
+        "default": "Search...",
+        "info": "Shown inside the inline search field. Leave empty to use the default \"Search\".",
+        "visible_if": "{{ section.settings.show_search and settings.search_type == 'inline' }}"
       },
       {
         "type": "select",

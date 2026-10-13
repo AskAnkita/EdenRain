@@ -95,7 +95,7 @@
       ],
       "name": "t:names.announcement_bar",
       "settings": {
-        "color_scheme": "scheme-brand-pink",
+        "color_scheme": "scheme-7",
         "margin_bottom": 0,
         "padding_top": 6,
         "padding_bottom": 5
@@ -188,7 +188,7 @@
         "button_type_size_link_3": "1.4rem",
         "button_font_weight_link_3": "default",
         "case_link_3": "none",
-        "show_message": true,
+        "show_message": false,
         "message": "<p><a href=\"tel:+44203554887\">+44 (0) 203 554 887</a></p>",
         "right_menu_items": "",
         "font": "var(--font-body--family)",
@@ -204,9 +204,9 @@
         "show_search": true,
         "search_display_type": "icon",
         "search_display": "block",
-        "search_type": "frame",
-        "search_underline_opacity": 0,
-        "search_position": "right",
+        "search_type": "underline",
+        "search_underline_opacity": 1,
+        "search_position": "left",
         "search_row": "top",
         "search_icon_pos_right": 1,
         "search_icon_pos_top": 1,
@@ -236,9 +236,9 @@
         "section_width": "full-width",
         "page_width_custom": 1570,
         "enable_sticky_header": "scroll-up",
-        "divider_width": 0,
-        "divider_size": "page-width",
-        "border_width": 0,
+        "divider_width": 1,
+        "divider_size": "full-width",
+        "border_width": 1,
         "enable_shadow": false,
         "color_scheme_top": "scheme-6",
         "color_scheme_top_mb": "scheme-6",
@@ -275,10 +275,10 @@
         "product_color_scheme": "default",
         "enable_transparent_header_collection": false,
         "collection_color_scheme": "default",
-        "padding-block-start-top": 10,
-        "padding-block-end-top": 10,
-        "padding-block-start-bottom": 0,
-        "padding-block-end-bottom": 0
+        "padding-block-start-top": 18,
+        "padding-block-end-top": 18,
+        "padding-block-start-bottom": 6,
+        "padding-block-end-bottom": 6
       }
     },
     "header_mobile_MqfLk9": {

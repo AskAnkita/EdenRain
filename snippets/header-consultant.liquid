@@ -1,0 +1,53 @@
+{% comment %}
+  Renders the "Meet a Consultant" chip that sits in the header's utility row,
+  before the account / wishlist / cart icons.
+
+  Everything about it (label, link, icon, type, colours, border) is a setting on
+  the header section, so it can be edited in Theme editor > Header > Consultant.
+
+  Accepts:
+  - sec_stts: {Object} section.settings
+  - extra_class: {String} optional extra classes
+
+  Usage:
+  {% render 'header-consultant', sec_stts: section.settings %}
+{% endcomment %}
+
+{%- liquid
+  assign label = sec_stts.consultant_text | strip
+  assign link = sec_stts.consultant_link | default: '/pages/contact'
+  assign extra_class = extra_class | default: '' | strip
+-%}
+
+{%- if sec_stts.show_consultant and label != blank -%}
+  {%- capture consultant_style -%}
+    --consultant-font: var(--font-{{ sec_stts.consultant_font | default: 'body' }}--family);
+    --consultant-font-size: {{ sec_stts.consultant_font_size | default: '1.4rem' }};
+    --consultant-case: {{ sec_stts.consultant_case | default: 'none' }};
+    {% if sec_stts.consultant_background != blank %}--consultant-background: {{ sec_stts.consultant_background }};{% endif %}
+    {% if sec_stts.consultant_text_color != blank %}--consultant-color: {{ sec_stts.consultant_text_color }};{% endif %}
+    {% if sec_stts.consultant_hover_background != blank %}--consultant-background-hover: {{ sec_stts.consultant_hover_background }};{% endif %}
+    {% if sec_stts.consultant_hover_text_color != blank %}--consultant-color-hover: {{ sec_stts.consultant_hover_text_color }};{% endif %}
+    {% if sec_stts.consultant_border_color != blank %}--consultant-border-color: {{ sec_stts.consultant_border_color }};{% endif %}
+    --consultant-border-width: {{ sec_stts.consultant_border_width | default: 0 }}px;
+  {%- endcapture -%}
+
+  <a
+    class="header-consultant max-md:hidden{% if extra_class != blank %} {{ extra_class }}{% endif %}"
+    {% if link != blank %}
+      href="{{ link }}"
+    {% else %}
+      role="link"
+      aria-disabled="true"
+      tabindex="-1"
+    {% endif %}
+    style="{{ consultant_style | strip_newlines | strip }}"
+  >
+    {%- if sec_stts.consultant_show_icon -%}
+      <span class="header-consultant__icon">
+        {{- 'icon-consultant.svg' | inline_asset_content -}}
+      </span>
+    {%- endif -%}
+    <span class="header-consultant__text">{{ label }}</span>
+  </a>
+{%- endif -%}

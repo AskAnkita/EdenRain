@@ -17,13 +17,19 @@
             {{- 'icon-search.svg' | inline_asset_content -}}
           </span>
         </button>
+        {%- liquid
+          assign search_placeholder = section.settings.search_placeholder | strip
+          if search_placeholder == blank
+            assign search_placeholder = 'content.search' | t
+          endif
+        -%}
         <input
           class="search__input field__input"
           id="{{ input_id }}"
           type="search"
           name="q"
           value="{{ search.terms | escape }}"
-          placeholder="{{ 'content.search' | t }}"
+          placeholder="{{ search_placeholder | escape }}"
           {%- if settings.predictive_search_enabled -%}
             role="combobox"
             aria-expanded="false"
