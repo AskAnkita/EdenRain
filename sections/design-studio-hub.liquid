@@ -1,0 +1,446 @@
+{% comment %}
+  Design studio hub - the section behind /pages/design-studio.
+
+  The shape is MiaDonna's Design Studio landing page, which is a router rather
+  than a tool: a centred text hero, a row of cards that each hand off to a
+  builder for one kind of piece, and the questions in two columns. Their own
+  builders are a third-party app in a full-bleed iframe, so there is nothing to
+  copy past this page - the card links are where ours go, whether that is
+  sections/design-studio.liquid, a configurator page or an enquiry form.
+
+  Three bands, each of which can be switched off, and a band with no blocks
+  hides itself. A card is a block, so the row is as wide as the number of
+  things we can actually build.
+
+  Looks come from assets/design-studio-hub.css; buttons from
+  assets/eden-actions.css, whose ink is rebound here so the card buttons follow
+  the section's own button colours. Image slots reuse
+  snippets/homepage-journey-image.liquid - picked image first, then a file in
+  assets/, then a pasted URL, then a placeholder, which is what keeps the cards
+  from collapsing while the products are still unpublished.
+
+  Every restylable setting is written onto the section element as a CSS custom
+  property, with the stylesheet's own value as the fallback, so a setting left
+  at "use the default" (a cleared colour, a size of 0) writes nothing at all.
+{% endcomment %}
+
+{{ 'design-studio-hub.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign transparent = 'rgba(0,0,0,0)'
+
+  # A template saved before a setting existed has no value for it, so sizes are
+  # coerced with 'plus: 0' and treated as "keep the stylesheet default" at 0.
+  # The paddings cannot use that sentinel - 0 is a real padding - and are gated
+  # by the custom_padding checkbox instead.
+  assign hero_size = section.settings.hero_size | plus: 0
+  assign hero_size_mobile = section.settings.hero_size_mobile | plus: 0
+  assign hero_tracking = section.settings.hero_tracking | plus: 0
+  assign heading_size = section.settings.heading_size | plus: 0
+  assign heading_tracking = section.settings.heading_tracking | plus: 0
+  assign eyebrow_size = section.settings.eyebrow_size | plus: 0
+  assign text_size = section.settings.text_size | plus: 0
+  assign card_heading_size = section.settings.card_heading_size | plus: 0
+  assign card_heading_tracking = section.settings.card_heading_tracking | plus: 0
+  assign card_text_size = section.settings.card_text_size | plus: 0
+  assign card_padding = section.settings.card_padding | plus: 0
+  assign cards_gap = section.settings.cards_gap | plus: 0
+  assign faq_size = section.settings.faq_size | plus: 0
+  assign faq_radius = section.settings.faq_radius | plus: 0
+  assign faq_gap = section.settings.faq_gap | plus: 0
+  assign button_radius = section.settings.button_radius | plus: 0
+  assign content_width = section.settings.content_width | plus: 0
+  assign hero_measure = section.settings.hero_measure | plus: 0
+  assign faqs_measure = section.settings.faqs_measure | plus: 0
+  assign pad_inline = section.settings.padding_horizontal | plus: 0
+  assign pad_top = section.settings.padding_top | plus: 0
+  assign pad_bottom = section.settings.padding_bottom | plus: 0
+
+  # Blocks are filtered into their own band rather than rendered in one run, so
+  # the cards and the questions can share a section without the editor's block
+  # order deciding which band a block lands in.
+  assign card_blocks = section.blocks | where: 'type', 'card'
+  assign faq_blocks = section.blocks | where: 'type', 'faq'
+
+  # The questions are split into columns here rather than flowed through a CSS
+  # grid: a grid row is as tall as its tallest answer, which leaves a gap under
+  # the shorter one. Rounded up, so a five-question page fills column one first.
+  assign faq_columns = section.settings.faq_columns | plus: 0
+  if faq_columns < 1
+    assign faq_columns = 1
+  endif
+  assign faq_per_col = faq_blocks.size | plus: faq_columns | minus: 1 | divided_by: faq_columns
+-%}
+
+{%- capture section_styles -%}
+  {%- if section.settings.section_background != blank and section.settings.section_background != transparent -%}--dsh-section-bg: {{ section.settings.section_background }};{%- endif -%}
+  {%- if section.settings.heading_color != blank and section.settings.heading_color != transparent -%}--dsh-heading-color: {{ section.settings.heading_color }};{%- endif -%}
+  {%- if section.settings.eyebrow_color != blank and section.settings.eyebrow_color != transparent -%}--dsh-eyebrow-color: {{ section.settings.eyebrow_color }};{%- endif -%}
+  {%- if section.settings.text_color != blank and section.settings.text_color != transparent -%}--dsh-text-color: {{ section.settings.text_color }};{%- endif -%}
+  {%- if section.settings.wash_background != blank and section.settings.wash_background != transparent -%}--dsh-wash-bg: {{ section.settings.wash_background }};{%- endif -%}
+  {%- if section.settings.card_background != blank and section.settings.card_background != transparent -%}--dsh-card-bg: {{ section.settings.card_background }};{%- endif -%}
+  {%- if section.settings.card_border != blank and section.settings.card_border != transparent -%}--dsh-card-border: {{ section.settings.card_border }};{%- endif -%}
+  {%- if section.settings.card_text_color != blank and section.settings.card_text_color != transparent -%}--dsh-card-text-color: {{ section.settings.card_text_color }};{%- endif -%}
+  {%- if section.settings.faq_question_color != blank and section.settings.faq_question_color != transparent -%}--dsh-faq-question-color: {{ section.settings.faq_question_color }};{%- endif -%}
+  {%- if section.settings.faq_background != blank and section.settings.faq_background != transparent -%}--dsh-faq-bg: {{ section.settings.faq_background }};{%- endif -%}
+  {%- if section.settings.rule_color != blank and section.settings.rule_color != transparent -%}--dsh-faq-line: {{ section.settings.rule_color }};{%- endif -%}
+
+  {%- comment -%}
+    The buttons take their fill and their text from eden-actions.css, so a
+    button colour is set by rebinding that file's two properties here: one pair
+    covers both the filled and the outlined style.
+  {%- endcomment -%}
+  {%- if section.settings.button_background != blank and section.settings.button_background != transparent -%}--eden-action-ink: {{ section.settings.button_background }};{%- endif -%}
+  {%- if section.settings.button_text_color != blank and section.settings.button_text_color != transparent -%}--eden-action-on-ink: {{ section.settings.button_text_color }};{%- endif -%}
+
+  {%- if hero_size > 0 -%}--dsh-hero-size: {{ hero_size }}px;{%- endif -%}
+  {%- if hero_size_mobile > 0 -%}--dsh-hero-size-mobile: {{ hero_size_mobile }}px;{%- endif -%}
+  {%- if hero_tracking > 0 -%}--dsh-hero-tracking: {{ hero_tracking | divided_by: 100.0 }}em;{%- endif -%}
+  {%- if heading_size > 0 -%}--dsh-heading-size: {{ heading_size }}px;{%- endif -%}
+  {%- if heading_tracking > 0 -%}--dsh-heading-tracking: {{ heading_tracking | divided_by: 100.0 }}em;{%- endif -%}
+  {%- if eyebrow_size > 0 -%}--dsh-eyebrow-size: {{ eyebrow_size }}px;{%- endif -%}
+  {%- if text_size > 0 -%}--dsh-text-size: {{ text_size }}px;{%- endif -%}
+  {%- if card_heading_size > 0 -%}--dsh-card-heading-size: {{ card_heading_size }}px;{%- endif -%}
+  {%- if card_heading_tracking > 0 -%}--dsh-card-heading-tracking: {{ card_heading_tracking | divided_by: 100.0 }}em;{%- endif -%}
+  {%- if card_text_size > 0 -%}--dsh-card-text-size: {{ card_text_size }}px;{%- endif -%}
+  {%- if faq_size > 0 -%}--dsh-faq-size: {{ faq_size }}px;{%- endif -%}
+  --dsh-faq-radius: {{ faq_radius }}px;
+  --dsh-faq-gap: {{ faq_gap }}px;
+  {%- comment -%}
+    The buttons take their corner from the theme's own button radius, so a
+    rounded card button is set by rebinding that property on this section
+    rather than by a radius of this section's own.
+  {%- endcomment -%}
+  --style-border-radius-buttons-primary: {{ button_radius }}px;
+
+  {%- unless section.settings.uppercase_hero -%}--dsh-hero-case: none;{%- endunless -%}
+  {%- unless section.settings.uppercase_headings -%}--dsh-heading-case: none;{%- endunless -%}
+  {%- unless section.settings.uppercase_card_headings -%}--dsh-card-heading-case: none;{%- endunless -%}
+
+  {%- if section.settings.hero_alignment == 'left' -%}--dsh-hero-align: left;--dsh-hero-items: flex-start;{%- elsif section.settings.hero_alignment == 'right' -%}--dsh-hero-align: right;--dsh-hero-items: flex-end;{%- endif -%}
+  {%- comment -%}
+    The measure under a band heading is centred by its own auto margins, so a
+    left-aligned head drops that margin to zero rather than re-centring.
+  {%- endcomment -%}
+  {%- if section.settings.band_alignment == 'left' -%}--dsh-band-align: left;--dsh-band-measure-inline: 0;{%- endif -%}
+  {%- if section.settings.card_alignment != 'center' -%}--dsh-card-align: {{ section.settings.card_alignment }};{%- endif -%}
+
+  --dsh-card-ratio: {{ section.settings.card_ratio }};
+  --dsh-cards-columns: {{ section.settings.cards_columns }};
+  --dsh-cards-columns-mobile: {{ section.settings.cards_columns_mobile }};
+  --dsh-faq-columns: {{ faq_columns }};
+  {%- if cards_gap > 0 -%}--dsh-cards-gap: {{ cards_gap }}px;{%- endif -%}
+  {%- if card_padding > 0 -%}--dsh-card-pad: {{ card_padding }}px;{%- endif -%}
+
+  {%- if section.settings.full_width -%}
+    --dsh-shell-max: none;
+  {%- elsif content_width > 0 -%}
+    --dsh-shell-max: {{ content_width }}px;
+  {%- endif -%}
+  {%- if hero_measure > 0 -%}--dsh-hero-measure: {{ hero_measure }}px;{%- endif -%}
+  {%- if faqs_measure > 0 -%}--dsh-faqs-measure: {{ faqs_measure }}px;{%- endif -%}
+  {%- if pad_inline > 0 -%}--dsh-pad-inline: {{ pad_inline }}px;{%- endif -%}
+  {%- if section.settings.custom_padding -%}--dsh-pad-top: {{ pad_top }}px;--dsh-pad-bottom: {{ pad_bottom }}px;{%- endif -%}
+{%- endcapture -%}
+
+<section class="ds-hub" style="{{ section_styles | strip_newlines | strip }}">
+  {%- if section.settings.show_hero -%}
+    <div class="dsh-band{% if section.settings.hero_wash %} dsh-band--wash{% endif %}">
+      <div class="dsh-shell dsh-hero">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="dsh-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.heading != blank -%}
+          {%- comment -%}
+            The hero carries the page title on a page of its own, but this section
+            can also sit under another one, so which tag it takes is a setting
+            rather than a given.
+          {%- endcomment -%}
+          {%- if section.settings.heading_is_h1 -%}
+            <h1 class="dsh-hero__heading">{{ section.settings.heading | escape }}</h1>
+          {%- else -%}
+            <h2 class="dsh-hero__heading">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+        {%- endif -%}
+
+        {%- if section.settings.intro != blank -%}
+          <div class="dsh-text dsh-hero__intro">{{ section.settings.intro }}</div>
+        {%- endif -%}
+
+        {%- if section.settings.primary_label != blank or section.settings.secondary_label != blank -%}
+          <div class="dsh-hero__actions">
+            {%- if section.settings.primary_label != blank -%}
+              <a class="eden-action eden-action--solid" href="{{ section.settings.primary_link | default: '#' }}">
+                {{- section.settings.primary_label | escape -}}
+              </a>
+            {%- endif -%}
+            {%- if section.settings.secondary_label != blank -%}
+              <a class="eden-action eden-action--outline" href="{{ section.settings.secondary_link | default: '#' }}">
+                {{- section.settings.secondary_label | escape -}}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_cards and card_blocks.size > 0 -%}
+    <div class="dsh-band{% if section.settings.cards_wash %} dsh-band--wash{% endif %}">
+      <div class="dsh-shell">
+        {%- if section.settings.cards_heading != blank or section.settings.cards_intro != blank -%}
+          <div class="dsh-band__head">
+            {%- if section.settings.cards_heading != blank -%}
+              <h2>{{ section.settings.cards_heading | escape }}</h2>
+            {%- endif -%}
+            {%- if section.settings.cards_intro != blank -%}
+              <div class="dsh-text">{{ section.settings.cards_intro }}</div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        <div class="dsh-cards">
+          {%- for block in card_blocks -%}
+            {%- liquid
+              assign card_image_set = false
+              if block.settings.image != blank or block.settings.image_asset != blank or block.settings.image_url != blank
+                assign card_image_set = true
+              endif
+
+              # One link per card, reused by the image, the heading and the
+              # button, so a card only has to be pointed somewhere once.
+              assign card_href = block.settings.link
+              assign button_href = block.settings.button_link | default: card_href
+            -%}
+
+            <div class="dsh-card" {{ block.shopify_attributes }}>
+              {%- if card_image_set -%}
+                <div class="dsh-card__media">
+                  {%- if card_href != blank -%}
+                    <a href="{{ card_href }}" aria-hidden="true" tabindex="-1">
+                  {%- endif -%}
+                  {%- render 'homepage-journey-image',
+                    image: block.settings.image,
+                    asset: block.settings.image_asset,
+                    image_url: block.settings.image_url,
+                    alt: block.settings.image_alt,
+                    placeholder: 'product-1',
+                    sizes: '(min-width: 990px) 32vw, 100vw',
+                    width: 900,
+                    height: 900
+                  -%}
+                  {%- if card_href != blank -%}
+                    </a>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+              {%- if block.settings.heading != blank -%}
+                <h3 class="dsh-card__heading">
+                  {%- if card_href != blank -%}
+                    <a href="{{ card_href }}">{{ block.settings.heading | escape }}</a>
+                  {%- else -%}
+                    {{- block.settings.heading | escape -}}
+                  {%- endif -%}
+                </h3>
+              {%- endif -%}
+
+              {%- if block.settings.text != blank -%}
+                <div class="dsh-card__text">{{ block.settings.text }}</div>
+              {%- endif -%}
+
+              {%- if block.settings.button_label != blank -%}
+                <div class="dsh-card__action">
+                  <a
+                    class="eden-action eden-action--{{ section.settings.card_button_style }}"
+                    href="{{ button_href | default: '#' }}"
+                  >
+                    {{- block.settings.button_label | escape -}}
+                  </a>
+                </div>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.show_faqs and faq_blocks.size > 0 -%}
+    <div class="dsh-band{% if section.settings.faqs_wash %} dsh-band--wash{% endif %}">
+      <div class="dsh-shell">
+        {%- if section.settings.faqs_heading != blank or section.settings.faqs_intro != blank -%}
+          <div class="dsh-band__head{% if section.settings.faqs_alignment == 'left' %} dsh-band__head--left{% endif %}">
+            {%- if section.settings.faqs_heading != blank -%}
+              <h2>{{ section.settings.faqs_heading | escape }}</h2>
+            {%- endif -%}
+            {%- if section.settings.faqs_intro != blank -%}
+              <div class="dsh-text">{{ section.settings.faqs_intro }}</div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        <div class="dsh-faqs{% if section.settings.faq_show_icon %} dsh-faqs--icons{% endif %}">
+          {%- for i in (1..faq_columns) -%}
+            {%- assign faq_offset = forloop.index0 | times: faq_per_col -%}
+            {%- comment -%}
+              Two columns and one question would otherwise leave an empty
+              column element sitting in the grid.
+            {%- endcomment -%}
+            {%- if faq_offset >= faq_blocks.size -%}
+              {%- continue -%}
+            {%- endif -%}
+            <div class="dsh-faq-col">
+              {%- for block in faq_blocks offset: faq_offset limit: faq_per_col -%}
+                <details
+                  class="dsh-faq"
+                  {% if block.settings.open %}
+                    open
+                  {% endif %}
+                  {{ block.shopify_attributes }}
+                >
+                  <summary>{{ block.settings.question | escape }}</summary>
+                  <div class="dsh-faq__answer dsh-text">{{ block.settings.answer }}</div>
+                </details>
+              {%- endfor -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Design studio hub",
+  "tag": "section",
+  "class": "section-design-studio-hub",
+  "settings": [
+    { "type": "header", "content": "Bands", "info": "Switch off a band to hide it. A band with no blocks hides itself." },
+    { "type": "checkbox", "id": "show_hero", "label": "Show the hero", "default": true },
+    { "type": "checkbox", "id": "show_cards", "label": "Show the cards", "default": true },
+    { "type": "checkbox", "id": "show_faqs", "label": "Show the questions", "default": true },
+
+    { "type": "header", "content": "Hero" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "info": "Leave empty to hide it." },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Design studio" },
+    { "type": "checkbox", "id": "heading_is_h1", "label": "Use the heading as the page's H1", "info": "Leave on when this section carries the page title. Switch it off if another section on the page already has an H1.", "default": true },
+    { "type": "richtext", "id": "intro", "label": "Intro", "default": "<p>Make the piece you have in mind. Choose the stone, the metal and every detail, and see it before it is made.</p>" },
+    { "type": "select", "id": "hero_alignment", "label": "Hero alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centre" }, { "value": "right", "label": "Right" } ], "default": "center" },
+    { "type": "checkbox", "id": "hero_wash", "label": "Put the hero on a tinted background", "info": "A full-width band behind the title, as on the reference page.", "default": true },
+
+    { "type": "header", "content": "Hero buttons", "info": "Optional - the cards carry the calls to action on their own. Leave a label empty to hide its button." },
+    { "type": "text", "id": "primary_label", "label": "First button label" },
+    { "type": "url", "id": "primary_link", "label": "First button link" },
+    { "type": "text", "id": "secondary_label", "label": "Second button label" },
+    { "type": "url", "id": "secondary_link", "label": "Second button link" },
+
+    { "type": "header", "content": "Cards", "info": "Add a card block for each thing we can build. Each card's image, heading and button all point at the card's own link." },
+    { "type": "text", "id": "cards_heading", "label": "Heading", "default": "Your design. Your story." },
+    { "type": "richtext", "id": "cards_intro", "label": "Text under the heading" },
+    { "type": "select", "id": "cards_columns", "label": "Cards per row (desktop)", "options": [ { "value": "2", "label": "2" }, { "value": "3", "label": "3" }, { "value": "4", "label": "4" } ], "default": "3" },
+    { "type": "select", "id": "cards_columns_mobile", "label": "Cards per row (mobile)", "options": [ { "value": "1", "label": "1" }, { "value": "2", "label": "2" } ], "default": "1" },
+    { "type": "select", "id": "card_ratio", "label": "Card image shape", "options": [ { "value": "1", "label": "Square" }, { "value": "0.8", "label": "Portrait" }, { "value": "1.33", "label": "Landscape" } ], "default": "1" },
+    { "type": "select", "id": "card_alignment", "label": "Card text alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centre" } ], "default": "center" },
+    { "type": "select", "id": "card_button_style", "label": "Card button style", "options": [ { "value": "outline", "label": "Outlined" }, { "value": "solid", "label": "Filled" }, { "value": "light", "label": "Outlined, for a dark background" }, { "value": "invert", "label": "Filled white, for a dark background" } ], "default": "outline" },
+    { "type": "range", "id": "button_radius", "label": "Button corner radius", "min": 0, "max": 48, "step": 4, "unit": "px", "default": 48, "info": "48 gives the fully rounded button on the reference page; 0 returns it to the theme's square corner." },
+    { "type": "range", "id": "cards_gap", "label": "Gap between cards", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the responsive default (24-48px)." },
+    { "type": "range", "id": "card_padding", "label": "Padding inside a card", "min": 0, "max": 48, "step": 4, "unit": "px", "default": 0, "info": "Only worth setting when the cards have a background or a border." },
+    { "type": "checkbox", "id": "cards_wash", "label": "Put this band on a tinted background", "default": false },
+
+    { "type": "header", "content": "Questions" },
+    { "type": "text", "id": "faqs_heading", "label": "Heading", "default": "FAQs" },
+    { "type": "richtext", "id": "faqs_intro", "label": "Text under the heading" },
+    { "type": "select", "id": "faq_columns", "label": "Columns (desktop)", "info": "Questions fill the first column before the second. One column on mobile either way.", "options": [ { "value": "1", "label": "1" }, { "value": "2", "label": "2" } ], "default": "1" },
+    { "type": "select", "id": "faqs_alignment", "label": "Heading alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centre" } ], "default": "left" },
+    { "type": "range", "id": "faq_radius", "label": "Row corner radius", "min": 0, "max": 24, "step": 2, "unit": "px", "default": 8, "info": "The rest of this theme is square-cornered. 0 returns these rows to that." },
+    { "type": "range", "id": "faq_gap", "label": "Gap between rows", "min": 0, "max": 24, "step": 2, "unit": "px", "default": 10 },
+    { "type": "checkbox", "id": "faq_show_icon", "label": "Show a plus icon on each row", "info": "The reference page shows a bare row.", "default": false },
+    { "type": "checkbox", "id": "faqs_wash", "label": "Put this band on a tinted background", "default": false },
+
+    { "type": "header", "content": "Colours", "info": "Clear a colour to use the stylesheet default." },
+    { "type": "color", "id": "section_background", "label": "Section background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "heading_color", "label": "Headings", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "text_color", "label": "Body text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "wash_background", "label": "Tinted band background", "info": "Also the colour behind a card image while it loads.", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "card_background", "label": "Card background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "card_border", "label": "Card border", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "card_text_color", "label": "Card text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_background", "label": "Button fill", "info": "Also the outline and the label on the outlined style.", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_text_color", "label": "Button label", "info": "The label on the filled style, and the fill on hover.", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "faq_question_color", "label": "Questions", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "faq_background", "label": "Question row background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "rule_color", "label": "Hairlines", "info": "The rules between the questions.", "default": "rgba(0,0,0,0)" },
+
+    { "type": "header", "content": "Typography", "info": "Set a size to 0 to keep the stylesheet's responsive default." },
+    { "type": "range", "id": "hero_size", "label": "Hero heading size (desktop)", "min": 0, "max": 96, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "hero_size_mobile", "label": "Hero heading size (mobile)", "min": 0, "max": 64, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "hero_tracking", "label": "Hero letter spacing", "min": 0, "max": 24, "step": 1, "default": 0, "info": "In hundredths of an em, so 12 is 0.12em. 0 keeps the default of 0.12em." },
+    { "type": "range", "id": "heading_size", "label": "Band heading size", "min": 0, "max": 72, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "heading_tracking", "label": "Band heading letter spacing", "min": 0, "max": 24, "step": 1, "default": 0, "info": "In hundredths of an em, so 8 is 0.08em. 0 keeps the default of 0.08em." },
+    { "type": "range", "id": "eyebrow_size", "label": "Eyebrow size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "text_size", "label": "Body text size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "card_heading_size", "label": "Card heading size", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "card_heading_tracking", "label": "Card heading letter spacing", "min": 0, "max": 24, "step": 1, "default": 0, "info": "In hundredths of an em, so 10 is 0.1em. 0 keeps the default of 0.1em." },
+    { "type": "range", "id": "card_text_size", "label": "Card text size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "faq_size", "label": "Question size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
+    { "type": "checkbox", "id": "uppercase_hero", "label": "Upper-case the hero heading", "default": true },
+    { "type": "checkbox", "id": "uppercase_headings", "label": "Upper-case the band headings", "default": true },
+    { "type": "checkbox", "id": "uppercase_card_headings", "label": "Upper-case the card headings", "default": true },
+
+    { "type": "header", "content": "Content width" },
+    { "type": "checkbox", "id": "full_width", "label": "Stretch content to the screen edge", "default": false },
+    { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "0 keeps the default 1560px. Ignored when the box above is ticked." },
+    { "type": "range", "id": "hero_measure", "label": "Hero intro width", "min": 0, "max": 1200, "step": 20, "unit": "px", "default": 0, "info": "How wide the paragraph under the hero heading is allowed to run. 0 keeps the default 760px." },
+    { "type": "range", "id": "faqs_measure", "label": "Questions width", "min": 0, "max": 1600, "step": 20, "unit": "px", "default": 0, "info": "0 keeps the default 1200px." },
+    { "type": "range", "id": "padding_horizontal", "label": "Side padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the theme's responsive padding (20-64px)." },
+
+    { "type": "header", "content": "Section padding" },
+    { "type": "checkbox", "id": "custom_padding", "label": "Use custom section padding", "info": "Off keeps the theme's responsive padding.", "default": false },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 60 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 60 }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Engagement rings" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Start from a setting, choose a stone and a metal, and see the piece before it is made.</p>" },
+        { "type": "url", "id": "link", "label": "Card link", "info": "Used by the image, the heading and the button. Leave empty for a card that is text only." },
+        { "type": "text", "id": "button_label", "label": "Button label", "info": "Leave empty to hide the button.", "default": "Get started" },
+        { "type": "url", "id": "button_link", "label": "Button link", "info": "Only needed when the button should go somewhere other than the card link." },
+        { "type": "header", "content": "Image", "info": "Leave all three empty for a card with no picture." },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_asset", "label": "Image file name (fallback)", "info": "A file already in the theme's assets folder, e.g. featured-engagement-signature.jpg. Only used when no image is picked above." },
+        { "type": "text", "id": "image_url", "label": "Image URL (fallback)", "info": "Only used when neither of the two above is set." },
+        { "type": "text", "id": "image_alt", "label": "Image alt text" }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question", "default": "What is the design studio?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>A way to build a piece to your own specification - the stone, the metal and the setting - and see it priced before you order.</p>" },
+        { "type": "checkbox", "id": "open", "label": "Open by default", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Design studio hub",
+      "blocks": [
+        { "type": "card" },
+        { "type": "card" },
+        { "type": "card" },
+        { "type": "faq" },
+        { "type": "faq" }
+      ]
+    }
+  ]
+}
+{% endschema %}

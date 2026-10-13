@@ -1,0 +1,158 @@
+{
+  "sections": {
+    "hub": {
+      "type": "design-studio-hub",
+      "blocks": {
+        "card_engagement": {
+          "type": "card",
+          "settings": {
+            "heading": "Engagement rings",
+            "text": "<p>Choose a setting, a stone shape and a metal, and watch the price move as you go. Nothing is made until you have seen it.<\/p>",
+            "link": "/pages/design-studio-builder",
+            "button_label": "Start designing",
+            "image_asset": "featured-engagement-signature.jpg",
+            "image_alt": "A lab-grown diamond solitaire engagement ring"
+          }
+        },
+        "card_bands": {
+          "type": "card",
+          "settings": {
+            "heading": "Eternity and wedding bands",
+            "text": "<p>Pick the stone shape, the carat weight and the metal, and we will set the band to the width and the fit you want.<\/p>",
+            "link": "/collections/wedding-bands",
+            "button_label": "Create yours",
+            "image_asset": "featured-wedding-eternity.jpg",
+            "image_alt": "A diamond eternity band in white gold"
+          }
+        },
+        "card_bespoke": {
+          "type": "card",
+          "settings": {
+            "heading": "Something one of a kind",
+            "text": "<p>An heirloom to reset, a sketch of your own, a piece you cannot find anywhere. Send us the idea and we will draw it with you.<\/p>",
+            "link": "/pages/bespoke-jewellery-request",
+            "button_label": "Talk to a designer",
+            "image_asset": "about-craft-workshop.png",
+            "image_alt": "A jeweller finishing a ring at the bench"
+          }
+        },
+        "faq_what": {
+          "type": "faq",
+          "settings": {
+            "question": "What is the design studio?",
+            "answer": "<p>A way to build a piece to your own specification - the setting, the stone and the metal - and see it priced before you order. Every piece is then made to order for you.<\/p>",
+            "open": false
+          }
+        },
+        "faq_experience": {
+          "type": "faq",
+          "settings": {
+            "question": "Do I need to know what I want before I start?",
+            "answer": "<p>No. Start anywhere - a shape you like, a budget, a photo - and change it as many times as you need. Nothing is cut or cast until you approve the design.<\/p>",
+            "open": false
+          }
+        },
+        "faq_pieces": {
+          "type": "faq",
+          "settings": {
+            "question": "What can I design?",
+            "answer": "<p>Engagement rings, wedding and eternity bands, and made-to-order necklaces, earrings and bracelets. If what you have in mind is not on this page, ask us.<\/p>",
+            "open": false
+          }
+        },
+        "faq_cost": {
+          "type": "faq",
+          "settings": {
+            "question": "What does it cost?",
+            "answer": "<p>The studio prices every change as you make it, so you always see the number before you commit. A design that starts from scratch is quoted once we have the drawing.<\/p>",
+            "open": false
+          }
+        },
+        "faq_time": {
+          "type": "faq",
+          "settings": {
+            "question": "How long does it take?",
+            "answer": "<p>Making begins once you have approved the design and the quote. We confirm the date in writing with your quote, so you know before you pay.<\/p>",
+            "open": false
+          }
+        },
+        "faq_help": {
+          "type": "faq",
+          "settings": {
+            "question": "Can someone help me while I design?",
+            "answer": "<p>Yes. <a href=\"/pages/contact\">Get in touch<\/a> at any point and one of our designers will go through the options with you.<\/p>",
+            "open": false
+          }
+        }
+      },
+      "block_order": [
+        "card_engagement",
+        "card_bands",
+        "card_bespoke",
+        "faq_what",
+        "faq_experience",
+        "faq_pieces",
+        "faq_cost",
+        "faq_time",
+        "faq_help"
+      ],
+      "settings": {
+        "show_hero": true,
+        "show_cards": true,
+        "show_faqs": true,
+        "eyebrow": "",
+        "heading": "Design studio",
+        "heading_is_h1": true,
+        "intro": "<p>Make the piece you have in mind. Choose the stone, the metal and every handcrafted detail, and see it before it exists.<\/p>",
+        "hero_alignment": "center",
+        "hero_wash": true,
+        "primary_label": "",
+        "secondary_label": "",
+        "cards_heading": "Your design. Your story.",
+        "cards_intro": "",
+        "cards_columns": "3",
+        "cards_columns_mobile": "1",
+        "card_ratio": "1",
+        "card_alignment": "center",
+        "card_button_style": "outline",
+        "button_radius": 48,
+        "cards_gap": 16,
+        "card_padding": 0,
+        "cards_wash": false,
+        "faqs_heading": "FAQs",
+        "faqs_intro": "",
+        "faq_columns": "1",
+        "faqs_alignment": "left",
+        "faq_radius": 8,
+        "faq_gap": 10,
+        "faq_show_icon": false,
+        "faqs_wash": false,
+        "uppercase_hero": true,
+        "uppercase_headings": true,
+        "uppercase_card_headings": true,
+        "hero_size": 0,
+        "hero_size_mobile": 0,
+        "hero_tracking": 0,
+        "heading_size": 0,
+        "heading_tracking": 0,
+        "eyebrow_size": 0,
+        "text_size": 0,
+        "card_heading_size": 0,
+        "card_heading_tracking": 0,
+        "card_text_size": 0,
+        "faq_size": 0,
+        "full_width": false,
+        "content_width": 0,
+        "hero_measure": 560,
+        "faqs_measure": 1560,
+        "padding_horizontal": 0,
+        "custom_padding": false,
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
+    }
+  },
+  "order": [
+    "hub"
+  ]
+}

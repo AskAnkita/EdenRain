@@ -1,0 +1,475 @@
+{% comment %}
+  Design studio builder - the configurator screen behind a card on the hub.
+
+  The layout only. The viewer is a slot and renders, in this order:
+
+    1. any app block added to this section - where a real builder goes once one
+       is installed. Nothing here is tied to a particular vendor.
+    2. a still image, if one is set, so the page reads properly before a builder
+       exists and in the editor.
+    3. the theme placeholder, so the frame never collapses.
+
+  There is no 3D here and nothing that wants a licence: the stage is a square
+  frame, and what fills it is somebody else's problem.
+
+  The option rail is made of blocks. One `option` block is one row - a set of
+  diamond shapes, metal swatches, carat pills or a dropdown - and its choices
+  are typed one per line, so a row can be added or re-ordered without code.
+  Every choice is a real radio input, so the page is usable with no JavaScript.
+
+  Looks come from assets/design-studio-builder.css; buttons from
+  assets/eden-actions.css. Image slots reuse snippets/homepage-journey-image.liquid.
+
+  Every restylable setting is written onto the section element as a CSS custom
+  property, with the stylesheet's own value as the fallback, so a setting left
+  at "use the default" (a cleared colour, a size of 0) writes nothing at all.
+{% endcomment %}
+
+{{ 'design-studio-builder.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign transparent = 'rgba(0,0,0,0)'
+
+  assign title_size = section.settings.title_size | plus: 0
+  assign eyebrow_size = section.settings.eyebrow_size | plus: 0
+  assign price_size = section.settings.price_size | plus: 0
+  assign text_size = section.settings.text_size | plus: 0
+  assign label_size = section.settings.label_size | plus: 0
+  assign step_size = section.settings.step_size | plus: 0
+  assign detail_size = section.settings.detail_size | plus: 0
+  assign note_size = section.settings.note_size | plus: 0
+  assign shape_size = section.settings.shape_size | plus: 0
+  assign swatch_size = section.settings.swatch_size | plus: 0
+  assign thumb_size = section.settings.thumb_size | plus: 0
+  assign sticky_top = section.settings.sticky_top | plus: 0
+  assign content_width = section.settings.content_width | plus: 0
+  assign pad_inline = section.settings.padding_horizontal | plus: 0
+  assign pad_top = section.settings.padding_top | plus: 0
+  assign pad_bottom = section.settings.padding_bottom | plus: 0
+
+  assign step_blocks = section.blocks | where: 'type', 'step'
+  assign option_blocks = section.blocks | where: 'type', 'option'
+  assign detail_blocks = section.blocks | where: 'type', 'detail'
+  assign view_blocks = section.blocks | where: 'type', 'view'
+
+  assign app_blocks = 0
+  for block in section.blocks
+    if block.type == '@app'
+      assign app_blocks = app_blocks | plus: 1
+    endif
+  endfor
+
+  assign stage_image_set = false
+  if section.settings.stage_image != blank or section.settings.stage_image_asset != blank or section.settings.stage_image_url != blank
+    assign stage_image_set = true
+  endif
+
+  assign reassurance = section.settings.reassurance | split: '|'
+-%}
+
+{%- capture section_styles -%}
+  {%- if section.settings.section_background != blank and section.settings.section_background != transparent -%}--dsb-section-bg: {{ section.settings.section_background }};{%- endif -%}
+  {%- if section.settings.heading_color != blank and section.settings.heading_color != transparent -%}--dsb-heading-color: {{ section.settings.heading_color }};{%- endif -%}
+  {%- if section.settings.eyebrow_color != blank and section.settings.eyebrow_color != transparent -%}--dsb-eyebrow-color: {{ section.settings.eyebrow_color }};{%- endif -%}
+  {%- if section.settings.text_color != blank and section.settings.text_color != transparent -%}--dsb-text-color: {{ section.settings.text_color }};{%- endif -%}
+  {%- if section.settings.label_color != blank and section.settings.label_color != transparent -%}--dsb-label-color: {{ section.settings.label_color }};{%- endif -%}
+  {%- if section.settings.price_color != blank and section.settings.price_color != transparent -%}--dsb-price-color: {{ section.settings.price_color }};{%- endif -%}
+  {%- if section.settings.stage_background != blank and section.settings.stage_background != transparent -%}--dsb-stage-bg: {{ section.settings.stage_background }};{%- endif -%}
+  {%- if section.settings.rule_color != blank and section.settings.rule_color != transparent -%}--dsb-rule: {{ section.settings.rule_color }};{%- endif -%}
+  {%- if section.settings.step_color != blank and section.settings.step_color != transparent -%}--dsb-step-color: {{ section.settings.step_color }};{%- endif -%}
+  {%- if section.settings.step_current_color != blank and section.settings.step_current_color != transparent -%}--dsb-step-current-color: {{ section.settings.step_current_color }};{%- endif -%}
+  {%- if section.settings.choice_active_background != blank and section.settings.choice_active_background != transparent -%}--dsb-choice-active-bg: {{ section.settings.choice_active_background }};{%- endif -%}
+
+  {%- comment -%}
+    The add-to-cart button takes its fill and its text from eden-actions.css, so
+    its colours are set by rebinding that file's two properties here.
+  {%- endcomment -%}
+  {%- if section.settings.button_background != blank and section.settings.button_background != transparent -%}--eden-action-ink: {{ section.settings.button_background }};{%- endif -%}
+  {%- if section.settings.button_text_color != blank and section.settings.button_text_color != transparent -%}--eden-action-on-ink: {{ section.settings.button_text_color }};{%- endif -%}
+
+  {%- if title_size > 0 -%}--dsb-title-size: {{ title_size }}px;{%- endif -%}
+  {%- if eyebrow_size > 0 -%}--dsb-eyebrow-size: {{ eyebrow_size }}px;{%- endif -%}
+  {%- if price_size > 0 -%}--dsb-price-size: {{ price_size }}px;{%- endif -%}
+  {%- if text_size > 0 -%}--dsb-text-size: {{ text_size }}px;{%- endif -%}
+  {%- if label_size > 0 -%}--dsb-label-size: {{ label_size }}px;{%- endif -%}
+  {%- if step_size > 0 -%}--dsb-step-size: {{ step_size }}px;{%- endif -%}
+  {%- if detail_size > 0 -%}--dsb-detail-size: {{ detail_size }}px;{%- endif -%}
+  {%- if note_size > 0 -%}--dsb-note-size: {{ note_size }}px;{%- endif -%}
+  {%- if shape_size > 0 -%}--dsb-shape-size: {{ shape_size }}px;{%- endif -%}
+  {%- if swatch_size > 0 -%}--dsb-swatch-size: {{ swatch_size }}px;{%- endif -%}
+  {%- if thumb_size > 0 -%}--dsb-thumb-size: {{ thumb_size }}px;{%- endif -%}
+  {%- if sticky_top > 0 -%}--dsb-sticky-top: {{ sticky_top }}px;{%- endif -%}
+
+  --dsb-stage-ratio: {{ section.settings.stage_ratio }};
+  --dsb-stage-fr: {{ section.settings.stage_width }}fr;
+  --dsb-shape-columns: {{ section.settings.shape_columns }};
+
+  {%- if section.settings.full_width -%}
+    --dsb-shell-max: none;
+  {%- elsif content_width > 0 -%}
+    --dsb-shell-max: {{ content_width }}px;
+  {%- endif -%}
+  {%- if pad_inline > 0 -%}--dsb-pad-inline: {{ pad_inline }}px;{%- endif -%}
+  {%- if section.settings.custom_padding -%}--dsb-pad-top: {{ pad_top }}px;--dsb-pad-bottom: {{ pad_bottom }}px;{%- endif -%}
+{%- endcapture -%}
+
+<section class="ds-builder" style="{{ section_styles | strip_newlines | strip }}">
+  {%- if section.settings.show_steps and step_blocks.size > 0 -%}
+    <div class="dsb-shell">
+      <nav class="dsb-steps" aria-label="{{ section.settings.steps_label | escape }}">
+        {%- for block in step_blocks -%}
+          {%- liquid
+            assign step_tag = 'span'
+            if block.settings.link != blank and block.settings.current == false
+              assign step_tag = 'a'
+            endif
+          -%}
+          <{{ step_tag }}
+            class="dsb-step{% if block.settings.current %} dsb-step--current{% endif %}"
+            {% if step_tag == 'a' %}
+              href="{{ block.settings.link }}"
+            {% endif %}
+            {% if block.settings.current %}
+              aria-current="step"
+            {% endif %}
+            {{ block.shopify_attributes }}
+          >
+            <span class="dsb-step__num"><span>{{ forloop.index }}</span></span>
+            {{ block.settings.label | escape }}
+          </{{ step_tag }}>
+        {%- endfor -%}
+      </nav>
+    </div>
+  {%- endif -%}
+
+  <div class="dsb-shell dsb-layout">
+    <div class="dsb-stage">
+      <div class="dsb-stage__frame" id="DesignStudioStage-{{ section.id }}">
+        {%- if app_blocks > 0 -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == '@app' -%}
+              {% render block %}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- elsif stage_image_set -%}
+          {%- render 'homepage-journey-image',
+            image: section.settings.stage_image,
+            asset: section.settings.stage_image_asset,
+            image_url: section.settings.stage_image_url,
+            alt: section.settings.stage_image_alt,
+            placeholder: 'product-1',
+            sizes: '(min-width: 990px) 55vw, 100vw',
+            width: 1200,
+            height: 1200
+          -%}
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'dsb-placeholder' }}
+        {%- endif -%}
+
+        {%- if section.settings.stage_badge != blank -%}
+          <span class="dsb-stage__badge">{{ section.settings.stage_badge | escape }}</span>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.show_thumbs and view_blocks.size > 0 -%}
+        <div class="dsb-thumbs">
+          {%- for block in view_blocks -%}
+            <button
+              class="dsb-thumb"
+              type="button"
+              aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              {%- render 'homepage-journey-image',
+                image: block.settings.image,
+                asset: block.settings.image_asset,
+                image_url: block.settings.image_url,
+                alt: block.settings.image_alt,
+                placeholder: 'product-2',
+                sizes: '90px',
+                width: 180,
+                height: 180
+              -%}
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="dsb-rail">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="dsb-rail__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.title != blank -%}
+        {%- if section.settings.title_is_h1 -%}
+          <h1 class="dsb-rail__title">{{ section.settings.title | escape }}</h1>
+        {%- else -%}
+          <h2 class="dsb-rail__title">{{ section.settings.title | escape }}</h2>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if section.settings.price != blank -%}
+        <p class="dsb-rail__price">{{ section.settings.price | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.intro != blank -%}
+        <div class="dsb-rail__note">{{ section.settings.intro }}</div>
+      {%- endif -%}
+
+      {%- for block in option_blocks -%}
+        {%- liquid
+          assign choices = block.settings.choices | newline_to_br | split: '<br />'
+          assign selected = block.settings.selected | plus: 0
+          assign group = section.id | append: '-' | append: block.id
+        -%}
+        <div class="dsb-option" {{ block.shopify_attributes }}>
+          <div class="dsb-option__head">
+            <span class="dsb-option__label">{{ block.settings.label | escape }}</span>
+            {%- if block.settings.value_note != blank -%}
+              <span class="dsb-option__value">{{ block.settings.value_note | escape }}</span>
+            {%- endif -%}
+          </div>
+
+          {%- if block.settings.style == 'dropdown' -%}
+            <select class="dsb-select" aria-label="{{ block.settings.label | escape }}">
+              {%- for choice in choices -%}
+                {%- assign parts = choice | strip | split: '|' -%}
+                {%- assign choice_label = parts[0] | strip -%}
+                {%- if choice_label != blank -%}
+                  <option {% if forloop.index == selected %}selected{% endif %}>{{ choice_label | escape }}</option>
+                {%- endif -%}
+              {%- endfor -%}
+            </select>
+          {%- else -%}
+            <div class="dsb-choices dsb-choices--{{ block.settings.style }}">
+              {%- for choice in choices -%}
+                {%- liquid
+                  assign parts = choice | strip | split: '|'
+                  assign choice_label = parts[0] | strip
+                  assign choice_value = parts[1] | strip
+                  assign choice_id = group | append: '-' | append: forloop.index
+                -%}
+                {%- if choice_label == blank -%}
+                  {%- continue -%}
+                {%- endif -%}
+                <span class="dsb-choice">
+                  <input
+                    type="radio"
+                    name="{{ group }}"
+                    id="{{ choice_id }}"
+                    {% if forloop.index == selected %}
+                      checked
+                    {% endif %}
+                  >
+                  <label for="{{ choice_id }}">
+                    {%- if block.settings.style == 'shapes' and choice_value != blank -%}
+                      <img
+                        src="{{ choice_value | asset_url }}"
+                        alt=""
+                        loading="lazy"
+                        width="60"
+                        height="60"
+                      >
+                    {%- elsif block.settings.style == 'swatches' and choice_value != blank -%}
+                      <span class="dsb-swatch" style="background: {{ choice_value }};"></span>
+                    {%- endif -%}
+                    {{ choice_label | escape }}
+                  </label>
+                </span>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          {%- if block.settings.help != blank -%}
+            <p class="dsb-rail__note">{{ block.settings.help | escape }}</p>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+
+      <div class="dsb-actions{% if section.settings.sticky_actions %} dsb-actions--sticky{% endif %}">
+        {%- if section.settings.total_label != blank or section.settings.total != blank -%}
+          <div class="dsb-actions__row">
+            <span class="dsb-option__label">{{ section.settings.total_label | escape }}</span>
+            <span class="dsb-rail__price">{{ section.settings.total | escape }}</span>
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.button_label != blank -%}
+          <a
+            class="eden-action eden-action--{{ section.settings.button_style }}"
+            href="{{ section.settings.button_link | default: '#' }}"
+          >
+            {{- section.settings.button_label | escape -}}
+          </a>
+        {%- endif -%}
+
+        {%- if reassurance.size > 0 -%}
+          <div class="dsb-reassure">
+            {%- for note in reassurance -%}
+              {%- assign note_text = note | strip -%}
+              {%- if note_text != blank -%}
+                <span>{{ note_text | escape }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.show_details and detail_blocks.size > 0 -%}
+        <div class="dsb-details">
+          {%- for block in detail_blocks -%}
+            <details
+              class="dsb-detail"
+              {% if block.settings.open %}
+                open
+              {% endif %}
+              {{ block.shopify_attributes }}
+            >
+              <summary>{{ block.settings.heading | escape }}</summary>
+              <div class="dsb-detail__body">{{ block.settings.text }}</div>
+            </details>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Design studio builder",
+  "tag": "section",
+  "class": "section-design-studio-builder",
+  "settings": [
+    { "type": "header", "content": "Parts", "info": "Switch a part off to hide it. A part with no blocks hides itself." },
+    { "type": "checkbox", "id": "show_steps", "label": "Show the step bar", "default": true },
+    { "type": "checkbox", "id": "show_thumbs", "label": "Show the view thumbnails", "default": true },
+    { "type": "checkbox", "id": "show_details", "label": "Show the details accordion", "default": true },
+    { "type": "checkbox", "id": "sticky_actions", "label": "Pin the price and button to the screen on mobile", "default": true },
+    { "type": "text", "id": "steps_label", "label": "Step bar label for screen readers", "default": "Design steps" },
+
+    { "type": "header", "content": "The viewer", "info": "Add a builder's app block to this section and it fills this frame. With none, the image below is shown, and with neither, a placeholder." },
+    { "type": "image_picker", "id": "stage_image", "label": "Image" },
+    { "type": "text", "id": "stage_image_asset", "label": "Image file name (fallback)", "info": "A file already in the theme's assets folder, e.g. featured-engagement-signature.jpg." },
+    { "type": "text", "id": "stage_image_url", "label": "Image URL (fallback)" },
+    { "type": "text", "id": "stage_image_alt", "label": "Image alt text", "default": "The ring you are designing" },
+    { "type": "select", "id": "stage_ratio", "label": "Frame shape", "options": [ { "value": "1", "label": "Square" }, { "value": "0.85", "label": "Portrait" }, { "value": "1.2", "label": "Landscape" } ], "default": "1" },
+    { "type": "select", "id": "stage_width", "label": "Viewer width against the options", "options": [ { "value": "1", "label": "Equal" }, { "value": "1.15", "label": "A little wider" }, { "value": "1.3", "label": "Wider" }, { "value": "1.5", "label": "Much wider" } ], "default": "1.15" },
+    { "type": "text", "id": "stage_badge", "label": "Badge over the frame", "info": "Leave empty to hide it.", "default": "360° view" },
+    { "type": "range", "id": "sticky_top", "label": "Sticky offset from the top", "min": 0, "max": 200, "step": 10, "unit": "px", "default": 90, "info": "Clear of the sticky header. 0 keeps the default of 90px." },
+    { "type": "range", "id": "thumb_size", "label": "Thumbnail size", "min": 0, "max": 140, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the default of 76px." },
+
+    { "type": "header", "content": "The rail" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "DESIGN STUDIO" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Build your engagement ring" },
+    { "type": "checkbox", "id": "title_is_h1", "label": "Use the title as the page's H1", "default": true },
+    { "type": "text", "id": "price", "label": "Price under the title", "info": "Leave empty to hide it." },
+    { "type": "richtext", "id": "intro", "label": "Text under the price", "default": "<p>Every change is priced as you make it. Nothing is cast until you have approved the design.</p>" },
+
+    { "type": "header", "content": "Price and button" },
+    { "type": "text", "id": "total_label", "label": "Total label", "default": "Your design" },
+    { "type": "text", "id": "total", "label": "Total", "default": "From £1,850" },
+    { "type": "text", "id": "button_label", "label": "Button label", "info": "Leave empty to hide the button.", "default": "Add to bag" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "select", "id": "button_style", "label": "Button style", "options": [ { "value": "solid", "label": "Filled" }, { "value": "outline", "label": "Outlined" }, { "value": "light", "label": "Outlined, for a dark background" }, { "value": "invert", "label": "Filled white, for a dark background" } ], "default": "solid" },
+    { "type": "text", "id": "reassurance", "label": "Lines under the button (separate with |)", "info": "Short and factual. Leave empty to hide them.", "default": "Free insured delivery | Made to order | 30-day returns" },
+
+    { "type": "header", "content": "Choices" },
+    { "type": "select", "id": "shape_columns", "label": "Shapes per row", "options": [ { "value": "3", "label": "3" }, { "value": "4", "label": "4" }, { "value": "5", "label": "5" }, { "value": "6", "label": "6" } ], "default": "5" },
+    { "type": "range", "id": "shape_size", "label": "Shape icon size", "min": 0, "max": 72, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 34px." },
+    { "type": "range", "id": "swatch_size", "label": "Metal swatch size", "min": 0, "max": 72, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 34px." },
+
+    { "type": "header", "content": "Colours", "info": "Clear a colour to use the stylesheet default." },
+    { "type": "color", "id": "section_background", "label": "Section background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "heading_color", "label": "Headings", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "text_color", "label": "Body text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "label_color", "label": "Option labels", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "price_color", "label": "Price", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "stage_background", "label": "Viewer background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "rule_color", "label": "Hairlines and choice borders", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "step_color", "label": "Steps", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "step_current_color", "label": "Current step", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "choice_active_background", "label": "Chosen option background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_background", "label": "Button fill", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_text_color", "label": "Button label", "default": "rgba(0,0,0,0)" },
+
+    { "type": "header", "content": "Typography", "info": "Set a size to 0 to keep the stylesheet's responsive default." },
+    { "type": "range", "id": "title_size", "label": "Title size", "min": 0, "max": 64, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "eyebrow_size", "label": "Eyebrow size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "price_size", "label": "Price size", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "text_size", "label": "Body text size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "label_size", "label": "Option label size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "step_size", "label": "Step size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "detail_size", "label": "Detail heading size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "note_size", "label": "Reassurance line size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+
+    { "type": "header", "content": "Content width" },
+    { "type": "checkbox", "id": "full_width", "label": "Stretch content to the screen edge", "default": false },
+    { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "0 keeps the default 1480px. Ignored when the box above is ticked." },
+    { "type": "range", "id": "padding_horizontal", "label": "Side padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the theme's responsive padding (16-48px)." },
+
+    { "type": "header", "content": "Section padding" },
+    { "type": "checkbox", "id": "custom_padding", "label": "Use custom section padding", "default": false },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 30 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 60 }
+  ],
+  "blocks": [
+    { "type": "@app" },
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Setting" },
+        { "type": "url", "id": "link", "label": "Link", "info": "Where this step goes. The current step is never a link." },
+        { "type": "checkbox", "id": "current", "label": "This is the step you are on", "default": false }
+      ]
+    },
+    {
+      "type": "option",
+      "name": "Option row",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Diamond shape" },
+        { "type": "select", "id": "style", "label": "Shown as", "options": [ { "value": "shapes", "label": "Shape icons" }, { "value": "swatches", "label": "Colour swatches" }, { "value": "pills", "label": "Text buttons" }, { "value": "dropdown", "label": "Dropdown" } ], "default": "shapes" },
+        { "type": "textarea", "id": "choices", "label": "Choices, one per line", "info": "Label on the left. After a | put the icon's file name in assets (shape icons) or a colour (swatches), e.g. \"Round | diamond-shape-round.png\" or \"Yellow gold | #d9b26b\". Text buttons and dropdowns need the label only.", "default": "Round | diamond-shape-round.png\nOval | diamond-shape-oval.png\nEmerald | diamond-shape-emerald.png\nPear | diamond-shape-pear.png\nCushion | diamond-shape-cushion.png" },
+        { "type": "range", "id": "selected", "label": "Which choice starts selected", "min": 1, "max": 12, "step": 1, "default": 1 },
+        { "type": "text", "id": "value_note", "label": "Note beside the label", "info": "The chosen value, a price, a caveat. Leave empty to hide it." },
+        { "type": "text", "id": "help", "label": "Help text under the row" }
+      ]
+    },
+    {
+      "type": "view",
+      "name": "View thumbnail",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_asset", "label": "Image file name (fallback)", "info": "A file already in the theme's assets folder." },
+        { "type": "text", "id": "image_url", "label": "Image URL (fallback)" },
+        { "type": "text", "id": "image_alt", "label": "Image alt text" }
+      ]
+    },
+    {
+      "type": "detail",
+      "name": "Detail",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Specification" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Lab-grown diamond, hand-set in recycled gold. Certificate supplied with every stone over 0.50ct.</p>" },
+        { "type": "checkbox", "id": "open", "label": "Open by default", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Design studio builder",
+      "blocks": [
+        { "type": "step" },
+        { "type": "step" },
+        { "type": "step" },
+        { "type": "option" },
+        { "type": "option" },
+        { "type": "detail" }
+      ]
+    }
+  ]
+}
+{% endschema %}
