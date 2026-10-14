@@ -10,6 +10,17 @@
 {% endcomment %}
 
 {%- liquid
+  # A menu can ask for the text-only panel instead ('menu-static-layout'): named options in
+  # columns, no picture tiles. Nothing else in this file runs when it does.
+  capture panel_layout
+    render 'menu-static-layout', parent: link.title
+  endcapture
+  assign panel_layout = panel_layout | strip
+-%}
+{%- if panel_layout == 'links' -%}
+  {%- render 'header-menu-drawer-links', link: link, drawer_id: drawer_id -%}
+{%- else -%}
+{%- liquid
   assign source_collection = blank
   if link.type == 'collection_link'
     assign source_collection = link.object
@@ -214,3 +225,4 @@
   {%- endif -%}
 
 </div>
+{%- endif -%}

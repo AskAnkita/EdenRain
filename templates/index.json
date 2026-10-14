@@ -111,6 +111,8 @@
       "type": "category-tiles",
       "settings": {
         "menu": "category",
+        "fit_all": true,
+        "show_progress": false,
         "heading": "",
         "width": "full",
         "per_row": 4,
@@ -119,6 +121,103 @@
         "color_scheme": "scheme-1",
         "padding_top": 56,
         "padding_bottom": 56
+      }
+    },
+    "service_marquee": {
+      "type": "service-marquee",
+      "blocks": {
+        "service_guarantee": {
+          "type": "service",
+          "settings": {
+            "title": "Lifetime guarantee",
+            "icon": "diamond",
+            "link": ""
+          }
+        },
+        "service_shipping": {
+          "type": "service",
+          "settings": {
+            "title": "Complimentary shipping",
+            "icon": "shipping",
+            "link": ""
+          }
+        },
+        "service_returns": {
+          "type": "service",
+          "settings": {
+            "title": "60-day returns",
+            "icon": "returns",
+            "link": ""
+          }
+        },
+        "service_crafted": {
+          "type": "service",
+          "settings": {
+            "title": "Consciously crafted",
+            "icon": "crafted",
+            "link": ""
+          }
+        },
+        "service_ethical": {
+          "type": "service",
+          "settings": {
+            "title": "Ethical choice",
+            "icon": "ethical",
+            "link": ""
+          }
+        },
+        "service_worldwide": {
+          "type": "service",
+          "settings": {
+            "title": "Worldwide shipping",
+            "icon": "globe",
+            "link": ""
+          }
+        },
+        "service_value": {
+          "type": "service",
+          "settings": {
+            "title": "Great value",
+            "icon": "value",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "service_guarantee",
+        "service_shipping",
+        "service_returns",
+        "service_crafted",
+        "service_ethical",
+        "service_worldwide",
+        "service_value"
+      ],
+      "settings": {
+        "scroll_duration": 30,
+        "pause_on_hover": true,
+        "background_color": "#f4f4f0",
+        "text_color": "#001514",
+        "icon_color": "#a98245",
+        "divider_color": "#c9c9c0",
+        "border_color": "#e4e4dd",
+        "show_top_border": false,
+        "show_bottom_border": false,
+        "hover_opacity": 70,
+        "underline_on_hover": false,
+        "label_font": "body",
+        "font_size": 13,
+        "mobile_font_size": 12,
+        "font_weight": "500",
+        "letter_spacing": 1.2,
+        "uppercase": true,
+        "icon_size": 36,
+        "mobile_icon_size": 20,
+        "icon_stroke": 1.2,
+        "icon_gap": 12,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "mobile_padding_top": 20,
+        "mobile_padding_bottom": 20
       }
     },
     "media_with_text_eLCFDd": {
@@ -1869,6 +1968,7 @@
         "tile_making",
         "tile_luxury"
       ],
+      "disabled": true,
       "settings": {
         "eyebrow": "",
         "heading": "The Signature Collection",
@@ -1925,6 +2025,43 @@
         "color_scheme": "scheme-1"
       }
     },
+    "design_split": {
+      "type": "design-split-banner",
+      "blocks": {
+        "route_setting": {
+          "type": "column",
+          "settings": {
+            "icon": "ring",
+            "heading": "Ring setting",
+            "text": "<p>Begin with the setting. Choose the shape of the shoulders and the metal, and we will bring the stone to it.<\/p>",
+            "button_label": "Start with a setting",
+            "button_link": "\/pages\/design-studio-builder",
+            "button_style": "outline"
+          }
+        },
+        "route_stone": {
+          "type": "column",
+          "settings": {
+            "icon": "stone",
+            "heading": "Centre stone",
+            "text": "<p>Begin with the diamond. Pick the cut, the carat and the clarity, then choose the setting it goes into.<\/p>",
+            "button_label": "Start with a stone",
+            "button_link": "\/collections\/lab-grown-diamonds",
+            "button_style": "outline"
+          }
+        }
+      },
+      "block_order": ["route_setting", "route_stone"],
+      "settings": {
+        "media_asset": "featured-engagement-signature.jpg",
+        "media_alt": "A solitaire engagement ring, its stone lifted off the setting",
+        "blend_media": true,
+        "footnote": "<p>Can't decide? <a href=\"\/pages\/contact\">Talk to one of our designers<\/a> and we will help you find it.<\/p>",
+        "uppercase_headings": true,
+        "show_button_arrow": true,
+        "custom_padding": false
+      }
+    },
     "favourites_carousel": {
       "type": "favourites-carousel",
       "blocks": {
@@ -1932,12 +2069,16 @@
           "type": "slide",
           "settings": {
             "image_asset": "menu-tile-tennis-bracelets.png",
+            "image_url": "",
             "image_alt": "Diamond tennis bracelet",
             "image_scale": 100,
             "object_position": "center",
+            "card_background": "rgba(0,0,0,0)",
             "badge": "#1 Best Seller",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
+            "caption": "",
+            "caption_color": "rgba(0,0,0,0)",
             "link": "shopify://collections/tennis-bracelets"
           }
         },
@@ -1945,9 +2086,16 @@
           "type": "slide",
           "settings": {
             "image_asset": "menu-tile-tennis-necklaces.png",
+            "image_url": "",
             "image_alt": "Diamond tennis necklace",
             "image_scale": 100,
             "object_position": "center",
+            "card_background": "rgba(0,0,0,0)",
+            "badge": "",
+            "badge_background": "#ffffff",
+            "badge_text_color": "#1a1a1a",
+            "caption": "",
+            "caption_color": "rgba(0,0,0,0)",
             "link": "shopify://collections/tennis-necklaces"
           }
         },
@@ -1955,12 +2103,16 @@
           "type": "slide",
           "settings": {
             "image_asset": "menu-tile-signature-bracelets.png",
+            "image_url": "",
             "image_alt": "Signature diamond bracelet",
             "image_scale": 100,
             "object_position": "center",
+            "card_background": "rgba(0,0,0,0)",
             "badge": "New",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
+            "caption": "",
+            "caption_color": "rgba(0,0,0,0)",
             "link": "shopify://collections/signature-bracelets"
           }
         },
@@ -1968,9 +2120,16 @@
           "type": "slide",
           "settings": {
             "image_asset": "menu-tile-signature-necklaces.png",
+            "image_url": "",
             "image_alt": "Signature diamond necklace",
             "image_scale": 100,
             "object_position": "center",
+            "card_background": "rgba(0,0,0,0)",
+            "badge": "",
+            "badge_background": "#ffffff",
+            "badge_text_color": "#1a1a1a",
+            "caption": "",
+            "caption_color": "rgba(0,0,0,0)",
             "link": "shopify://collections/signature-necklaces"
           }
         },
@@ -1978,9 +2137,16 @@
           "type": "slide",
           "settings": {
             "image_asset": "menu-tile-signature-earrings.png",
+            "image_url": "",
             "image_alt": "Signature diamond earrings",
             "image_scale": 100,
             "object_position": "center",
+            "card_background": "rgba(0,0,0,0)",
+            "badge": "",
+            "badge_background": "#ffffff",
+            "badge_text_color": "#1a1a1a",
+            "caption": "",
+            "caption_color": "rgba(0,0,0,0)",
             "link": "shopify://collections/signature-earrings"
           }
         },
@@ -1988,9 +2154,16 @@
           "type": "slide",
           "settings": {
             "image_asset": "menu-tile-best-sellers.png",
+            "image_url": "",
             "image_alt": "Best selling diamond jewellery",
             "image_scale": 100,
             "object_position": "center",
+            "card_background": "rgba(0,0,0,0)",
+            "badge": "",
+            "badge_background": "#ffffff",
+            "badge_text_color": "#1a1a1a",
+            "caption": "",
+            "caption_color": "rgba(0,0,0,0)",
             "link": "shopify://collections/best-sellers"
           }
         }
@@ -2011,6 +2184,7 @@
         "heading_weight": "400",
         "heading_italic": false,
         "heading_tracking": 0,
+        "heading_color": "rgba(0,0,0,0)",
         "panel_alignment": "center",
         "panel_width": 25,
         "panel_background": "#f5f5f5",
@@ -2019,9 +2193,11 @@
         "link_size": 13,
         "link_tracking": 12,
         "link_transform": "uppercase",
+        "link_color": "rgba(0,0,0,0)",
         "show_arrows": true,
         "loop_arrows": false,
         "arrow_size": 32,
+        "arrow_color": "rgba(0,0,0,0)",
         "per_row": 3,
         "per_row_mobile": 1.4,
         "ratio": "1 / 1",
@@ -2037,6 +2213,7 @@
         "page_padding_mobile": 16,
         "padding_top": 40,
         "padding_bottom": 40,
+        "section_background": "rgba(0,0,0,0)",
         "color_scheme": "scheme-1"
       }
     },
@@ -2199,105 +2376,9 @@
       "block_order": [
         "ai_gen_block_5ee0a2a_nP6H3j"
       ],
+      "disabled": true,
       "name": "Find Your Shape",
       "settings": {}
-    },
-    "service_marquee": {
-      "type": "service-marquee",
-      "blocks": {
-        "service_guarantee": {
-          "type": "service",
-          "settings": {
-            "title": "Lifetime guarantee",
-            "icon": "diamond",
-            "link": ""
-          }
-        },
-        "service_shipping": {
-          "type": "service",
-          "settings": {
-            "title": "Complimentary shipping",
-            "icon": "shipping",
-            "link": ""
-          }
-        },
-        "service_returns": {
-          "type": "service",
-          "settings": {
-            "title": "60-day returns",
-            "icon": "returns",
-            "link": ""
-          }
-        },
-        "service_crafted": {
-          "type": "service",
-          "settings": {
-            "title": "Consciously crafted",
-            "icon": "crafted",
-            "link": ""
-          }
-        },
-        "service_ethical": {
-          "type": "service",
-          "settings": {
-            "title": "Ethical choice",
-            "icon": "ethical",
-            "link": ""
-          }
-        },
-        "service_worldwide": {
-          "type": "service",
-          "settings": {
-            "title": "Worldwide shipping",
-            "icon": "globe",
-            "link": ""
-          }
-        },
-        "service_value": {
-          "type": "service",
-          "settings": {
-            "title": "Great value",
-            "icon": "value",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "service_guarantee",
-        "service_shipping",
-        "service_returns",
-        "service_crafted",
-        "service_ethical",
-        "service_worldwide",
-        "service_value"
-      ],
-      "settings": {
-        "scroll_duration": 30,
-        "pause_on_hover": true,
-        "background_color": "#f4f4f0",
-        "text_color": "#001514",
-        "icon_color": "#A98245",
-        "divider_color": "#c9c9c0",
-        "border_color": "#e4e4dd",
-        "show_top_border": false,
-        "show_bottom_border": false,
-        "hover_opacity": 70,
-        "underline_on_hover": false,
-        "label_font": "body",
-        "font_size": 13,
-        "mobile_font_size": 12,
-        "font_weight": "500",
-        "letter_spacing": 1.2,
-        "uppercase": true,
-        "icon_size": 36,
-        "mobile_icon_size": 20,
-        "icon_stroke": 1.2,
-        "icon_gap": 12,
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "mobile_padding_top": 20,
-        "mobile_padding_bottom": 20
-      }
     },
     "section_GzhCGT": {
       "type": "section",
@@ -3555,11 +3636,13 @@
       "block_order": [
         "ai_gen_block_5ee0a2a_dPcwNd"
       ],
+      "disabled": true,
       "name": "Find Your Shape",
       "settings": {}
     },
     "homepage_discover": {
       "type": "homepage-journey",
+      "disabled": true,
       "settings": {
         "layout_style": "discover",
         "eyebrow": "THE EDEN EDIT",
@@ -3684,6 +3767,7 @@
     },
     "homepage_experience": {
       "type": "homepage-journey",
+      "disabled": true,
       "settings": {
         "layout_style": "experience",
         "eyebrow": "MORE WAYS TO MAKE IT YOURS",
@@ -4161,6 +4245,7 @@
         "icon_97YHyW",
         "icon_kX7QWb"
       ],
+      "disabled": true,
       "name": "t:names.marquee",
       "settings": {
         "movement_direction": "normal",
@@ -5426,6 +5511,7 @@
     "media_with_text_eLCFDd",
     "signature_grid_Er26Sg",
     "favourites_carousel",
+    "design_split",
     "178498476563ecd091",
     "section_GzhCGT",
     "blocks_DTAzNP",

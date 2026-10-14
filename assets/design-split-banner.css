@@ -1,0 +1,213 @@
+/*
+  Design split banner - two routes into the Design Studio either side of one tall ring.
+
+  Every look here is a custom property with its default written in this file, so a setting left
+  at "use the default" (a cleared colour, a size of 0) writes nothing onto the section element
+  and this value stands. The section is sections/design-split-banner.liquid.
+
+  The picture is one slot in the middle of the band, still or animated. Product shots in this
+  shop are photographed on white, so it multiplies over the band by default rather than sitting
+  in a white box on it.
+*/
+
+.ds-split {
+  --dsp-section-bg: #f4f3f1;
+  --dsp-heading-color: #171714;
+  --dsp-text-color: rgba(23, 23, 20, 0.72);
+  --dsp-icon-color: #171714;
+  --dsp-footnote-color: rgba(23, 23, 20, 0.6);
+
+  --dsp-eyebrow-size: 12px;
+  --dsp-heading-size: 54px;
+  --dsp-heading-size-mobile: 34px;
+  --dsp-heading-tracking: 0.01em;
+  --dsp-heading-case: uppercase;
+  --dsp-text-size: 16px;
+  --dsp-footnote-size: 14px;
+  --dsp-icon-size: 46px;
+
+  --dsp-shell-max: 1480px;
+  --dsp-media-width: 420px;
+  --dsp-media-gap: 48px;
+  --dsp-measure: 38ch;
+
+  --dsp-pad-inline: 4rem;
+  --dsp-pad-top: 80px;
+  --dsp-pad-bottom: 80px;
+
+  background: var(--dsp-section-bg);
+  padding: var(--dsp-pad-top) var(--dsp-pad-inline) var(--dsp-pad-bottom);
+  overflow: hidden;
+}
+
+.dsp-shell {
+  width: 100%;
+  max-width: var(--dsp-shell-max);
+  margin: 0 auto;
+}
+
+.dsp-head {
+  margin: 0 0 4.8rem;
+  text-align: center;
+}
+
+.dsp-eyebrow {
+  margin: 0 0 1.2rem;
+  color: var(--dsp-text-color);
+  font-size: var(--dsp-eyebrow-size);
+  letter-spacing: 0.18em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.dsp-head__heading {
+  margin: 0;
+  color: var(--dsp-heading-color);
+  font-family: var(--font-heading--family);
+  font-size: var(--dsp-heading-size-mobile);
+  font-weight: 400;
+  letter-spacing: var(--dsp-heading-tracking);
+  line-height: 1.05;
+  text-transform: var(--dsp-heading-case);
+}
+
+/* The ring runs the full height of the band with a column either side of it */
+.dsp-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, var(--dsp-media-width)) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--dsp-media-gap);
+}
+
+.dsp-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 0;
+}
+
+.dsp-col__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--dsp-icon-size);
+  height: var(--dsp-icon-size);
+  margin-bottom: 2.4rem;
+  color: var(--dsp-icon-color);
+}
+
+.dsp-col__icon svg,
+.dsp-col__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.dsp-col__heading {
+  margin: 0 0 1.6rem;
+  color: var(--dsp-heading-color);
+  font-family: var(--font-heading--family);
+  font-size: var(--dsp-heading-size-mobile);
+  font-weight: 400;
+  letter-spacing: var(--dsp-heading-tracking);
+  line-height: 1.05;
+  text-transform: var(--dsp-heading-case);
+}
+
+.dsp-col__text {
+  max-width: var(--dsp-measure);
+  margin: 0 0 2.8rem;
+  color: var(--dsp-text-color);
+  font-size: var(--dsp-text-size);
+  line-height: 1.5;
+}
+
+.dsp-col__text > *:first-child { margin-top: 0; }
+.dsp-col__text > *:last-child { margin-bottom: 0; }
+
+.dsp-col__icon + .dsp-col__text,
+.dsp-col__heading + .dsp-col__text { margin-top: 0; }
+
+.dsp-col .eden-action .svg-wrapper {
+  display: inline-flex;
+  width: 1rem;
+}
+
+.dsp-col .eden-action .svg-wrapper svg {
+  width: 100%;
+  height: auto;
+}
+
+.dsp-media {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.dsp-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Shots photographed on white keep no white box of their own on the band */
+.ds-split--blend .dsp-media img {
+  mix-blend-mode: multiply;
+}
+
+.dsp-footnote {
+  margin: 4.8rem 0 0;
+  color: var(--dsp-footnote-color);
+  font-size: var(--dsp-footnote-size);
+  line-height: 1.5;
+  text-align: center;
+}
+
+.dsp-footnote a {
+  color: inherit;
+  text-underline-offset: 0.3em;
+}
+
+.dsp-footnote p { margin: 0; }
+
+@media screen and (min-width: 990px) {
+  .dsp-head__heading,
+  .dsp-col__heading {
+    font-size: var(--dsp-heading-size);
+  }
+}
+
+@media screen and (max-width: 1199px) {
+  .ds-split {
+    --dsp-media-gap: 32px;
+  }
+}
+
+/* Under the desktop breakpoint the three columns stack, ring first */
+@media screen and (max-width: 989px) {
+  .ds-split {
+    --dsp-pad-inline: 2rem;
+  }
+
+  .dsp-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5.6rem;
+    justify-items: center;
+  }
+
+  .dsp-media {
+    order: -1;
+    max-width: min(var(--dsp-media-width), 78vw);
+  }
+
+  .dsp-col {
+    max-width: 46rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsp-media img {
+    transition: none;
+  }
+}

@@ -75,11 +75,19 @@
     never had, so every one of those tiles opened a 404.
   endcomment
 
+  comment
+    Engagement is the panel a shopper meets first, so its two lists below are the common settings
+    and the classic cuts only, not the whole catalogue - the full set was a wall of names to read.
+    The ones left out (Hidden Halo, Nature Inspired, Toi et Moi, Promise; Radiant, Marquise,
+    Asscher) still have their collections and are still reached from the engagement listing and
+    its filters; only the menu stops naming them.
+  endcomment
+
   case key
     when 'engagement/by-style' or 'engagement/shop-by-style'
-      echo '::Solitaire|solitaire~Side Stone|side-stone~Halo|halo~Hidden Halo|hidden-halo~Three Stone|three-stone~Bridal Sets|bridal-sets~Vintage|vintage~Nature Inspired|nature-inspired~Toi et Moi|toi-et-moi~Promise|promise'
+      echo '::Solitaire|solitaire~Halo|halo~Side Stone|side-stone~Three Stone|three-stone~Vintage|vintage~Bridal Sets|bridal-sets'
     when 'engagement/by-shape' or 'engagement/shop-by-shape'
-      echo '::Round|round-engagement-rings~Oval|oval-engagement-rings~Cushion|cushion-engagement-rings~Emerald|emerald-engagement-rings~Pear|pear-engagement-rings~Princess|princess-engagement-rings~Radiant|radiant-engagement-rings~Marquise|marquise-engagement-rings~Asscher|asscher-engagement-rings'
+      echo '::Round|round-engagement-rings~Oval|oval-engagement-rings~Cushion|cushion-engagement-rings~Emerald|emerald-engagement-rings~Pear|pear-engagement-rings~Princess|princess-engagement-rings'
     when 'wedding/by-style' or 'wedding/womens'
       echo '::Wedding|wedding-bands~Anniversary|anniversary-rings~Eternity|eternity-rings~Plain Metal|plain-metal-wedding-bands'
       echo ';;Featured Collections::Curved|curved-wedding-bands~Stackable|stackable-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship'

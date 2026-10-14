@@ -949,3 +949,236 @@ a.menu-drawer-desktop__group-heading:hover {
     grid-template-columns: var(--menu-tabs-width) minmax(0, 1fr);
   }
 }
+
+/* ---------- Text-only layout ('header-menu-drawer-links') ----------
+   Two halves: the menu's own groups as columns of named links on the left, the Design Studio
+   promo and the guide columns on the right. The promo picture is the only image on the panel. */
+
+.menu-drawer-desktop__page--links {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 6rem;
+  /* Both halves run the full height of the row, so the View all button can sit at the foot of
+     the browse half level with the bottom of the guide columns opposite it. */
+  align-items: stretch;
+  /* Tighter top and bottom than the shared .menu-drawer-desktop__page padding: there are no
+     tiles here, so the panel should drop no further down the page than the lists need. */
+  padding-top: 2.4rem;
+  padding-bottom: 2.8rem;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.menu-drawer-desktop__half {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* The rule under each heading runs the full width of the half it sits in, as a divider rather
+   than an underline of the words. */
+.menu-drawer-desktop__half-heading {
+  margin: 0 0 1.6rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  color: #111;
+  font-family: var(--font-heading--family);
+  font-size: 1.7rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.menu-drawer-desktop__columns {
+  display: grid;
+  /* Style runs one column, the cuts run two; the wider share goes to the cuts. */
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 2.4rem 4rem;
+  /* The least the View all button below may close up to when the half is stretched */
+  margin-bottom: 2.4rem;
+}
+
+/* A row-style column sits under both columns rather than beside them */
+.menu-drawer-desktop__column--inline {
+  grid-column: 1 / -1;
+}
+
+.menu-drawer-desktop__column-heading {
+  margin: 0 0 1.2rem;
+  color: #111;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.menu-drawer-desktop__link-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.menu-drawer-desktop__column--shapes .menu-drawer-desktop__link-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem 3.2rem;
+}
+
+.menu-drawer-desktop__column--inline .menu-drawer-desktop__link-list {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1.2rem 3.2rem;
+}
+
+.menu-drawer-desktop__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2rem;
+  color: #111;
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+/* Same drawn underline as the nav bar; it sits on the words, not on the icon beside them */
+.menu-drawer-desktop__link-text {
+  background: linear-gradient(currentColor, currentColor) center bottom / 0 1px no-repeat;
+  padding-bottom: 0.2rem;
+  transition: background-size 0.35s ease;
+}
+
+.menu-drawer-desktop__link:hover .menu-drawer-desktop__link-text {
+  background-size: 100% 1px;
+}
+
+.menu-drawer-desktop__link-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 2.2rem;
+  height: 2.2rem;
+  color: rgba(0, 0, 0, 0.55);
+  transition: color 0.2s ease;
+}
+
+.menu-drawer-desktop__link-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.menu-drawer-desktop__link:hover .menu-drawer-desktop__link-icon {
+  color: #111;
+}
+
+.menu-drawer-desktop__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem 2.4rem;
+  border: 1px solid rgba(0, 0, 0, 0.45);
+  color: #111;
+  font-size: 1.2rem;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.menu-drawer-desktop__button:hover {
+  background-color: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+.menu-drawer-desktop__button--wide {
+  /* Pushed to the foot of the half so it lines up with the bottom of the panel */
+  margin-top: auto;
+  padding-top: 1.4rem;
+  padding-bottom: 1.4rem;
+  width: 100%;
+}
+
+.menu-drawer-desktop__studio {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-drawer-desktop__studio-media {
+  display: block;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.menu-drawer-desktop__studio-media img {
+  display: block;
+  width: 100%;
+  /* The art is portrait, so it is cropped to a band here; keep the ratio shallow enough that
+     the bench still reads and deep enough that the panel does not grow past the viewport. The
+     cap stops a wide viewport widening the band into the tallest thing on the panel. */
+  aspect-ratio: 3.6 / 1;
+  max-height: 18rem;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.6s ease;
+}
+
+.menu-drawer-desktop__studio-media:hover img {
+  transform: scale(1.03);
+}
+
+.menu-drawer-desktop__studio-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.6rem;
+  margin-top: 1.6rem;
+}
+
+.menu-drawer-desktop__guides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 4rem;
+  margin-top: 2.4rem;
+}
+
+.menu-drawer-desktop__guide {
+  min-width: 0;
+}
+
+@media screen and (max-width: 1199px) {
+  .menu-drawer-desktop__page--links {
+    gap: 0 3.6rem;
+  }
+
+  .menu-drawer-desktop__columns {
+    gap: 2rem 2.8rem;
+  }
+
+  .menu-drawer-desktop__column--shapes .menu-drawer-desktop__link-list {
+    gap: 1.2rem 2rem;
+  }
+
+  .menu-drawer-desktop__link,
+  .menu-drawer-desktop__column-heading {
+    font-size: 1.4rem;
+  }
+
+  .menu-drawer-desktop__button {
+    letter-spacing: 0.12em;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-drawer-desktop__link-text,
+  .menu-drawer-desktop__link-icon,
+  .menu-drawer-desktop__button,
+  .menu-drawer-desktop__studio-media img {
+    transition: none;
+  }
+}

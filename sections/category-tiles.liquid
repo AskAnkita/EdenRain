@@ -1,5 +1,7 @@
 {% comment %}
-  Category tiles: one tall picture card per menu item, in a row you can scroll sideways.
+  Category tiles: one tall picture card per menu item. On desktop the whole menu fits in
+  one row by default ("Fit every tile on desktop"); turn that off and the row scrolls
+  sideways instead, a set number of tiles at a time. Narrower screens always scroll.
 
   Where a tile's picture comes from, in order:
     1. a "Picture for a tile" block in the theme editor, matched to the menu item;
@@ -23,6 +25,19 @@
   # name. A picture chosen in the theme editor always wins over this
   # list, so a tile never ignores it.
   # ------------------------------------------------------------------
+  # On desktop in "fit" mode every menu item shares the row, so a tile is 100/<tiles> of
+  # the screen; otherwise it is one of "Tiles across on desktop".
+  assign tile_count = menu.links.size
+  if tile_count < 1
+    assign tile_count = 1
+  endif
+  if section.settings.fit_all
+    assign desktop_tile_vw = 100 | divided_by: tile_count | plus: 1 | round
+  else
+    assign desktop_tile_vw = 100 | divided_by: section.settings.per_row | plus: 1 | round
+  endif
+  assign tile_sizes = '(min-width: 990px) ' | append: desktop_tile_vw | append: 'vw, (min-width: 750px) 45vw, 100vw'
+
   assign tile_pictures = 'Rings: category-rings.png, Earrings: category-earrings.png, Necklaces: category-necklaces.png, Bracelets: category-bracelets.png, Best Sellers: category-best-sellers.png'
   assign tile_picture_pairs = tile_pictures | split: ','
 -%}
@@ -250,6 +265,33 @@
     color: rgb(0 0 0 / 0.55);
   }
 
+  {%- if section.settings.fit_all -%}
+    /* Every tile shares the desktop row, so the whole menu is there without scrolling.
+       "minmax(0, 1fr)" lets a tile shrink below its picture's own width, and the columns
+       are auto, not a fixed count, so a tile the script drops closes its gap rather than
+       leaving a hole. */
+    @media screen and (min-width: 990px) {
+      #category-tiles-{{ section.id }} .ct-track {
+        grid-auto-columns: minmax(0, 1fr);
+        overflow-x: clip;
+        scroll-snap-type: none;
+      }
+
+      #category-tiles-{{ section.id }} .ct-arrow,
+      #category-tiles-{{ section.id }} .ct-progress {
+        display: none;
+      }
+
+      /* The tiles are narrower the more there are, so the label follows the tile down
+         rather than wrapping or running past its edge. */
+      #category-tiles-{{ section.id }} .ct-label {
+        max-width: calc(100% - 2.4rem);
+        font-size: clamp(1.05rem, 0.72vw, 1.35rem);
+        letter-spacing: 0.14em;
+      }
+    }
+  {%- endif -%}
+
   @media screen and (max-width: 989px) {
     #category-tiles-{{ section.id }} .ct-track {
       grid-auto-columns: calc((100% - 2rem) / 2.3);
@@ -345,7 +387,7 @@
                   <img
                     src="{{ tile_asset | asset_img_url: '900x' }}"
                     srcset="{{ tile_asset | asset_img_url: '450x' }} 450w, {{ tile_asset | asset_img_url: '700x' }} 700w, {{ tile_asset | asset_img_url: '900x' }} 900w, {{ tile_asset | asset_img_url: '1200x' }} 1200w"
-                    sizes="(min-width: 990px) 25vw, 100vw"
+                    sizes="{{ tile_sizes }}"
                     alt="{{ link.title | escape }}"
                     width="1122"
                     height="1402"
@@ -353,7 +395,7 @@
                     data-ct-asset
                   >
                 {%- elsif tile_image != blank -%}
-                  {{ tile_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, 100vw', alt: link.title }}
+                  {{ tile_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: tile_sizes, alt: link.title }}
                 {%- endif -%}
                 <span class="ct-label">{{ link.title | escape }}</span>
               </a>
@@ -364,7 +406,9 @@
           <span class="svg-wrapper">{%- render 'icon-arrow' -%}</span>
         </button>
       </div>
-      <div class="ct-progress" aria-hidden="true"><span></span></div>
+      {%- if section.settings.show_progress -%}
+        <div class="ct-progress" aria-hidden="true"><span></span></div>
+      {%- endif -%}
     {%- endif -%}
   </div>
 </div>
@@ -384,8 +428,10 @@
       next.disabled = track.scrollLeft >= max - 2;
       const shown = track.clientWidth / track.scrollWidth;
       const progress = max > 0 ? shown + (1 - shown) * (track.scrollLeft / max) : 1;
-      bar.style.setProperty('--ct-progress', `${Math.round(progress * 100)}%`);
-      bar.hidden = max <= 0;
+      if (bar) {
+        bar.style.setProperty('--ct-progress', `${Math.round(progress * 100)}%`);
+        bar.hidden = max <= 0;
+      }
     };
     // Scroll by whole tiles, so a click always lands on a tile edge rather than part way
     // through one and letting scroll snapping decide where it ends up.
@@ -446,10 +492,17 @@
       "info": "Full width runs the tiles to the edges of the screen, leaving only the margin the arrows need."
     },
     {
+      "type": "checkbox",
+      "id": "fit_all",
+      "label": "Fit every tile on desktop",
+      "info": "The whole menu shares the desktop row, so there is nothing to scroll to and the arrows are hidden. Narrower screens still scroll. Turn this off to show a set number of tiles at a time.",
+      "default": true
+    },
+    {
       "type": "range",
       "id": "per_row",
       "label": "Tiles across on desktop",
-      "info": "The tiles share the full width between them, so fewer across means a bigger tile on a wide screen. A half, e.g. 4.5, leaves the next tile peeking at the edge.",
+      "info": "Only with \"Fit every tile on desktop\" off. The tiles share the full width between them, so fewer across means a bigger tile on a wide screen. A half, e.g. 4.5, leaves the next tile peeking at the edge.",
       "min": 3,
       "max": 8,
       "step": 0.5,
@@ -459,7 +512,7 @@
       "type": "range",
       "id": "min_tile_width",
       "label": "Smallest tile width",
-      "info": "A tile never shrinks below this; on a narrower screen the row scrolls instead.",
+      "info": "Only with \"Fit every tile on desktop\" off. A tile never shrinks below this; on a narrower screen the row scrolls instead.",
       "min": 180,
       "max": 480,
       "step": 20,
@@ -476,6 +529,13 @@
         { "value": "2 / 3", "label": "Tall" }
       ],
       "default": "3 / 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress",
+      "label": "Show the scroll progress bar",
+      "info": "The bar under the row that fills as the tiles scroll. The arrows either side still work with it off.",
+      "default": false
     },
     {
       "type": "color_scheme",

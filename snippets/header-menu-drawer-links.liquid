@@ -1,0 +1,160 @@
+{% comment %}
+  Text-only desktop mega menu panel: every option is a named link, no picture tiles.
+
+  Used by the menus 'menu-static-layout' returns "links" for. Two halves:
+  - Browse: the menu's own groups side by side as columns of links. A column whose group is a
+    diamond cut gets the line drawing from 'icon-diamond-shape' beside each name, and the whole
+    half ends in a wide "View all" button.
+  - Studio: the Design Studio promo (the one picture on the panel) over its two entry points,
+    then the guide columns underneath.
+
+  Accepts:
+  - link: {Object} the top-level menu link
+  - drawer_id: {String}
+
+  The lists themselves still come from 'menu-static-items', so the names here and the tiles on
+  every other menu cannot drift apart; this snippet only decides which groups are drawn as
+  columns and how wide each one runs. Columns are declared in `browse_columns` below as
+  "group|Heading|style", where style is "shapes" for the icon grid, "inline" for a row of links
+  that runs full width under the columns, and blank for a plain column.
+{% endcomment %}
+
+{%- liquid
+  assign browse_heading = 'Curated Rings'
+  assign browse_columns = 'By Style|Shop by Style|,By Shape|Shop by Shape|shapes' | split: ','
+
+  assign studio_image = 'about-craft-workshop.png'
+  assign studio_image_alt = 'A jeweller finishing a ring at the bench'
+  assign studio_url = '/pages/design-studio'
+
+  comment
+    Two entry points, both of which have to land somewhere that exists: the builder page is the
+    setting-first route ('design-studio-builder'), and the diamond-first route is the lab-grown
+    collection, the only diamond listing the shop has. 'Label|url' each.
+  endcomment
+  assign studio_actions = 'Start with a setting|/pages/design-studio-builder,Start with a diamond|/collections/lab-grown-diamonds' | split: ','
+
+  comment
+    Guides are pages on the guide template, not blog articles, and only the five below exist -
+    anything else here opens a 404. Columns are "Heading::Label|url~Label|url".
+  endcomment
+  assign guide_columns = 'Diamond Education::Education & Guides|/pages/education-guides~Gemstones|/pages/gemstones~Jewellery Care|/pages/jewellery-care,Ring Guide::Ring Size Guide|/pages/er-sizing~Wrist Size Guide|/pages/wrist-sizer-guide~Talk to a Designer|/pages/contact' | split: ','
+-%}
+
+<div
+  class="menu-drawer-desktop__page menu-drawer-desktop__page--links"
+  id="{{ drawer_id }}"
+  data-menu-drawer-page
+  hidden
+>
+  <section class="menu-drawer-desktop__half menu-drawer-desktop__half--browse">
+    <h2 class="menu-drawer-desktop__half-heading">{{ browse_heading | escape }}</h2>
+
+    <div class="menu-drawer-desktop__columns">
+      {%- for column in browse_columns -%}
+        {%- liquid
+          assign column_parts = column | split: '|'
+          assign column_group = column_parts[0]
+          assign column_heading = column_parts[1] | default: column_parts[0]
+          assign column_style = column_parts[2] | default: ''
+
+          capture column_source
+            render 'menu-static-items', group: column_group, parent: link.title
+          endcapture
+          assign column_source = column_source | strip
+
+          # Only the first section of a group is drawn: these groups have just the one, and a
+          # second would need a heading the columns have no room for.
+          assign column_sections = column_source | split: ';;'
+          assign column_parts_raw = column_sections[0] | split: '::'
+          assign column_items_raw = column_parts_raw[0]
+          if column_parts_raw.size > 1
+            assign column_items_raw = column_parts_raw[1]
+          endif
+          assign column_items = column_items_raw | split: '~'
+        -%}
+        {%- if column_items.size > 0 -%}
+          <div class="menu-drawer-desktop__column menu-drawer-desktop__column--{{ column_style | default: 'plain' }}">
+            <p class="menu-drawer-desktop__column-heading">{{ column_heading | escape }}</p>
+            <ul class="menu-drawer-desktop__link-list" role="list">
+              {%- for item in column_items -%}
+                {%- liquid
+                  assign item_parts = item | split: '|'
+                  assign item_title = item_parts[0]
+                  assign item_url = item_parts[1]
+                  unless item_url contains '/'
+                    assign item_url = item_url | prepend: '/collections/'
+                  endunless
+                  # `render` takes no filters in its arguments, so the cut's key is made here
+                  assign item_shape = item_title | handle
+                -%}
+                <li>
+                  <a class="menu-drawer-desktop__link" href="{{ item_url }}">
+                    {%- if column_style == 'shapes' -%}
+                      <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
+                        {%- render 'icon-diamond-shape', shape: item_shape -%}
+                      </span>
+                    {%- endif -%}
+                    <span class="menu-drawer-desktop__link-text">{{ item_title | escape }}</span>
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if link.url != blank -%}
+      <a class="menu-drawer-desktop__button menu-drawer-desktop__button--wide" href="{{ link.url }}">
+        View all {{ link.title | downcase | escape }}
+      </a>
+    {%- endif -%}
+  </section>
+
+  <section class="menu-drawer-desktop__half menu-drawer-desktop__half--studio">
+    <div class="menu-drawer-desktop__studio">
+      <h2 class="menu-drawer-desktop__half-heading">Design Studio</h2>
+      <a class="menu-drawer-desktop__studio-media" href="{{ studio_url }}">
+        <img
+          src="{{ studio_image | asset_img_url: '900x' }}"
+          srcset="{{ studio_image | asset_img_url: '600x' }} 600w, {{ studio_image | asset_img_url: '900x' }} 900w"
+          sizes="(min-width: 1200px) 42vw, 38vw"
+          alt="{{ studio_image_alt | escape }}"
+          width="1086"
+          height="1448"
+          loading="lazy"
+        >
+      </a>
+      <div class="menu-drawer-desktop__studio-actions">
+        {%- for action in studio_actions -%}
+          {%- assign action_parts = action | split: '|' -%}
+          <a class="menu-drawer-desktop__button" href="{{ action_parts[1] }}">{{ action_parts[0] | escape }}</a>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <div class="menu-drawer-desktop__guides">
+      {%- for guide_column in guide_columns -%}
+        {%- liquid
+          assign guide_parts = guide_column | split: '::'
+          assign guide_heading = guide_parts[0]
+          assign guide_items = guide_parts[1] | split: '~'
+        -%}
+        <div class="menu-drawer-desktop__guide">
+          <h2 class="menu-drawer-desktop__half-heading">{{ guide_heading | escape }}</h2>
+          <ul class="menu-drawer-desktop__link-list" role="list">
+            {%- for item in guide_items -%}
+              {%- assign item_parts = item | split: '|' -%}
+              <li>
+                <a class="menu-drawer-desktop__link" href="{{ item_parts[1] }}">
+                  <span class="menu-drawer-desktop__link-text">{{ item_parts[0] | escape }}</span>
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endfor -%}
+    </div>
+  </section>
+</div>

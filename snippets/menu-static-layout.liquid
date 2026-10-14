@@ -1,0 +1,24 @@
+{% comment %}
+  Which desktop panel layout a top-level mega menu item uses.
+
+  Accepts:
+  - parent: {String} the top-level item's title, e.g. "Engagement"
+
+  Outputs:
+  - "links" - the text-only panel: named options in columns, no picture tiles
+    ('header-menu-drawer-links')
+  - nothing  - the default tabs-and-tiles panel ('header-menu-drawer-panel')
+
+  A menu listed here still needs its groups in 'menu-static-groups' so the header counts it
+  as drawer-eligible, and its lists still come from 'menu-static-items'; only the way they
+  are drawn changes.
+{% endcomment %}
+
+{%- liquid
+  assign parent_key = parent | handle
+
+  case parent_key
+    when 'engagement'
+      echo 'links'
+  endcase
+-%}
