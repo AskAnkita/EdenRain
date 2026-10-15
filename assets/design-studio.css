@@ -24,6 +24,14 @@
     var(--ds-pad-bottom, clamp(42px, 6vw, 92px));
 }
 
+/* The closing panel runs to both window edges and is the last thing before the
+   footer, so the section's bottom padding would read as a white strip under a
+   block of colour rather than as space around the section. A merchant who sets
+   their own padding still gets it. */
+.design-studio:has(.ds-cta) {
+  padding-bottom: var(--ds-pad-bottom, 0px);
+}
+
 .design-studio img,
 .design-studio svg {
   display: block;
@@ -169,6 +177,27 @@
   background: var(--ds-frame-bg, var(--ds-wash));
 }
 
+/* The enquiry card is not the builder, so it keeps its own, shorter height
+   rather than reserving a 3D canvas worth of frame, and it runs the full width
+   of the window rather than sitting inside the shell: it reads as a band, not
+   as a panel, so the side borders come off with the margins. The width is the
+   viewport less the scrollbar, the measure the rest of the theme breaks out
+   with, so the page gains no sideways scroll.
+
+   On a phone the frame is barely wider than the copy, so there is nowhere to
+   put the model that is not behind the text: the card is the wash alone, and
+   the gradient stands in for the photograph's own backdrop. The art is set as
+   a custom property on the element rather than as a background-image, so the
+   stylesheet keeps charge of how it is laid in. */
+.ds-builder__frame--fallback {
+  --ds-fallback-viewport: calc(100vw - var(--scrollbar-width, 0px));
+  width: var(--ds-fallback-viewport);
+  margin-inline: calc(50% - var(--ds-fallback-viewport) / 2);
+  min-height: var(--ds-fallback-height-mobile, 440px);
+  border-inline: 0;
+  background-image: linear-gradient(180deg, #eff0f3 0%, #e5e8eb 100%);
+}
+
 .ds-builder__frame > * {
   max-width: 100%;
 }
@@ -203,6 +232,25 @@
   max-width: 540px;
 }
 
+/* The fallback art carries the model on its right, so the copy sits in the
+   empty half on the left rather than centred under her hands. The width cap
+   that keeps the lines clear of her waits for the tablet breakpoint, where
+   the frame is wide enough to hold two halves. */
+.ds-builder__frame--fallback .ds-builder__fallback {
+  align-items: flex-start;
+  text-align: left;
+}
+
+/* The solid button sits on a photograph here, where the shared hover - drop
+   the fill, keep the ink - leaves white-on-light text. Invert to a white fill
+   with ink text instead, which holds its contrast whatever the art does. */
+.ds-builder__frame--fallback .eden-action--solid:hover,
+.ds-builder__frame--fallback .eden-action--solid:focus-visible {
+  border-color: var(--eden-action-on-ink, #ffffff);
+  background: var(--eden-action-on-ink, #ffffff);
+  color: var(--eden-action-ink, #171714);
+}
+
 .ds-builder__aside {
   margin: 14px 0 0;
   color: var(--ds-text-color, var(--ds-muted));
@@ -217,8 +265,10 @@
 
 /* ------------------------------------------------------------------ bands */
 
+/* One gap between every band, so the page keeps a single vertical rhythm and
+   a merchant moves all of them with one slider. */
 .ds-band {
-  margin-top: clamp(48px, 7vw, 108px);
+  margin-top: var(--ds-band-gap, clamp(28px, 4vw, 60px));
 }
 
 .ds-band--wash {
@@ -363,16 +413,20 @@
 /* -------------------------------------------------------------------- cta */
 
 .ds-cta {
-  margin-top: clamp(48px, 7vw, 108px);
+  box-sizing: border-box;
+  width: 100vw;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+  margin-top: var(--ds-band-gap, clamp(28px, 4vw, 60px));
   padding: clamp(40px, 6vw, 88px) clamp(24px, 4vw, 64px);
-  background: var(--ds-cta-bg, #17211e);
-  color: var(--ds-cta-ink, #ffffff);
+  background: var(--ds-cta-bg, #ead9d1);
+  color: var(--ds-cta-ink, #171714);
   text-align: center;
 }
 
 .ds-cta h2 {
   margin: 0 0 16px;
-  color: var(--ds-cta-ink, #ffffff);
+  color: var(--ds-cta-ink, #171714);
   font-size: var(--ds-heading-size, clamp(2.4rem, 3.2vw, 4rem));
   line-height: 1.15;
 }
@@ -380,7 +434,7 @@
 .ds-cta .ds-text {
   max-width: 560px;
   margin: 0 auto;
-  color: var(--ds-cta-ink, #ffffff);
+  color: var(--ds-cta-ink, #171714);
   opacity: 0.82;
 }
 
@@ -393,6 +447,27 @@
 @media screen and (min-width: 750px) {
   .ds-builder__frame {
     min-height: var(--ds-frame-height, 720px);
+  }
+
+  /* Once there is room for two halves, the photograph is laid in at its own
+     proportions against the right edge - fitted to the height of the frame,
+     not stretched across its width, which is what left the model cropped and
+     blown up when the card was shortened. The surplus is taken off her left,
+     where the picture is only backdrop, and the gradient under it carries on
+     where the picture stops. */
+  .ds-builder__frame--fallback {
+    min-height: var(--ds-fallback-height, 520px);
+    background-image: var(--ds-fallback-art, none), linear-gradient(180deg, #eff0f3 0%, #e5e8eb 100%);
+    background-position: right center, center;
+    background-repeat: no-repeat, no-repeat;
+    background-size: auto 100%, cover;
+  }
+
+  /* The band now starts at the window edge, so the copy carries the inset the
+     shell used to give it. */
+  .ds-builder__frame--fallback .ds-builder__fallback {
+    max-width: 58%;
+    padding-left: clamp(40px, 7vw, 120px);
   }
 
   .ds-builder__iframe {
