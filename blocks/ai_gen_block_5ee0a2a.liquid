@@ -831,7 +831,7 @@
                     >
                   {% elsif preset_image != blank %}
                     <img
-                      src="{{ preset_image | asset_url }}"
+                      src="{% render 'image-source', file: preset_image, width: 800 %}"
                       alt="{{ title | escape }}"
                       loading="lazy"
                       width="{{ preset_width }}"
@@ -851,7 +851,7 @@
                     >
                   {% elsif preset_hover_image != blank %}
                     <img
-                      src="{{ preset_hover_image | asset_url }}"
+                      src="{% render 'image-source', file: preset_hover_image, width: 800 %}"
                       alt="{{ preset_hover_alt | default: title | escape }}"
                       loading="lazy"
                       width="{{ preset_hover_width }}"

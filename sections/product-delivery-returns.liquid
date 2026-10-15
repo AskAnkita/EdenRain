@@ -1,0 +1,76 @@
+<section
+  class="product-delivery"
+  style="--product-delivery-bg: {{ section.settings.background_color }}; --product-delivery-text: {{ section.settings.text_color }};"
+>
+  <div class="product-delivery__inner">
+    {% if section.settings.heading != blank %}
+      <h2 class="product-delivery__heading">{{ section.settings.heading | escape }}</h2>
+    {% endif %}
+    {% if section.settings.description != blank %}
+      <div class="product-delivery__description">{{ section.settings.description }}</div>
+    {% endif %}
+    {% if section.settings.button_label != blank %}
+      <a class="product-delivery__button" href="{{ section.settings.button_link | default: '/pages/delivery-returns' }}">
+        {{ section.settings.button_label | escape }}
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  #shopify-section-{{ section.id }} .product-delivery {
+    background: var(--product-delivery-bg);
+    color: var(--product-delivery-text);
+    margin-inline: auto;
+    max-width: 1700px;
+    padding: clamp(28px, 3vw, 42px) 24px;
+    text-align: center;
+  }
+  #shopify-section-{{ section.id }} .product-delivery__inner { margin: 0 auto; max-width: 1200px; }
+  #shopify-section-{{ section.id }} .product-delivery__heading {
+    color: inherit;
+    font-family: var(--font-heading--family, inherit);
+    font-size: clamp(2.4rem, 3vw, 4.2rem);
+    font-weight: 400;
+    letter-spacing: .08em;
+    line-height: 1.2;
+    margin: 0 0 22px;
+    text-transform: uppercase;
+  }
+  #shopify-section-{{ section.id }} .product-delivery__description { font-size: clamp(1.5rem, 1.3vw, 1.9rem); line-height: 1.55; }
+  #shopify-section-{{ section.id }} .product-delivery__description p { margin: 0; }
+  #shopify-section-{{ section.id }} .product-delivery__button {
+    background: #000;
+    color: #fff;
+    display: inline-block;
+    font-size: 1.5rem;
+    letter-spacing: .12em;
+    line-height: 1.2;
+    margin-top: 28px;
+    padding: 13px 22px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: opacity .2s ease;
+  }
+  #shopify-section-{{ section.id }} .product-delivery__button:hover { opacity: .8; }
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .product-delivery { margin-inline: 16px; padding: 28px 18px; }
+    #shopify-section-{{ section.id }} .product-delivery__heading { margin-bottom: 14px; }
+    #shopify-section-{{ section.id }} .product-delivery__button { margin-top: 20px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Delivery and returns",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Delivery and returns" },
+    { "type": "richtext", "id": "description", "label": "Description", "default": "<p>Complimentary worldwide delivery with all orders and 28 day return policy (excluding bespoke items)</p>" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Read more" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "color", "id": "background_color", "label": "Background color", "default": "#eeeeee" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#222222" }
+  ],
+  "presets": [{ "name": "Delivery and returns" }]
+}
+{% endschema %}

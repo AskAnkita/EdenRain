@@ -160,7 +160,7 @@
                                                     {{ item_image | image_url: width: 300 | image_tag: loading: 'lazy', sizes: '28vw', class: 'mnav__tile-cover', alt: grandchild.title }}
                                                   {%- elsif placeholder_asset != blank and placeholder_asset != '' -%}
                                                     <img
-                                                      src="{{ placeholder_asset | asset_img_url: '300x' }}"
+                                                      src="{% render 'image-source', file: placeholder_asset, width: 300 %}"
                                                       alt="{{ grandchild.title | escape }}"
                                                       loading="lazy"
                                                       width="300"
@@ -217,7 +217,7 @@
                                                       {{ item_collection.featured_image | image_url: width: 300 | image_tag: loading: 'lazy', sizes: '28vw', class: 'mnav__tile-cover', alt: item_title }}
                                                     {%- elsif placeholder_asset != blank and placeholder_asset != '' -%}
                                                       <img
-                                                        src="{{ placeholder_asset | asset_img_url: '300x' }}"
+                                                        src="{% render 'image-source', file: placeholder_asset, width: 300 %}"
                                                         alt="{{ item_title | escape }}"
                                                         loading="lazy"
                                                         width="300"
@@ -267,7 +267,7 @@
                                               {{ item_image | image_url: width: 300 | image_tag: loading: 'lazy', sizes: '28vw', class: 'mnav__tile-cover', alt: child.title }}
                                             {%- elsif placeholder_asset != blank and placeholder_asset != '' -%}
                                               <img
-                                                src="{{ placeholder_asset | asset_img_url: '300x' }}"
+                                                src="{% render 'image-source', file: placeholder_asset, width: 300 %}"
                                                 alt="{{ child.title | escape }}"
                                                 loading="lazy"
                                                 width="300"

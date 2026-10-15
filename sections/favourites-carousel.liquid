@@ -219,6 +219,26 @@
     text-transform: uppercase;
   }
 
+  /* Optional progress line under the arrows (off by default, so the live row is unchanged). */
+  #fav-{{ section.id }} .fav-progress {
+    position: relative;
+    width: 100%;
+    max-width: 32rem;
+    height: 1px;
+    margin-top: 1.6rem;
+    background-color: {{ section.settings.arrow_color }};
+    opacity: 0.2;
+  }
+
+  #fav-{{ section.id }} .fav-progress-bar {
+    position: absolute;
+    inset: 0;
+    background-color: {{ section.settings.arrow_color }};
+    opacity: 1;
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
   @media screen and (max-width: 989px) {
     #fav-{{ section.id }} .fav-inner {
       grid-template-columns: minmax(0, 1fr);
@@ -292,6 +312,10 @@
           </button>
         </div>
       {%- endif -%}
+
+      {%- if section.settings.show_progress -%}
+        <div class="fav-progress" aria-hidden="true"><div class="fav-progress-bar" data-fav-bar></div></div>
+      {%- endif -%}
     </div>
 
     <ul class="fav-track" role="list">
@@ -342,8 +366,8 @@
             {%- elsif slide_asset != blank -%}
               {%- comment -%} The width and height only reserve the space; the panel's shape comes from the section. {%- endcomment -%}
               <img
-                src="{{ slide_asset | asset_img_url: '900x' }}"
-                srcset="{{ slide_asset | asset_img_url: '400x' }} 400w, {{ slide_asset | asset_img_url: '600x' }} 600w, {{ slide_asset | asset_img_url: '900x' }} 900w, {{ slide_asset | asset_img_url: '1200x' }} 1200w"
+                src="{% render 'image-source', file: slide_asset, width: 900 %}"
+                srcset="{% render 'image-source', file: slide_asset, width: 400 %} 400w, {% render 'image-source', file: slide_asset, width: 600 %} 600w, {% render 'image-source', file: slide_asset, width: 900 %} 900w, {% render 'image-source', file: slide_asset, width: 1200 %} 1200w"
                 sizes="(min-width: 990px) 25vw, 60vw"
                 alt="{{ slide_alt | escape }}"
                 width="1200"
@@ -391,6 +415,26 @@
   </div>
 </favourites-carousel>
 
+{%- if section.settings.show_progress -%}
+<script>
+  (function () {
+    var root = document.getElementById('fav-{{ section.id }}');
+    if (!root) return;
+    var track = root.querySelector('.fav-track');
+    var bar = root.querySelector('[data-fav-bar]');
+    if (!track || !bar) return;
+    function update() {
+      var max = track.scrollWidth - track.clientWidth;
+      var share = track.scrollWidth ? track.clientWidth / track.scrollWidth : 1;
+      bar.style.transform = 'scaleX(' + (max > 0 ? share : 1) + ') translateX(' + (max > 0 ? (track.scrollLeft / track.scrollWidth) * 100 / share : 0) + '%)';
+    }
+    track.addEventListener('scroll', function () { window.requestAnimationFrame(update); }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+</script>
+{%- endif -%}
+
 
 {% schema %}
 {
@@ -421,6 +465,7 @@
     { "type": "header", "content": "Arrows" },
     { "type": "checkbox", "id": "show_arrows", "label": "Show the arrows", "default": true, "info": "The arrows hide themselves when there are too few panels to fill the row - there is nothing to scroll." },
     { "type": "checkbox", "id": "loop_arrows", "label": "Loop at the ends", "default": false, "info": "On: the next arrow at the end of the row goes back to the first panel. Off: the row stops at the last panel and the arrow greys out." },
+    { "type": "checkbox", "id": "show_progress", "label": "Show progress line under the arrows", "default": false },
     { "type": "range", "id": "arrow_size", "label": "Arrow size", "min": 20, "max": 64, "step": 2, "unit": "px", "default": 32 },
     { "type": "color", "id": "arrow_color", "label": "Arrow colour", "default": "rgba(0,0,0,0)" },
 
@@ -454,7 +499,7 @@
       "settings": [
         { "type": "header", "content": "Picture" },
         { "type": "image_picker", "id": "image", "label": "Picture" },
-        { "type": "text", "id": "image_asset", "label": "Picture file name (fallback)", "info": "A file already in the theme's assets folder, e.g. menu-tile-tennis-bracelets.png. Only used when no picture is chosen." },
+        { "type": "text", "id": "image_asset", "label": "Picture file name (fallback)", "info": "A file name in Content > Files (or assets/), e.g. menu-tile-tennis-bracelets.png. Only used when no picture is chosen." },
         { "type": "text", "id": "image_url", "label": "Picture URL (fallback)", "info": "Only used when neither of the two above is set." },
         { "type": "text", "id": "image_alt", "label": "Picture alt text" },
         { "type": "range", "id": "image_scale", "label": "Picture zoom", "min": 100, "max": 200, "step": 5, "unit": "%", "default": 100 },

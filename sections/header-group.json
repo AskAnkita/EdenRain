@@ -163,8 +163,8 @@
       "settings": {
         "gap": 12,
         "align_items": "center",
-        "logo_width": 180,
-        "logo_width_mobile": 100,
+        "logo_width": 240,
+        "logo_width_mobile": 140,
         "logo_spacing_left": 0,
         "logo_spacing_right": 0,
         "logo_position": "center",

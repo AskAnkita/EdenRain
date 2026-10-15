@@ -5,7 +5,8 @@
 
   @param {number} index - 1-3; only used for the data attribute
   @param {object} [image] - merchant-picked image from the section settings
-  @param {string} [fallback] - theme asset filename to show until an image is picked
+  @param {string} [fallback] - file name to show until an image is picked, resolved by
+    'image-source' against Content > Files and then assets/
   @param {string} [url] - optional link for the whole tile
   @param {string} [heading] - optional overlay heading
   @param {string} [subheading] - optional overlay line under the heading
@@ -68,7 +69,7 @@
       {%- else -%}
         {%- comment -%} No image picked yet: fall back to a theme asset so the slot is never empty {%- endcomment -%}
         <img
-          src="{{ fallback | asset_img_url: '1600x' }}"
+          src="{% render 'image-source', file: fallback, width: 1600 %}"
           alt="{{ alt_text | escape }}"
           loading="lazy"
           class="collection-banner__image"

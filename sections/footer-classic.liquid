@@ -7,6 +7,15 @@
 {%- liquid
   assign footer_id = 'footer-classic-' | append: section.id
   assign stts = section.settings
+
+  # Fallback: the Eden Raine "ER" monogram bundled in theme assets, used when no logo is picked.
+  # Picks the light or dark cut to match the footer text colour.
+  assign text_brightness = stts.text_color | color_brightness
+  if text_brightness > 127
+    assign fallback_monogram_url = 'eden-raine-icon-white.png' | asset_url
+  else
+    assign fallback_monogram_url = 'eden-raine-icon.png' | asset_url
+  endif
 -%}
 
 {%- style -%}
@@ -50,11 +59,40 @@
   #{{ footer_id }} a {
     color: {{ stts.link_color }};
     text-decoration: none;
-    transition: color 0.2s ease;
   }
 
-  #{{ footer_id }} a:hover {
-    color: {{ stts.link_hover_color }};
+  #{{ footer_id }} .fc-list a {
+    position: relative;
+    display: inline-block;
+  }
+
+  #{{ footer_id }} .fc-list a::after {
+    position: absolute;
+    right: 0;
+    bottom: -0.18em;
+    left: 0;
+    height: 1px;
+    background: currentColor;
+    content: '';
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.25s ease;
+  }
+
+  #{{ footer_id }} .fc-list a:hover,
+  #{{ footer_id }} .fc-list a:focus-visible {
+    color: {{ stts.link_color }};
+  }
+
+  #{{ footer_id }} .fc-list a:hover::after,
+  #{{ footer_id }} .fc-list a:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #{{ footer_id }} .fc-list a::after {
+      transition: none;
+    }
   }
 
   #{{ footer_id }} .fc-list {
@@ -464,7 +502,12 @@
                 {%- if block.settings.logo != blank -%}
                   {{ block.settings.logo | image_url: width: 600 | image_tag: loading: 'lazy', alt: shop.name }}
                 {%- else -%}
-                  <span class="fc-heading">{{ shop.name | escape }}</span>
+                  <img
+                    src="{{ fallback_monogram_url }}"
+                    alt="{{ shop.name | escape }}"
+                    width="400"
+                    height="346"
+                    loading="lazy">
                 {%- endif -%}
               </a>
               {%- if block.settings.text != blank -%}
@@ -776,7 +819,8 @@
         {
           "type": "image_picker",
           "id": "logo",
-          "label": "Logo"
+          "label": "Logo",
+          "info": "Leave empty to use the bundled Eden Raine ER monogram."
         },
         {
           "type": "richtext",

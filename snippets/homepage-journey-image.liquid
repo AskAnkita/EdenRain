@@ -1,14 +1,15 @@
 {%- comment -%}
   One image slot for the Homepage journey section.
 
-  A picked image wins; next a file that already sits in the theme's own assets/
-  folder, which is how the rest of this shop seeds its defaults; then the plain
-  URL field, so the homepage keeps the images it was set up with before the
-  picker existed. With none of the three, the theme placeholder keeps the layout
-  from collapsing in the editor.
+  A picked image wins; next a file named by name, which is how the rest of this
+  shop seeds its defaults and is resolved by 'image-source' against Content >
+  Files and then assets/; then the plain URL field, so the homepage keeps the
+  images it was set up with before the picker existed. With none of the three,
+  the theme placeholder keeps the layout from collapsing in the editor.
 
-  Accepts: image (image_picker), asset (string, a file name under assets/),
-  image_url (string), alt (string), placeholder (string), sizes (string), width, height.
+  Accepts: image (image_picker), asset (string, a file name in Content > Files
+  or assets/), image_url (string), alt (string), placeholder (string),
+  sizes (string), width, height.
 {%- endcomment -%}
 
 {%- liquid
@@ -24,25 +25,28 @@
   assign image_sizes = sizes | default: '(min-width: 990px) 50vw, 100vw'
 
   comment
-    A file under assets/ can go through the CDN resizer and carry a srcset; a pasted URL can
-    only be printed as it was given. They differ in src and srcset alone, so they share one img.
+    A named file can go through the CDN resizer and carry a srcset; a pasted URL can only be
+    printed as it was given. They differ in src and srcset alone, so they share one img.
   endcomment
   assign fallback_src = ''
   assign fallback_srcset = ''
-  if asset_file != blank
-    assign fallback_src = asset_file | asset_img_url: '1600x'
-    capture fallback_srcset
-      echo asset_file | asset_img_url: '480x'
-      echo ' 480w, '
-      echo asset_file | asset_img_url: '900x'
-      echo ' 900w, '
-      echo asset_file | asset_img_url: '1600x'
-      echo ' 1600w'
-    endcapture
-  elsif image_url != blank
+  if asset_file == blank and image_url != blank
     assign fallback_src = image_url | escape
   endif
 -%}
+
+{%- comment -%}
+  The named file is resolved out here rather than in the block above, because `render` is the
+  only thing that reads Content > Files and the `liquid` tag cannot call it.
+{%- endcomment -%}
+{%- if asset_file != blank -%}
+  {%- capture fallback_src -%}
+    {%- render 'image-source', file: asset_file, width: 1600 -%}
+  {%- endcapture -%}
+  {%- capture fallback_srcset -%}
+    {%- render 'image-source', file: asset_file, width: 480 %} 480w, {% render 'image-source', file: asset_file, width: 900 %} 900w, {% render 'image-source', file: asset_file, width: 1600 %} 1600w
+  {%- endcapture -%}
+{%- endif -%}
 
 {%- if image != blank -%}
   {%- assign image_alt = alt | default: image.alt | default: '' -%}

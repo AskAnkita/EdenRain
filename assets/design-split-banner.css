@@ -29,6 +29,7 @@
   --dsp-shell-max: 1480px;
   --dsp-media-width: 420px;
   --dsp-media-gap: 48px;
+  --dsp-media-stone-gap: 0px;
   --dsp-measure: 38ch;
 
   --dsp-pad-inline: 4rem;
@@ -77,6 +78,22 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, var(--dsp-media-width)) minmax(0, 1fr);
   align-items: center;
   gap: var(--dsp-media-gap);
+}
+
+/* A single Design Studio route pairs its copy with the image in a balanced two-column band. */
+.ds-split--single .dsp-grid {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+
+.ds-split--single .dsp-col {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.ds-split--single .dsp-media {
+  width: 100%;
+  max-width: min(560px, 100%);
+  justify-self: end;
 }
 
 .dsp-col {
@@ -143,12 +160,46 @@
   display: flex;
   justify-content: center;
   min-width: 0;
+  position: relative;
 }
 
 .dsp-media img {
   display: block;
   width: 100%;
   height: auto;
+}
+
+/*
+  The floating stone hangs off the top of this box, so the setting is pushed down by the gap
+  rather than the stone being lifted: the stone keeps the travel its animation is drawn for.
+  Only the direct child is moved - the stone's own img is nested a level deeper.
+*/
+.dsp-media > img,
+.dsp-media > svg {
+  margin-top: var(--dsp-media-stone-gap);
+}
+
+.dsp-media__stone {
+  position: absolute;
+  z-index: 1;
+  top: -4%;
+  left: 50%;
+  width: 26%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  animation: dsp-stone-jump 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.dsp-media__stone img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@keyframes dsp-stone-jump {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -22px); }
 }
 
 /* Shots photographed on white keep no white box of their own on the band */
@@ -196,6 +247,10 @@
     justify-items: center;
   }
 
+  .ds-split--single .dsp-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .dsp-media {
     order: -1;
     max-width: min(var(--dsp-media-width), 78vw);
@@ -204,10 +259,27 @@
   .dsp-col {
     max-width: 46rem;
   }
+
+  .ds-split--single .dsp-col {
+    order: 0;
+    width: 100%;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .ds-split--single .dsp-media {
+    order: 1;
+    max-width: min(560px, 88vw);
+    justify-self: center;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .dsp-media img {
     transition: none;
+  }
+
+  .dsp-media__stone {
+    animation: none;
   }
 }

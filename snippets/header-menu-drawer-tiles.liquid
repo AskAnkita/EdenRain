@@ -143,8 +143,8 @@
                   {%- endcomment -%}
                   <img
                     class="menu-drawer-desktop__tile-placeholder{% if shape_tile %} menu-drawer-desktop__tile-placeholder--shape{% endif %}"
-                    src="{{ placeholder_asset | asset_img_url: '400x' }}"
-                    srcset="{{ placeholder_asset | asset_img_url: '400x' }} 400w, {{ placeholder_asset | asset_img_url: '600x' }} 600w"
+                    src="{% render 'image-source', file: placeholder_asset, width: 400 %}"
+                    srcset="{% render 'image-source', file: placeholder_asset, width: 400 %} 400w, {% render 'image-source', file: placeholder_asset, width: 600 %} 600w"
                     sizes="180px"
                     alt="{{ item_title | escape }}"
                     width="400"

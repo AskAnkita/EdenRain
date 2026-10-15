@@ -1,0 +1,210 @@
+/*
+  Consultation banner - one photograph of the room, and beside it the invitation to book time
+  in it. The section is sections/consultation-banner.liquid.
+
+  The band is a 50/50 split at desktop: the picture runs edge to edge and full height on one
+  side, the copy sits on a flat panel on the other. Below 750px the picture goes on top and the
+  copy underneath it, so neither is cropped to nothing on a phone.
+
+  Every look here is a custom property with its default written in this file, so a setting left
+  at "use the default" (a cleared colour, a size of 0) writes nothing onto the section element
+  and this value stands.
+*/
+
+.eden-consult {
+  --ecb-section-bg: #ffffff;
+  --ecb-panel-bg: #ffffff;
+  --ecb-heading-color: #171714;
+  --ecb-text-color: rgba(23, 23, 20, 0.72);
+  --ecb-mode-color: #171714;
+  --ecb-icon-color: #171714;
+  --ecb-divider-color: rgba(23, 23, 20, 0.22);
+
+  --ecb-heading-size: 48px;
+  --ecb-heading-size-mobile: 32px;
+  --ecb-heading-tracking: 0.01em;
+  --ecb-heading-case: none;
+  --ecb-mode-size: 15px;
+  --ecb-text-size: 17px;
+  --ecb-icon-size: 28px;
+  --ecb-measure: 44ch;
+
+  --ecb-shell-max: none;
+  --ecb-media-share: 50%;
+  --ecb-media-height: 520px;
+  --ecb-media-ratio: 4 / 3;
+  --ecb-pad-inline: 6rem;
+  --ecb-pad-block: 6rem;
+  --ecb-pad-top: 0px;
+  --ecb-pad-bottom: 0px;
+  --ecb-pad-top-mobile: 0px;
+  --ecb-pad-bottom-mobile: 0px;
+
+  display: block;
+  background: var(--ecb-section-bg);
+  padding-block: var(--ecb-pad-top-mobile) var(--ecb-pad-bottom-mobile);
+}
+
+.ecb-shell {
+  width: 100%;
+  max-width: var(--ecb-shell-max);
+  margin: 0 auto;
+}
+
+.ecb-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* ------------------------------------------------------------------- media */
+
+/*
+  On a phone the picture is held to a ratio; from 750px it stops being a shape of its own and
+  simply fills its half of the band, however tall the copy beside it turns out to be.
+*/
+.ecb-media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--ecb-media-ratio);
+  background: rgba(23, 23, 20, 0.06);
+}
+
+.ecb-media :is(img, svg) {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ------------------------------------------------------------------- panel */
+
+.ecb-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2.8rem;
+  background: var(--ecb-panel-bg);
+  padding: var(--ecb-pad-block) var(--ecb-pad-inline);
+  text-align: left;
+}
+
+.eden-consult--centred .ecb-panel {
+  align-items: center;
+  text-align: center;
+}
+
+/* The row of ways to meet, each one divided from the last by a hairline rule. */
+.ecb-modes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.2rem 2.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ecb-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--ecb-mode-color);
+  font-size: var(--ecb-mode-size);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.ecb-mode + .ecb-mode {
+  padding-inline-start: 2.4rem;
+  border-inline-start: 1px solid var(--ecb-divider-color);
+}
+
+.ecb-mode__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: var(--ecb-icon-size);
+  height: var(--ecb-icon-size);
+  color: var(--ecb-icon-color);
+}
+
+.ecb-mode__icon :is(svg, img) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ecb-heading {
+  margin: 0;
+  color: var(--ecb-heading-color);
+  font-family: var(--font-heading--family);
+  font-size: var(--ecb-heading-size-mobile);
+  font-weight: 400;
+  letter-spacing: var(--ecb-heading-tracking);
+  line-height: 1.08;
+  text-transform: var(--ecb-heading-case);
+}
+
+.ecb-text {
+  max-width: var(--ecb-measure);
+  margin: 0;
+  color: var(--ecb-text-color);
+  font-size: var(--ecb-text-size);
+  line-height: 1.6;
+}
+
+.ecb-text > :first-child {
+  margin-top: 0;
+}
+
+.ecb-text > :last-child {
+  margin-bottom: 0;
+}
+
+.ecb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.6rem 2.4rem;
+  margin-top: 0.8rem;
+}
+
+/* ----------------------------------------------------------------- desktop */
+
+@media screen and (min-width: 750px) {
+  .eden-consult {
+    padding-block: var(--ecb-pad-top) var(--ecb-pad-bottom);
+  }
+
+  .ecb-grid {
+    grid-template-columns: var(--ecb-media-share) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .ecb-media {
+    aspect-ratio: auto;
+    min-height: var(--ecb-media-height);
+  }
+
+  /*
+    With the picture on the right the two cells swap column rather than source order, so the
+    copy still comes first for a screen reader and first in the stack on a phone.
+  */
+  .eden-consult--media-right .ecb-grid {
+    grid-template-columns: minmax(0, 1fr) var(--ecb-media-share);
+  }
+
+  .eden-consult--media-right .ecb-media {
+    grid-area: 1 / 2;
+  }
+
+  .eden-consult--media-right .ecb-panel {
+    grid-area: 1 / 1;
+  }
+
+  .ecb-heading {
+    font-size: var(--ecb-heading-size);
+  }
+}

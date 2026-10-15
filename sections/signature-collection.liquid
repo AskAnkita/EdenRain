@@ -1058,7 +1058,17 @@
           if tile_image != blank
             assign tile_poster = tile_image | image_url: width: 1400
           elsif tile_asset != blank
-            assign tile_poster = tile_asset | asset_img_url: '1400x'
+            comment
+              The same order 'image-source' uses, inlined because `render` cannot be called
+              from inside a `liquid` tag: Content > Files, where the photography lives, and
+              then assets/ for a name that has not been moved across.
+            endcomment
+            assign tile_asset_in_files = images[tile_asset]
+            if tile_asset_in_files != blank
+              assign tile_poster = tile_asset_in_files | image_url: width: 1400
+            else
+              assign tile_poster = tile_asset | asset_img_url: '1400x'
+            endif
           elsif tile_image_url != blank
             assign tile_poster = tile_image_url
           elsif tile_video != blank
@@ -1270,8 +1280,8 @@
           {%- comment -%} A tile fills a third of a row at most, so the original is never what gets served. {%- endcomment -%}
           <img
             class="signature-editorial__image"
-            src="{{ tile_asset | asset_img_url: '900x' }}"
-            srcset="{{ tile_asset | asset_img_url: '400x' }} 400w, {{ tile_asset | asset_img_url: '600x' }} 600w, {{ tile_asset | asset_img_url: '900x' }} 900w, {{ tile_asset | asset_img_url: '1400x' }} 1400w"
+            src="{% render 'image-source', file: tile_asset, width: 900 %}"
+            srcset="{% render 'image-source', file: tile_asset, width: 400 %} 400w, {% render 'image-source', file: tile_asset, width: 600 %} 600w, {% render 'image-source', file: tile_asset, width: 900 %} 900w, {% render 'image-source', file: tile_asset, width: 1400 %} 1400w"
             sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
             alt="{{ tile_alt | escape }}"
             width="1200"
@@ -1422,7 +1432,7 @@
 
     { "type": "header", "content": "Images" },
     { "type": "image_picker", "id": "default_image", "label": "Fallback image", "info": "Used by any tile with no image of its own." },
-    { "type": "text", "id": "default_image_asset", "label": "Fallback image file name", "info": "A file in the theme's assets folder. Only used when no fallback image is picked." },
+    { "type": "text", "id": "default_image_asset", "label": "Fallback image file name", "info": "A file name in Content > Files (or assets/). Only used when no fallback image is picked." },
 
     { "type": "header", "content": "Section layout" },
     { "type": "color", "id": "section_background", "label": "Section background", "default": "rgba(0,0,0,0)" },
@@ -1447,7 +1457,7 @@
 
         { "type": "header", "content": "Image" },
         { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "image_asset", "label": "Image file name (fallback)", "info": "A file already in the theme's assets folder, e.g. style-halo-hover.jpg. Only used when no image is picked." },
+        { "type": "text", "id": "image_asset", "label": "Image file name (fallback)", "info": "A file name in Content > Files (or assets/), e.g. style-halo-hover.jpg. Only used when no image is picked." },
         { "type": "text", "id": "image_url", "label": "Image URL (fallback)", "info": "Only used when neither of the two above is set." },
         { "type": "text", "id": "image_alt", "label": "Image alt text" },
         { "type": "range", "id": "image_scale", "label": "Image zoom", "min": 100, "max": 220, "step": 5, "unit": "%", "default": 100, "info": "Zooms out from the side chosen below, which is how a centred product shot is pushed clear of the text." },

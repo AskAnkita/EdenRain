@@ -2,7 +2,8 @@
   Line icon for one route into the Design Studio, drawn in the same weight as the diamond cuts
   in 'icon-diamond-shape' so the two read as one set.
 
-  @param {string} icon - "ring" (a setting with its stone above it) or "stone" (a loose diamond)
+  @param {string} icon - "ring" (a setting with its stone above it), "stone" (a loose diamond)
+    or "chat" (a stone inside a speech bubble, for the route that ends with a person)
 {%- enddoc -%}
 
 <svg
@@ -24,5 +25,9 @@
     {%- when 'stone' -%}
       <path d="M6.9 4.1h10.2l4.2 5.6L12 20.4 2.7 9.7z"/>
       <path d="M2.7 9.7h18.6M6.9 4.1l2.7 5.6L12 20.4l2.4-10.7 2.7-5.6"/>
+    {%- when 'chat' -%}
+      <path d="M3 4.6h18v11.2h-7.4L9 19.8v-4H3z"/>
+      <path d="M10 8h4l1.4 1.9L12 13.4 8.6 9.9z"/>
+      <path d="M8.6 9.9h6.8M10 8l2 5.4L14 8"/>
   {%- endcase -%}
 </svg>

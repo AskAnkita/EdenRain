@@ -230,6 +230,70 @@ page's current body is saved to `backups/` before either script writes.
 The dev server caches page content, so a guide can still look empty after a run — reload with a
 query string (`?x=1`) to see it.
 
+## The photographs live in Content > Files, not in assets/
+
+`assets/` was 62 MB, and 38 MB of that was photography: category tiles, the mega menu's cards and
+tiles, the lifestyle shots, the Design Studio's stone renders, the skin tone previews. A picture
+sitting in the theme has to be deployed to be changed, it counts against the theme's own file
+budget, and it is copied into every duplicate of the theme. So the photography was moved into
+Content > Files and the theme now reads it from there.
+
+```bash
+node scripts/shopify/upload-theme-images.mjs                  # preview: what would be uploaded
+node scripts/shopify/upload-theme-images.mjs --apply          # upload anything not already there
+node scripts/shopify/upload-theme-images.mjs --verify         # check every one resolves in Files
+node scripts/shopify/upload-theme-images.mjs --apply --prune  # ...then delete the assets/ copies
+node scripts/shopify/upload-theme-images.mjs --apply a.png    # just the files named
+```
+
+The list of which pictures belong in Files is `DEFAULT_FILES` at the top of the script, grouped by
+what uses them. A file of the same name already up there is reused rather than uploaded twice, so
+re-running costs almost nothing.
+
+**Nothing is pruned unless every file in the run verified.** A URL counts as verified only when it
+is on Shopify's CDN, still carries the exact file name the theme asks for, and answers a HEAD
+request. That last pair of checks matter: a processing poll that times out hands back the staged
+Google Storage URL rather than a CDN one, and a name Shopify had to change because something was
+already called that would leave the theme's reference resolving to nothing. Either one is reported
+and stops the prune.
+
+### How the theme resolves a name
+
+Every photograph goes through `snippets/image-source.liquid`:
+
+```liquid
+src="{% render 'image-source', file: tile_asset, width: 900 %}"
+```
+
+It tries `images[name]`, which is Content > Files, and falls back to `asset_img_url` for a name
+still in `assets/`. Two reasons for the fallback rather than Files alone. Several of the settings
+that reach it are free text a merchant types — "Hand photo file name", "Image file name
+(fallback)" — and their help text pointed at the assets folder for as long as the pictures were
+there, so a name typed before the move still has to resolve. And a picture dropped into `assets/`
+during development works straight away, without an upload first.
+
+Three places inline the same two-step lookup instead of calling the snippet, because `render`
+cannot be called from inside a `{% liquid %}` tag: `blocks/image.liquid`,
+`sections/signature-collection.liquid` (the video poster) and
+`snippets/header-menu-drawer-featured.liquid`.
+
+### What deliberately stays in assets/
+
+- every `icon-*.svg`, `mask-arch.svg`, `square.svg`, `loading-spinner.svg` — `inline_asset_content`
+  reads the theme, not Files.
+- `eden-raine-logo*.png`, `-icon*.png`, `-monogram.png`, `-favicon.png` — the brand marks. 116 KB
+  in total, on every page, and a logo that can go missing from the admin is a bad trade.
+- `icon-flag.png`, `icon-flag-2x.png`, `sparkle.gif` — named by `url()` inside
+  `assets/icon-flag.css` and `assets/base.css`. A `.css` file is not Liquid, so it cannot call
+  `file_url`; pointing it at Files would mean pasting a versioned CDN URL into the stylesheet.
+
+### Source pictures that were never theme assets
+
+`scripts/images/page-sources/` holds pictures that are only ever an *input* to a script — the three
+gemstone photographs `update-gemstones-page.mjs` puts in a page body, and the hand pose
+`add-product-media.mjs` attaches to a product. They were in `assets/`, which pushed 3.6 MB to the
+theme for nothing, since the theme never renders them. `.shopifyignore` excludes `scripts/*`.
+
 ## Redirects: the broken ones and the missing ones
 
 A redirect into a dead page is worse than no redirect: the visitor still loses, and a search

@@ -1,0 +1,239 @@
+{%- liquid
+  assign image = section.settings.image
+  assign mobile_image = section.settings.mobile_image | default: image
+-%}
+
+<section
+  id="gifting-banner-{{ section.id }}"
+  class="gifting-banner"
+  style="
+    --gifting-background: {{ section.settings.background_color }};
+    --gifting-ink: {{ section.settings.text_color }};
+    --gifting-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --gifting-height: {{ section.settings.desktop_height }}px;
+    --gifting-height-mobile: {{ section.settings.mobile_height }}px;
+    --gifting-content-width: {{ section.settings.content_width }}px;
+    --gifting-padding-top: {{ section.settings.padding_top }}px;
+    --gifting-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  {%- if image != blank -%}
+    <div class="gifting-banner__media" aria-hidden="true">
+      <picture>
+        {%- if mobile_image != blank -%}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {{ mobile_image | image_url: width: 750 }} 750w,
+              {{ mobile_image | image_url: width: 1100 }} 1100w
+            "
+            sizes="100vw"
+          >
+        {%- endif -%}
+        {{
+          image
+          | image_url: width: 2400
+          | image_tag:
+            loading: 'lazy',
+            widths: '750, 1100, 1500, 1800, 2200, 2400',
+            sizes: '100vw',
+            alt: '',
+            class: 'gifting-banner__image'
+        }}
+      </picture>
+    </div>
+  {%- else -%}
+    <div class="gifting-banner__media" aria-hidden="true">
+      <img
+        class="gifting-banner__image"
+        src="{% render 'image-source', file: 'gifting-banner-background.jpg', width: 2042 %}"
+        alt=""
+        loading="lazy"
+        width="2042"
+        height="770"
+      >
+    </div>
+  {%- endif -%}
+
+  <div class="gifting-banner__content">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="gifting-banner__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+    {%- if section.settings.heading != blank -%}
+      <h2 class="gifting-banner__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+    {%- if section.settings.text != blank -%}
+      <div class="gifting-banner__text rte">{{ section.settings.text }}</div>
+    {%- endif -%}
+    {%- if section.settings.button_label != blank -%}
+      <a
+        class="gifting-banner__button"
+        {% if section.settings.button_link != blank %}
+          href="{{ section.settings.button_link }}"
+        {% else %}
+          role="link" aria-disabled="true"
+        {% endif %}
+      >
+        {{ section.settings.button_label | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+
+{%- style -%}
+  #gifting-banner-{{ section.id }} {
+    position: relative;
+    display: grid;
+    min-height: var(--gifting-height);
+    overflow: hidden;
+    place-items: center;
+    isolation: isolate;
+    padding: var(--gifting-padding-top) 24px var(--gifting-padding-bottom);
+    background:
+      radial-gradient(ellipse at 50% 48%, rgba(255, 252, 247, 0.82), rgba(239, 231, 222, 0.18) 56%, transparent 76%),
+      var(--gifting-background);
+    color: var(--gifting-ink);
+  }
+
+  #gifting-banner-{{ section.id }}::after {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: rgba(239, 231, 222, var(--gifting-overlay));
+    content: '';
+  }
+
+  #gifting-banner-{{ section.id }} .gifting-banner__media,
+  #gifting-banner-{{ section.id }} .gifting-banner__media picture,
+  #gifting-banner-{{ section.id }} .gifting-banner__image {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  #gifting-banner-{{ section.id }} .gifting-banner__image {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  #gifting-banner-{{ section.id }} .gifting-banner__content {
+    display: flex;
+    width: min(100%, var(--gifting-content-width));
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  #gifting-banner-{{ section.id }} .gifting-banner__eyebrow {
+    margin: 0 0 18px;
+    font-family: var(--font-body--family);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  #gifting-banner-{{ section.id }} .gifting-banner__heading {
+    max-width: 100%;
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-size: clamp(38px, 4.7vw, 68px);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: 0.015em;
+    text-wrap: balance;
+  }
+
+  #gifting-banner-{{ section.id }} .gifting-banner__text {
+    max-width: 600px;
+    margin-top: 22px;
+    font-family: var(--font-body--family);
+    font-size: clamp(14px, 1.15vw, 17px);
+    font-weight: 400;
+    line-height: 1.65;
+    letter-spacing: 0.08em;
+  }
+
+  #gifting-banner-{{ section.id }} .gifting-banner__text p { margin: 0; }
+
+  #gifting-banner-{{ section.id }} .gifting-banner__button {
+    display: inline-flex;
+    min-width: 190px;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30px;
+    padding: 12px 28px;
+    border: 1px solid currentColor;
+    color: inherit;
+    font-family: var(--font-body--family);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background-color 180ms ease, color 180ms ease;
+  }
+
+  #gifting-banner-{{ section.id }} .gifting-banner__button:hover {
+    background-color: var(--gifting-ink);
+    color: var(--gifting-background);
+  }
+
+  @media screen and (max-width: 749px) {
+    #gifting-banner-{{ section.id }} {
+      min-height: var(--gifting-height-mobile);
+      padding-right: 22px;
+      padding-left: 22px;
+    }
+
+    #gifting-banner-{{ section.id }} .gifting-banner__eyebrow {
+      margin-bottom: 14px;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+    }
+
+    #gifting-banner-{{ section.id }} .gifting-banner__heading {
+      font-size: clamp(34px, 10vw, 52px);
+      letter-spacing: 0.01em;
+    }
+
+    #gifting-banner-{{ section.id }} .gifting-banner__text {
+      margin-top: 17px;
+      font-size: 13px;
+      letter-spacing: 0.045em;
+    }
+
+    #gifting-banner-{{ section.id }} .gifting-banner__button { margin-top: 24px; }
+  }
+{%- endstyle -%}
+
+{% schema %}
+{
+  "name": "Gifting banner",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Desktop image" },
+    { "type": "image_picker", "id": "mobile_image", "label": "Mobile image (optional)" },
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "A thoughtful way to celebrate" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Made to be worn, and loved, for a lifetime." },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Mark the moments that matter with a piece they will love for years to come.</p>" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Explore the collection" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#e8dfd5" },
+    { "type": "color", "id": "text_color", "label": "Text colour", "default": "#191614" },
+    { "type": "range", "id": "overlay_opacity", "label": "Image wash", "min": 0, "max": 70, "step": 5, "unit": "%", "default": 15 },
+    { "type": "range", "id": "desktop_height", "label": "Desktop height", "min": 300, "max": 760, "step": 20, "unit": "px", "default": 500 },
+    { "type": "range", "id": "mobile_height", "label": "Mobile height", "min": 360, "max": 720, "step": 20, "unit": "px", "default": 500 },
+    { "type": "range", "id": "content_width", "label": "Content width", "min": 420, "max": 1100, "step": 20, "unit": "px", "default": 760 },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 40 }
+  ],
+  "presets": [{ "name": "Gifting banner" }]
+}
+{% endschema %}

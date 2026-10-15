@@ -20893,111 +20893,6 @@ footer.section-footer .email-signup__input {
 }
 }
 
-/* Homepage editorial feature: image left, centered story content right. */
-#shopify-section-section_87hr6F .section-content-wrapper {
-  align-items: stretch !important;
-  gap: 40px !important;
-  max-width: 1800px;
-  margin-inline: auto;
-}
-
-#shopify-section-section_87hr6F .section-content-wrapper > .image-block,
-#shopify-section-section_87hr6F .section-content-wrapper > .group-block {
-  flex: 1 1 calc(50% - 20px) !important;
-  width: calc(50% - 20px) !important;
-  max-width: calc(50% - 20px) !important;
-}
-
-#shopify-section-section_87hr6F .section-content-wrapper > .image-block {
-  aspect-ratio: 1.2 / 1;
-  overflow: hidden;
-  border-radius: 4px;
-  background: url('./editorial-stella-placeholder-desktop.png') center / cover no-repeat;
-}
-
-#shopify-section-section_87hr6F .image-block__image {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  opacity: 0;
-}
-
-#shopify-section-section_87hr6F .group-block-content {
-  width: 100%;
-  height: 100%;
-  padding: 48px 64px;
-  align-items: center !important;
-  justify-content: center !important;
-  text-align: center;
-}
-
-#shopify-section-section_87hr6F .group-block-content h2 {
-  max-width: 620px;
-  margin-inline: auto;
-  font-family: var(--font-heading--family);
-  font-size: 46px;
-  font-weight: 400;
-  line-height: 1.15;
-  letter-spacing: 2px;
-}
-
-#shopify-section-section_87hr6F .group-block-content .rte p {
-  max-width: 620px;
-  margin-inline: auto;
-  font-family: var(--font-body--family);
-  font-size: 17px;
-  line-height: 1.6;
-  letter-spacing: 0;
-}
-
-#shopify-section-section_87hr6F .group-block-content .button {
-  width: auto !important;
-  min-width: 248px !important;
-  min-height: 58px;
-  padding: 14px 28px !important;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  font-size: 15px;
-  letter-spacing: 1px;
-}
-
-@media screen and (max-width: 989px) {
-  #shopify-section-section_87hr6F .section-content-wrapper {
-    flex-direction: column !important;
-    gap: 28px !important;
-  }
-
-  #shopify-section-section_87hr6F .section-content-wrapper > .image-block,
-  #shopify-section-section_87hr6F .section-content-wrapper > .group-block {
-    flex-basis: auto !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  #shopify-section-section_87hr6F .section-content-wrapper > .image-block {
-    aspect-ratio: 1 / 1;
-    background-image: url('./editorial-stella-placeholder-mobile.png');
-  }
-
-  #shopify-section-section_87hr6F .group-block-content {
-    padding: 24px 16px 12px;
-  }
-
-  #shopify-section-section_87hr6F .group-block-content h2 {
-    font-size: 32px;
-    line-height: 1.2;
-  }
-
-  #shopify-section-section_87hr6F .group-block-content .rte p {
-    font-size: 15px;
-  }
-
-  #shopify-section-section_87hr6F .group-block-content .button {
-    min-width: 220px !important;
-    min-height: 52px;
-  }
-}
-
 /* A linked group (e.g. a sub-collection tile) pointing at the page being viewed */
 .group-block:has(> .group-block__link[aria-current='page']) {
   outline: 1px solid var(--color-foreground, #000);
@@ -21393,6 +21288,92 @@ footer.section-footer .email-signup__input {
   margin-right: auto;
   width: 100%;
   max-width: min(280px, calc(100% - 40px));
+}
+
+/* Carousel arrows pinned to the top right of the section, level with the
+   heading, instead of sitting under the slides. featured-collection.liquid
+   renders a second pair inside .section-global__header and marks the section
+   .arrow-on-header; global.js hands Swiper those buttons, and the rule further
+   up this file hides the pair that still sits inside the carousel.
+
+   The wrap is taken out of flow so a centred heading stays centred under it. */
+.collection.arrow-on-header .section-global__header {
+  position: relative;
+}
+
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2.4rem;
+  width: auto;
+  height: auto;
+  margin: 0;
+  z-index: 2;
+}
+
+/* The buttons are laid out by the flex row above, so the left/right insets
+   Swiper gives .swiper-button-prev and .swiper-button-next are cleared --
+   .swiper-btns-on-header leaves them position: relative, where those insets
+   still shift each button inwards and the two end up on top of each other.
+
+   Everything the theme draws around the glyph goes with them: the disc, the
+   border, the hover fill and the rounded corner. What is left is a black
+   chevron that fades when the carousel runs out of slides that way. */
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button {
+  inset: auto;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+  color: var(--color-foreground);
+  cursor: pointer;
+}
+
+/* The disc is painted on a pseudo-element, not the button's own background, and
+   that pseudo-element is the only thing the theme's hover rule repaints. Taking
+   it out removes the disc and the hover with it. */
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button::before,
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button::after {
+  display: none;
+}
+
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button:hover,
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button:focus-visible {
+  background: none;
+  box-shadow: none;
+  color: var(--color-foreground);
+}
+
+/* The caret ships pointing down and component-slider.css turns it a quarter
+   turn each way, so the box stays upright while the glyph reads < and >. */
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button .icon {
+  width: 1.4rem;
+  height: auto;
+}
+
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button .fill-bg {
+  display: none;
+}
+
+/* !important only to outrank the theme's own .swiper-btns-on-header rules
+   further up, which force every header arrow to opacity 1, then 0.5 when
+   disabled. */
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button.swiper-button-disabled {
+  opacity: 0.25 !important;
+  pointer-events: none;
 }
 
 /* ==================================================================

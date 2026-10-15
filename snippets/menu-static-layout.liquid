@@ -17,8 +17,13 @@
 {%- liquid
   assign parent_key = parent | handle
 
+  comment
+    Every drawer menu is drawn this way now: the panels differ only in the columns they list,
+    which 'header-menu-drawer-links' sets per menu. The tabs-and-tiles panel below it in
+    'header-menu-drawer-panel' is what a menu falls back to when it isn't named here.
+  endcomment
   case parent_key
-    when 'engagement'
+    when 'engagement' or 'wedding' or 'diamonds' or 'jewellery' or 'jewelry'
       echo 'links'
   endcase
 -%}

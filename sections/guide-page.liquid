@@ -322,11 +322,11 @@
         }}
       {%- elsif hero_asset != blank -%}
         <img
-          src="{{ hero_asset | asset_img_url: '2400x' }}"
+          src="{% render 'image-source', file: hero_asset, width: 2400 %}"
           srcset="
-            {{ hero_asset | asset_img_url: '900x' }} 900w,
-            {{ hero_asset | asset_img_url: '1600x' }} 1600w,
-            {{ hero_asset | asset_img_url: '2400x' }} 2400w
+            {% render 'image-source', file: hero_asset, width: 900 %} 900w,
+            {% render 'image-source', file: hero_asset, width: 1600 %} 1600w,
+            {% render 'image-source', file: hero_asset, width: 2400 %} 2400w
           "
           sizes="{{ media_sizes }}"
           alt="{{ heading | escape }}"
@@ -493,10 +493,10 @@
                         }}
                       {%- else -%}
                         <img
-                          src="{{ picture_asset | asset_img_url: '900x' }}"
+                          src="{% render 'image-source', file: picture_asset, width: 900 %}"
                           srcset="
-                            {{ picture_asset | asset_img_url: '450x' }} 450w,
-                            {{ picture_asset | asset_img_url: '900x' }} 900w
+                            {% render 'image-source', file: picture_asset, width: 450 %} 450w,
+                            {% render 'image-source', file: picture_asset, width: 900 %} 900w
                           "
                           sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
                           alt="{{ title | escape }}"
@@ -1064,7 +1064,7 @@
           "info": "Used only when the shared image is empty and no fallback image is chosen above."
         },
         { "type": "image_picker", "id": "hero_image", "label": "Banner image", "info": "Optional wide image for this guide's top banner. Falls back to its card image." },
-        { "type": "text", "id": "hero_image_asset", "label": "Banner image file name", "info": "A file under assets/, used only when no banner image is selected." },
+        { "type": "text", "id": "hero_image_asset", "label": "Banner image file name", "info": "A file name in Content > Files (or assets/), used only when no banner image is selected." },
         { "type": "checkbox", "id": "hero_use_page_image", "label": "Use the first image from this guide's page content", "default": false, "info": "Useful when the guide already has a topic-specific image in its content." },
         { "type": "url", "id": "link", "label": "Link" },
         { "type": "text", "id": "link_label", "label": "Link text", "default": "Read the guide" }

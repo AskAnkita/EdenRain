@@ -1,0 +1,40 @@
+{%- doc -%}
+  A CDN URL for one of the theme's own photographs, named by its file name.
+
+  The photographs live in Content > Files, not in assets/: a picture up there can be replaced in
+  the admin without a theme deploy, and it does not spend the theme's file budget, which 38 MB of
+  photography was doing. `scripts/shopify/upload-theme-images.mjs` is what puts them there and
+  holds the list of which ones.
+
+  Files is tried first and assets/ second, rather than only Files, for two reasons. Several of the
+  settings that reach here are free text a merchant types - "Hand photo file name", "Fallback
+  picture" - and their help text pointed at the assets folder for as long as the pictures were
+  there, so a name typed before the move still has to resolve. And a picture added to assets/
+  from now on keeps working without having to be uploaded first, which keeps the dev loop quick.
+
+  Width is the width in pixels, as a number, not a size string. Shopify's CDN resizes to it, so
+  pass the width the slot actually needs and give the same file several widths for a srcset:
+
+    src="{% render 'image-source', file: tile_asset, width: 900 %}"
+    srcset="{% render 'image-source', file: tile_asset, width: 450 %} 450w,
+            {% render 'image-source', file: tile_asset, width: 900 %} 900w"
+
+  Nothing is echoed when the name matches neither place, so the caller's `src` comes out empty
+  rather than pointing at a 404.
+
+  @param {string} file - the file name, e.g. 'category-rings.png'
+  @param {number} width - the width in pixels to resize to
+{%- enddoc -%}
+{%- liquid
+  assign source_name = file | strip
+
+  if source_name != blank
+    assign in_files = images[source_name]
+    if in_files != blank
+      echo in_files | image_url: width: width
+    else
+      assign asset_size = width | append: 'x'
+      echo source_name | asset_img_url: asset_size
+    endif
+  endif
+-%}

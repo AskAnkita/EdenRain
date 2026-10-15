@@ -265,7 +265,7 @@
                   <label for="{{ choice_id }}">
                     {%- if block.settings.style == 'shapes' and choice_value != blank -%}
                       <img
-                        src="{{ choice_value | asset_url }}"
+                        src="{% render 'image-source', file: choice_value, width: 120 %}"
                         alt=""
                         loading="lazy"
                         width="60"
@@ -351,7 +351,7 @@
 
     { "type": "header", "content": "The viewer", "info": "Add a builder's app block to this section and it fills this frame. With none, the image below is shown, and with neither, a placeholder." },
     { "type": "image_picker", "id": "stage_image", "label": "Image" },
-    { "type": "text", "id": "stage_image_asset", "label": "Image file name (fallback)", "info": "A file already in the theme's assets folder, e.g. featured-engagement-signature.jpg." },
+    { "type": "text", "id": "stage_image_asset", "label": "Image file name (fallback)", "info": "A file name in Content > Files (or assets/), e.g. featured-engagement-signature.jpg." },
     { "type": "text", "id": "stage_image_url", "label": "Image URL (fallback)" },
     { "type": "text", "id": "stage_image_alt", "label": "Image alt text", "default": "The ring you are designing" },
     { "type": "select", "id": "stage_ratio", "label": "Frame shape", "options": [ { "value": "1", "label": "Square" }, { "value": "0.85", "label": "Portrait" }, { "value": "1.2", "label": "Landscape" } ], "default": "1" },
@@ -443,7 +443,7 @@
       "name": "View thumbnail",
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "image_asset", "label": "Image file name (fallback)", "info": "A file already in the theme's assets folder." },
+        { "type": "text", "id": "image_asset", "label": "Image file name (fallback)", "info": "A file name in Content > Files (or assets/)." },
         { "type": "text", "id": "image_url", "label": "Image URL (fallback)" },
         { "type": "text", "id": "image_alt", "label": "Image alt text" }
       ]

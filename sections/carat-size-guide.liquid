@@ -266,7 +266,7 @@
     {%- if section.settings.base_image != blank -%}
       {{ section.settings.base_image | image_url: width: 1600 }}
     {%- elsif section.settings.base_image_asset != blank -%}
-      {{ section.settings.base_image_asset | asset_url }}
+      {% render 'image-source', file: section.settings.base_image_asset, width: 1600 %}
     {%- else -%}
       {{ section.settings.base_image_url }}
     {%- endif -%}
@@ -332,7 +332,7 @@
           {%- if block.settings.base_image != blank -%}
             {{ block.settings.base_image | image_url: width: 1600 }}
           {%- elsif block.settings.base_image_asset != blank -%}
-            {{ block.settings.base_image_asset | asset_url }}
+            {% render 'image-source', file: block.settings.base_image_asset, width: 1600 %}
           {%- elsif block.settings.base_image_url != blank -%}
             {{ block.settings.base_image_url }}
           {%- else -%}
@@ -374,7 +374,7 @@
               {%- if anchor_image != blank -%}
                 {{ anchor_image | image_url: width: 1400 }}
               {%- elsif anchor_asset != blank -%}
-                {{ anchor_asset | asset_url }}
+                {% render 'image-source', file: anchor_asset, width: 1400 %}
               {%- else -%}
                 {{ anchor_url }}
               {%- endif -%}
@@ -446,7 +446,7 @@
 
     { "type": "header", "content": "Fallback hand photo", "info": "Used by any shape block that has no hand photo of its own. One pose serves every shape." },
     { "type": "image_picker", "id": "base_image", "label": "Hand photo" },
-    { "type": "text", "id": "base_image_asset", "label": "Hand photo file name (fallback)", "info": "A file already in the theme's assets folder, e.g. carat-guide-hand.webp." },
+    { "type": "text", "id": "base_image_asset", "label": "Hand photo file name (fallback)", "info": "A file name in Content > Files (or assets/), e.g. carat-guide-hand.webp." },
     { "type": "text", "id": "base_image_url", "label": "Hand photo URL (fallback)", "info": "Only used when neither of the two above is set." },
 
     { "type": "header", "content": "Section layout" },

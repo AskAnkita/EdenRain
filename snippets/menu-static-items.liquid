@@ -62,12 +62,87 @@
   comment
     Shape and Stone span the whole catalogue - a round stone in a stud counts, not only in a ring -
     and both are automated on the tags 'scripts/shopify/tag-products.mjs' derives, so a new product
-    joins them on its own. Only values the shop stocks more than one of are listed; cushion,
-    emerald and asscher have a single piece each and their collections wait in store-config.mjs
-    until there is more to show.
+    joins them on its own.
+
+    The nine cuts, in the order the trade lists them rather than by how many of each the shop
+    holds: round, oval, cushion, emerald, pear, princess, radiant, marquise, asscher. It is the
+    same nine Engagement shows under By Shape, and the nine 'icon-diamond-shape' and the
+    'shape-outline-<cut>.png' drawings in assets cover, so every name in the column carries its
+    own picture. Heart, triangle, baguette and square came off the list with them: the drawings
+    exist for none of the last three, and the shop holds none of them either.
+
+    Radiant is the one that is not a collection. There is no shape-radiant yet - store-config.mjs
+    describes it now, but until `setup-store.mjs --apply --only=collections` is run it does not
+    exist, and a tile that 404s is worse than one that is a filter - so it opens the catalogue
+    with the `shape:radiant` tag filter applied, which is the same tag the collection would be
+    automated on. Swap it for shape-radiant once the collection is there.
   endcomment
-  assign shapes = '::Round|shape-round~Heart|shape-heart~Pear|shape-pear~Marquise|shape-marquise~Triangle|shape-trillion~Baguette|shape-baguette~Oval|shape-oval~Princess|shape-princess~Square|shape-square'
+  assign shapes = '::Round|shape-round~Oval|shape-oval~Cushion|shape-cushion~Emerald|shape-emerald~Pear|shape-pear~Princess|shape-princess~Radiant|/collections/all?filter.p.tag=shape:radiant~Marquise|shape-marquise~Asscher|shape-asscher'
   assign stones = '::Cubic Zirconia|stone-cubic-zirconia~Lab-Grown Diamond|stone-lab-grown-diamond~Pearl|stone-pearl~Shell & Abalone|stone-shell~Turquoise|stone-turquoise~Black Onyx|stone-onyx~Opal|stone-opal~Birthstone|stone-birthstone'
+
+  comment
+    The jewellery category lists, named once here. The desktop panel draws one column per
+    category now - Rings, Earrings, Necklaces, Bracelets, Men's, in that order
+    ('header-menu-drawer-links') - and the groups further down hand the same names back one
+    category at a time for anything that asks for a category on its own.
+  endcomment
+  assign jewellery_earrings = 'Studs|studs~Hoops & Huggies|hoops-huggies~Dangles & Drops|dangles-drops~Climbers, Jackets & Cuffs|climbers-jackets-cuffs'
+  assign jewellery_necklaces = 'Pendants|pendants~Chains|chains~Charms|charms'
+
+  comment
+    Rings has no sub-ranges of its own under Jewellery, so rather than invent names for it the
+    column lists the ring collections the other two menus are built from. Every one of these
+    exists in scripts/shopify/store-config.mjs and is reachable from Engagement or Wedding as
+    well; a ring shopper who came in through Jewellery should not have to go back out for them.
+  endcomment
+  assign jewellery_rings = 'Engagement|engagement-rings~Wedding Bands|wedding-bands~Eternity|eternity-rings~Anniversary|anniversary-rings~Stackable|stackable-rings~Promise|promise'
+
+  comment
+    Bracelets has no sub-ranges and no sub-collections either - the shop sells bracelets, not
+    bangles and tennis bracelets, and store-config.mjs leaves a category it does not stock
+    uncreated rather than empty. So instead of names that would 404, the column opens the
+    bracelet collection with a metal filter applied, on the same `metal:` tags the Metal group
+    in the filter drawer filters on ('static-filters'). These are URLs, not collections, so
+    nothing has to be created for them to work and nothing goes stale if the range changes.
+  endcomment
+  assign bracelet_metals = 'Yellow Gold|yellow-gold,White Gold|white-gold,Rose Gold|rose-gold,Sterling Silver|sterling-silver' | split: ','
+  assign jewellery_bracelets = ''
+  for bracelet_metal in bracelet_metals
+    assign bracelet_parts = bracelet_metal | split: '|'
+    unless forloop.first
+      assign jewellery_bracelets = jewellery_bracelets | append: '~'
+    endunless
+    assign jewellery_bracelets = jewellery_bracelets | append: bracelet_parts[0] | append: '|/collections/bracelets?filter.p.tag=metal:' | append: bracelet_parts[1]
+  endfor
+
+  comment
+    Men's. Rings and Engagement Rings are the two collections the store already carries under
+    that name; both are empty, but they exist, so the links land somewhere.
+
+    Bracelets opens the bracelet collection itself rather than a men's one. There is no men's
+    tag in the catalogue and no mens-bracelets collection - store-config.mjs describes one now,
+    so `setup-store.mjs --apply --only=collections` creates it - and until it is there, sending
+    the row to /collections/bracelets shows the bracelets the shop does sell instead of a 404.
+    Swap it for mens-bracelets once the collection exists and has something in it.
+  endcomment
+  assign jewellery_mens = 'Rings|mens-rings~Engagement Rings|mens-engagement-rings~Bracelets|bracelets'
+
+  comment
+    Bracelets and Rings have no sub-ranges of their own, and New In and Best Sellers are
+    listings rather than categories; "More" is the two of them together.
+  endcomment
+  assign jewellery_pieces = 'Bracelets|bracelets~Rings|rings'
+  assign jewellery_listings = 'New In|new-in~Best Sellers|best-sellers'
+  assign jewellery_more = jewellery_pieces | append: '~' | append: jewellery_listings
+
+  comment
+    The shared guide column, which any menu can ask for by the group name "Guides"
+    ('header-menu-drawer-links'). Engagement is the one that does: the other menus give that
+    column to their own options, and Diamonds has its own "Learn" list of the same kind below.
+    These are pages on the guide template, not blog articles, and only these six exist -
+    anything else here opens a 404.
+  endcomment
+  assign guides = '::Education & Guides|/pages/education-guides~Gemstones|/pages/gemstones~Jewellery Care|/pages/jewellery-care~Ring Size Guide|/pages/er-sizing~Wrist Size Guide|/pages/wrist-sizer-guide~Talk to a Designer|/pages/contact'
 
   comment
     The Jewellery lists below name what the shop actually sells. The MiaDonna-shaped ones that used
@@ -75,19 +150,16 @@
     never had, so every one of those tiles opened a 404.
   endcomment
 
-  comment
-    Engagement is the panel a shopper meets first, so its two lists below are the common settings
-    and the classic cuts only, not the whole catalogue - the full set was a wall of names to read.
-    The ones left out (Hidden Halo, Nature Inspired, Toi et Moi, Promise; Radiant, Marquise,
-    Asscher) still have their collections and are still reached from the engagement listing and
-    its filters; only the menu stops naming them.
-  endcomment
-
   case key
     when 'engagement/by-style' or 'engagement/shop-by-style'
-      echo '::Solitaire|solitaire~Halo|halo~Side Stone|side-stone~Three Stone|three-stone~Vintage|vintage~Bridal Sets|bridal-sets'
+      echo '::Solitaire|solitaire~Side Stone|side-stone~Halo|halo~Hidden Halo|hidden-halo~Three Stone|three-stone~Bridal Sets|bridal-sets~Vintage|vintage~Nature Inspired|nature-inspired~Toi et Moi|toi-et-moi~Promise|promise'
     when 'engagement/by-shape' or 'engagement/shop-by-shape'
-      echo '::Round|round-engagement-rings~Oval|oval-engagement-rings~Cushion|cushion-engagement-rings~Emerald|emerald-engagement-rings~Pear|pear-engagement-rings~Princess|princess-engagement-rings'
+      # Heart last, and the one of the ten that is not a collection: there is no
+      # heart-engagement-rings yet. store-config.mjs describes it, and until
+      # `setup-store.mjs --apply --only=collections` is run it opens the engagement rings with
+      # the `shape:heart` tag filter applied - the same tag the collection is automated on -
+      # rather than a 404. Swap it for heart-engagement-rings once the collection is there.
+      echo '::Round|round-engagement-rings~Oval|oval-engagement-rings~Cushion|cushion-engagement-rings~Emerald|emerald-engagement-rings~Pear|pear-engagement-rings~Princess|princess-engagement-rings~Radiant|radiant-engagement-rings~Marquise|marquise-engagement-rings~Asscher|asscher-engagement-rings~Heart|/collections/engagement-rings?filter.p.tag=shape:heart'
     when 'wedding/by-style' or 'wedding/womens'
       echo '::Wedding|wedding-bands~Anniversary|anniversary-rings~Eternity|eternity-rings~Plain Metal|plain-metal-wedding-bands'
       echo ';;Featured Collections::Curved|curved-wedding-bands~Stackable|stackable-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship'
@@ -97,14 +169,50 @@
       echo '::Round|round-diamonds~Oval|oval-diamonds~Emerald|emerald-diamonds~Cushion|cushion-diamonds~Marquise|marquise-diamonds~Radiant|radiant-diamonds~Pear|pear-diamonds~Princess|princess-diamonds~Asscher|asscher-diamonds~Heart|heart-diamonds'
     when 'diamonds/learn'
       echo '::Education & Guides|/pages/education-guides~Gemstones|/pages/gemstones~Ring Size Guide|/pages/er-sizing~Wrist Size Guide|/pages/wrist-sizer-guide~Jewellery Care|/pages/jewellery-care'
+    when 'jewellery/shop-jewellery' or 'jewelry/shop-jewellery'
+      comment
+        Every piece the shop sells under one heading, each category led by the category itself:
+        three headings over four names apiece left the panel reading as three short lists with
+        a hole under each. Drawn as one column split in two ('header-menu-drawer-links'), and
+        ordered so the break between the two falls between categories rather than through one:
+        the browser puts the first seven on the left, which is Earrings down to Rings.
+      endcomment
+      echo '::Earrings|earrings~'
+      echo jewellery_earrings
+      echo '~'
+      echo jewellery_pieces
+      echo '~Necklaces|necklaces~'
+      echo jewellery_necklaces
+      echo '~'
+      echo jewellery_listings
     when 'jewellery/earrings' or 'jewelry/earrings'
-      echo '::Studs|studs~Hoops & Huggies|hoops-huggies~Dangles & Drops|dangles-drops~Climbers, Jackets & Cuffs|climbers-jackets-cuffs'
+      echo '::'
+      echo jewellery_earrings
     when 'jewellery/necklaces' or 'jewelry/necklaces'
-      echo '::Pendants|pendants~Chains|chains~Charms|charms'
+      echo '::'
+      echo jewellery_necklaces
+    when 'jewellery/rings' or 'jewelry/rings'
+      echo '::'
+      echo jewellery_rings
+    when 'jewellery/bracelets' or 'jewelry/bracelets'
+      echo '::'
+      echo jewellery_bracelets
+    when 'jewellery/mens' or 'jewelry/mens'
+      # "Men's" handleizes to "mens": the apostrophe goes, as it does in "Women's" under Wedding
+      echo '::'
+      echo jewellery_mens
     when 'jewellery/shop-by-shape' or 'jewelry/shop-by-shape' or 'jewellery/by-shape'
       echo shapes
     when 'jewellery/shop-by-stone' or 'jewelry/shop-by-stone' or 'jewellery/by-stone'
       echo stones
+    when 'jewellery/more' or 'jewelry/more'
+      comment
+        Bracelets and Rings have no sub-ranges to list - the shop sells bracelets, not tennis
+        bracelets and bangles - so the text-only panel gives them a line each in a column with
+        the two featured listings rather than a column apiece with one name under it.
+      endcomment
+      echo '::'
+      echo jewellery_more
     when 'jewellery/featured' or 'jewelry/featured'
       echo '::New In|new-in~Best Sellers|best-sellers'
     else
@@ -114,6 +222,8 @@
         echo shapes
       elsif group_key == 'by-stone' or group_key == 'shop-by-stone'
         echo stones
+      elsif group_key == 'guides'
+        echo guides
       endif
   endcase
 -%}

@@ -28,7 +28,9 @@ const flag = (name, fallback) => {
 };
 
 const SKU = flag('sku', 'AJLR262');
-const IMAGE = flag('image', 'assets/pear-ring-hand-skin-tone-pose.png');
+// The pose is only ever a source for this upload, so it sits beside the script rather than in
+// assets/, which would push it to the theme for nothing.
+const IMAGE = flag('image', 'scripts/images/page-sources/pear-ring-hand-skin-tone-pose.png');
 const ALT = flag('alt', '#Jewelry material_Pear Gold');
 
 const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };

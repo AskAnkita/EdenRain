@@ -289,7 +289,7 @@
             {%- if block.settings.image != blank -%}
               {{ block.settings.image | image_url: width: 1400 }}
             {%- elsif block.settings.image_asset != blank -%}
-              {{ block.settings.image_asset | asset_url }}
+              {% render 'image-source', file: block.settings.image_asset, width: 1400 %}
             {%- else -%}
               {{ block.settings.image_url }}
             {%- endif -%}
@@ -344,7 +344,7 @@
               {%- if block.settings.image != blank -%}
                 {{ block.settings.image | image_url: width: 1400 }}
               {%- elsif block.settings.image_asset != blank -%}
-                {{ block.settings.image_asset | asset_url }}
+                {% render 'image-source', file: block.settings.image_asset, width: 1400 %}
               {%- else -%}
                 {{ block.settings.image_url }}
               {%- endif -%}
@@ -863,7 +863,7 @@
           "type": "text",
           "id": "image_asset",
           "label": "Photo from the theme's assets",
-          "info": "A file name in assets/, used when no photo is picked above."
+          "info": "A file name in Content > Files (or assets/), used when no photo is picked above."
         },
         {
           "type": "text",

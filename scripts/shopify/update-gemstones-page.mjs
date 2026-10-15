@@ -148,12 +148,19 @@ async function main() {
   log(`Found page: "${page.title}" (ID: ${page.id}, templateSuffix: "${page.templateSuffix}")`);
   log(`Current body length: ${page.body ? page.body.length : 0} characters (Blank: ${!page.body})`);
 
-  // Check asset directory for generated images
+  // The page's photographs. Three of them are only ever a source for this upload — the theme
+  // never renders them — so they live beside the script rather than in assets/, where they would
+  // be pushed to the theme for nothing. assets/ is still checked, for one the theme shares.
+  const sourceDir = resolve(repoRoot, 'scripts', 'images', 'page-sources');
   const assetDir = resolve(repoRoot, 'assets');
-  const heroLocal = resolve(assetDir, 'gemstones-hero.jpg');
-  const sapphireLocal = resolve(assetDir, 'gemstone-sapphire.jpg');
-  const emeraldLocal = resolve(assetDir, 'gemstone-emerald.jpg');
-  const rubyLocal = resolve(assetDir, 'gemstone-ruby.jpg');
+  const findLocal = (name) => {
+    const beside = resolve(sourceDir, name);
+    return existsSync(beside) ? beside : resolve(assetDir, name);
+  };
+  const heroLocal = findLocal('gemstones-hero.jpg');
+  const sapphireLocal = findLocal('gemstone-sapphire.jpg');
+  const emeraldLocal = findLocal('gemstone-emerald.jpg');
+  const rubyLocal = findLocal('gemstone-ruby.jpg');
 
   let images = {
     hero: 'https://cdn.shopify.com/s/files/1/0423/9668/0352/files/ER-lab-grown-mined-diamond_5d2e8ffa-1564-46a8-99ee-c25f98937cf3.jpg?v=1624534302',

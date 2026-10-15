@@ -125,7 +125,7 @@
                 {%- assign shape_asset = 'diamond-shape-' | append: shape_icon | append: '.png' -%}
                 <span class="mobile-facets__shape-image">
                   <img
-                    src="{{ shape_asset | asset_url }}"
+                    src="{% render 'image-source', file: shape_asset, width: 400 %}"
                     alt="{{ option_label | escape }}"
                     width="200"
                     height="200"

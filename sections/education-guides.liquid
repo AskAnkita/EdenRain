@@ -170,10 +170,10 @@
                     }}
                   {%- elsif picture_asset != blank -%}
                     <img
-                      src="{{ picture_asset | asset_img_url: '480x' }}"
+                      src="{% render 'image-source', file: picture_asset, width: 480 %}"
                       srcset="
-                        {{ picture_asset | asset_img_url: '240x' }} 240w,
-                        {{ picture_asset | asset_img_url: '480x' }} 480w
+                        {% render 'image-source', file: picture_asset, width: 240 %} 240w,
+                        {% render 'image-source', file: picture_asset, width: 480 %} 480w
                       "
                       sizes="(min-width: 750px) 15rem, 100vw"
                       alt=""
@@ -530,7 +530,7 @@
           "type": "text",
           "id": "image_asset",
           "label": "Fallback image file name",
-          "info": "A file under assets/, e.g. featured-diamonds-education.jpg. Used only when no image is chosen above, and ignored if the file is missing."
+          "info": "A file name in Content > Files (or assets/), e.g. featured-diamonds-education.jpg. Used only when no image is chosen above, and ignored if the file is missing."
         },
         {
           "type": "text",

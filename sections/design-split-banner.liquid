@@ -9,11 +9,10 @@
   two is what it is drawn for and what it caps at. A block with no heading, text or button
   still prints its icon, so an icon-only column is possible.
 
-  The picture is one slot, and an animated GIF goes in it as readily as a still: the stone
-  lifted off the setting is one piece of art, not two images stacked. It goes through
-  'homepage-journey-image' - picked image first, then a file in assets/, then a pasted URL,
-  then a placeholder - which is what keeps the band from collapsing while the products are
-  still unpublished.
+  The middle image is the open ring setting. A separate 3D stone layer floats above it and
+  changes cut on each jump. The setting goes through 'homepage-journey-image' - picked image
+  first, then a file in assets/, then a pasted URL, then a placeholder - which keeps the band
+  from collapsing while the products are still unpublished.
 
   Looks come from assets/design-split-banner.css; buttons from assets/eden-actions.css, whose
   ink is rebound here so the buttons follow this section's own button colours.
@@ -41,6 +40,7 @@
   assign icon_size = section.settings.icon_size | plus: 0
   assign media_width = section.settings.media_width | plus: 0
   assign media_gap = section.settings.media_gap | plus: 0
+  assign media_stone_gap = section.settings.media_stone_gap | plus: 0
   assign measure = section.settings.text_measure | plus: 0
   assign button_radius = section.settings.button_radius | plus: 0
   assign content_width = section.settings.content_width | plus: 0
@@ -86,6 +86,7 @@
 
   {%- if media_width > 0 -%}--dsp-media-width: {{ media_width }}px;{%- endif -%}
   {%- if media_gap > 0 -%}--dsp-media-gap: {{ media_gap }}px;{%- endif -%}
+  {%- if media_stone_gap > 0 -%}--dsp-media-stone-gap: {{ media_stone_gap }}px;{%- endif -%}
   {%- if measure > 0 -%}--dsp-measure: {{ measure }}ch;{%- endif -%}
 
   {%- if section.settings.full_width -%}
@@ -112,11 +113,29 @@
       width: 800,
       height: 1020
     -%}
+    {%- if section.settings.animate_stones -%}
+      {%- comment -%}
+        The stone renders live in Content > Files, so each URL goes through 'image-source' and
+        is captured before `json` sees it - `json` takes a string, not a tag.
+      {%- endcomment -%}
+      {%- capture stone_round %}{% render 'image-source', file: 'design-stone-round-3d.webp', width: 512 %}{% endcapture -%}
+      {%- capture stone_oval %}{% render 'image-source', file: 'design-stone-oval-3d.webp', width: 512 %}{% endcapture -%}
+      {%- capture stone_emerald %}{% render 'image-source', file: 'design-stone-emerald-3d.webp', width: 512 %}{% endcapture -%}
+      {%- capture stone_pear %}{% render 'image-source', file: 'design-stone-pear-3d.webp', width: 512 %}{% endcapture -%}
+      {%- capture stone_marquise %}{% render 'image-source', file: 'design-stone-marquise-3d.webp', width: 512 %}{% endcapture -%}
+      <div
+        class="dsp-media__stone"
+        data-stone-sources='[{{ stone_round | strip | json }},{{ stone_oval | strip | json }},{{ stone_emerald | strip | json }},{{ stone_pear | strip | json }},{{ stone_marquise | strip | json }}]'
+        aria-hidden="true"
+      >
+        <img src="{{ stone_round | strip }}" alt="" loading="eager" width="512" height="512">
+      </div>
+    {%- endif -%}
   </div>
 {%- endcapture -%}
 
 <section
-  class="ds-split{% if section.settings.blend_media %} ds-split--blend{% endif %}"
+  class="ds-split{% if section.settings.blend_media %} ds-split--blend{% endif %}{% if column_blocks.size == 1 %} ds-split--single{% endif %}"
   style="{{ section_styles | strip_newlines | strip }}"
   {{ section.shopify_attributes }}
 >
@@ -192,6 +211,32 @@
   </div>
 </section>
 
+{%- if section.settings.animate_stones -%}
+  <script>
+    (() => {
+      const sectionRoot = document.getElementById('shopify-section-{{ section.id }}');
+      const stone = sectionRoot?.querySelector('.dsp-media__stone');
+      const image = stone?.querySelector('img');
+      if (!stone || !image || stone.dataset.ready === 'true') return;
+
+      let sources;
+      try {
+        sources = JSON.parse(stone.dataset.stoneSources || '[]');
+      } catch (error) {
+        return;
+      }
+      if (sources.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      let current = 0;
+      stone.dataset.ready = 'true';
+      stone.addEventListener('animationiteration', () => {
+        current = (current + 1) % sources.length;
+        image.src = sources[current];
+      });
+    })();
+  </script>
+{%- endif -%}
+
 {% schema %}
 {
   "name": "Design split banner",
@@ -204,11 +249,12 @@
     { "type": "text", "id": "heading", "label": "Heading", "info": "With a heading here the routes below drop to h3, so the band keeps one heading order." },
 
     { "type": "header", "content": "The piece" },
-    { "type": "paragraph", "content": "One picture in the middle of the band. An animated GIF goes here as readily as a still. A picked image wins, then a file in assets\/, then a pasted URL." },
+    { "type": "paragraph", "content": "The setting image sits below a separate 3D stone that floats and changes cut on every jump. A picked image wins, then a file in assets\/, then a pasted URL." },
     { "type": "image_picker", "id": "media_image", "label": "Image or GIF" },
-    { "type": "text", "id": "media_asset", "label": "File in assets\/", "default": "featured-engagement-signature.jpg" },
+    { "type": "text", "id": "media_asset", "label": "File in assets\/", "default": "design-split-ring-setting.webp" },
     { "type": "text", "id": "media_image_url", "label": "Image URL" },
-    { "type": "text", "id": "media_alt", "label": "Alt text", "default": "A solitaire engagement ring, its stone lifted off the setting" },
+    { "type": "text", "id": "media_alt", "label": "Alt text", "default": "An open white-gold solitaire ring setting" },
+    { "type": "checkbox", "id": "animate_stones", "label": "Float and change stone cuts", "default": true },
     { "type": "checkbox", "id": "blend_media", "label": "Blend the pictures into the band", "info": "For shots photographed on white: the white drops away instead of sitting as a box on the background. Turn off for a picture with its own background.", "default": true },
 
     { "type": "header", "content": "Footnote" },
@@ -242,6 +288,7 @@
     { "type": "range", "id": "icon_size", "label": "Icon size", "min": 0, "max": 100, "step": 2, "unit": "px", "default": 0 },
     { "type": "range", "id": "media_width", "label": "Width of the piece", "min": 0, "max": 900, "step": 20, "unit": "px", "default": 0, "info": "0 keeps the default of 420px." },
     { "type": "range", "id": "media_gap", "label": "Gap either side of the piece", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 0 },
+    { "type": "range", "id": "media_stone_gap", "label": "Gap between the stone and the setting", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 28, "info": "Drops the setting image down the band so the floating stone sits clear of it instead of resting on the prongs." },
     { "type": "checkbox", "id": "full_width", "label": "Full width", "default": false },
     { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "0 keeps the default of 1480px. Ignored when the box above is ticked." },
     { "type": "range", "id": "padding_horizontal", "label": "Side padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's responsive padding." },
@@ -261,6 +308,7 @@
           "options": [
             { "value": "ring", "label": "Ring setting" },
             { "value": "stone", "label": "Diamond" },
+            { "value": "chat", "label": "Diamond in a speech bubble" },
             { "value": "none", "label": "None" }
           ],
           "default": "ring"

@@ -40,7 +40,7 @@ export const collections = [
   // Two rules, not one. `shape:round` is the shop-wide stone-shape tag — a round stud earring
   // carries it too — so these collections also require the engagement-ring type tag, or every
   // earring would turn up under Round Engagement Rings. Both tags come from tag-products.mjs.
-  ...['round', 'oval', 'cushion', 'emerald', 'pear', 'princess', 'radiant', 'marquise', 'asscher'].map((shape) => ({
+  ...['round', 'oval', 'cushion', 'emerald', 'pear', 'princess', 'radiant', 'marquise', 'asscher', 'heart'].map((shape) => ({
     handle: `${shape}-engagement-rings`,
     title: `${shape[0].toUpperCase()}${shape.slice(1)} Engagement Rings`,
     rules: [tag(`shape:${shape}`), tag('type:engagement-ring')],
@@ -74,6 +74,17 @@ export const collections = [
   { handle: 'new-in', title: 'New In' },
   { handle: 'best-sellers', title: 'Best Sellers' },
   { handle: 'ready-to-ship', title: 'Ready to Ship' },
+
+  // Men's. Both of these already existed in the store and neither was described here, which
+  // left them a prune away from deletion; the Men's column in the mega menu links to them
+  // (snippets/menu-static-items.liquid), so they are named here now. Manual, not automated:
+  // there is no men's tag, and no rule to write one from until the range is stocked.
+  { handle: 'mens-rings', title: "Men's Rings" },
+  { handle: 'mens-engagement-rings', title: "Men's Engagement Rings" },
+  // The third row of the Men's column. This one does not exist in the store yet; until it is
+  // created the menu sends that row to /collections/bracelets rather than to a 404
+  // (snippets/menu-static-items.liquid).
+  { handle: 'mens-bracelets', title: "Men's Bracelets" },
 
   // Jewelry sub-categories, shown as the tiles under Jewellery in the mega menu.
   //
@@ -109,6 +120,10 @@ export const collections = [
     ['cushion', 'Cushion'],
     ['emerald', 'Emerald'],
     ['asscher', 'Asscher'],
+    // The ninth cut the By Shape column in the mega menu lists, and the only one of the nine
+    // with no collection behind it yet. Until this is created the menu reaches radiant through
+    // the tag filter instead (snippets/menu-static-items.liquid).
+    ['radiant', 'Radiant'],
   ].map(([slug, name]) => ({ handle: `shape-${slug}`, title: `${name} Shape Jewellery`, rule: tag(`shape:${slug}`) })),
 
   // Shop by stone. Richer than shape in this catalogue, and the shape tiles lean on it: a
@@ -162,16 +177,21 @@ const metalItems = (base) =>
 
 // Shop by Shape and Shop by Stone, shared by the Jewellery panel and the drawer. Only values the
 // catalogue actually carries more than one of; see the collection list above for the rest.
+// The nine cuts, in the order the trade lists them - the same nine, in the same order, as the
+// By Shape column in the mega menu (snippets/menu-static-items.liquid) and as Engagement's own
+// Shop by Shape. Heart, triangle, baguette and square are off the list: there is no drawing for
+// the last three and no stock behind any of them. Radiant goes through the tag filter until its
+// collection is created, which is why it is the one with a url rather than a collection.
 const shapeItems = [
   { title: 'Round', collection: 'shape-round' },
-  { title: 'Heart', collection: 'shape-heart' },
-  { title: 'Pear', collection: 'shape-pear' },
-  { title: 'Marquise', collection: 'shape-marquise' },
-  { title: 'Triangle', collection: 'shape-trillion' },
-  { title: 'Baguette', collection: 'shape-baguette' },
   { title: 'Oval', collection: 'shape-oval' },
+  { title: 'Cushion', collection: 'shape-cushion' },
+  { title: 'Emerald', collection: 'shape-emerald' },
+  { title: 'Pear', collection: 'shape-pear' },
   { title: 'Princess', collection: 'shape-princess' },
-  { title: 'Square', collection: 'shape-square' },
+  { title: 'Radiant', url: '/collections/all?filter.p.tag=shape:radiant' },
+  { title: 'Marquise', collection: 'shape-marquise' },
+  { title: 'Asscher', collection: 'shape-asscher' },
 ];
 
 const stoneItems = [
@@ -213,7 +233,7 @@ export const menu = {
         {
           title: 'Shop by Shape',
           collection: 'engagement-rings',
-          items: ['Round', 'Oval', 'Cushion', 'Emerald', 'Pear', 'Princess', 'Radiant', 'Marquise', 'Asscher'].map((shape) => ({
+          items: ['Round', 'Oval', 'Cushion', 'Emerald', 'Pear', 'Princess', 'Radiant', 'Marquise', 'Asscher', 'Heart'].map((shape) => ({
             title: shape,
             collection: `${shape.toLowerCase()}-engagement-rings`,
           })),
@@ -245,7 +265,23 @@ export const menu = {
       // snippets/menu-static-groups.liquid looks the panel up.
       title: 'Jewellery',
       url: '/collections/all',
+      // Rings, Earrings, Necklaces, Bracelets, Men's: the same order and the same nesting the
+      // desktop mega menu draws its five category columns in, so the two menus read alike
+      // (snippets/header-menu-drawer-links.liquid).
       items: [
+        {
+          title: 'Rings',
+          collection: 'rings',
+          items: [
+            { title: 'All Rings', collection: 'rings' },
+            { title: 'Engagement', collection: 'engagement-rings' },
+            { title: 'Wedding Bands', collection: 'wedding-bands' },
+            { title: 'Eternity', collection: 'eternity-rings' },
+            { title: 'Anniversary', collection: 'anniversary-rings' },
+            { title: 'Stackable', collection: 'stackable-rings' },
+            { title: 'Promise', collection: 'promise' },
+          ],
+        },
         {
           title: 'Earrings',
           collection: 'earrings',
@@ -267,11 +303,27 @@ export const menu = {
             { title: 'Charms', collection: 'charms' },
           ],
         },
-        // Bracelets and Rings have no sub-categories to list: the shop sells bracelets, not tennis
-        // bracelets and bangles. The desktop panel tiles their products instead
-        // (snippets/menu-static-groups.liquid, source "products").
-        { title: 'Bracelets', collection: 'bracelets', items: [{ title: 'All Bracelets', collection: 'bracelets' }] },
-        { title: 'Rings', collection: 'rings', items: [{ title: 'All Rings', collection: 'rings' }] },
+        // Bracelets has no sub-categories to list: the shop sells bracelets, not tennis
+        // bracelets and bangles, and a collection for a range it does not stock would be the
+        // dead link this set exists to avoid. The menu breaks it down by metal filter instead
+        // (snippets/menu-static-items.liquid).
+        {
+          title: 'Bracelets',
+          collection: 'bracelets',
+          items: [
+            { title: 'All Bracelets', collection: 'bracelets' },
+            ...metalItems('/collections/bracelets'),
+          ],
+        },
+        {
+          title: "Men's",
+          collection: 'mens-rings',
+          items: [
+            { title: 'Rings', collection: 'mens-rings' },
+            { title: 'Engagement Rings', collection: 'mens-engagement-rings' },
+            { title: 'Bracelets', collection: 'bracelets' },
+          ],
+        },
         { title: 'Shop by Shape', url: '/collections/all', items: shapeItems },
         { title: 'Shop by Stone', url: '/collections/all', items: stoneItems },
         { title: 'Shop by Metal', url: '/collections/all', items: metalItems('/collections/all') },

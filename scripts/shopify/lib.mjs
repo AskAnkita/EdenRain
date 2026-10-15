@@ -194,20 +194,14 @@ export function themeLinkedHandles(cfg, kind) {
   return found;
 }
 
-// Puts a local image into Shopify's Content > Files and hands back its CDN URL, so a page body
-// written by a script can point at it. A file of the same name already up there is reused rather
-// than uploaded twice - these scripts are meant to be re-run.
-//
-// Shopify takes an upload in three steps: ask for a signed target, POST the bytes to it, then
-// tell Shopify to make a file out of what landed there. The CDN URL only exists once the image
-// has been processed, which takes a few seconds, so the last step polls for it.
-export async function uploadImage(cfg, localPath, filename, mimeType = 'image/jpeg') {
-  if (!existsSync(localPath)) return null;
-
-  const existing = await gql(
+// The CDN URL of a picture already in Content > Files, or null. Shopify's `filename:` search
+// matches loosely, so a query for style-halo.png also comes back with style-halo-hover.jpg; the
+// basename of each result is compared against the name asked for rather than trusting the order.
+export async function findImageInFiles(cfg, filename) {
+  const res = await gql(
     cfg,
     `query($q: String!) {
-      files(first: 5, query: $q) {
+      files(first: 20, query: $q) {
         nodes {
           ... on MediaImage { image { url } }
           ... on GenericFile { url }
@@ -217,11 +211,32 @@ export async function uploadImage(cfg, localPath, filename, mimeType = 'image/jp
     { q: `filename:${filename}` }
   );
 
-  const foundUrl = existing.files?.nodes?.[0]?.image?.url || existing.files?.nodes?.[0]?.url;
+  for (const node of res.files?.nodes || []) {
+    const url = node?.image?.url || node?.url;
+    if (!url) continue;
+    const basename = decodeURIComponent(url.split('?')[0].split('/').pop() || '');
+    if (basename === filename) return url;
+  }
+  return null;
+}
+
+// Puts a local image into Shopify's Content > Files and hands back its CDN URL, so a page body
+// written by a script can point at it. A file of the same name already up there is reused rather
+// than uploaded twice - these scripts are meant to be re-run.
+//
+// Shopify takes an upload in three steps: ask for a signed target, POST the bytes to it, then
+// tell Shopify to make a file out of what landed there. The CDN URL only exists once the image
+// has been processed, which takes a few seconds, so the last step polls for it.
+export async function uploadImage(cfg, localPath, filename, mimeType = 'image/jpeg') {
+  // Files is asked first, not the disk: once a picture is up there the theme reads it from Files,
+  // so the local copy may well have been pruned, and that is not a reason to report nothing.
+  const foundUrl = await findImageInFiles(cfg, filename);
   if (foundUrl) {
     console.log(`  = Already in Shopify: ${filename}`);
     return foundUrl;
   }
+
+  if (!localPath || !existsSync(localPath)) return null;
 
   console.log(`  + Staging upload for ${filename}...`);
   const stagedRes = await gql(

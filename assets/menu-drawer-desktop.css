@@ -951,19 +951,23 @@ a.menu-drawer-desktop__group-heading:hover {
 }
 
 /* ---------- Text-only layout ('header-menu-drawer-links') ----------
-   Two halves: the menu's own groups as columns of named links on the left, the Design Studio
-   promo and the guide columns on the right. The promo picture is the only image on the panel. */
+   Three regions: the menu's own groups as columns of named links on the left, the menu's promo
+   picture - the Design Studio on Engagement and Diamonds, a collection on the rest - inset to
+   the top and the right edge of the panel on the right with its heading and entry points set
+   over the foot of it, and a hairline strip across both carrying the "View all". The promo is
+   the only image on the panel. */
 
 .menu-drawer-desktop__page--links {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0 6rem;
-  /* Both halves run the full height of the row, so the View all button can sit at the foot of
-     the browse half level with the bottom of the guide columns opposite it. */
+  /* The promo track is a page margin wider than the picture: the half pads that back off its
+     right edge. Narrowed once the style and cut icons grew, since the width had to come from
+     somewhere and the picture had more of it to spare than the names did. */
+  grid-template-columns: minmax(0, 1fr) minmax(34rem, 46rem);
+  gap: 0 5.6rem;
+  /* Both halves run the full height of the first row, so the picture reaches the footer rule */
   align-items: stretch;
-  /* Tighter top and bottom than the shared .menu-drawer-desktop__page padding: there are no
-     tiles here, so the panel should drop no further down the page than the lists need. */
-  padding-top: 2.4rem;
-  padding-bottom: 2.8rem;
+  /* The halves and the footer carry their own padding instead: without that the picture would
+     stop at the page margin rather than running to the edge of the panel. */
+  padding: 0;
   min-height: 0;
   overflow-y: auto;
 }
@@ -974,63 +978,175 @@ a.menu-drawer-desktop__group-heading:hover {
   min-width: 0;
 }
 
-/* The rule under each heading runs the full width of the half it sits in, as a divider rather
-   than an underline of the words. */
-.menu-drawer-desktop__half-heading {
-  margin: 0 0 1.6rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+.menu-drawer-desktop__half--browse {
+  padding: 3.2rem 0 3.2rem var(--page-margin, 4rem);
+}
+
+/* Inset from the top and the right edge rather than bled into the corner of the panel; the top
+   is the browse half's own padding, so the picture starts level with "Shop by Style". The foot
+   stays flush, which is what sits it on the footer rule. */
+.menu-drawer-desktop__half--promo {
+  padding: 3.2rem var(--page-margin, 4rem) 0 0;
+}
+
+/* A row rather than a grid: each menu lists its own columns ('header-menu-drawer-links'), from
+   two on Diamonds to four on Jewellery, so the number of them is not known here. They share the
+   room evenly except for the shares set below, and a column that cannot hold its names at its
+   share wraps onto the next row rather than crushing the ones beside it. */
+.menu-drawer-desktop__columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.4rem 4rem;
+}
+
+/* A column in a row of columns, and a column itself: the names stack between the heading and the
+   "View all" at the foot, which the stretch of the row lets every column in it sit on one line
+   however many names it carries - five lists of different lengths with their ways in at five
+   heights read as a ragged edge across the panel. */
+.menu-drawer-desktop__column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 13rem;
+}
+
+/* A group that splits into two sub-columns takes twice the room of a plain one beside it */
+.menu-drawer-desktop__column--split {
+  flex-grow: 2;
+  min-width: 22rem;
+}
+
+/* Style gets the widest share: its drawings are pictures, which run wider than the square cut
+   icons beside them, and its names ("Nature Inspired") are the longest on the panel. */
+.menu-drawer-desktop__column--ring-styles {
+  flex-grow: 2.8;
+}
+
+/* The gap a row of compact columns runs at. Five of them at 4rem apart spend 16rem of the browse
+   half on the gaps alone, which is what pushed the fifth onto a row of its own at the narrow end
+   of the range. */
+.menu-drawer-desktop__columns--tight {
+  gap: 2.4rem;
+}
+
+/* A column that has to share the row with four others - the five jewellery categories. The floor
+   comes down so all five hold their row, and the ceiling is there for the row they wrap onto if
+   the panel does get too narrow for them: without it a column left on its own at the end would
+   grow to the full width of the half, and its heading rule would read as a section break across
+   the panel rather than as one column among five. A name longer than the floor wraps inside its
+   own column, which is what "Climbers, Jackets & Cuffs" does. */
+.menu-drawer-desktop__column--compact {
+  min-width: 9.5rem;
+  max-width: 22rem;
+}
+
+/* The cut column among the compact four: every name carries a drawing, so it needs the width of
+   an icon and a gap on top of what a plain name takes. A little more of the share and a higher
+   floor, which is also what holds its heading on one line. */
+.menu-drawer-desktop__column--compact.menu-drawer-desktop__column--shapes {
+  flex-grow: 1.35;
+  min-width: 11.5rem;
+}
+
+/* The band column among Wedding's compact four ('icon-band-style'). Same reasoning as the cut
+   column above, with a higher floor: these drawings sit beside the longest names in the row
+   ("Anniversary", "Plain Metal"), which an 11.5rem column wraps. Declared after the compact rule
+   so its floor is the one that applies. */
+.menu-drawer-desktop__column--compact.menu-drawer-desktop__column--band-styles {
+  flex-grow: 1.3;
+  min-width: 13rem;
+}
+
+/* A row-style column sits under all of the columns rather than beside them */
+.menu-drawer-desktop__column--inline {
+  flex: 1 1 100%;
+}
+
+/* The rule under each heading runs the full width of its column, as a divider rather than an
+   underline of the words. */
+.menu-drawer-desktop__column-heading {
+  margin: 0 0 1.8rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
   color: #111;
   font-family: var(--font-heading--family);
   font-size: 1.7rem;
   font-weight: 400;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   line-height: 1.2;
   text-transform: uppercase;
 }
 
-.menu-drawer-desktop__columns {
-  display: grid;
-  /* Style runs one column, the cuts run two; the wider share goes to the cuts. */
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  gap: 2.4rem 4rem;
-  /* The least the View all button below may close up to when the half is stretched */
-  margin-bottom: 2.4rem;
+/* Wedding runs four short lists, so its columns grew far wider than the names in them: a rule
+   that ran the full width of a column read as a line across empty paper, and the names sat in
+   islands with a hand's width of white between them. The columns take a ceiling here so the four
+   pack together - the room they give back falls to the right of the row, against the promo
+   picture, where it reads as margin rather than as a hole in the middle of the panel - and the
+   rules are capped just past the words they sit under. Both are scoped to this menu: Jewellery's
+   five columns are full of names and want the width. */
+.menu-drawer-desktop__page--wedding .menu-drawer-desktop__column--compact {
+  /* A width rather than a share with a ceiling on it: the four are the same width either way,
+     but a column that is sized by its own basis lets the browse half be sized by its columns
+     (see the wide-screen query by the promo pair), which is what gives the room left over to
+     the pictures rather than leaving it in the middle of the panel. */
+  flex: 0 1 14rem;
+  max-width: 14rem;
 }
 
-/* A row-style column sits under both columns rather than beside them */
-.menu-drawer-desktop__column--inline {
-  grid-column: 1 / -1;
+/* The band column holds the longest names on the row ("Anniversary", "Plain Metal") beside a
+   drawing, so its ceiling is the one that keeps them off a second line. */
+.menu-drawer-desktop__page--wedding .menu-drawer-desktop__column--compact.menu-drawer-desktop__column--band-styles {
+  flex: 0 1 16rem;
+  max-width: 16rem;
 }
 
-.menu-drawer-desktop__column-heading {
-  margin: 0 0 1.2rem;
-  color: #111;
-  font-size: 1.4rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
+/* Browse columns only: the promo heading beside them keeps its full-width rule, which is what
+   carries the eye across the top of the picture. */
+.menu-drawer-desktop__page--wedding .menu-drawer-desktop__column .menu-drawer-desktop__column-heading {
+  max-width: 11rem;
+  margin-bottom: 1.4rem;
+  padding-bottom: 0.9rem;
 }
 
 .menu-drawer-desktop__link-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+  columns: 1;
 }
 
-.menu-drawer-desktop__column--shapes .menu-drawer-desktop__link-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.2rem 3.2rem;
+/* A "split" group runs in two balanced sub-columns rather than one tall one: ten styles stacked
+   in a single column was most of the panel's height. Multi-column rather than a grid because the
+   groups are different lengths - the browser splits 10 as 5/5 and 9 as 5/4 on its own - and
+   because it fills top-to-bottom, so the names still read down each column. The short lists
+   stay as one column: splitting four names in two would set them against the five-deep groups
+   beside them, as it would the six guides. */
+.menu-drawer-desktop__column--split .menu-drawer-desktop__link-list {
+  columns: 2;
+  column-gap: 2.4rem;
+}
+
+.menu-drawer-desktop__link-list li {
+  /* A name must not be split across the two columns */
+  break-inside: avoid;
+  /* Set off the icon's height rather than the text's, or the drawings crowd each other */
+  margin-bottom: 1.6rem;
+}
+
+.menu-drawer-desktop__link-list li:last-child {
+  margin-bottom: 0;
 }
 
 .menu-drawer-desktop__column--inline .menu-drawer-desktop__link-list {
+  columns: auto;
+  display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 1.2rem 3.2rem;
+}
+
+.menu-drawer-desktop__column--inline .menu-drawer-desktop__link-list li {
+  margin-bottom: 0;
 }
 
 .menu-drawer-desktop__link {
@@ -1051,15 +1167,56 @@ a.menu-drawer-desktop__group-heading:hover {
   transition: background-size 0.35s ease;
 }
 
-.menu-drawer-desktop__link:hover .menu-drawer-desktop__link-text {
+.menu-drawer-desktop__link:hover .menu-drawer-desktop__link-text,
+.menu-drawer-desktop__column-cta:hover .menu-drawer-desktop__link-text,
+.menu-drawer-desktop__footer-cta:hover .menu-drawer-desktop__link-text {
   background-size: 100% 1px;
 }
 
+/* The way in to the category a column lists, under its names. Set in the panel's small caps rather
+   than the size the names take, so it reads as a step out of the list instead of one more name in
+   it, and held to one line - at the width a compact column leaves, "View all" plus a category name
+   would wrap. The arrow is the one the panel's own "View all" strip carries. */
+.menu-drawer-desktop__column-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  /* Pushed to the foot of the column, which is what lines the row of them up; the padding is the
+     floor on the gap, for the longest column in the row, where there is nothing left to push. */
+  margin-top: auto;
+  padding-top: 2rem;
+  color: rgba(0, 0, 0, 0.62);
+  font-size: 1.1rem;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  align-self: flex-start;
+  transition: color 0.2s ease;
+}
+
+.menu-drawer-desktop__column-cta:hover {
+  color: #111;
+}
+
+.menu-drawer-desktop__column-cta-arrow {
+  transition: transform 0.25s ease;
+}
+
+.menu-drawer-desktop__column-cta:hover .menu-drawer-desktop__column-cta-arrow {
+  transform: translateX(0.3rem);
+}
+
+/* All three icon sets ('icon-diamond-shape', 'icon-ring-style' and 'icon-band-style') are drawn
+   on the same 24 grid, so one size holds them level down a column. These are line drawings of a ring at three-quarters
+   the size of the words beside them: below about 2.6rem a halo and a hidden halo stop telling
+   themselves apart. The sub-columns are sized around this, not the other way round. */
 .menu-drawer-desktop__link-icon {
   display: inline-flex;
   flex: 0 0 auto;
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 2.8rem;
+  height: 2.8rem;
   color: rgba(0, 0, 0, 0.55);
   transition: color 0.2s ease;
 }
@@ -1071,6 +1228,37 @@ a.menu-drawer-desktop__group-heading:hover {
 
 .menu-drawer-desktop__link:hover .menu-drawer-desktop__link-icon {
   color: #111;
+}
+
+/* A picture from assets rather than a drawn icon ('header-menu-drawer-links'). Wider than it is
+   tall because the ring styles are arrangements laid out across: three stones side by side need
+   the width, a solitaire fits the height. Both sides are fixed and the picture is fitted inside,
+   so a replacement file of any proportion lands in the same box and the rows stay level. */
+.menu-drawer-desktop__link-icon--image {
+  width: 4.4rem;
+  height: 3rem;
+  /* A picture cannot take currentColor, so it carries the rest state as weight instead and
+     comes up to full on hover, which is the same move the drawn icons make. */
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+/* The cut drawings are square, not the landscape photographs the ring styles carry, so they take
+   the drawn icons' box and stay level with the columns that still draw their own. */
+.menu-drawer-desktop__link-icon--shape {
+  width: 2.8rem;
+  height: 2.8rem;
+}
+
+.menu-drawer-desktop__link-icon--image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.menu-drawer-desktop__link:hover .menu-drawer-desktop__link-icon--image {
+  opacity: 1;
 }
 
 .menu-drawer-desktop__button {
@@ -1095,76 +1283,345 @@ a.menu-drawer-desktop__group-heading:hover {
   color: #fff;
 }
 
-.menu-drawer-desktop__button--wide {
-  /* Pushed to the foot of the half so it lines up with the bottom of the panel */
-  margin-top: auto;
-  padding-top: 1.4rem;
-  padding-bottom: 1.4rem;
-  width: 100%;
-}
+/* ---------- Promo half: the picture, with the words over its foot ---------- */
 
-.menu-drawer-desktop__studio {
+.menu-drawer-desktop__promo {
+  position: relative;
+  flex: 1 1 auto;
   display: flex;
-  flex-direction: column;
-}
+  /* The heading above it takes the picture's old top room, so this only has to clear the copy
+     and the two buttons over its foot. Raised from 24rem once the Jewellery panel came down to
+     five short columns: the browse half no longer sets the height on every menu, and at 24rem a
+     portrait picture in a wide frame was cropped to a band across the model's shoulders. This is
+     the floor the pictures still read at; a panel whose columns run taller than it is unchanged.
 
-.menu-drawer-desktop__studio-media {
-  display: block;
+     Back down from 34rem to 30rem: this floor is what sets the height of every links panel - no
+     menu's columns reach 34rem - so the shortest menu, Wedding, carried the difference as empty
+     white under its names. 30rem takes 4rem of that off every panel while staying clear of the
+     24rem that cropped the picture to a band across the shoulders. The rest of Wedding's gap is
+     closed on the browse side, with a fourth column ('header-menu-drawer-links'). */
+  min-height: 30rem;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.04);
+  background: #2a2522;
 }
 
-.menu-drawer-desktop__studio-media img {
+/* The promo half holds a row of pictures rather than one picture. Wedding is the only menu that
+   fills it: its four columns are capped ('--wedding --compact' above) so the names pack together,
+   and the room that gives back - about a fifth of the panel - was reading as a hole between the
+   last column and the promo rather than as the margin it was meant to be. A second picture takes
+   it. Every other menu passes no second picture and this is the row of one it has always been. */
+.menu-drawer-desktop__promo-pair {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 2.4rem;
+  min-height: 0;
+}
+
+/* The promo keeps the share it had: the room the pair takes back is what the second picture
+   stands in, so the first one is about the width it was before beside it. */
+.menu-drawer-desktop__promo-pair > .menu-drawer-desktop__promo {
+  flex: 1.6 1 0;
+}
+
+/* One more way in rather than a second pitch, so it carries a name over its foot and nothing
+   else, and the whole tile is the link. Narrow and full height, which is the portrait frame the
+   pictures want anyway. Drawn only where there is room for it - see the query below. */
+.menu-drawer-desktop__promo-pair > .menu-drawer-desktop__promo--secondary {
+  display: none;
+  /* The narrower of the two: the first picture keeps the width it has always had and this takes
+     the room the columns left over, which is about two thirds of it. */
+  flex: 1 1 0;
+  text-decoration: none;
+}
+
+.menu-drawer-desktop__promo-media {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.menu-drawer-desktop__promo-media img {
   display: block;
   width: 100%;
-  /* The art is portrait, so it is cropped to a band here; keep the ratio shallow enough that
-     the bench still reads and deep enough that the panel does not grow past the viewport. The
-     cap stops a wide viewport widening the band into the tallest thing on the panel. */
-  aspect-ratio: 3.6 / 1;
-  max-height: 18rem;
+  height: 100%;
+  /* Every promo picture is portrait and the frame is tall, so it crops honestly */
   object-fit: cover;
   object-position: center;
   transition: transform 0.6s ease;
 }
 
-.menu-drawer-desktop__studio-media:hover img {
+/* The workshop bench sits high in its frame: hold it just below centre so the hands stay clear
+   of the words over the foot. The collection pictures are framed on the piece and need none. */
+.menu-drawer-desktop__promo--studio .menu-drawer-desktop__promo-media img {
+  object-position: center 40%;
+}
+
+.menu-drawer-desktop__promo:hover .menu-drawer-desktop__promo-media img {
   transform: scale(1.03);
 }
 
-.menu-drawer-desktop__studio-actions {
+.menu-drawer-desktop__promo-overlay {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 3.2rem;
+  /* Deep enough under the words that white type clears 4.5:1 over the brightest part of the
+     bench, and clear at the top so the picture still reads as a picture. */
+  background: linear-gradient(
+    to bottom,
+    rgba(26, 22, 19, 0) 0%,
+    rgba(26, 22, 19, 0.35) 34%,
+    rgba(26, 22, 19, 0.74) 62%,
+    rgba(26, 22, 19, 0.92) 100%
+  );
+}
+
+/* The promo heading is the one heading on the panel that is also a destination, and it carries the
+   link on the words only, with the rule under it left as a divider. The browse columns do not: a
+   column's destination is the "View all" under its names ('header-menu-drawer-links'). */
+.menu-drawer-desktop__promo-heading-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.menu-drawer-desktop__promo-heading-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.menu-drawer-desktop__promo-text {
+  margin: 0 0 2.4rem;
+  max-width: 38rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1.4rem;
+  line-height: 1.5;
+}
+
+.menu-drawer-desktop__promo-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.6rem;
-  margin-top: 1.6rem;
 }
 
-.menu-drawer-desktop__guides {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 4rem;
-  margin-top: 2.4rem;
+.menu-drawer-desktop__button--on-image {
+  /* Tighter than the panel's other buttons: at the shared tracking "Start with a setting" wrapped
+     onto two lines in half of the picture's width. */
+  padding: 1.2rem 0.8rem;
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #fff;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
 }
 
-.menu-drawer-desktop__guide {
-  min-width: 0;
+.menu-drawer-desktop__button--on-image:hover {
+  background-color: #fff;
+  border-color: #fff;
+  color: #111;
+}
+
+/* The second picture's words sit closer to its foot than the promo's: there is one line of them
+   rather than copy and two buttons, and the tile is the narrower of the two. */
+.menu-drawer-desktop__promo-overlay--label {
+  padding: 2.4rem;
+}
+
+/* The same small caps and arrow the "View all" in the footer carries, in white over the picture */
+.menu-drawer-desktop__promo-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2rem;
+  color: #fff;
+  font-size: 1.2rem;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* The drawn underline is on the words, not the arrow, and the tile is what is hovered */
+.menu-drawer-desktop__promo--secondary:hover .menu-drawer-desktop__link-text {
+  background-size: 100% 1px;
+}
+
+/* Wide screens only. The browse half takes exactly what its four columns need and the pictures
+   take the rest of the row, up to a ceiling of their own: past it the pair runs wider than it
+   reads, and the leftover goes back to the middle of the panel as margin. Below this query the
+   promo half is one picture in the track it has always had, which is all the room there is.
+
+   This used to read `max-content minmax(34rem, 84rem)` with the row set to space-between, and
+   both halves of that were wrong.
+
+   The ceiling: the pictures reached 84rem at about 1480px, well before they were wider than
+   they read, and from there every pixel the panel gained went into the middle instead. At
+   1700px the two halves stood 167px apart, the names in four narrow columns one side of the
+   channel and the pictures the other.
+
+   The overlap: a max-content track is measured from the columns in it, and a flex row reports
+   a smaller figure than the widths it is set to whenever the browser decides the items may
+   shrink. The columns cannot shrink - flex-shrink is 0 below, which is what holds the four on
+   one line - so a track measured short does not squeeze them, it is overrun by them. With the
+   row set to space-between there was then nowhere for the overflow to go: the promo track is
+   held against the end edge, so the pictures were laid over the last column.
+
+   Both are gone. The browse track is stated outright, as the width of the four columns and the
+   gaps between them, so nothing is measured and nothing can be measured short - keep the sum
+   in step with the three widths below. The promo track is a plain 1fr, taking what the columns
+   leave and no more, so the gap between the halves is the gap set here at every width; the
+   ceiling has moved off the track and onto the half, where overrunning it can only pull the
+   pictures away from the names. */
+@media screen and (min-width: 1400px) {
+  .menu-drawer-desktop__page--links.menu-drawer-desktop__page--wedding {
+    /* 17rem + 16rem + 16rem + 16rem of columns, 3 gaps of 2.4rem between them, and the page
+       margin the half carries as padding. */
+    grid-template-columns: calc(72.2rem + var(--page-margin, 4rem)) minmax(34rem, 1fr);
+    /* Closer than the 5.6rem the other menus run at. Four short lists do not need a channel
+       that wide between them and the picture, and the room buys the columns below their width. */
+    gap: 0 4rem;
+  }
+
+  /* The ceiling the promo track used to carry, moved onto the half so that overrunning it
+     cannot overlap anything: the pictures are held against the right edge of their track and
+     the room they give back on a very wide panel falls to their left, as margin between the
+     two halves. Nothing gives any back below about 1900px, which is the whole of the desktop
+     range. The half rather than the pair inside it, so the heading and its rule stay the width
+     of the pictures they sit over; the page margin is added back because the half carries it
+     as padding and the box is a border box. */
+  .menu-drawer-desktop__page--wedding .menu-drawer-desktop__half--promo {
+    /* The width is spelt out so that the auto margin below only has the room left over the
+       ceiling to take. Left to size itself against an auto margin, a grid item is laid out at
+       the width of its own content and the margin swallows the whole of the rest of the track,
+       which stands the pictures off the right edge at every width rather than past the
+       ceiling. */
+    width: 100%;
+    max-width: calc(110rem + var(--page-margin, 4rem));
+    margin-left: auto;
+  }
+
+  /* The four hold one row at this width. The track above is cut to fit them exactly, so there
+     is nothing for a second row to gain. */
+  .menu-drawer-desktop__page--wedding .menu-drawer-desktop__columns {
+    flex-wrap: nowrap;
+  }
+
+  /* Two rem wider than the columns take below this query. At 14rem the longest names on the
+     row - "Education & Guides", "Talk to a Designer", "Sterling Silver" - ran within a few
+     pixels of the column edge, so the four lists read as one block of text with no air in it
+     rather than as four columns. The extra width comes out of the middle, not out of the
+     pictures: the browse track is max-content, so widening the columns is what moves the
+     panel's spare room from the channel between the halves into the names. Held to this query
+     because below 1400px the browse half is a share of the row rather than its own measure,
+     and four columns this wide would wrap off it. */
+  .menu-drawer-desktop__page--wedding .menu-drawer-desktop__column--compact {
+    flex: 0 0 16rem;
+    max-width: 16rem;
+  }
+
+  /* The band column keeps the extra rem it has below: its names are the longest on the row and
+     they sit beside a drawing. */
+  .menu-drawer-desktop__page--wedding .menu-drawer-desktop__column--compact.menu-drawer-desktop__column--band-styles {
+    flex: 0 0 17rem;
+    max-width: 17rem;
+  }
+
+  .menu-drawer-desktop__promo-pair > .menu-drawer-desktop__promo--secondary {
+    display: flex;
+  }
+}
+
+/* ---------- Footer strip ---------- */
+
+.menu-drawer-desktop__links-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.6rem 4rem;
+  margin: 0 var(--page-margin, 4rem);
+  padding: 2rem 0 2.8rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.menu-drawer-desktop__footer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2rem;
+  color: #111;
+  font-size: 1.2rem;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-decoration: none;
 }
 
 @media screen and (max-width: 1199px) {
   .menu-drawer-desktop__page--links {
+    grid-template-columns: minmax(0, 1fr) minmax(29rem, 38rem);
     gap: 0 3.6rem;
   }
 
+  .menu-drawer-desktop__link-icon {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+
+  .menu-drawer-desktop__link-icon--image {
+    width: 3.8rem;
+    height: 2.6rem;
+  }
+
+  .menu-drawer-desktop__link-icon--shape {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+
+  .menu-drawer-desktop__half--promo {
+    padding-top: 2.4rem;
+  }
+
   .menu-drawer-desktop__columns {
-    gap: 2rem 2.8rem;
+    gap: 2rem 3.2rem;
   }
 
-  .menu-drawer-desktop__column--shapes .menu-drawer-desktop__link-list {
-    gap: 1.2rem 2rem;
+  .menu-drawer-desktop__column--split .menu-drawer-desktop__link-list {
+    column-gap: 1.8rem;
   }
 
-  .menu-drawer-desktop__link,
-  .menu-drawer-desktop__column-heading {
+  /* Four columns and the promo half at this width: the shares still hold, the floors come down
+     so none of them wraps to a row of its own before the panel itself gets narrower. */
+  .menu-drawer-desktop__column {
+    min-width: 11rem;
+  }
+
+  .menu-drawer-desktop__column--split {
+    min-width: 19rem;
+  }
+
+  .menu-drawer-desktop__column--compact {
+    min-width: 8.5rem;
+  }
+
+  .menu-drawer-desktop__column--compact.menu-drawer-desktop__column--shapes {
+    min-width: 10.5rem;
+  }
+
+  .menu-drawer-desktop__promo-overlay {
+    padding: 2.4rem;
+  }
+
+  .menu-drawer-desktop__promo-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .menu-drawer-desktop__link {
     font-size: 1.4rem;
+  }
+
+  .menu-drawer-desktop__column-heading {
+    font-size: 1.5rem;
   }
 
   .menu-drawer-desktop__button {
@@ -1172,13 +1629,14 @@ a.menu-drawer-desktop__group-heading:hover {
     padding-left: 1.2rem;
     padding-right: 1.2rem;
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
   .menu-drawer-desktop__link-text,
   .menu-drawer-desktop__link-icon,
   .menu-drawer-desktop__button,
-  .menu-drawer-desktop__studio-media img {
+  .menu-drawer-desktop__promo-media img {
     transition: none;
   }
 }

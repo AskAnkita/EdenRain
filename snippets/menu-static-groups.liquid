@@ -4,6 +4,11 @@
   Only for menus whose column should not mirror Online Store > Navigation. A top-level item
   that isn't listed here keeps using its own sub-links.
 
+  Every menu is drawn by the text-only panel now ('menu-static-layout'), which lists its own
+  columns and reads the items straight from 'menu-static-items'. So what a menu is listed with
+  here is what makes the header count it as drawer-eligible ('header-menu'); the collection,
+  source and heading fields only come back into play for a menu taken off that layout.
+
   Accepts:
   - parent: {String} the top-level item's title, e.g. "Jewellery"
 
@@ -21,6 +26,10 @@
 
   case parent_key
     when 'engagement'
+      comment
+        No By Metal here: metal is a filter on the collection page, and as a third group it only
+        left a ragged row under the two that matter. 'header-menu-drawer-links' drops it too.
+      endcomment
       echo 'By Style|-|items|Shop All'
       echo ',By Shape|-|items|Shop All'
       echo ',Featured|-|featured|Featured'
@@ -36,14 +45,19 @@
       endcomment
       echo ',Learn|-|featured|Learn'
     when 'jewellery' or 'jewelry'
-      echo 'Earrings|earrings|items|Shop All Earrings'
-      echo ',Necklaces|necklaces|items|Shop All Necklaces'
       comment
-        Bracelets and Rings have no sub-categories to tile - the shop sells bracelets, not tennis
-        bracelets and bangles - so these tabs show the pieces themselves instead of category tiles.
+        Rings first, the way the panel draws them ('header-menu-drawer-links'): it is the
+        category the shop sells most of.
       endcomment
-      echo ',Bracelets|bracelets|products|Shop All Bracelets'
-      echo ',Rings|rings|products|Shop All Rings'
+      echo 'Rings|rings|items|Shop All Rings'
+      echo ',Earrings|earrings|items|Shop All Earrings'
+      echo ',Necklaces|necklaces|items|Shop All Necklaces'
+      echo ',Bracelets|bracelets|items|Shop All Bracelets'
+      comment
+        Men's is the two collections the store carries under that name; 'menu-static-items' says
+        why there is no third.
+      endcomment
+      echo ",Men's|mens-rings|items|Shop All Men's"
       comment
         Shape and Stone browse the whole catalogue rather than one category: a shopper after a
         round stone wants it in a stud as much as in a ring. They read the same `shape:` tags the

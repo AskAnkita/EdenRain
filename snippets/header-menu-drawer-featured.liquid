@@ -53,6 +53,16 @@
           if image_setting_prefix != ''
             assign selected_card_image = settings[image_setting_key]
           endif
+          comment
+            Nothing picked in Theme settings: the card's own file name is looked up in
+            Content > Files, where the mega menu photography now lives. It comes back as the
+            same kind of image object the picker gives, so both take the branch below, and a
+            name that is still only in assets/ falls through to the resizer after it.
+          endcomment
+          if selected_card_image == blank and card_image != blank
+            assign selected_card_image = images[card_image]
+          endif
+
           if selected_card_image != blank
             assign card_image_src = selected_card_image | image_url: width: 800
             capture card_image_srcset

@@ -1,70 +1,240 @@
 {% comment %}
   Text-only desktop mega menu panel: every option is a named link, no picture tiles.
 
-  Used by the menus 'menu-static-layout' returns "links" for. Two halves:
-  - Browse: the menu's own groups side by side as columns of links. A column whose group is a
-    diamond cut gets the line drawing from 'icon-diamond-shape' beside each name, and the whole
-    half ends in a wide "View all" button.
-  - Studio: the Design Studio promo (the one picture on the panel) over its two entry points,
-    then the guide columns underneath.
+  Used by the menus 'menu-static-layout' returns "links" for, which is now all of them. Three
+  regions on every menu; what each menu puts in them is set in the case block below:
+  - Browse (left): the menu's own groups side by side as columns of links, and then any
+    row-style group full width underneath. The style column carries a picture from the theme's
+    assets beside each name (see `styles_with_images` below) and the other icon columns a line
+    drawing. Only Engagement ends
+    its columns with the shared guide pages; the other menus give that room to their own
+    options, and Diamonds has its own "Learn" column of guides.
+  - Promo (right): a heading over a picture, which is inset from the right edge of the panel
+    and carries a line of copy and two entry points over its foot. Engagement and Diamonds
+    show the Design Studio there, Wedding and Jewellery a collection. The heading takes the
+    same rule as the browse columns, so they all line up across the panel.
+  - Footer: a hairline strip across both carrying the menu's "View all".
 
   Accepts:
   - link: {Object} the top-level menu link
   - drawer_id: {String}
 
-  The lists themselves still come from 'menu-static-items', so the names here and the tiles on
-  every other menu cannot drift apart; this snippet only decides which groups are drawn as
-  columns and how wide each one runs. Columns are declared in `browse_columns` below as
-  "group|Heading|style", where style is "shapes" for the icon grid, "inline" for a row of links
-  that runs full width under the columns, and blank for a plain column.
+  The lists themselves all come from 'menu-static-items', so the names here cannot drift apart
+  from the menu; this snippet only decides which groups a menu draws, in what order and how wide
+  each one runs. Columns are declared per menu in `browse_columns` below as
+
+      group|Heading|styles|heading-url
+
+  - group is the name 'menu-static-items' lists the items under; "Guides" is the shared list of
+    guide pages, which any menu can ask for.
+  - Heading defaults to the group's own name.
+  - styles is a space-separated list, any of: "split" for a long list in two sub-columns,
+    "compact" for a narrower column, which is what lets a menu run five of them in one row,
+    "inline" for a row of links that runs full width under the columns, and one of the four
+    icon sets - "shapes" for the cut drawings from 'icon-diamond-shape', "ring-styles" for the
+    setting pictures in assets, "types" for the piece drawings from
+    'icon-jewellery-type', "stones" for the material drawings from 'icon-stone'. Blank is a
+    plain single column with no drawings. Only a list whose every name is drawn in that set may
+    ask for it, or the names it misses would each carry an empty box.
+  - heading-url is optional and gives the column a "View all" link under its names, for a
+    group that is also a collection. The heading itself is never a link: one destination per
+    column, in one place.
+
+  Order matters: a column is drawn where it is listed, so the "inline" rows go last.
 {% endcomment %}
 
 {%- liquid
-  assign browse_heading = 'Curated Rings'
-  assign browse_columns = 'By Style|Shop by Style|,By Shape|Shop by Shape|shapes' | split: ','
-
-  assign studio_image = 'about-craft-workshop.png'
-  assign studio_image_alt = 'A jeweller finishing a ring at the bench'
-  assign studio_url = '/pages/design-studio'
+  assign parent_key = link.title | handle
 
   comment
-    Two entry points, both of which have to land somewhere that exists: the builder page is the
-    setting-first route ('design-studio-builder'), and the diamond-first route is the lab-grown
-    collection, the only diamond listing the shop has. 'Label|url' each.
+    Defaults, for a menu that asks for this panel without being named below: its own groups are
+    not known here, so it gets the guide pages and the studio alone rather than an empty half.
   endcomment
-  assign studio_actions = 'Start with a setting|/pages/design-studio-builder,Start with a diamond|/collections/lab-grown-diamonds' | split: ','
+  assign browse_columns = 'Guides|Guides|' | split: ','
+  assign parent_lower = link.title | downcase
+  assign view_all_label = 'View all ' | append: parent_lower
 
   comment
-    Guides are pages on the guide template, not blog articles, and only the five below exist -
-    anything else here opens a 404. Columns are "Heading::Label|url~Label|url".
+    The promo picture that fills the right-hand half. Every one of them is a portrait asset
+    under assets/, framed by the half rather than by its own proportions, and it sits behind
+    the words carrying nothing they do not - so it goes in decorative, alt="", rather than a
+    description a screen reader would read out over the heading.
+
+    'promo_style' is the modifier the picture takes: "studio" holds the workshop bench just
+    below centre, where the collection pictures are framed on the piece and want none.
   endcomment
-  assign guide_columns = 'Diamond Education::Education & Guides|/pages/education-guides~Gemstones|/pages/gemstones~Jewellery Care|/pages/jewellery-care,Ring Guide::Ring Size Guide|/pages/er-sizing~Wrist Size Guide|/pages/wrist-sizer-guide~Talk to a Designer|/pages/contact' | split: ','
+  assign promo_heading = 'Design Studio'
+  assign promo_url = '/pages/design-studio'
+  assign promo_image = 'about-craft-workshop.png'
+  assign promo_width = 1086
+  assign promo_height = 1448
+  assign promo_style = 'studio'
+  assign promo_text = 'Have a piece made to your own design, or ask us to remake something you love.'
+  assign promo_actions = 'Explore the studio|/pages/design-studio,Talk to a designer|/pages/contact' | split: ','
+
+  comment
+    An optional second picture, standing beside the promo in the same half as
+    'Name|url|asset|width|height'. Only a menu whose browse columns stop well short of the
+    picture asks for one - Wedding, whose four capped columns leave about a fifth of the panel
+    empty between the names and the promo - and the CSS draws it only on the wide screens where
+    that room exists. Blank is one picture, which is every other menu.
+  endcomment
+  assign promo_secondary = ''
+
+  comment
+    Metal is deliberately absent from Engagement: it is a filter on the collection page, and as a
+    third column beside the two long ones it left a ragged row. Wedding, whose lists are short,
+    gives it a column of its own.
+
+    Every studio action has to land somewhere that exists: the builder page is the setting-first
+    route ('design-studio-builder'), and the designer route is the bespoke enquiry page. 'Label|url'
+    each, and the two of them are what sits over the foot of the picture.
+  endcomment
+  case parent_key
+    when 'engagement'
+      assign browse_columns = 'By Style|Shop by Style|ring-styles split,By Shape|Shop by Shape|shapes split,Guides|Guides|' | split: ','
+      assign view_all_label = 'View all engagement rings'
+      assign promo_text = 'Build a ring from the setting up, or start from the stone and let us set it.'
+      assign promo_actions = 'Create your own design|/pages/design-studio-builder,Talk to our designer|/pages/bespoke-jewellery-request' | split: ','
+    when 'wedding'
+      comment
+        Four columns, where there were three. Three lists of four short names left the browse half
+        about 22rem tall against a promo picture that floors at 30rem, so the panel carried a band
+        of empty white under the names; the shared Guides list is the longest column the menu can
+        ask for and it anchors the row at the height the picture sets.
+
+        By Style takes the band drawings ('icon-band-style') for the same reason Engagement's does:
+        four names on their own read as a list, and the drawings give the column the height and the
+        weight the panel is built around. Note the set is 'band-styles', not the 'ring-styles' used
+        on Engagement - none of these four is a setting, and 'icon-ring-style' draws nothing for a
+        style it does not know, which is four blank boxes down the column.
+
+        No Shape column here. The cuts are Engagement's browse axis and the wedding range carries
+        no shape tag at all - every cut under this menu would open an empty filter.
+
+        The headings are the short forms - "By Style", not "Shop by Style" - and the columns are
+        compact, both for the same reason Jewellery's five are: at the narrow end of the desktop
+        range a quarter of the browse half is about 13rem, which "Shop by Style" overruns, and a
+        heading that wraps takes its rule out of line with the three beside it.
+      endcomment
+      assign browse_columns = 'By Style|By Style|band-styles compact,Featured|Featured|compact,By Metal|By Metal|compact,Guides|Guides|compact' | split: ','
+      assign view_all_label = 'View all wedding bands'
+      assign promo_heading = 'Signature Wedding Bands'
+      assign promo_url = '/collections/wedding-bands'
+      assign promo_image = 'category-wedding-bands.png'
+      assign promo_style = ''
+      assign promo_text = 'Plain metal, pavé and eternity bands, made to sit with the ring they are worn beside.'
+      assign promo_actions = 'Shop wedding bands|/collections/wedding-bands,Shop eternity rings|/collections/eternity-rings' | split: ','
+      assign promo_secondary = 'Eternity Rings|/collections/eternity-rings|featured-wedding-eternity.jpg|800|1020'
+    when 'diamonds'
+      comment
+        Learn is the menu's own column of guide pages, so the shared Guides list is not asked for
+        on top of it. The studio stays: the diamond-first route into it starts here.
+      endcomment
+      assign browse_columns = 'Lab-Grown Diamonds|Shop by Shape|shapes split|/collections/lab-grown-diamonds,Learn|Learn|' | split: ','
+      assign promo_text = 'Choose a lab-grown stone and we will set it in the design you pick.'
+      assign promo_actions = 'Start with a diamond|/collections/lab-grown-diamonds,Start with a setting|/pages/design-studio-builder' | split: ','
+    when 'jewellery' or 'jewelry'
+      comment
+        A column per category, in the order a jewellery shopper reads them: Rings, Earrings,
+        Necklaces, Bracelets, Men's. Each heading is the category's own collection and the names
+        under it are its sub-ranges, which is the nesting the menu had on mobile but not here -
+        the panel used to merge them all into one "Shop Jewellery" list, which read as a wall of
+        names with no sign of where one category ended and the next began.
+
+        Five columns, so they take "compact": the floor each one wraps at comes down far enough
+        for all five to stay on one row beside the promo picture. Their names and order come
+        from 'menu-static-items', so the panel and the mobile menu cannot drift apart.
+
+        Neither Shape nor Stone is on the panel. Both are still groups in the navigation and
+        still listed in 'menu-static-items' - Shape as the nine cuts, each with its drawing in
+        assets - so the mobile menu and anything else that asks for them is unchanged; it is
+        this panel that gives them no column. Putting "Shop by Shape|By Shape|shapes compact"
+        or "Shop by Stone|Shop by Stone|inline" back into the list above is all it takes to
+        return either. Keep a cut column's heading short: at the width a fifth of the row leaves
+        it, "Shop by Shape" wraps onto a second line and takes its rule out of line with the
+        four beside it, which is why the form above reads "By Shape".
+      endcomment
+      assign browse_columns = "Rings|Rings|compact|/collections/rings,Earrings|Earrings|compact|/collections/earrings,Necklaces|Necklaces|compact|/collections/necklaces,Bracelets|Bracelets|compact|/collections/bracelets,Men's|Men's|compact|/collections/mens-rings" | split: ','
+      assign promo_heading = 'Best Sellers'
+      assign promo_url = '/collections/best-sellers'
+      assign promo_image = 'category-best-sellers.png'
+      assign promo_width = 1122
+      assign promo_height = 1402
+      assign promo_style = ''
+      assign promo_text = 'The pieces that leave the workshop most often, in earrings, necklaces and rings.'
+      assign promo_actions = 'Shop best sellers|/collections/best-sellers,Shop new in|/collections/new-in' | split: ','
+  endcase
+
+  comment
+    The ring style drawings are pictures in the theme's assets, one per style, each named after
+    the style's handle: 'ring-style-<handle>.png'. Replace a file under Online Store > Themes >
+    Edit code > Assets and the menu takes the new one up; the file name is the whole contract.
+
+    A style listed here uses its picture. Take one off the list - or never add one - and that
+    style falls back to the drawn icon in 'icon-ring-style', which is how to cope with a picture
+    that is missing or not ready yet, rather than leaving a broken image in the column.
+  endcomment
+  assign styles_with_images = 'solitaire,side-stone,halo,hidden-halo,three-stone,bridal-sets,vintage,nature-inspired,toi-et-moi,promise' | split: ','
+
+  comment
+    A menu running compact columns gets a tighter gap between them as well: five columns at the
+    gap the two- and three-column menus use would not hold their row beside the promo picture at
+    the narrow end, and the fifth dropped to a row of its own. Read off the columns rather than
+    set per menu, so a menu that asks for compact columns gets the gap that goes with them.
+  endcomment
+  assign columns_tight = false
+  for column in browse_columns
+    assign column_probe = column | split: '|'
+    if column_probe[2] contains 'compact'
+      assign columns_tight = true
+      break
+    endif
+  endfor
+
+  comment
+    The cuts work the same way: a line drawing of the stone face-on, per cut, named
+    'shape-outline-<handle>.png'. A cut that is not listed here - trillion, baguette, square -
+    falls back to the drawn icon in 'icon-diamond-shape' rather than a broken image.
+  endcomment
+  assign shapes_with_images = 'round,oval,cushion,emerald,pear,princess,radiant,marquise,asscher,heart' | split: ','
 -%}
 
+{%- comment -%}
+  The menu's own handle rides on the page as a modifier, so a panel that wants something the
+  others don't - Wedding's shorter heading rules and narrower columns - can be reached from CSS
+  without a class per column. A menu with no rules of its own is unaffected by carrying it.
+{%- endcomment -%}
 <div
-  class="menu-drawer-desktop__page menu-drawer-desktop__page--links"
+  class="menu-drawer-desktop__page menu-drawer-desktop__page--links menu-drawer-desktop__page--{{ parent_key }}"
   id="{{ drawer_id }}"
   data-menu-drawer-page
   hidden
 >
   <section class="menu-drawer-desktop__half menu-drawer-desktop__half--browse">
-    <h2 class="menu-drawer-desktop__half-heading">{{ browse_heading | escape }}</h2>
-
-    <div class="menu-drawer-desktop__columns">
+    <div
+      class="
+        menu-drawer-desktop__columns
+        {%- if columns_tight %} menu-drawer-desktop__columns--tight{% endif -%}
+      "
+    >
       {%- for column in browse_columns -%}
         {%- liquid
           assign column_parts = column | split: '|'
           assign column_group = column_parts[0]
           assign column_heading = column_parts[1] | default: column_parts[0]
-          assign column_style = column_parts[2] | default: ''
+          assign column_styles = column_parts[2] | split: ' '
+          # Compared against '' rather than blank: a column with no heading url has no fourth
+          # field at all, and `nil != blank` is not reliable across Liquid versions.
+          assign column_url = column_parts[3] | default: ''
 
           capture column_source
             render 'menu-static-items', group: column_group, parent: link.title
           endcapture
           assign column_source = column_source | strip
 
-          # Only the first section of a group is drawn: these groups have just the one, and a
-          # second would need a heading the columns have no room for.
+          # Only the first section of a group is drawn: a second would need a heading of its own,
+          # which the columns have no room for. Wedding lists its second section as a column.
           assign column_sections = column_source | split: ';;'
           assign column_parts_raw = column_sections[0] | split: '::'
           assign column_items_raw = column_parts_raw[0]
@@ -72,10 +242,35 @@
             assign column_items_raw = column_parts_raw[1]
           endif
           assign column_items = column_items_raw | split: '~'
+
+          # Which set of drawings the names in this column carry, if any. `render` takes no
+          # variable for the snippet it renders, so each set is a branch of its own below.
+          assign column_icons = ''
+          if column_styles contains 'shapes'
+            assign column_icons = 'shapes'
+          elsif column_styles contains 'ring-styles'
+            assign column_icons = 'ring-styles'
+          elsif column_styles contains 'band-styles'
+            assign column_icons = 'band-styles'
+          elsif column_styles contains 'types'
+            assign column_icons = 'types'
+          elsif column_styles contains 'stones'
+            assign column_icons = 'stones'
+          endif
         -%}
         {%- if column_items.size > 0 -%}
-          <div class="menu-drawer-desktop__column menu-drawer-desktop__column--{{ column_style | default: 'plain' }}">
-            <p class="menu-drawer-desktop__column-heading">{{ column_heading | escape }}</p>
+          <div
+            class="
+              menu-drawer-desktop__column
+              {%- for style in column_styles %} menu-drawer-desktop__column--{{ style }}{% endfor -%}
+            "
+          >
+            {%- comment -%}
+              Plain text, never a link. The heading labels the column; a shopper who wants the
+              category itself takes the "View all" under the names, which is the one place a
+              column's own destination is offered.
+            {%- endcomment -%}
+            <h2 class="menu-drawer-desktop__column-heading">{{ column_heading | escape }}</h2>
             <ul class="menu-drawer-desktop__link-list" role="list">
               {%- for item in column_items -%}
                 {%- liquid
@@ -85,14 +280,70 @@
                   unless item_url contains '/'
                     assign item_url = item_url | prepend: '/collections/'
                   endunless
-                  # `render` takes no filters in its arguments, so the cut's key is made here
-                  assign item_shape = item_title | handle
+                  # `render` takes no filters in its arguments, so the icon's key is made here
+                  assign item_key = item_title | handle
                 -%}
                 <li>
                   <a class="menu-drawer-desktop__link" href="{{ item_url }}">
-                    {%- if column_style == 'shapes' -%}
+                    {%- if column_icons == 'shapes' -%}
+                      {%- if shapes_with_images contains item_key -%}
+                        {%- assign shape_asset = item_key | prepend: 'shape-outline-' | append: '.png' -%}
+                        <span
+                          class="menu-drawer-desktop__link-icon menu-drawer-desktop__link-icon--image menu-drawer-desktop__link-icon--shape"
+                          aria-hidden="true"
+                        >
+                          {%- comment -%}
+                            The box, not the file: the drawings are square and the CSS fits them
+                            inside the same box the drawn icons take, so the column stays level.
+                          {%- endcomment -%}
+                          <img
+                            src="{% render 'image-source', file: shape_asset, width: 56 %}"
+                            alt=""
+                            width="28"
+                            height="28"
+                            loading="lazy"
+                          >
+                        </span>
+                      {%- else -%}
+                        <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
+                          {%- render 'icon-diamond-shape', shape: item_key -%}
+                        </span>
+                      {%- endif -%}
+                    {%- elsif column_icons == 'ring-styles' -%}
+                      {%- if styles_with_images contains item_key -%}
+                        {%- assign icon_asset = item_key | prepend: 'ring-style-' | append: '.png' -%}
+                        <span
+                          class="menu-drawer-desktop__link-icon menu-drawer-desktop__link-icon--image"
+                          aria-hidden="true"
+                        >
+                          {%- comment -%}
+                            The box, not the file: CSS fixes both sides and fits the picture
+                            inside, so these stay true whatever shape the replacement file is.
+                          {%- endcomment -%}
+                          <img
+                            src="{% render 'image-source', file: icon_asset, width: 92 %}"
+                            alt=""
+                            width="46"
+                            height="32"
+                            loading="lazy"
+                          >
+                        </span>
+                      {%- else -%}
+                        <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
+                          {%- render 'icon-ring-style', style: item_key -%}
+                        </span>
+                      {%- endif -%}
+                    {%- elsif column_icons == 'band-styles' -%}
                       <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
-                        {%- render 'icon-diamond-shape', shape: item_shape -%}
+                        {%- render 'icon-band-style', style: item_key -%}
+                      </span>
+                    {%- elsif column_icons == 'types' -%}
+                      <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
+                        {%- render 'icon-jewellery-type', type: item_key -%}
+                      </span>
+                    {%- elsif column_icons == 'stones' -%}
+                      <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
+                        {%- render 'icon-stone', stone: item_key -%}
                       </span>
                     {%- endif -%}
                     <span class="menu-drawer-desktop__link-text">{{ item_title | escape }}</span>
@@ -100,61 +351,110 @@
                 </li>
               {%- endfor -%}
             </ul>
+            {%- if column_url != '' -%}
+              {%- comment -%}
+                The column's own way in to everything under it. The words stay short so they hold
+                one line in a compact column, and the heading rides on the link as its label: five
+                bare "View all"s read alike to anything that meets one out of its column.
+              {%- endcomment -%}
+              {%- assign column_cta_label = column_heading | prepend: 'View all ' -%}
+              <a
+                class="menu-drawer-desktop__column-cta"
+                href="{{ column_url }}"
+                aria-label="{{ column_cta_label | escape }}"
+              >
+                <span class="menu-drawer-desktop__link-text">View all</span>
+                <span class="menu-drawer-desktop__column-cta-arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            {%- endif -%}
           </div>
         {%- endif -%}
       {%- endfor -%}
     </div>
+  </section>
 
+  <section class="menu-drawer-desktop__half menu-drawer-desktop__half--promo">
+    <h2 class="menu-drawer-desktop__column-heading">
+      <a class="menu-drawer-desktop__promo-heading-link" href="{{ promo_url }}">
+        {{- promo_heading | escape -}}
+      </a>
+    </h2>
+
+    {%- comment -%}
+      A row, so that a menu carrying a second picture sets it beside the first under the one
+      heading rule, and a menu carrying none is the row of one it was before.
+    {%- endcomment -%}
+    <div class="menu-drawer-desktop__promo-pair">
+      <div
+        class="
+          menu-drawer-desktop__promo
+          {%- if promo_style != '' %} menu-drawer-desktop__promo--{{ promo_style }}{% endif -%}
+        "
+      >
+        <span class="menu-drawer-desktop__promo-media" aria-hidden="true">
+          <img
+            src="{% render 'image-source', file: promo_image, width: 900 %}"
+            srcset="{% render 'image-source', file: promo_image, width: 600 %} 600w, {% render 'image-source', file: promo_image, width: 900 %} 900w"
+            sizes="(min-width: 1200px) 34vw, 30vw"
+            alt=""
+            width="{{ promo_width }}"
+            height="{{ promo_height }}"
+            loading="lazy"
+          >
+        </span>
+        <div class="menu-drawer-desktop__promo-overlay">
+          <p class="menu-drawer-desktop__promo-text">{{ promo_text | escape }}</p>
+          <div class="menu-drawer-desktop__promo-actions">
+            {%- for action in promo_actions -%}
+              {%- assign action_parts = action | split: '|' -%}
+              <a
+                class="menu-drawer-desktop__button menu-drawer-desktop__button--on-image"
+                href="{{ action_parts[1] }}"
+              >{{ action_parts[0] | escape }}</a>
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%}
+        The second picture, where a menu asks for one. A link rather than a panel of its own:
+        the picture beside it carries the copy and the two buttons, and this is one more way in,
+        so the whole tile is the hit area and the name over its foot is the only word on it.
+      {%- endcomment -%}
+      {%- if promo_secondary != '' -%}
+        {%- assign secondary_parts = promo_secondary | split: '|' -%}
+        <a
+          class="menu-drawer-desktop__promo menu-drawer-desktop__promo--secondary"
+          href="{{ secondary_parts[1] }}"
+        >
+          <span class="menu-drawer-desktop__promo-media" aria-hidden="true">
+            <img
+              src="{% render 'image-source', file: secondary_parts[2], width: 700 %}"
+              srcset="{% render 'image-source', file: secondary_parts[2], width: 450 %} 450w, {% render 'image-source', file: secondary_parts[2], width: 700 %} 700w"
+              sizes="(min-width: 1400px) 22vw, 30vw"
+              alt=""
+              width="{{ secondary_parts[3] }}"
+              height="{{ secondary_parts[4] }}"
+              loading="lazy"
+            >
+          </span>
+          <span class="menu-drawer-desktop__promo-overlay menu-drawer-desktop__promo-overlay--label">
+            <span class="menu-drawer-desktop__promo-label">
+              <span class="menu-drawer-desktop__link-text">{{ secondary_parts[0] | escape }}</span>
+              <span class="menu-drawer-desktop__footer-arrow" aria-hidden="true">&rarr;</span>
+            </span>
+          </span>
+        </a>
+      {%- endif -%}
+    </div>
+  </section>
+
+  <div class="menu-drawer-desktop__links-footer">
     {%- if link.url != blank -%}
-      <a class="menu-drawer-desktop__button menu-drawer-desktop__button--wide" href="{{ link.url }}">
-        View all {{ link.title | downcase | escape }}
+      <a class="menu-drawer-desktop__footer-cta" href="{{ link.url }}">
+        <span class="menu-drawer-desktop__link-text">{{ view_all_label | escape }}</span>
+        <span class="menu-drawer-desktop__footer-arrow" aria-hidden="true">&rarr;</span>
       </a>
     {%- endif -%}
-  </section>
-
-  <section class="menu-drawer-desktop__half menu-drawer-desktop__half--studio">
-    <div class="menu-drawer-desktop__studio">
-      <h2 class="menu-drawer-desktop__half-heading">Design Studio</h2>
-      <a class="menu-drawer-desktop__studio-media" href="{{ studio_url }}">
-        <img
-          src="{{ studio_image | asset_img_url: '900x' }}"
-          srcset="{{ studio_image | asset_img_url: '600x' }} 600w, {{ studio_image | asset_img_url: '900x' }} 900w"
-          sizes="(min-width: 1200px) 42vw, 38vw"
-          alt="{{ studio_image_alt | escape }}"
-          width="1086"
-          height="1448"
-          loading="lazy"
-        >
-      </a>
-      <div class="menu-drawer-desktop__studio-actions">
-        {%- for action in studio_actions -%}
-          {%- assign action_parts = action | split: '|' -%}
-          <a class="menu-drawer-desktop__button" href="{{ action_parts[1] }}">{{ action_parts[0] | escape }}</a>
-        {%- endfor -%}
-      </div>
-    </div>
-
-    <div class="menu-drawer-desktop__guides">
-      {%- for guide_column in guide_columns -%}
-        {%- liquid
-          assign guide_parts = guide_column | split: '::'
-          assign guide_heading = guide_parts[0]
-          assign guide_items = guide_parts[1] | split: '~'
-        -%}
-        <div class="menu-drawer-desktop__guide">
-          <h2 class="menu-drawer-desktop__half-heading">{{ guide_heading | escape }}</h2>
-          <ul class="menu-drawer-desktop__link-list" role="list">
-            {%- for item in guide_items -%}
-              {%- assign item_parts = item | split: '|' -%}
-              <li>
-                <a class="menu-drawer-desktop__link" href="{{ item_parts[1] }}">
-                  <span class="menu-drawer-desktop__link-text">{{ item_parts[0] | escape }}</span>
-                </a>
-              </li>
-            {%- endfor -%}
-          </ul>
-        </div>
-      {%- endfor -%}
-    </div>
-  </section>
+  </div>
 </div>

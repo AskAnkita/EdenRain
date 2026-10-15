@@ -5546,11 +5546,33 @@
         "padding-inline-start": 0,
         "padding-inline-end": 0
       }
+    },
+    "product_delivery_returns": {
+      "type": "product-delivery-returns",
+      "settings": {
+        "heading": "Delivery and returns",
+        "description": "<p>Complimentary worldwide delivery with all orders and 28 day return policy (excluding bespoke items)</p>",
+        "button_label": "Read more",
+        "button_link": "",
+        "background_color": "#eeeeee",
+        "text_color": "#222222"
+      }
+    },
+    "product_packaging": {
+      "type": "product-packaging",
+      "settings": {
+        "image": "",
+        "image_position": "left",
+        "heading": "Beautifully packaged",
+        "text": "<p>We want you to be delighted with your jewellery purchase. Enjoy the big reveal as you unwrap the layers of our stylish packaging. Each item is presented in a luxurious velvet case which in turn is protected by an outer case. Our online shopping experience is wrapped and delivered with love.</p>"
+      }
     }
   },
   "order": [
     "breadcrumb_NKGGwM",
     "main",
+    "product_delivery_returns",
+    "product_packaging",
     "skin_tone_preview",
     "quick_order_list_XTrabM",
     "section_product_tabs_U8mYg9",

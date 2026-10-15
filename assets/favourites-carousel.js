@@ -15,6 +15,8 @@ if (!customElements.get('favourites-carousel')) {
       this.arrows = this.querySelector('.fav-arrows');
       this.prev = this.querySelector('.fav-arrow--prev');
       this.next = this.querySelector('.fav-arrow--next');
+      this.bar = this.querySelector('[data-fav-bar]');
+      this.progress = this.querySelector('[data-fav-progress]');
       // Off by default: the row stops at the last panel rather than jumping back to
       // the first one.
       this.loop = this.dataset.loop === 'true';
@@ -49,9 +51,19 @@ if (!customElements.get('favourites-carousel')) {
 
     update() {
       const max = this.maxScroll;
-      // Fewer panels than fit the row: there is nothing to scroll, so the arrows go
-      // rather than sit there doing nothing.
+      if (this.bar) {
+        // The same fill as the rest of the theme's carousels: it starts at the left edge
+        // covering the share of the row on screen and grows to the full width at the last
+        // panel, rather than sliding along the track as a thumb.
+        const filled = this.track.scrollWidth
+          ? (this.track.scrollLeft + this.track.clientWidth) / this.track.scrollWidth
+          : 1;
+        this.bar.style.transform = `scaleX(${Math.min(1, filled)})`;
+      }
+      // Fewer panels than fit the row: there is nothing to scroll, so the arrows and
+      // the progress bar go rather than sit there doing nothing.
       if (this.arrows) this.arrows.hidden = max <= 2;
+      if (this.progress) this.progress.hidden = max <= 2;
       if (!this.prev || !this.next) return;
       this.prev.disabled = this.loop ? false : this.track.scrollLeft <= 2;
       this.next.disabled = this.loop ? false : this.track.scrollLeft >= max - 2;

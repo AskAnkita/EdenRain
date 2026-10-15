@@ -1,0 +1,179 @@
+<style>
+  #eden-megamenu-options {
+    --eden-surface: light-dark(#fff, #211f1d);
+    --eden-text: light-dark(#24211f, #f4efeb);
+    --eden-muted: light-dark(#6f6964, #c4bbb3);
+    --eden-rule: light-dark(#ded8d2, #514a44);
+    --eden-soft: light-dark(#f4f0ec, #302b27);
+    --eden-accent: light-dark(#9c7459, #d0a77f);
+    color: var(--eden-text);
+    font-family: Arial, sans-serif;
+  }
+  #eden-megamenu-options [data-variant] {
+    min-height: 590px;
+    overflow: hidden;
+    background: var(--eden-surface);
+    border: 1px solid var(--eden-rule);
+  }
+  #eden-megamenu-options .eden-nav {
+    display: flex;
+    justify-content: center;
+    gap: clamp(14px, 3vw, 42px);
+    padding: 22px 16px 17px;
+    border-bottom: 1px solid var(--eden-rule);
+    color: var(--eden-text);
+    font-size: 12px;
+    letter-spacing: .19em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  #eden-megamenu-options .eden-nav span:first-child {
+    color: var(--eden-accent);
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 5px;
+  }
+  #eden-megamenu-options .eden-panel { padding: 30px clamp(22px, 4vw, 52px); }
+  #eden-megamenu-options h2,
+  #eden-megamenu-options h3,
+  #eden-megamenu-options p { margin: 0; }
+  #eden-megamenu-options h2 {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+  }
+  #eden-megamenu-options h3 { font-size: 14px; font-weight: 600; }
+  #eden-megamenu-options .eden-rule { height: 1px; margin: 12px 0 18px; background: var(--eden-rule); }
+  #eden-megamenu-options .eden-links { display: grid; gap: 13px; color: var(--eden-muted); font-size: 14px; }
+  #eden-megamenu-options .eden-link { display: flex; align-items: center; gap: 10px; }
+  #eden-megamenu-options .eden-links .active { color: var(--eden-text); }
+  #eden-megamenu-options .eden-shapes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; }
+  #eden-megamenu-options .eden-shape { display: flex; align-items: center; gap: 10px; color: var(--eden-muted); font-size: 14px; }
+  #eden-megamenu-options .eden-icon { width: 18px; height: 18px; color: var(--eden-accent); }
+  #eden-megamenu-options .eden-card {
+    display: flex;
+    min-height: 112px;
+    align-items: flex-end;
+    padding: 20px;
+    color: #fff;
+    background: linear-gradient(135deg, #51463c, #a88767 55%, #d2b69a);
+  }
+  #eden-megamenu-options .eden-card-content { display: grid; gap: 8px; }
+  #eden-megamenu-options .eden-card small { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; opacity: .82; }
+  #eden-megamenu-options .eden-card strong { font-family: Georgia, serif; font-size: 20px; font-weight: 400; }
+  #eden-megamenu-options .eden-cta {
+    display: flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--eden-rule);
+    color: var(--eden-text);
+    font-size: 10px;
+    letter-spacing: .15em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  #eden-megamenu-options .eden-mini-title { margin-bottom: 10px; font-size: 11px; font-weight: 600; }
+  #eden-megamenu-options .eden-resources { display: grid; gap: 12px; color: var(--eden-muted); font-size: 13px; }
+
+  #eden-megamenu-options .eden-columns {
+    display: grid;
+    grid-template-columns: .8fr 1.05fr 1.35fr;
+    gap: clamp(24px, 4vw, 58px);
+  }
+  #eden-megamenu-options .eden-catalog { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+  #eden-megamenu-options .eden-feature { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; }
+  #eden-megamenu-options .eden-feature .eden-card { min-height: 205px; }
+  #eden-megamenu-options .eden-feature-links { display: grid; gap: 10px; align-content: end; }
+  #eden-megamenu-options .eden-footer-link { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--eden-rule); color: var(--eden-muted); font-size: 12px; }
+
+  #eden-megamenu-options .eden-guided { display: grid; grid-template-columns: 210px 1fr 250px; gap: 34px; }
+  #eden-megamenu-options .eden-side { display: grid; align-content: start; gap: 4px; }
+  #eden-megamenu-options .eden-side a { padding: 11px 12px; color: var(--eden-muted); font-size: 14px; }
+  #eden-megamenu-options .eden-side a:first-child { color: var(--eden-text); background: var(--eden-soft); }
+  #eden-megamenu-options .eden-style-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  #eden-megamenu-options .eden-style-tile {
+    display: grid;
+    min-height: 95px;
+    align-content: end;
+    gap: 8px;
+    padding: 12px;
+    background: var(--eden-soft);
+    color: var(--eden-text);
+    font-size: 12px;
+  }
+  #eden-megamenu-options .eden-guide { padding: 18px; background: var(--eden-soft); }
+  #eden-megamenu-options .eden-guide .eden-links { margin-top: 16px; }
+  #eden-megamenu-options .eden-guide .eden-cta { margin-top: 20px; }
+
+  #eden-megamenu-options .eden-editorial { display: grid; grid-template-columns: 1.1fr 1fr; gap: 42px; align-items: stretch; }
+  #eden-megamenu-options .eden-editorial .eden-card { min-height: 335px; padding: 28px; background: linear-gradient(145deg, #322a24, #775d48 58%, #bd9a77); }
+  #eden-megamenu-options .eden-editorial .eden-card strong { font-size: 27px; }
+  #eden-megamenu-options .eden-editorial-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-content: start; }
+  #eden-megamenu-options .eden-editorial-copy .eden-wide { grid-column: 1 / -1; }
+  #eden-megamenu-options .eden-editorial-copy .eden-resources { gap: 14px; }
+  #eden-megamenu-options .eden-editorial-bottom { grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 6px; }
+  #eden-megamenu-options .eden-editorial-bottom .eden-cta { flex: 1; }
+
+  @media (max-width: 720px) {
+    #eden-megamenu-options [data-variant] { min-height: 810px; }
+    #eden-megamenu-options .eden-nav { justify-content: flex-start; overflow: hidden; gap: 18px; font-size: 10px; }
+    #eden-megamenu-options .eden-columns,
+    #eden-megamenu-options .eden-guided,
+    #eden-megamenu-options .eden-editorial { grid-template-columns: 1fr; }
+    #eden-megamenu-options .eden-catalog { grid-template-columns: 1fr 1fr; }
+    #eden-megamenu-options .eden-feature { grid-template-columns: 1fr; }
+    #eden-megamenu-options .eden-feature .eden-card { min-height: 145px; }
+    #eden-megamenu-options .eden-style-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #eden-megamenu-options .eden-side { grid-template-columns: repeat(2, 1fr); }
+    #eden-megamenu-options .eden-editorial .eden-card { min-height: 190px; }
+  }
+</style>
+
+<div class="viz-carousel" id="eden-megamenu-options" aria-label="Mega menu layout options">
+  <section data-variant="Browse Columns" aria-label="Browse Columns mega menu">
+    <nav class="eden-nav" aria-label="Main navigation"><span>Engagement</span><span>Wedding</span><span>Jewellery</span><span>Design Studio</span><span>Learn</span><span>About</span></nav>
+    <div class="eden-panel eden-columns">
+      <div>
+        <h2>Curated Rings</h2><div class="eden-rule"></div>
+        <div class="eden-mini-title">Shop by Style</div>
+        <div class="eden-links"><span>Solitaire</span><span>Halo</span><span>Side Stone</span><span>Three Stone</span><span>Vintage</span><span>Bridal Sets</span></div>
+        <div class="eden-cta" style="margin-top:24px">View all engagement</div>
+      </div>
+      <div class="eden-catalog">
+        <div><h3>Shop by Shape</h3><div class="eden-rule"></div><div class="eden-links"><span class="eden-shape"><i class="eden-icon" data-lucide="circle" aria-hidden="true"></i>Round</span><span class="eden-shape"><i class="eden-icon" data-lucide="gem" aria-hidden="true"></i>Cushion</span><span class="eden-shape"><i class="eden-icon" data-lucide="droplet" aria-hidden="true"></i>Pear</span></div></div>
+        <div><h3>&nbsp;</h3><div class="eden-rule"></div><div class="eden-links"><span class="eden-shape"><i class="eden-icon" data-lucide="oval" aria-hidden="true"></i>Oval</span><span class="eden-shape"><i class="eden-icon" data-lucide="square" aria-hidden="true"></i>Emerald</span><span class="eden-shape"><i class="eden-icon" data-lucide="square" aria-hidden="true"></i>Princess</span></div></div>
+      </div>
+      <div>
+        <h2>Discover</h2><div class="eden-rule"></div>
+        <div class="eden-feature">
+          <div class="eden-card"><div class="eden-card-content"><small>Design Studio</small><strong>Create your ring</strong></div></div>
+          <div class="eden-feature-links"><div class="eden-cta">Start with a setting</div><div class="eden-cta">Start with a diamond</div></div>
+        </div>
+        <div class="eden-footer-link">Diamond Education　·　Ring Guide　·　Talk to a Designer</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-variant="Guided Finder" aria-label="Guided Finder mega menu" hidden>
+    <nav class="eden-nav" aria-label="Main navigation"><span>Engagement</span><span>Wedding</span><span>Jewellery</span><span>Design Studio</span><span>Learn</span><span>About</span></nav>
+    <div class="eden-panel eden-guided">
+      <div><h2>Find your style</h2><div class="eden-rule"></div><div class="eden-side"><a>All engagement rings</a><a>Solitaire</a><a>Halo</a><a>Side Stone</a><a>Three Stone</a><a>Vintage</a><a>Bridal Sets</a></div></div>
+      <div><h2>Popular designs</h2><div class="eden-rule"></div><div class="eden-style-grid"><div class="eden-style-tile"><i class="eden-icon" data-lucide="gem" aria-hidden="true"></i>Solitaire</div><div class="eden-style-tile"><i class="eden-icon" data-lucide="sparkles" aria-hidden="true"></i>Halo</div><div class="eden-style-tile"><i class="eden-icon" data-lucide="circle-dot" aria-hidden="true"></i>Three Stone</div><div class="eden-style-tile"><i class="eden-icon" data-lucide="flower-2" aria-hidden="true"></i>Vintage</div><div class="eden-style-tile"><i class="eden-icon" data-lucide="layers-2" aria-hidden="true"></i>Side Stone</div><div class="eden-style-tile"><i class="eden-icon" data-lucide="heart" aria-hidden="true"></i>Bridal Sets</div></div><div class="eden-footer-link">Browse all engagement rings　→</div></div>
+      <aside class="eden-guide"><h2>Shop by Shape</h2><div class="eden-rule"></div><div class="eden-links"><span>Round</span><span>Oval</span><span>Cushion</span><span>Emerald</span><span>Pear</span><span>Princess</span></div><div class="eden-cta">Explore diamond shapes</div></aside>
+    </div>
+  </section>
+
+  <section data-variant="Editorial Feature" aria-label="Editorial Feature mega menu" hidden>
+    <nav class="eden-nav" aria-label="Main navigation"><span>Engagement</span><span>Wedding</span><span>Jewellery</span><span>Design Studio</span><span>Learn</span><span>About</span></nav>
+    <div class="eden-panel eden-editorial">
+      <div class="eden-card"><div class="eden-card-content"><small>Made for your moment</small><strong>Find the ring that feels like you.</strong><span>Explore settings, shapes, and one of a kind details.</span></div></div>
+      <div class="eden-editorial-copy">
+        <div><h2>Shop by Style</h2><div class="eden-rule"></div><div class="eden-resources"><span>Solitaire</span><span>Halo</span><span>Side Stone</span><span>Three Stone</span><span>Vintage</span><span>Bridal Sets</span></div></div>
+        <div><h2>Shop by Shape</h2><div class="eden-rule"></div><div class="eden-resources"><span>Round</span><span>Oval</span><span>Cushion</span><span>Emerald</span><span>Pear</span><span>Princess</span></div></div>
+        <div class="eden-editorial-bottom"><div class="eden-cta">Design Studio</div><div class="eden-cta">Diamond Education</div><div class="eden-cta">Ring Guide</div></div>
+      </div>
+    </div>
+  </section>
+</div>

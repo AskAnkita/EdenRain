@@ -10,6 +10,11 @@ assets/environment-maps/*
 scripts/*
 .gitignore
 
+# Static HTML previews of sections and menus, rendered from the real snippets for a browser.
+# They are not theme files, and regenerating one while `theme dev` is running churned the
+# watcher for nothing.
+design-previews/*
+
 # Half-written temp files an editor or `sed -i` leaves beside the real one. They appear for a
 # moment during a save and break an upload that happens to scan the folder right then.
 .!*!*
