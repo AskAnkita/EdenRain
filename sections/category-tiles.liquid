@@ -77,7 +77,7 @@
   # name. A picture chosen in the theme editor always wins over this
   # list, so a tile never ignores it.
   # ------------------------------------------------------------------
-  assign tile_pictures = 'Engagement Rings: category-rings.png, Rings: category-rings.png, Earrings: category-earrings.png, Necklaces: category-necklaces.png, Bracelets: category-bracelets.png, Best Sellers: category-best-sellers.png, Wedding Bands: category-wedding-bands.png'
+  assign tile_pictures = 'Engagement Rings: category-engagement-rings-model.png, Rings: category-rings.png, Earrings: category-earrings.png, Necklaces: category-necklaces.png, Bracelets: category-bracelets.png, Best Sellers: category-best-sellers.png, Wedding Bands: category-wedding-bands-product.png'
   assign tile_picture_pairs = tile_pictures | split: ','
 -%}
 
@@ -529,7 +529,7 @@
       "type": "text",
       "id": "items",
       "label": "Tiles",
-      "default": "Wedding Bands, Engagement Rings, Necklaces, Earrings, Bracelets",
+      "default": "Engagement Rings, Wedding Bands, Necklaces, Earrings, Bracelets",
       "info": "One title per tile, comma separated, in the order they appear. A title that matches an item in the menu below uses that item's link; any other links to \/collections\/<title>. Leave empty to show every item in the menu instead."
     },
     {
