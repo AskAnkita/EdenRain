@@ -1,151 +1,48 @@
 {
   "sections": {
-    "builder": {
-      "type": "design-studio-builder",
-      "blocks": {
-        "step_setting": { "type": "step", "settings": { "label": "Setting", "current": true } },
-        "step_stone": { "type": "step", "settings": { "label": "Diamond", "link": "", "current": false } },
-        "step_review": { "type": "step", "settings": { "label": "Review", "link": "", "current": false } },
-        "view_front": { "type": "view", "settings": { "image_asset": "featured-engagement-signature.jpg", "image_alt": "The ring from the front" } },
-        "view_side": { "type": "view", "settings": { "image_asset": "featured-engagement-bridal.jpg", "image_alt": "The ring from the side" } },
-        "view_hand": { "type": "view", "settings": { "image_asset": "pear-ring-hand-tone-3.jpg", "image_alt": "The ring worn on the hand" } },
-        "opt_shape": {
-          "type": "option",
-          "settings": {
-            "label": "Diamond shape",
-            "style": "shapes",
-            "choices": "Round | diamond-shape-round.png\nOval | diamond-shape-oval.png\nEmerald | diamond-shape-emerald.png\nPear | diamond-shape-pear.png\nCushion | diamond-shape-cushion.png\nPrincess | diamond-shape-princess.png\nRadiant | diamond-shape-radiant.png\nAsscher | diamond-shape-asscher.png\nMarquise | diamond-shape-marquise.png\nHeart | diamond-shape-heart.png",
-            "selected": 1,
-            "value_note": "Round"
-          }
-        },
-        "opt_metal": {
-          "type": "option",
-          "settings": {
-            "label": "Metal",
-            "style": "swatches",
-            "choices": "Yellow gold | #d7b06a\nWhite gold | #dcdcdc\nRose gold | #d8a08c\nPlatinum | #c8c9c7",
-            "selected": 2,
-            "value_note": "18ct white gold"
-          }
-        },
-        "opt_carat": {
-          "type": "option",
-          "settings": {
-            "label": "Carat",
-            "style": "pills",
-            "choices": "0.50\n0.75\n1.00\n1.25\n1.50\n2.00",
-            "selected": 3,
-            "value_note": "1.00 ct",
-            "help": "Carat is weight, not width. Two stones of the same weight can look different sizes."
-          }
-        },
-        "opt_quality": {
-          "type": "option",
-          "settings": {
-            "label": "Colour and clarity",
-            "style": "pills",
-            "choices": "E VS1\nF VS2\nG VS2\nH SI1",
-            "selected": 2,
-            "value_note": "F VS2"
-          }
-        },
-        "opt_size": {
-          "type": "option",
-          "settings": {
-            "label": "Ring size",
-            "style": "dropdown",
-            "choices": "J\nK\nL\nM\nN\nO\nP\nQ",
-            "selected": 4,
-            "help": "Not sure? Order a free ring sizer and we will hold your design."
-          }
-        },
-        "detail_spec": {
-          "type": "detail",
-          "settings": {
-            "heading": "Specification",
-            "text": "<p>Lab-grown diamond, hand-set in recycled gold. Every stone over 0.50ct is supplied with its own certificate.<\/p>",
-            "open": true
-          }
-        },
-        "detail_making": {
-          "type": "detail",
-          "settings": {
-            "heading": "Making and delivery",
-            "text": "<p>Made to order in our workshop and sent to you insured. We confirm the date in writing before you pay.<\/p>",
-            "open": false
-          }
-        },
-        "detail_returns": {
-          "type": "detail",
-          "settings": {
-            "heading": "Returns",
-            "text": "<p>Thirty days to change your mind on a made-to-order piece, from the day it reaches you.<\/p>",
-            "open": false
-          }
-        }
-      },
-      "block_order": [
-        "step_setting",
-        "step_stone",
-        "step_review",
-        "view_front",
-        "view_side",
-        "view_hand",
-        "opt_shape",
-        "opt_metal",
-        "opt_carat",
-        "opt_quality",
-        "opt_size",
-        "detail_spec",
-        "detail_making",
-        "detail_returns"
-      ],
+    "studio": {
+      "type": "ijewel-studio",
       "settings": {
-        "show_steps": true,
-        "show_thumbs": true,
-        "show_details": true,
-        "sticky_actions": true,
-        "steps_label": "Design steps",
-        "stage_image_asset": "featured-engagement-signature.jpg",
-        "stage_image_alt": "The ring you are designing",
-        "stage_ratio": "1",
-        "stage_width": "1.15",
-        "stage_badge": "360° view",
-        "sticky_top": 90,
-        "thumb_size": 0,
+        "embed_url": "",
+        "embed_title": "Design your own jewellery",
+        "lazy_load": true,
+        "frame_height": 760,
+        "frame_height_mobile": 560,
+        "loading_label": "Loading the designer",
         "eyebrow": "DESIGN STUDIO",
-        "title": "Build your engagement ring",
-        "title_is_h1": true,
-        "price": "",
-        "intro": "<p>Every change is priced as you make it. Nothing is cast until you have approved the design.<\/p>",
-        "total_label": "Your design",
-        "total": "From £1,850",
-        "button_label": "Add to bag",
-        "button_link": "",
-        "button_style": "solid",
-        "reassurance": "Free insured delivery | Made to order | 30-day returns",
-        "shape_columns": "5",
-        "shape_size": 0,
-        "swatch_size": 0,
-        "title_size": 0,
+        "heading": "Design your ring in 3D",
+        "heading_is_h1": true,
+        "intro": "<p>Choose the setting, the stone and the metal, and turn the ring to see it from every side. Every change is priced as you make it, and nothing is made until you have approved the design.<\/p>",
+        "alignment": "center",
+        "poster_image_asset": "featured-engagement-signature.jpg",
+        "poster_image_alt": "A lab-grown diamond ring made to order",
+        "notes": "No design fee | Made to order | Free insured delivery",
+        "primary_label": "",
+        "primary_link": "",
+        "primary_style": "solid",
+        "primary_new_tab": false,
+        "secondary_label": "Talk to a designer",
+        "secondary_link": "/pages/bespoke-jewellery-request",
+        "secondary_style": "outline",
+        "aside": "",
+        "fallback_heading": "Designed with you, by hand",
+        "fallback_text": "<p>Tell us what you have in mind - a stone, a setting, a piece you want remade - and we will come back with a sketch and a price.<\/p>",
+        "fallback_label": "Start a bespoke enquiry",
+        "fallback_link": "/pages/bespoke-jewellery-request",
+        "heading_size": 0,
         "eyebrow_size": 0,
-        "price_size": 0,
         "text_size": 0,
-        "label_size": 0,
-        "step_size": 0,
-        "detail_size": 0,
         "note_size": 0,
         "full_width": false,
         "content_width": 0,
         "padding_horizontal": 0,
         "custom_padding": false,
-        "padding_top": 30,
+        "padding_top": 40,
         "padding_bottom": 60
       }
     }
   },
   "order": [
-    "builder"
+    "studio"
   ]
 }

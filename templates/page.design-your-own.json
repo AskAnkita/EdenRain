@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "studio": {
@@ -9,7 +18,9 @@
             "label": "",
             "heading": "Design it",
             "text": "<p>Pick a setting, a stone shape and a metal in the studio above, or send us a reference and we will draw it with you.</p>",
+            "image": "shopify://shop_images/ChatGPT_Image_15_Oct_2026_14_21_39.png",
             "image_asset": "featured-diamonds-education.jpg",
+            "image_url": "",
             "image_alt": "Choosing a lab-grown diamond"
           }
         },
@@ -18,8 +29,10 @@
           "settings": {
             "label": "",
             "heading": "See it before it exists",
-            "text": "<p>We come back with a 3D view and a firm price. Change the stone, the band, the setting height \u2014 as many times as you need \u2014 until it is right.</p>",
+            "text": "<p>We come back with a 3D view and a firm price. Change the stone, the band, the setting height — as many times as you need — until it is right.</p>",
+            "image": "shopify://shop_images/pear-ring-hand-tone-6.jpg",
             "image_asset": "featured-engagement-value.jpg",
+            "image_url": "",
             "image_alt": "A 3D view of a made-to-order ring"
           }
         },
@@ -30,6 +43,7 @@
             "heading": "We make it",
             "text": "<p>Your piece is cast, set and finished by hand, then checked and sent to you insured. We will confirm the date with your quote.</p>",
             "image_asset": "about-craft-workshop.png",
+            "image_url": "",
             "image_alt": "A jeweller finishing a ring at the bench"
           }
         },
@@ -37,7 +51,7 @@
           "type": "faq",
           "settings": {
             "question": "What does a bespoke piece cost?",
-            "answer": "<p>The studio prices every change as you make it, so you always see the number before you commit. For a design that starts from scratch we quote once we have the drawing \u2014 the stone, the metal and the work involved set the price.</p>",
+            "answer": "<p>The studio prices every change as you make it, so you always see the number before you commit. For a design that starts from scratch we quote once we have the drawing — the stone, the metal and the work involved set the price.</p>",
             "open": true
           }
         },
@@ -61,7 +75,7 @@
           "type": "faq",
           "settings": {
             "question": "Can you use my own stone?",
-            "answer": "<p>Often, yes \u2014 an heirloom diamond or a stone from a piece you no longer wear can be reset. Send us a photo and any certificate you have and we will tell you what is possible.</p>",
+            "answer": "<p>Often, yes — an heirloom diamond or a stone from a piece you no longer wear can be reset. Send us a photo and any certificate you have and we will tell you what is possible.</p>",
             "open": false
           }
         },
@@ -101,7 +115,9 @@
         "primary_link": "",
         "secondary_label": "Talk to a designer",
         "secondary_link": "/pages/bespoke-jewellery-request",
+        "hero_image": "shopify://shop_images/category-rings.png",
         "hero_image_asset": "featured-engagement-signature.jpg",
+        "hero_image_url": "",
         "hero_image_alt": "A lab-grown diamond ring made to order in our studio",
         "hero_ratio": "1.1",
         "hero_ratio_mobile": "1.05",
@@ -111,11 +127,13 @@
         "embed_title": "Design your own jewellery",
         "builder_note": "",
         "fallback_heading": "Designed with you, by hand",
-        "fallback_text": "<p>Tell us what you have in mind \u2014 a stone, a setting, a piece you want remade \u2014 and we will come back with a sketch and a price.</p>",
+        "fallback_text": "<p>Tell us what you have in mind — a stone, a setting, a piece you want remade — and we will come back with a sketch and a price.</p>",
         "fallback_label": "Start a bespoke enquiry",
         "fallback_link": "/pages/bespoke-jewellery-request",
         "frame_height": 760,
         "frame_height_mobile": 560,
+        "frame_background": "rgba(0,0,0,0)",
+        "frame_border": "rgba(0,0,0,0)",
         "steps_heading": "How it works",
         "steps_intro": "<p>Three steps from an idea to a finished piece.</p>",
         "number_steps": true,
@@ -132,6 +150,28 @@
         "cta_text": "<p>Send us the idea, however rough. One of our designers will come back with what is possible, what it would cost and how long it would take.</p>",
         "cta_label": "Talk to a designer",
         "cta_link": "/pages/bespoke-jewellery-request",
+        "cta_background": "rgba(0,0,0,0)",
+        "cta_text_color": "rgba(0,0,0,0)",
+        "section_background": "rgba(0,0,0,0)",
+        "heading_color": "rgba(0,0,0,0)",
+        "eyebrow_color": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "note_background": "rgba(0,0,0,0)",
+        "note_border": "rgba(0,0,0,0)",
+        "note_color": "rgba(0,0,0,0)",
+        "wash_background": "rgba(0,0,0,0)",
+        "rule_color": "rgba(0,0,0,0)",
+        "step_num_color": "rgba(0,0,0,0)",
+        "hero_size": 0,
+        "hero_size_mobile": 0,
+        "heading_size": 0,
+        "eyebrow_size": 0,
+        "text_size": 0,
+        "note_size": 0,
+        "step_num_size": 0,
+        "step_heading_size": 0,
+        "caption_size": 0,
+        "faq_size": 0,
         "full_width": false,
         "content_width": 0,
         "padding_horizontal": 0,

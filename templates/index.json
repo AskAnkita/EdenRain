@@ -222,7 +222,7 @@
             "heading": "Design your own",
             "text": "<p>Choose your setting, select a centre stone, and make every detail your own in our Design Studio.</p>",
             "button_label": "Start designing",
-            "button_link": "/pages/design-studio-builder"
+            "button_link": "shopify://pages/design-your-own"
           }
         },
         "route_stone": {
@@ -242,7 +242,6 @@
       "settings": {
         "eyebrow": "Your ring, your way",
         "heading": "Where would you like to begin?",
-        "media_image": "",
         "media_asset": "category-engagement-rings-model.png",
         "media_image_url": "",
         "media_alt": "Engagement ring shown from top and side views in several metal colours",

@@ -1,0 +1,298 @@
+{% comment %}
+  iJewel 3D studio - the page a "Start designing" button lands on.
+
+  The band is the configurator: an optional heading above it, iJewel's 3D tool
+  in the frame, and the reassurance lines and links under it. Which tool goes
+  in the frame is decided in this order:
+
+    1. any app block added to this section, so an app-based builder still
+       takes the slot if one is ever installed.
+    2. the 3D configurator, when an embed URL is set. iJewel hands one over in
+       the Embedding tab of a file in iJewel Drive - either the whole <iframe>
+       snippet or just its src, and this takes both. The URL looks like
+       https://ijewel3d.com/<instance>/files/<file id>/embedded, or
+       https://ijewel3d.com/drive/files/embedded?tag=...&scope=<folder id>.
+       The file has to be public, or the frame loads empty.
+       assets/ijewel-studio.js builds the frame once it is near the viewport.
+    3. the enquiry card, when neither is there - the shop still takes custom
+       work by email and form, so the page is useful before the tool is wired
+       up and stays useful if it is ever turned off.
+
+  Looks come from assets/ijewel-studio.css; buttons from assets/eden-actions.css.
+  The poster image reuses snippets/homepage-journey-image.liquid - picked image
+  first, then a file in Content > Files or assets/, then a pasted URL.
+
+  Every restylable setting is written onto the section element as a CSS custom
+  property, with the stylesheet's own value as the fallback, so a setting left
+  at "use the default" (a cleared colour, a size of 0) writes nothing at all.
+{% endcomment %}
+
+{{ 'ijewel-studio.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ijewel-studio.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign transparent = 'rgba(0,0,0,0)'
+
+  assign heading_size = section.settings.heading_size | plus: 0
+  assign eyebrow_size = section.settings.eyebrow_size | plus: 0
+  assign text_size = section.settings.text_size | plus: 0
+  assign note_size = section.settings.note_size | plus: 0
+  assign content_width = section.settings.content_width | plus: 0
+  assign pad_inline = section.settings.padding_horizontal | plus: 0
+  assign pad_top = section.settings.padding_top | plus: 0
+  assign pad_bottom = section.settings.padding_bottom | plus: 0
+
+  # iJewel's Embedding tab offers the whole <iframe ...> snippet and the bare
+  # URL, and pasting either into the one field should work. A snippet is cut
+  # down to its src; anything else is taken as the URL it is.
+  assign embed_src = section.settings.embed_url | strip
+
+  if embed_src contains 'src='
+    assign src_parts = embed_src | split: 'src=' | last | replace: "'", '"' | split: '"'
+    assign embed_src = src_parts[1] | default: ''
+  endif
+
+  # Only an absolute https URL is ever printed into the frame, so a stray word
+  # in the field cannot turn into a relative path on our own domain.
+  unless embed_src contains 'https://'
+    assign embed_src = ''
+  endunless
+
+  assign app_blocks = 0
+  for block in section.blocks
+    if block.type == '@app'
+      assign app_blocks = app_blocks | plus: 1
+    endif
+  endfor
+
+  assign poster_set = false
+  if section.settings.poster_image != blank or section.settings.poster_image_asset != blank or section.settings.poster_image_url != blank
+    assign poster_set = true
+  endif
+
+  assign notes = section.settings.notes | split: '|'
+-%}
+
+{%- capture section_styles -%}
+  {%- if section.settings.section_background != blank and section.settings.section_background != transparent -%}--ijw-section-bg: {{ section.settings.section_background }};{%- endif -%}
+  {%- if section.settings.heading_color != blank and section.settings.heading_color != transparent -%}--ijw-heading-color: {{ section.settings.heading_color }};{%- endif -%}
+  {%- if section.settings.eyebrow_color != blank and section.settings.eyebrow_color != transparent -%}--ijw-eyebrow-color: {{ section.settings.eyebrow_color }};{%- endif -%}
+  {%- if section.settings.text_color != blank and section.settings.text_color != transparent -%}--ijw-text-color: {{ section.settings.text_color }};{%- endif -%}
+  {%- if section.settings.note_color != blank and section.settings.note_color != transparent -%}--ijw-note-color: {{ section.settings.note_color }};{%- endif -%}
+  {%- if section.settings.frame_background != blank and section.settings.frame_background != transparent -%}--ijw-frame-bg: {{ section.settings.frame_background }};{%- endif -%}
+  {%- if section.settings.frame_border != blank and section.settings.frame_border != transparent -%}--ijw-frame-border: {{ section.settings.frame_border }};{%- endif -%}
+  {%- if section.settings.button_background != blank and section.settings.button_background != transparent -%}--ijw-button-bg: {{ section.settings.button_background }};{%- endif -%}
+  {%- if section.settings.button_text_color != blank and section.settings.button_text_color != transparent -%}--ijw-button-ink: {{ section.settings.button_text_color }};{%- endif -%}
+  {%- if heading_size > 0 -%}--ijw-heading-size: {{ heading_size }}px;{%- endif -%}
+  {%- if eyebrow_size > 0 -%}--ijw-eyebrow-size: {{ eyebrow_size }}px;{%- endif -%}
+  {%- if text_size > 0 -%}--ijw-text-size: {{ text_size }}px;{%- endif -%}
+  {%- if note_size > 0 -%}--ijw-note-size: {{ note_size }}px;{%- endif -%}
+  --ijw-frame-height: {{ section.settings.frame_height }}px;
+  --ijw-frame-height-mobile: {{ section.settings.frame_height_mobile }}px;
+  {%- if content_width > 0 and section.settings.full_width == false -%}--ijw-shell-max: {{ content_width }}px;{%- endif -%}
+  {%- if pad_inline > 0 -%}--ijw-pad-inline: {{ pad_inline }}px;{%- endif -%}
+  {%- if section.settings.custom_padding -%}--ijw-pad-top: {{ pad_top }}px;--ijw-pad-bottom: {{ pad_bottom }}px;{%- endif -%}
+{%- endcapture -%}
+
+<section
+  class="ijewel-studio{% if section.settings.full_width %} ijewel-studio--wide{% endif %}"
+  style="{{ section_styles }}"
+>
+  <div class="ijw-shell">
+    {%- if section.settings.heading != blank or section.settings.eyebrow != blank or section.settings.intro != blank -%}
+      <div class="ijw-head{% if section.settings.alignment == 'left' %} ijw-head--left{% endif %}">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="ijw-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.heading != blank -%}
+          {%- if section.settings.heading_is_h1 -%}
+            <h1 class="ijw-title">{{ section.settings.heading | escape }}</h1>
+          {%- else -%}
+            <h2 class="ijw-title">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+        {%- endif -%}
+
+        {%- if section.settings.intro != blank -%}
+          <div class="ijw-text">{{ section.settings.intro }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="ijw-frame">
+      {%- if app_blocks > 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == '@app' -%}
+            <div class="ijw-app" {{ block.shopify_attributes }}>{% render block %}</div>
+          {%- endif -%}
+        {%- endfor -%}
+
+      {%- elsif embed_src != blank -%}
+        <ijewel-studio
+          data-src="{{ embed_src | escape }}"
+          data-title="{{ section.settings.embed_title | default: 'Design your own jewellery' | escape }}"
+          data-lazy="{% if section.settings.lazy_load %}true{% else %}false{% endif %}"
+        >
+          <noscript>
+            <iframe
+              src="{{ embed_src | escape }}"
+              title="{{ section.settings.embed_title | default: 'Design your own jewellery' | escape }}"
+              allow="autoplay; camera; fullscreen; xr-spatial-tracking; web-share"
+              allowfullscreen
+            ></iframe>
+          </noscript>
+        </ijewel-studio>
+
+        <div class="ijw-poster">
+          {%- if poster_set -%}
+            <div class="ijw-poster__image">
+              {%- render 'homepage-journey-image',
+                image: section.settings.poster_image,
+                asset: section.settings.poster_image_asset,
+                image_url: section.settings.poster_image_url,
+                alt: section.settings.poster_image_alt,
+                placeholder: 'product-1',
+                sizes: '100vw',
+                width: 1600,
+                height: 1200
+              -%}
+            </div>
+          {%- endif -%}
+          {%- if section.settings.loading_label != blank -%}
+            <p class="ijw-poster__label">{{ section.settings.loading_label | escape }}</p>
+          {%- endif -%}
+        </div>
+
+      {%- else -%}
+        <div class="ijw-fallback">
+          {%- if section.settings.fallback_heading != blank -%}
+            <h2>{{ section.settings.fallback_heading | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.fallback_text != blank -%}
+            <div class="ijw-text">{{ section.settings.fallback_text }}</div>
+          {%- endif -%}
+          {%- if section.settings.fallback_label != blank -%}
+            <div class="ijw-actions">
+              <a class="eden-action eden-action--solid" href="{{ section.settings.fallback_link | default: '#' }}">
+                {{- section.settings.fallback_label | escape -}}
+              </a>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if notes.size > 0 -%}
+      <ul class="ijw-notes">
+        {%- for note in notes -%}
+          {%- assign note_text = note | strip -%}
+          {%- if note_text != blank -%}
+            <li class="ijw-note">{{ note_text | escape }}</li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if section.settings.primary_label != blank or section.settings.secondary_label != blank -%}
+      <div class="ijw-actions">
+        {%- if section.settings.primary_label != blank -%}
+          <a
+            class="eden-action eden-action--{{ section.settings.primary_style }}"
+            href="{{ section.settings.primary_link | default: '#' }}"
+            {% if section.settings.primary_new_tab %}target="_blank" rel="noopener"{% endif %}
+          >
+            {{- section.settings.primary_label | escape -}}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.secondary_label != blank -%}
+          <a
+            class="eden-action eden-action--{{ section.settings.secondary_style }}"
+            href="{{ section.settings.secondary_link | default: '#' }}"
+          >
+            {{- section.settings.secondary_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.aside != blank -%}
+      <p class="ijw-aside">{{ section.settings.aside }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "iJewel 3D studio",
+  "tag": "section",
+  "class": "section-ijewel-studio",
+  "settings": [
+    { "type": "header", "content": "The 3D designer", "info": "In iJewel Drive open the file, go to Embedding, and copy what it gives you. The file must be set to public or the frame loads empty." },
+    { "type": "textarea", "id": "embed_url", "label": "Embed URL or iframe code", "info": "Paste either the URL (https://ijewel3d.com/.../files/.../embedded) or the whole <iframe> snippet - the src is taken out of it. Leave empty to show the enquiry card instead." },
+    { "type": "text", "id": "embed_title", "label": "Frame title for screen readers", "default": "Design your own jewellery" },
+    { "type": "checkbox", "id": "lazy_load", "label": "Load the designer when it scrolls into view", "default": true, "info": "Untick to load it with the page. A 3D scene is a heavy first load." },
+    { "type": "range", "id": "frame_height", "label": "Frame height (desktop)", "min": 400, "max": 1400, "step": 20, "unit": "px", "default": 760 },
+    { "type": "range", "id": "frame_height_mobile", "label": "Frame height (mobile)", "min": 320, "max": 1200, "step": 20, "unit": "px", "default": 560 },
+    { "type": "text", "id": "loading_label", "label": "Line shown while it loads", "info": "Leave empty to hide it.", "default": "Loading the designer" },
+
+    { "type": "header", "content": "Above the designer" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "DESIGN STUDIO" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Design your ring in 3D" },
+    { "type": "checkbox", "id": "heading_is_h1", "label": "Use the heading as the page's H1", "default": true },
+    { "type": "richtext", "id": "intro", "label": "Text under the heading", "default": "<p>Choose the setting, the stone and the metal, and turn the ring to see it from every side. Nothing is made until you have approved it.</p>" },
+    { "type": "select", "id": "alignment", "label": "Alignment", "options": [ { "value": "center", "label": "Centred" }, { "value": "left", "label": "Left" } ], "default": "center" },
+
+    { "type": "header", "content": "Loading image", "info": "Sits behind the designer until it has loaded. Leave empty for a plain frame." },
+    { "type": "image_picker", "id": "poster_image", "label": "Image" },
+    { "type": "text", "id": "poster_image_asset", "label": "Image file name (fallback)", "info": "A file name in Content > Files (or assets/), e.g. featured-engagement-signature.jpg." },
+    { "type": "text", "id": "poster_image_url", "label": "Image URL (fallback)" },
+    { "type": "text", "id": "poster_image_alt", "label": "Image alt text", "default": "A lab-grown diamond ring made to order" },
+
+    { "type": "header", "content": "Under the designer" },
+    { "type": "text", "id": "notes", "label": "Reassurance lines (separate with |)", "info": "Short and factual. Leave empty to hide them.", "default": "No design fee | Made to order | Free insured delivery" },
+    { "type": "text", "id": "primary_label", "label": "First button label", "info": "Leave empty to hide it." },
+    { "type": "url", "id": "primary_link", "label": "First button link" },
+    { "type": "select", "id": "primary_style", "label": "First button style", "options": [ { "value": "solid", "label": "Filled" }, { "value": "outline", "label": "Outlined" }, { "value": "light", "label": "Outlined, for a dark background" }, { "value": "invert", "label": "Filled white, for a dark background" } ], "default": "solid" },
+    { "type": "checkbox", "id": "primary_new_tab", "label": "Open the first button in a new tab", "default": false },
+    { "type": "text", "id": "secondary_label", "label": "Second button label", "info": "Leave empty to hide it.", "default": "Talk to a designer" },
+    { "type": "url", "id": "secondary_link", "label": "Second button link" },
+    { "type": "select", "id": "secondary_style", "label": "Second button style", "options": [ { "value": "outline", "label": "Outlined" }, { "value": "solid", "label": "Filled" }, { "value": "light", "label": "Outlined, for a dark background" }, { "value": "invert", "label": "Filled white, for a dark background" } ], "default": "outline" },
+    { "type": "richtext", "id": "aside", "label": "Small print under the buttons" },
+
+    { "type": "header", "content": "If no designer is set", "info": "Shown in the frame when there is no iJewel link and no app block, so the page still leads somewhere." },
+    { "type": "text", "id": "fallback_heading", "label": "Heading", "default": "Designed with you, by hand" },
+    { "type": "richtext", "id": "fallback_text", "label": "Text", "default": "<p>Tell us what you have in mind - a stone, a setting, a piece you want remade - and we will come back with a sketch and a price.</p>" },
+    { "type": "text", "id": "fallback_label", "label": "Button label", "default": "Start a bespoke enquiry" },
+    { "type": "url", "id": "fallback_link", "label": "Button link" },
+
+    { "type": "header", "content": "Colours", "info": "Clear a colour to use the stylesheet default." },
+    { "type": "color", "id": "section_background", "label": "Section background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "heading_color", "label": "Heading", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "text_color", "label": "Body text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "note_color", "label": "Reassurance lines", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "frame_background", "label": "Frame background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "frame_border", "label": "Frame border", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_background", "label": "Button fill", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_text_color", "label": "Button label", "default": "rgba(0,0,0,0)" },
+
+    { "type": "header", "content": "Typography", "info": "Set a size to 0 to keep the stylesheet's responsive default." },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 0, "max": 64, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "eyebrow_size", "label": "Eyebrow size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "text_size", "label": "Body text size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "note_size", "label": "Reassurance line size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+
+    { "type": "header", "content": "Content width" },
+    { "type": "checkbox", "id": "full_width", "label": "Stretch content to the screen edge", "default": false },
+    { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "0 keeps the default 1560px. Ignored when the box above is ticked." },
+    { "type": "range", "id": "padding_horizontal", "label": "Side padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the theme's responsive padding (20-64px)." },
+
+    { "type": "header", "content": "Section padding" },
+    { "type": "checkbox", "id": "custom_padding", "label": "Use custom section padding", "default": false },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 60 }
+  ],
+  "blocks": [{ "type": "@app" }],
+  "presets": [{ "name": "iJewel 3D studio" }]
+}
+{% endschema %}

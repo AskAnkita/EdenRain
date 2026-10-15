@@ -1,0 +1,242 @@
+/*
+  iJewel 3D studio - the live configurator page (/pages/design-studio-builder).
+
+  One band: an optional heading, the configurator frame, and the lines and
+  links under it. The frame holds an iframe pointed at the embed URL from
+  iJewel, built by assets/ijewel-studio.js once the section is near the
+  viewport. Until it has loaded, the frame shows the poster and a loading
+  line, so the page is never an empty box.
+
+  Every value a merchant can move is a --ijw-* custom property written onto
+  the section element, with the value this file always had as its fallback,
+  so a setting left alone renders exactly as shipped. Square corners
+  throughout - this theme sets every radius to 0. Buttons come from
+  assets/eden-actions.css.
+*/
+
+.ijewel-studio {
+  --ijw-ink: #171714;
+  --ijw-muted: #69675f;
+  --ijw-line: rgba(23, 23, 20, 0.18);
+  --ijw-wash: #f4f2ef;
+  color: var(--ijw-ink);
+  background: var(--ijw-section-bg, transparent);
+  padding: var(--ijw-pad-top, clamp(28px, 4vw, 56px)) var(--ijw-pad-inline, clamp(20px, 4vw, 64px))
+    var(--ijw-pad-bottom, clamp(42px, 6vw, 92px));
+}
+
+.ijw-shell {
+  max-width: var(--ijw-shell-max, 1560px);
+  margin: 0 auto;
+}
+
+.ijewel-studio.ijewel-studio--wide .ijw-shell {
+  max-width: none;
+}
+
+.ijewel-studio h1,
+.ijewel-studio h2,
+.ijewel-studio h3 {
+  margin: 0;
+  color: var(--ijw-heading-color, var(--ijw-ink));
+  font-family: var(--font-heading--family);
+  font-weight: 400;
+}
+
+.ijw-head {
+  max-width: 760px;
+  margin: 0 auto clamp(20px, 3vw, 40px);
+  text-align: center;
+}
+
+.ijw-head--left {
+  margin-left: 0;
+  text-align: left;
+}
+
+.ijw-eyebrow {
+  margin: 0 0 14px;
+  color: var(--ijw-eyebrow-color, var(--ijw-muted));
+  font-size: var(--ijw-eyebrow-size, 1.05rem);
+  letter-spacing: 0.18em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.ijw-title {
+  font-size: var(--ijw-heading-size, clamp(2.6rem, 3.6vw, 4.4rem));
+  letter-spacing: 0.015em;
+  line-height: 1.12;
+}
+
+.ijw-title + .ijw-text {
+  margin-top: 14px;
+}
+
+.ijw-text {
+  color: var(--ijw-text-color, var(--ijw-muted));
+  font-size: var(--ijw-text-size, 1.55rem);
+  line-height: 1.75;
+}
+
+.ijw-text p {
+  margin: 0 0 1em;
+}
+
+.ijw-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* ------------------------------------------------------------------ frame */
+
+/* min-height rather than height: a 3D canvas that cannot grow ends up
+   scrolling inside its own frame on a phone. */
+.ijw-frame {
+  position: relative;
+  min-height: var(--ijw-frame-height-mobile, 560px);
+  border: 1px solid var(--ijw-frame-border, var(--ijw-line));
+  background: var(--ijw-frame-bg, var(--ijw-wash));
+}
+
+.ijw-frame > * {
+  max-width: 100%;
+}
+
+ijewel-studio {
+  display: block;
+  min-height: inherit;
+}
+
+.ijw-frame iframe {
+  display: block;
+  width: 100%;
+  min-height: var(--ijw-frame-height-mobile, 560px);
+  height: var(--ijw-frame-height-mobile, 560px);
+  border: 0;
+}
+
+/* The poster sits under the configurator and is removed once it has loaded,
+   so a slow first paint of a 3D scene is never a blank grey rectangle. */
+.ijw-poster {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: clamp(28px, 5vw, 64px);
+  text-align: center;
+  pointer-events: none;
+}
+
+.ijw-poster__image {
+  position: absolute;
+  inset: 0;
+  opacity: 0.45;
+}
+
+.ijw-poster__image img,
+.ijw-poster__image svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ijw-poster__label {
+  position: relative;
+  margin: 0;
+  color: var(--ijw-note-color, var(--ijw-muted));
+  font-size: var(--ijw-note-size, 1.2rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* The card that stands in the frame when no iJewel link has been set: the
+   shop still takes custom work by enquiry, so this is a real route. */
+.ijw-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: inherit;
+  padding: clamp(36px, 6vw, 80px) clamp(20px, 4vw, 56px);
+  text-align: center;
+}
+
+.ijw-fallback h2 {
+  font-size: var(--ijw-heading-size, clamp(2rem, 2.6vw, 3rem));
+  line-height: 1.2;
+}
+
+.ijw-fallback .ijw-text {
+  max-width: 540px;
+}
+
+/* ------------------------------------------------------- under the frame */
+
+.ijw-notes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 26px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ijw-note {
+  position: relative;
+  color: var(--ijw-note-color, var(--ijw-muted));
+  font-size: var(--ijw-note-size, 1.2rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ijw-note + .ijw-note::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -14px;
+  width: 3px;
+  height: 3px;
+  background: currentColor;
+  transform: translateY(-50%);
+}
+
+/* The button colour settings ride on the two variables eden-actions.css reads,
+   so a filled button and an outlined one stay a matching pair. */
+.ijw-actions {
+  --eden-action-ink: var(--ijw-button-bg, #171714);
+  --eden-action-on-ink: var(--ijw-button-ink, #ffffff);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 16px;
+  margin-top: clamp(20px, 3vw, 32px);
+}
+
+.ijw-aside {
+  margin: 16px 0 0;
+  color: var(--ijw-text-color, var(--ijw-muted));
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.ijw-aside a {
+  color: inherit;
+}
+
+@media screen and (min-width: 750px) {
+  .ijw-frame {
+    min-height: var(--ijw-frame-height, 760px);
+  }
+
+  .ijw-frame iframe {
+    min-height: var(--ijw-frame-height, 760px);
+    height: var(--ijw-frame-height, 760px);
+  }
+}
