@@ -30,7 +30,7 @@
             "label": "",
             "heading": "See it before it exists",
             "text": "<p>We come back with a 3D view and a firm price. Change the stone, the band, the setting height — as many times as you need — until it is right.</p>",
-            "image": "shopify://shop_images/pear-ring-hand-tone-6.jpg",
+            "image": "shopify://shop_images/ChatGPT_Image_15_Oct_2026_15_05_38.png",
             "image_asset": "featured-engagement-value.jpg",
             "image_url": "",
             "image_alt": "A 3D view of a made-to-order ring"
@@ -42,6 +42,7 @@
             "label": "",
             "heading": "We make it",
             "text": "<p>Your piece is cast, set and finished by hand, then checked and sent to you insured. We will confirm the date with your quote.</p>",
+            "image": "shopify://shop_images/ChatGPT_Image_15_Oct_2026_15_56_56.png",
             "image_asset": "about-craft-workshop.png",
             "image_url": "",
             "image_alt": "A jeweller finishing a ring at the bench"
@@ -130,6 +131,8 @@
         "fallback_text": "<p>Tell us what you have in mind — a stone, a setting, a piece you want remade — and we will come back with a sketch and a price.</p>",
         "fallback_label": "Start a bespoke enquiry",
         "fallback_link": "/pages/bespoke-jewellery-request",
+        "fallback_height": 520,
+        "fallback_height_mobile": 440,
         "frame_height": 760,
         "frame_height_mobile": 560,
         "frame_background": "rgba(0,0,0,0)",
@@ -175,6 +178,7 @@
         "full_width": false,
         "content_width": 0,
         "padding_horizontal": 0,
+        "band_gap": 0,
         "custom_padding": false,
         "padding_top": 60,
         "padding_bottom": 60
