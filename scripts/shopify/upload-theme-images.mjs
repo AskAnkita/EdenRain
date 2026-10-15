@@ -125,11 +125,16 @@ const DEFAULT_FILES = [
   'pear-ring-hand-tone-4.jpg',
   'pear-ring-hand-tone-5.jpg',
   'pear-ring-hand-tone-6.jpg',
-  // The desktop mega menu's shape column: one outline per cut, and one per ring setting. Both
-  // sets are built by name at render time (`shape-outline-` / `ring-style-` plus the menu item's
-  // handle in snippets/header-menu-drawer-links.liquid), so the whole set has to be present or a
-  // column of the menu shows broken pictures. The outlines are generated from the illustrator's
-  // originals by scripts/images/normalise-shape-outlines.py.
+  // The desktop mega menu's shape column: one outline per cut, one per ring setting, and one per
+  // wedding band style. All three sets are built by name at render time (`shape-outline-` /
+  // `ring-style-` / `band-style-` plus the menu item's handle in
+  // snippets/header-menu-drawer-links.liquid), so the whole set has to be present or a column of
+  // the menu shows broken pictures. The outlines are generated from the illustrator's originals
+  // by scripts/images/normalise-shape-outlines.py.
+  'band-style-anniversary.png',
+  'band-style-eternity.png',
+  'band-style-plain-metal.png',
+  'band-style-wedding.png',
   'ring-style-bridal-sets.png',
   'ring-style-halo.png',
   'ring-style-hidden-halo.png',

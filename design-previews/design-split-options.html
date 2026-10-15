@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Design Split Banner — UI Options</title>
+  <style>
+    :root { --ink:#211e1a; --muted:#6f6962; --paper:#f5f2ee; --line:#d9d2ca; --serif:Georgia,"Times New Roman",serif; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#e8e4df; color:var(--ink); font:16px/1.5 Arial,sans-serif; }
+    .page { width:min(1440px, calc(100% - 64px)); margin:0 auto; padding:34px 0 64px; }
+    .intro { margin:0 0 32px; }
+    .intro p { margin:0 0 7px; color:#7f756b; font-size:11px; letter-spacing:.2em; text-transform:uppercase; }
+    .intro h1 { margin:0; font:400 clamp(27px,3vw,42px)/1.1 var(--serif); }
+    .option { margin:0 0 34px; }
+    .option-label { display:flex; align-items:baseline; gap:13px; margin:0 0 12px; }
+    .option-label span { color:#82776c; font-size:10px; letter-spacing:.18em; text-transform:uppercase; }
+    .option-label h2 { margin:0; font:400 20px/1.2 var(--serif); }
+    .option-label p { margin:0 0 0 auto; color:#746d66; font-size:12px; }
+    .eyebrow { color:#8a7560; font-size:10px; letter-spacing:.21em; text-transform:uppercase; }
+    h3 { margin:10px 0 14px; font:400 clamp(32px,3.1vw,48px)/1.08 var(--serif); }
+    .copy { max-width:390px; margin:0; color:#675f58; font-size:15px; line-height:1.7; }
+    .button { display:inline-flex; align-items:center; gap:22px; margin-top:25px; padding:14px 18px; border:1px solid currentColor; color:inherit; font-size:10px; letter-spacing:.14em; text-decoration:none; text-transform:uppercase; }
+    .button b { font-size:17px; font-weight:400; line-height:10px; }
+    .image { background: url('../assets/category-engagement-rings-model.png') center 45%/cover no-repeat; }
+
+    /* 01 — Two balanced image-led cards */
+    .cards { display:grid; grid-template-columns:1fr 1fr; gap:18px; min-height:360px; }
+    .card { position:relative; display:flex; align-items:flex-end; overflow:hidden; min-height:360px; background-color:#d8d2ca; }
+    .card:before { content:""; position:absolute; inset:0; background:linear-gradient(0deg,rgba(20,18,16,.76),rgba(20,18,16,.04) 78%); }
+    .card:first-child { background-position:57% 48%; }
+    .card:nth-child(2) { background-color:#342e29; background-image:url('../assets/gifting-floating-ring.png'); background-position:right 8% center; background-size:auto 82%; background-repeat:no-repeat; }
+    .card-content { position:relative; z-index:1; padding:34px 38px; color:#fff; }
+    .card .eyebrow { color:#e0c8a9; }
+    .card h3 { max-width:470px; margin:8px 0 10px; }
+    .card .copy { max-width:390px; color:rgba(255,255,255,.86); }
+    .card .button { margin-top:18px; }
+
+    /* 02 — Editorial photo with two clean choices */
+    .editorial { display:grid; grid-template-columns:1.05fr .95fr; min-height:380px; background:var(--paper); }
+    .editorial-photo { min-height:380px; background-position:63% 44%; }
+    .editorial-content { display:flex; flex-direction:column; justify-content:center; padding:40px clamp(32px,5vw,76px); }
+    .editorial-content > .eyebrow { margin-bottom:10px; }
+    .editorial-content > h3 { margin:0 0 25px; font-size:38px; }
+    .path { display:grid; grid-template-columns:1fr auto; align-items:center; gap:10px 20px; padding:18px 0; border-top:1px solid var(--line); }
+    .path h4 { margin:0; font:400 22px/1.15 var(--serif); }
+    .path p { grid-column:1; margin:0; color:var(--muted); font-size:13px; }
+    .path a { grid-column:2; grid-row:1 / span 2; color:var(--ink); font-size:21px; text-decoration:none; }
+
+    /* 03 — Minimal luxury choices, no giant central cutout */
+    .minimal { position:relative; display:grid; grid-template-columns:1fr 1fr; min-height:340px; background:#f8f6f3; }
+    .minimal:after { content:""; position:absolute; top:46px; bottom:46px; left:50%; width:1px; background:var(--line); }
+    .minimal-choice { display:flex; flex-direction:column; justify-content:center; padding:48px clamp(36px,7vw,105px); }
+    .minimal-choice + .minimal-choice { padding-left:clamp(54px,8vw,120px); }
+    .minimal-choice h3 { margin:10px 0 12px; font-size:39px; }
+    .minimal-choice .copy { max-width:330px; }
+    .minimal-choice .button { align-self:flex-start; }
+    .minimal-choice .eyebrow { color:#8a7560; }
+
+    @media (max-width:760px) {
+      .page { width:min(100% - 28px, 560px); padding-top:24px; }
+      .option-label { flex-wrap:wrap; }
+      .option-label p { width:100%; margin:0; }
+      .cards,.editorial,.minimal { grid-template-columns:1fr; }
+      .card { min-height:340px; }
+      .editorial-photo { min-height:250px; }
+      .editorial-content { padding:28px 24px; }
+      .editorial-content > h3 { font-size:31px; }
+      .minimal:after { top:50%; right:28px; bottom:auto; left:28px; width:auto; height:1px; }
+      .minimal-choice,.minimal-choice + .minimal-choice { min-height:290px; padding:36px 28px; }
+      .minimal-choice h3 { font-size:34px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="intro">
+      <p>Design split banner · three directions</p>
+      <h1>Choose the feel that fits Eden &amp; Raine</h1>
+    </header>
+
+    <section class="option">
+      <div class="option-label"><span>Option 01</span><h2>Two image-led cards</h2><p>Warm, visual, easy to scan</p></div>
+      <div class="cards">
+        <article class="card image"><div class="card-content"><span class="eyebrow">Design Studio</span><h3>Create a ring that feels like you</h3><p class="copy">Choose your setting, select a centre stone, and make every detail your own.</p><a class="button" href="#">Start designing <b>→</b></a></div></article>
+        <article class="card image"><div class="card-content"><span class="eyebrow">One-to-one guidance</span><h3>A little help finding the right ring</h3><p class="copy">Talk with our designer and bring your ideas to life, one detail at a time.</p><a class="button" href="#">Talk to a designer <b>→</b></a></div></article>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-label"><span>Option 02</span><h2>Editorial split</h2><p>One strong photo, clear paths</p></div>
+      <div class="editorial">
+        <div class="editorial-photo image" role="img" aria-label="Model wearing an engagement ring"></div>
+        <div class="editorial-content">
+          <span class="eyebrow">Your ring, your way</span><h3>Where would you like to begin?</h3>
+          <div class="path"><h4>Design your own</h4><p>Choose a setting and centre stone.</p><a href="#" aria-label="Start designing">→</a></div>
+          <div class="path"><h4>Speak with a designer</h4><p>Get personal guidance for your idea.</p><a href="#" aria-label="Talk to a designer">→</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="option">
+      <div class="option-label"><span>Option 03</span><h2>Minimal luxury</h2><p>Quiet, balanced, closest to current style</p></div>
+      <div class="minimal">
+        <article class="minimal-choice"><span class="eyebrow">01 · Design Studio</span><h3>Create a ring that is yours</h3><p class="copy">Choose your setting, select a centre stone, and make every detail your own.</p><a class="button" href="#">Create your own design <b>→</b></a></article>
+        <article class="minimal-choice"><span class="eyebrow">02 · Personal service</span><h3>Get advice from our designer</h3><p class="copy">Share your idea and we’ll help you bring the details together.</p><a class="button" href="#">Talk to our designer <b>→</b></a></article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

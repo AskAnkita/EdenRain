@@ -1423,27 +1423,22 @@ a.menu-drawer-desktop__group-heading:hover {
   color: #111;
 }
 
-/* The second picture's words sit closer to its foot than the promo's: there is one line of them
-   rather than copy and two buttons, and the tile is the narrower of the two. */
-.menu-drawer-desktop__promo-overlay--label {
-  padding: 2.4rem;
-}
-
-/* The same small caps and arrow the "View all" in the footer carries, in white over the picture */
+/* The second picture's one word is an outlined button, the same one the promo beside it carries
+   twice. It used to be bare small caps and an arrow, which read as a third kind of link in a row
+   that already had two boxed ones a few pixels to its left, and the eye took the odd one out as
+   an unstyled leftover. The overlay over it is the plain promo overlay - it used to take a
+   `--label` modifier that pulled its padding in to 2.4rem, and dropping that is what puts all
+   three buttons on one line across the pair, at every width. */
 .menu-drawer-desktop__promo-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 1.2rem;
-  color: #fff;
-  font-size: 1.2rem;
-  letter-spacing: 0.16em;
-  line-height: 1.2;
-  text-transform: uppercase;
+  width: 100%;
 }
 
-/* The drawn underline is on the words, not the arrow, and the tile is what is hovered */
-.menu-drawer-desktop__promo--secondary:hover .menu-drawer-desktop__link-text {
-  background-size: 100% 1px;
+/* The tile is the hit area, so the button inverts on a hover anywhere over the picture rather
+   than on the words alone. */
+.menu-drawer-desktop__promo--secondary:hover .menu-drawer-desktop__promo-label {
+  background-color: #fff;
+  border-color: #fff;
+  color: #111;
 }
 
 /* Wide screens only. The browse half takes exactly what its four columns need and the pictures

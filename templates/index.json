@@ -219,25 +219,19 @@
         "route_setting": {
           "type": "column",
           "settings": {
-            "icon": "ring",
-            "icon_asset": "",
-            "heading": "Create a ring that is yours",
+            "heading": "Design your own",
             "text": "<p>Choose your setting, select a centre stone, and make every detail your own in our Design Studio.</p>",
-            "button_label": "Create your own design",
-            "button_link": "/pages/design-studio-builder",
-            "button_style": "outline"
+            "button_label": "Start designing",
+            "button_link": "/pages/design-studio-builder"
           }
         },
         "route_stone": {
           "type": "column",
           "settings": {
-            "icon": "chat",
-            "icon_asset": "",
-            "heading": "Get personal advice",
-            "text": "<p>Have an idea in mind? Talk with our designer about the details and bring your perfect ring to life.</p>",
-            "button_label": "Talk to our designer",
-            "button_link": "/pages/bespoke-jewellery-request",
-            "button_style": "outline"
+            "heading": "Speak with a designer",
+            "text": "<p>Have an idea in mind? Get personal guidance and bring your perfect ring to life.</p>",
+            "button_label": "Talk to a designer",
+            "button_link": "/pages/bespoke-jewellery-request"
           }
         }
       },
@@ -246,36 +240,29 @@
         "route_stone"
       ],
       "settings": {
-        "eyebrow": "",
-        "heading": "",
-        "media_image": "shopify://shop_images/design-setting-setting-image.webp",
-        "media_asset": "design-split-ring-setting.webp",
+        "eyebrow": "Your ring, your way",
+        "heading": "Where would you like to begin?",
+        "media_image": "",
+        "media_asset": "category-engagement-rings-model.png",
         "media_image_url": "",
-        "media_alt": "A diamond ring ready to customize in the Design Studio",
-        "animate_stones": true,
-        "blend_media": false,
+        "media_alt": "Engagement ring shown from top and side views in several metal colours",
+        "media_video_asset": "design-split-ring-showcase.mp4",
+        "media_video_poster_asset": "design-split-ring-showcase-poster.jpg",
+        "media_zoom": 110,
         "footnote": "",
         "section_background": "rgba(0,0,0,0)",
         "heading_color": "rgba(0,0,0,0)",
         "text_color": "rgba(0,0,0,0)",
-        "icon_color": "rgba(0,0,0,0)",
         "footnote_color": "rgba(0,0,0,0)",
-        "button_background": "rgba(0,0,0,0)",
-        "button_text_color": "rgba(0,0,0,0)",
         "heading_size": 0,
         "heading_size_mobile": 0,
         "heading_tracking": 0,
-        "uppercase_headings": true,
+        "uppercase_headings": false,
         "eyebrow_size": 0,
         "text_size": 0,
         "footnote_size": 0,
         "text_measure": 0,
-        "button_radius": 0,
         "show_button_arrow": true,
-        "icon_size": 0,
-        "media_width": 0,
-        "media_gap": 0,
-        "media_stone_gap": 28,
         "full_width": false,
         "content_width": 0,
         "padding_horizontal": 0,
@@ -435,7 +422,7 @@
         "page_padding": 0,
         "page_padding_mobile": 16,
         "padding_top": 32,
-        "padding_bottom": 72,
+        "padding_bottom": 20,
         "section_background": "rgba(0,0,0,0)",
         "color_scheme": "scheme-1"
       }
@@ -444,24 +431,16 @@
       "type": "eden-quote",
       "settings": {
         "width": "full",
-        "side_padding": 30,
-        "image": "shopify://shop_images/ChatGPT_Image_15_Oct_2026_10_46_08.png",
-        "image_position": "focal",
-        "overlay_color": "#ffffff",
-        "overlay_opacity": 10,
-        "background": "#ffffff",
-        "desktop_height": 460,
-        "mobile_height": 420,
+        "desktop_height": 360,
+        "mobile_height": 320,
+        "text_color": "#191614",
         "quote": "Made to be worn, and loved, for a lifetime.",
         "attribution": "Eden Raine",
         "quote_size": 32,
         "attribution_size": 11,
-        "inner_width": 880,
-        "text_color": "#000000",
+        "inner_width": 1000,
         "rule_color": "#d9cfc7",
-        "attribution_color": "#8a7d74",
-        "padding_top": 0,
-        "padding_bottom": 0
+        "attribution_color": "#8a7d74"
       }
     },
     "featured_collection_QbxCWk": {
@@ -970,7 +949,7 @@
         "swipe_on_mobile": false,
         "show_arrows": false,
         "show_dots": true,
-        "padding-block-start": 72,
+        "padding-block-start": 20,
         "padding-block-end": 72,
         "padding-inline-start": 20,
         "padding-inline-end": 20

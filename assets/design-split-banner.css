@@ -1,44 +1,25 @@
-/*
-  Design split banner - two routes into the Design Studio either side of one tall ring.
-
-  Every look here is a custom property with its default written in this file, so a setting left
-  at "use the default" (a cleared colour, a size of 0) writes nothing onto the section element
-  and this value stands. The section is sections/design-split-banner.liquid.
-
-  The picture is one slot in the middle of the band, still or animated. Product shots in this
-  shop are photographed on white, so it multiplies over the band by default rather than sitting
-  in a white box on it.
-*/
-
+/* Editorial split banner: one feature image beside two clear routes. */
 .ds-split {
-  --dsp-section-bg: #f4f3f1;
+  --dsp-section-bg: #ffffff;
   --dsp-heading-color: #171714;
   --dsp-text-color: rgba(23, 23, 20, 0.72);
-  --dsp-icon-color: #171714;
   --dsp-footnote-color: rgba(23, 23, 20, 0.6);
 
   --dsp-eyebrow-size: 12px;
-  --dsp-heading-size: 54px;
-  --dsp-heading-size-mobile: 34px;
-  --dsp-heading-tracking: 0.01em;
-  --dsp-heading-case: uppercase;
-  --dsp-text-size: 16px;
+  --dsp-heading-size: 40px;
+  --dsp-heading-size-mobile: 32px;
+  --dsp-heading-tracking: 0;
+  --dsp-heading-case: none;
+  --dsp-text-size: 15px;
   --dsp-footnote-size: 14px;
-  --dsp-icon-size: 46px;
-
   --dsp-shell-max: 1480px;
-  --dsp-media-width: 420px;
-  --dsp-media-gap: 48px;
-  --dsp-media-stone-gap: 0px;
-  --dsp-measure: 38ch;
-
+  --dsp-measure: 48ch;
   --dsp-pad-inline: 4rem;
-  --dsp-pad-top: 80px;
-  --dsp-pad-bottom: 80px;
+  --dsp-pad-top: 56px;
+  --dsp-pad-bottom: 56px;
 
   background: var(--dsp-section-bg);
   padding: var(--dsp-pad-top) var(--dsp-pad-inline) var(--dsp-pad-bottom);
-  overflow: hidden;
 }
 
 .dsp-shell {
@@ -47,13 +28,67 @@
   margin: 0 auto;
 }
 
+.dsp-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: stretch;
+  min-height: 500px;
+}
+
+.dsp-media {
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  align-self: center;
+  overflow: hidden;
+  background: #e8e3dd;
+}
+
+.dsp-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+  object-position: 62% center;
+}
+
+/* The video is letterboxed inside the media box, so the zoom scales the element and
+   the box clips what spills past it. */
+.dsp-media__video,
+.dsp-media__poster {
+  background: #fff;
+  object-fit: contain;
+  object-position: center;
+  transform: scale(var(--dsp-media-zoom, 1.1));
+  transform-origin: center;
+}
+
+dsp-video { display: contents; }
+
+.dsp-media__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dsp-media__poster { display: none !important; }
+
+.dsp-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 44px clamp(34px, 5.6vw, 84px);
+}
+
 .dsp-head {
-  margin: 0 0 4.8rem;
-  text-align: center;
+  margin: 0 0 22px;
+  text-align: left;
 }
 
 .dsp-eyebrow {
-  margin: 0 0 1.2rem;
+  margin: 0 0 10px;
   color: var(--dsp-text-color);
   font-size: var(--dsp-eyebrow-size);
   letter-spacing: 0.18em;
@@ -65,221 +100,145 @@
   margin: 0;
   color: var(--dsp-heading-color);
   font-family: var(--font-heading--family);
-  font-size: var(--dsp-heading-size-mobile);
+  font-size: var(--dsp-heading-size);
   font-weight: 400;
   letter-spacing: var(--dsp-heading-tracking);
-  line-height: 1.05;
+  line-height: 1.08;
   text-transform: var(--dsp-heading-case);
 }
 
-/* The ring runs the full height of the band with a column either side of it */
-.dsp-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, var(--dsp-media-width)) minmax(0, 1fr);
-  align-items: center;
-  gap: var(--dsp-media-gap);
-}
-
-/* A single Design Studio route pairs its copy with the image in a balanced two-column band. */
-.ds-split--single .dsp-grid {
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-}
-
-.ds-split--single .dsp-col {
-  align-items: flex-start;
-  text-align: left;
-}
-
-.ds-split--single .dsp-media {
-  width: 100%;
-  max-width: min(560px, 100%);
-  justify-self: end;
+.dsp-routes {
+  border-top: 1px solid rgba(23, 23, 20, 0.17);
 }
 
 .dsp-col {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  text-align: center;
-  min-width: 0;
+  gap: 16px 24px;
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(23, 23, 20, 0.17);
 }
 
-.dsp-col__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--dsp-icon-size);
-  height: var(--dsp-icon-size);
-  margin-bottom: 2.4rem;
-  color: var(--dsp-icon-color);
-}
-
-.dsp-col__icon svg,
-.dsp-col__icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+.dsp-col__copy { min-width: 0; }
 
 .dsp-col__heading {
-  margin: 0 0 1.6rem;
+  margin: 0 0 8px;
   color: var(--dsp-heading-color);
   font-family: var(--font-heading--family);
-  font-size: var(--dsp-heading-size-mobile);
+  font-size: clamp(22px, 2vw, 28px);
   font-weight: 400;
-  letter-spacing: var(--dsp-heading-tracking);
-  line-height: 1.05;
-  text-transform: var(--dsp-heading-case);
+  letter-spacing: 0;
+  line-height: 1.15;
+  text-transform: none;
 }
 
 .dsp-col__text {
   max-width: var(--dsp-measure);
-  margin: 0 0 2.8rem;
+  margin: 0;
   color: var(--dsp-text-color);
   font-size: var(--dsp-text-size);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .dsp-col__text > *:first-child { margin-top: 0; }
 .dsp-col__text > *:last-child { margin-bottom: 0; }
 
-.dsp-col__icon + .dsp-col__text,
-.dsp-col__heading + .dsp-col__text { margin-top: 0; }
-
-.dsp-col .eden-action .svg-wrapper {
+.dsp-route__link {
   display: inline-flex;
-  width: 1rem;
+  align-items: center;
+  gap: 14px;
+  color: var(--dsp-heading-color);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  line-height: 1.3;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.dsp-col .eden-action .svg-wrapper svg {
-  width: 100%;
-  height: auto;
+.dsp-route__link span:last-child {
+  font-size: 22px;
+  letter-spacing: 0;
+  transition: transform 180ms ease;
 }
 
-.dsp-media {
-  display: flex;
-  justify-content: center;
-  min-width: 0;
-  position: relative;
-}
-
-.dsp-media img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/*
-  The floating stone hangs off the top of this box, so the setting is pushed down by the gap
-  rather than the stone being lifted: the stone keeps the travel its animation is drawn for.
-  Only the direct child is moved - the stone's own img is nested a level deeper.
-*/
-.dsp-media > img,
-.dsp-media > svg {
-  margin-top: var(--dsp-media-stone-gap);
-}
-
-.dsp-media__stone {
-  position: absolute;
-  z-index: 1;
-  top: -4%;
-  left: 50%;
-  width: 26%;
-  aspect-ratio: 1;
-  transform: translateX(-50%);
-  animation: dsp-stone-jump 2.2s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.dsp-media__stone img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-@keyframes dsp-stone-jump {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -22px); }
-}
-
-/* Shots photographed on white keep no white box of their own on the band */
-.ds-split--blend .dsp-media img {
-  mix-blend-mode: multiply;
-}
+.dsp-route__link:hover span:last-child { transform: translateX(4px); }
+.dsp-route__link:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
 
 .dsp-footnote {
-  margin: 4.8rem 0 0;
+  margin: 22px 0 0;
   color: var(--dsp-footnote-color);
   font-size: var(--dsp-footnote-size);
   line-height: 1.5;
-  text-align: center;
+  text-align: right;
 }
 
-.dsp-footnote a {
-  color: inherit;
-  text-underline-offset: 0.3em;
-}
-
+.dsp-footnote a { color: inherit; text-underline-offset: 0.3em; }
 .dsp-footnote p { margin: 0; }
 
 @media screen and (min-width: 990px) {
-  .dsp-head__heading,
-  .dsp-col__heading {
-    font-size: var(--dsp-heading-size);
-  }
-}
-
-@media screen and (max-width: 1199px) {
   .ds-split {
-    --dsp-media-gap: 32px;
+    height: 60vh;
+    min-height: 480px;
+    box-sizing: border-box;
   }
+
+  .dsp-shell,
+  .dsp-grid {
+    height: 100%;
+  }
+
+  .dsp-grid { min-height: 0; }
+  .dsp-media { height: 100%; aspect-ratio: auto; }
+  .dsp-media img { height: 100%; min-height: 0; }
+  .dsp-content { padding-top: 24px; padding-bottom: 24px; }
 }
 
-/* Under the desktop breakpoint the three columns stack, ring first */
 @media screen and (max-width: 989px) {
   .ds-split {
+    height: auto;
+    min-height: 0;
     --dsp-pad-inline: 2rem;
+    --dsp-pad-top: 32px;
+    --dsp-pad-bottom: 32px;
   }
 
-  .dsp-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 5.6rem;
-    justify-items: center;
+  .dsp-grid { grid-template-columns: minmax(0, 1fr); }
+
+  .dsp-media,
+  .dsp-media img {
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 1.45 / 1;
   }
 
-  .ds-split--single .dsp-grid {
-    grid-template-columns: minmax(0, 1fr);
+  .dsp-media__video,
+  .dsp-media__poster {
+    height: 100% !important;
+    min-height: 0 !important;
+    aspect-ratio: 1.45 / 1;
+    object-fit: contain;
   }
 
-  .dsp-media {
-    order: -1;
-    max-width: min(var(--dsp-media-width), 78vw);
-  }
-
-  .dsp-col {
-    max-width: 46rem;
-  }
-
-  .ds-split--single .dsp-col {
-    order: 0;
-    width: 100%;
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .ds-split--single .dsp-media {
-    order: 1;
-    max-width: min(560px, 88vw);
-    justify-self: center;
-  }
+  .dsp-media img { object-position: 62% 45%; }
+  .dsp-content { padding: 32px clamp(4px, 3vw, 24px) 8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dsp-media img {
-    transition: none;
-  }
+  .dsp-media__video { display: none !important; }
+  .dsp-media__poster { display: block !important; }
+}
 
-  .dsp-media__stone {
-    animation: none;
-  }
+@media screen and (max-width: 600px) {
+  .dsp-content { padding: 26px 0 0; }
+  .dsp-head__heading { font-size: var(--dsp-heading-size-mobile); }
+  .dsp-col { grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 20px 0; }
+  .dsp-col__heading { font-size: 22px; }
+  .dsp-col__text { font-size: 14px; }
+  .dsp-route__link { gap: 8px; font-size: 9px; letter-spacing: 0.08em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsp-route__link span:last-child { transition: none; }
 }
