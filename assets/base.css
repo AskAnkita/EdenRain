@@ -21501,80 +21501,180 @@ footer.section-footer .email-signup__input {
   }
 }
 
+/* The header search panel lives in assets/search-luxe.css. */
+
 /* ==================================================================
-   Eden Raine: header search dropdown
-   Theme settings > Popover has both the border and the drop shadow switched
-   off, so the predictive panel reads as a white slab dropped onto the page
-   rather than a panel hanging off the field. It is also wider and looser than
-   a 25rem field needs, and the matched word in each suggestion came through
-   with the browser's default yellow <mark>.
+   Eden Raine: style-row carousel arrows, pinned top right
+   blocks/multicolumn.liquid renders a second pair of bare chevrons above the
+   slides when the block's arrow position is "Top right", and marks the wrapper
+   around the carousel .arrow-on-header so global.js hands Swiper that pair
+   instead. The rule further up hides the pair still sitting inside the
+   carousel, so the row keeps one set of arrows, both of them on the right —
+   the same treatment as the homepage product rows.
    ================================================================== */
+.multicolumn-arrows-top > .swiper-btns-on-header {
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2.4rem;
+  width: auto;
+  height: auto;
+  margin: 0 0 1.6rem auto;
+  opacity: 1;
+}
 
-@media screen and (min-width: 1025px) {
-  #header-component .header__columns:has(.search--inline) .header__search .details__list {
-    min-width: 56rem;
-  }
+/* Swiper leaves .swiper-button-prev/.swiper-button-next with left/right insets
+   and a translate; .swiper-btns-on-header keeps them position: relative, where
+   those insets would still drag the two buttons on top of each other. Clearing
+   them, along with the disc, border, hover fill and rounded corner the theme
+   draws around the glyph, leaves a bare chevron. */
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button {
+  inset: auto;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+  color: var(--color-foreground);
+  cursor: pointer;
+}
 
-  #header-component .predictive-search--header {
-    border: 1px solid #e5e2dd;
-    box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.3);
-    max-height: 56dvh;
-    padding-inline: 2rem;
-    scrollbar-width: thin;
-    scrollbar-color: #d8d3cc transparent;
-  }
+/* The disc is painted on a pseudo-element rather than the button's own
+   background, and that pseudo-element is the only thing the theme's hover rule
+   repaints, so taking it out removes the disc and its hover together. */
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button::before,
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button::after {
+  display: none;
+}
 
-  #header-component .predictive-search--header::-webkit-scrollbar {
-    width: 4px;
-  }
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button:hover,
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button:focus-visible {
+  background: none;
+  box-shadow: none;
+  color: var(--color-foreground);
+}
 
-  #header-component .predictive-search--header::-webkit-scrollbar-thumb {
-    background: #d8d3cc;
-  }
+/* The caret ships pointing down and component-slider.css turns it a quarter
+   turn each way, so the box stays upright while the glyph reads < and >. */
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button .icon {
+  width: 1.4rem;
+  height: auto;
+}
 
-  #header-component .predictive-search--header::-webkit-scrollbar-track {
-    background: transparent;
-  }
+/* !important only to outrank .swiper-btns-on-header .swiper-button further up,
+   which forces every header arrow to opacity 1, then 0.5 when disabled. */
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button.swiper-button-disabled {
+  opacity: 0.25 !important;
+  pointer-events: none;
+}
 
-  /* The stock 2rem group gap sits on top of the heading's own padding, which
-     left a band of empty white between every section. */
-  #header-component .predictive-search--header .predictive-search__result-group {
-    gap: 1rem;
-  }
-
-  #header-component .predictive-search--header .predictive-search__heading {
-    padding: 1.6rem 0 0.8rem;
-    font-size: 1.2rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  /* Suggestion pills: square, like every other surface in the theme */
-  #header-component .predictive-search--header .predictive-search-results__pill {
-    border-radius: 0;
-    padding: 0.7rem 1.2rem;
-    font-size: 1.3rem;
-  }
-
-  #header-component .predictive-search--header .predictive-search-results__wrapper-queries {
-    gap: 0.8rem;
-  }
-
-  /* Product rows: smaller thumbnail, less air around each one */
-  #header-component .predictive-search--header .predictive-search__item {
-    padding: 0.8rem 1.2rem;
-  }
-
-  #header-component .predictive-search--header .predictive-search__item--link-with-thumbnail {
-    grid-template-columns: 4.4rem 1fr;
-    grid-column-gap: 1.4rem;
+@media screen and (max-width: 749px) {
+  .multicolumn-arrows-top > .swiper-btns-on-header {
+    gap: 1.8rem;
+    margin-bottom: 1.2rem;
   }
 }
 
-/* The highlight on the matched word is the browser's <mark> default. Only the
-   query-result variant was reset upstream, so the suggestion pills kept it. */
-#header-component .predictive-search--header mark {
-  background-color: transparent;
-  color: inherit;
-  font-weight: 600;
+/* ==================================================================
+   Eden Raine: the style row as compact pills on mobile
+   blocks/multicolumn.liquid adds .multicolumn--compact-mobile when the block's
+   "Item layout on mobile" is Compact, and hands Swiper slidesPerView: auto
+   below its first breakpoint. The pill keeps the shape it has on desktop —
+   thumbnail in a cell on the left, label beside it — but is only as wide as
+   the style it names instead of a fixed share of the screen, so "All" is a
+   short pill and three or four of them read as a row of chips. The block's
+   mobile columns setting does nothing while Compact is on, by design.
+   ================================================================== */
+@media screen and (max-width: 749px) {
+  .multicolumn--compact-mobile .grid__item {
+    width: auto;
+  }
+
+  .multicolumn--compact-mobile .grid__item > .group-block {
+    /* The pills carry a 1px border at zero opacity, so the box is invisible
+       and only its width is doing any work. The pill needs the hairline. */
+    --border-width: 1px;
+    --border-style: solid;
+    --border-color: rgb(var(--color-border-rgb) / 1);
+    width: auto;
+    padding-block: 0;
+    padding-inline: 0;
+  }
+
+  .multicolumn--compact-mobile .grid__item .group-block-content.layout-panel-flex {
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    height: 100%;
+  }
+
+  /* The thumbnail keeps its own cell, divided off from the label the way the
+     desktop pill divides them. A blanket mobile rule further up pins every
+     group-block icon image to 42 x 42 with !important, so the thumbnail has
+     to outrank it. */
+  .multicolumn--compact-mobile .grid__item .icon-block {
+    flex: 0 0 auto;
+    padding: 0.6rem;
+    border-inline-end: 1px solid rgb(var(--color-border-rgb) / 1);
+  }
+
+  .multicolumn--compact-mobile .grid__item .icon-block--size-style img {
+    width: 3.6rem !important;
+    height: auto !important;
+  }
+
+  .multicolumn--compact-mobile .grid__item .icon-block + .group-block {
+    flex: 0 1 auto;
+    width: auto;
+    padding-inline: 1.2rem;
+  }
+
+  /* One line per pill, since the pill grows to fit rather than the label
+     wrapping inside a fixed box. The label is a <p> in a group block, and two
+     blanket mobile rules further up — the "Made for your story" icon sizing
+     and the delivery-time row — force every one of those to 15px and to the
+     left with !important, hence the same here. */
+  .multicolumn--compact-mobile .grid__item .text-block,
+  .multicolumn--compact-mobile .grid__item .text-block > * {
+    width: auto;
+    max-width: none;
+    margin-block: 0;
+    font-size: 1.2rem !important;
+    line-height: 1.3;
+    letter-spacing: 0.06em;
+    text-align: center !important;
+    text-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  /* The arrows live above the row, on the right, whenever the block is set to
+     that position — base.css hides the pair inside the carousel further up,
+     but only without !important, so this keeps a round arrow off the pills. */
+  .arrow-on-header .multicolumn--compact-mobile .swiper-btns-wrap:not(.swiper-btns-on-header) {
+    display: none !important;
+  }
+}
+
+/* ==================================================================
+   Eden Raine: product card names on mobile
+   The card title block is set to the h5 preset, 2.1rem of heading serif. That
+   reads on a four-up desktop grid; on the two-up mobile grid it fills both
+   clamped lines with half a name. Only the oversized presets are touched, so a
+   card whose title is already set to h6 or body size keeps its size.
+   ================================================================== */
+@media screen and (max-width: 749px) {
+  .card--block-title .text-block:is(.h1, .h2, .h3, .h4, .h5),
+  .card--block-title .text-block:is(.h1, .h2, .h3, .h4, .h5) > * {
+    font-size: 1.6rem;
+    line-height: 1.35;
+  }
 }

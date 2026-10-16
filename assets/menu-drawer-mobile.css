@@ -92,34 +92,138 @@
   padding: 0 0 2.4rem;
 }
 
-.mnav__sub {
-  display: grid;
-  gap: 1.4rem;
+/* Sections, rows and drawings are the desktop mega menu's at phone size: the same heading over
+   its own rule, the same small line drawing beside each name, and the same step out of a list
+   underneath it ('header-menu-drawer-links', menu-drawer-desktop.css). The drawings themselves
+   come from 'menu-link-icon', which both menus render, so a name cannot be drawn one way here
+   and another way there. */
+.mnav__sections {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.mnav__sub a {
-  color: rgb(var(--color-foreground-rgb) / 0.75);
+.mnav__section {
+  display: flex;
+  flex-direction: column;
+  margin-top: 3.2rem;
+}
+
+.mnav__section:first-child {
+  margin-top: 0;
+}
+
+/* The desktop column heading a size down: the heading face, uppercase, over a hairline. */
+.mnav__section-heading {
+  margin: 0 0 1.6rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 0.18);
+  color: var(--color-foreground);
+  font-family: var(--font-heading--family);
+  font-size: 1.4rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* A second list inside one section - Wedding's "Featured Collections" under its styles - takes
+   the panel's small caps rather than a second rule, which would read as a section of its own. */
+.mnav__section-subhead {
+  margin: 2.4rem 0 1.2rem;
+  color: rgb(var(--color-foreground-rgb) / 0.55);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.mnav__links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mnav__link {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  /* The row, not the words, is the tap target: the padding is what gives a name its 44px */
+  padding: 0.7rem 0;
+  color: var(--color-foreground);
   font-size: 1.5rem;
   letter-spacing: 0.01em;
+  line-height: 1.3;
   text-decoration: none;
 }
 
-.mnav__sub a:hover {
-  color: var(--color-foreground);
+.mnav__link:hover .mnav__link-text,
+.mnav__section-cta:hover .mnav__link-text {
+  background-size: 100% 1px;
 }
 
-.mnav__sub--nested {
-  gap: 1rem;
-  margin-top: 1rem;
-  padding-left: 1.4rem;
-  border-left: 1px solid rgb(var(--color-foreground-rgb) / 0.12);
+.mnav__link-text {
+  padding-bottom: 0.2rem;
+  background: linear-gradient(currentColor, currentColor) center bottom / 0 1px no-repeat;
+  transition: background-size 0.35s ease;
 }
 
-.mnav__sub--nested a {
-  font-size: 1.4rem;
+/* All three drawn sets ('icon-diamond-shape', 'icon-ring-style', 'icon-band-style') are drawn on
+   the same 24 grid, and the pictures beside them are wider than they are tall. The box is what
+   holds the column level, so it is fixed and whatever is inside it is fitted, never cropped -
+   which is what the square photo tiles this list replaced were doing to a line drawing. */
+.mnav__link-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  color: rgb(var(--color-foreground-rgb) / 0.55);
+}
+
+.mnav__link-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.mnav__link-icon--image {
+  width: 4.4rem;
+  height: 3rem;
+  /* A picture cannot take currentColor, so it carries its rest state as weight instead, which is
+     what keeps it level with the drawn icons it sits among. */
+  opacity: 0.85;
+}
+
+.mnav__link-icon--shape {
+  width: 2.8rem;
+  height: 2.8rem;
+}
+
+.mnav__link-icon--image img {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* The way in to the category a section lists, under its names. Set in the panel's small caps
+   rather than the size the names take, so it reads as a step out of the list instead of one more
+   name in it. */
+.mnav__section-cta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.8rem;
+  margin-top: 1.6rem;
+  color: rgb(var(--color-foreground-rgb) / 0.62);
+  font-size: 1.1rem;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .mnav__products {
@@ -170,15 +274,19 @@
   color: rgb(var(--color-foreground-rgb) / 0.65);
 }
 
+/* The menu's own "View all" strip, the same one the desktop panel carries across the foot of a
+   panel: a hairline, then the words in the panel's small caps. */
 .mnav__all {
-  display: inline-block;
-  margin-top: 2.2rem;
-  padding-bottom: 0.3rem;
-  border-bottom: 1px solid currentColor;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-top: 3.2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgb(var(--color-foreground-rgb) / 0.12);
   color: var(--color-foreground);
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 1.2rem;
   letter-spacing: 0.16em;
+  line-height: 1.2;
   text-transform: uppercase;
   text-decoration: none;
 }
@@ -188,7 +296,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mnav__icon {
+  .mnav__icon,
+  .mnav__link-text {
     transition: none;
   }
 }

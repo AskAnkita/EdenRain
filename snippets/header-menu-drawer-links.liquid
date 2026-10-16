@@ -5,8 +5,8 @@
   regions on every menu; what each menu puts in them is set in the case block below:
   - Browse (left): the menu's own groups side by side as columns of links, and then any
     row-style group full width underneath. The style column carries a picture from the theme's
-    assets beside each name (see `styles_with_images` below) and the other icon columns a line
-    drawing. Only Engagement ends
+    assets beside each name, and the other icon columns a line drawing ('menu-link-icon' holds
+    which file each name takes and what it falls back to). Only Engagement ends
     its columns with the shared guide pages; the other menus give that room to their own
     options, and Diamonds has its own "Learn" column of guides.
   - Promo (right): a heading over a picture, which is inset from the right edge of the panel
@@ -104,7 +104,7 @@
         ask for and it anchors the row at the height the picture sets.
 
         By Style carries a line drawing of the band itself beside each name, one per style
-        ('band-style-<handle>.png' in `band_styles_with_images` below), which gives these names
+        ('band-style-<handle>.png', see 'menu-link-icon'), which gives these names
         the same visual weight as Engagement's picture-led styles. Drawings rather than the tile
         photographs the mobile menu shows: at icon size a photograph of a plain band and a
         photograph of a pavé one are the same grey ellipse, where the drawings say in one look
@@ -169,25 +169,6 @@
   endcase
 
   comment
-    The ring style drawings are pictures in the theme's assets, one per style, each named after
-    the style's handle: 'ring-style-<handle>.png'. Replace a file under Online Store > Themes >
-    Edit code > Assets and the menu takes the new one up; the file name is the whole contract.
-
-    A style listed here uses its picture. Take one off the list - or never add one - and that
-    style falls back to the drawn icon in 'icon-ring-style', which is how to cope with a picture
-    that is missing or not ready yet, rather than leaving a broken image in the column.
-  endcomment
-  assign styles_with_images = 'solitaire,side-stone,halo,hidden-halo,three-stone,bridal-sets,vintage,nature-inspired,toi-et-moi,promise' | split: ','
-
-  comment
-    The wedding bands work the same way, as 'band-style-<handle>.png': the four names under
-    Wedding > By Style, each drawn as the band it is - pavé, three-stone, set all the way round,
-    plain. Same contract as the two sets above, so a style taken off this list falls back to the
-    drawn icon in 'icon-band-style' rather than leaving a broken picture in the column.
-  endcomment
-  assign band_styles_with_images = 'wedding,anniversary,eternity,plain-metal' | split: ','
-
-  comment
     A menu running compact columns gets a tighter gap between them as well: five columns at the
     gap the two- and three-column menus use would not hold their row beside the promo picture at
     the narrow end, and the fifth dropped to a row of its own. Read off the columns rather than
@@ -201,13 +182,6 @@
       break
     endif
   endfor
-
-  comment
-    The cuts work the same way: a line drawing of the stone face-on, per cut, named
-    'shape-outline-<handle>.png'. A cut that is not listed here - trillion, baguette, square -
-    falls back to the drawn icon in 'icon-diamond-shape' rather than a broken image.
-  endcomment
-  assign shapes_with_images = 'round,oval,cushion,emerald,pear,princess,radiant,marquise,asscher,heart' | split: ','
 -%}
 
 {%- comment -%}
@@ -295,89 +269,7 @@
                 -%}
                 <li>
                   <a class="menu-drawer-desktop__link" href="{{ item_url }}">
-                    {%- if column_icons == 'shapes' -%}
-                      {%- if shapes_with_images contains item_key -%}
-                        {%- assign shape_asset = item_key | prepend: 'shape-outline-' | append: '.png' -%}
-                        <span
-                          class="menu-drawer-desktop__link-icon menu-drawer-desktop__link-icon--image menu-drawer-desktop__link-icon--shape"
-                          aria-hidden="true"
-                        >
-                          {%- comment -%}
-                            The box, not the file: the drawings are square and the CSS fits them
-                            inside the same box the drawn icons take, so the column stays level.
-                          {%- endcomment -%}
-                          <img
-                            src="{% render 'image-source', file: shape_asset, width: 56 %}"
-                            alt=""
-                            width="28"
-                            height="28"
-                            loading="lazy"
-                          >
-                        </span>
-                      {%- else -%}
-                        <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
-                          {%- render 'icon-diamond-shape', shape: item_key -%}
-                        </span>
-                      {%- endif -%}
-                    {%- elsif column_icons == 'ring-styles' -%}
-                      {%- if styles_with_images contains item_key -%}
-                        {%- assign icon_asset = item_key | prepend: 'ring-style-' | append: '.png' -%}
-                        <span
-                          class="menu-drawer-desktop__link-icon menu-drawer-desktop__link-icon--image"
-                          aria-hidden="true"
-                        >
-                          {%- comment -%}
-                            The box, not the file: CSS fixes both sides and fits the picture
-                            inside, so these stay true whatever shape the replacement file is.
-                          {%- endcomment -%}
-                          <img
-                            src="{% render 'image-source', file: icon_asset, width: 92 %}"
-                            alt=""
-                            width="46"
-                            height="32"
-                            loading="lazy"
-                          >
-                        </span>
-                      {%- else -%}
-                        <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
-                          {%- render 'icon-ring-style', style: item_key -%}
-                        </span>
-                      {%- endif -%}
-                    {%- elsif column_icons == 'band-styles' -%}
-                      {%- if band_styles_with_images contains item_key -%}
-                        {%- assign band_asset = item_key | prepend: 'band-style-' | append: '.png' -%}
-                        <span
-                          class="menu-drawer-desktop__link-icon menu-drawer-desktop__link-icon--image menu-drawer-desktop__link-icon--band"
-                          aria-hidden="true"
-                        >
-                          {%- comment -%}
-                            The same box the ring settings take, and the drawings are drawn to it:
-                            each one is 264px of ink wide on a canvas that follows its own height,
-                            so the bands fill the width and the eternity ring, which is drawn
-                            face-on, fits by its height instead.
-                          {%- endcomment -%}
-                          <img
-                            src="{% render 'image-source', file: band_asset, width: 92 %}"
-                            alt=""
-                            width="46"
-                            height="32"
-                            loading="lazy"
-                          >
-                        </span>
-                      {%- else -%}
-                        <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
-                          {%- render 'icon-band-style', style: item_key -%}
-                        </span>
-                      {%- endif -%}
-                    {%- elsif column_icons == 'types' -%}
-                      <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
-                        {%- render 'icon-jewellery-type', type: item_key -%}
-                      </span>
-                    {%- elsif column_icons == 'stones' -%}
-                      <span class="menu-drawer-desktop__link-icon" aria-hidden="true">
-                        {%- render 'icon-stone', stone: item_key -%}
-                      </span>
-                    {%- endif -%}
+                    {%- render 'menu-link-icon', icons: column_icons, key: item_key, prefix: 'menu-drawer-desktop__link-icon' -%}
                     <span class="menu-drawer-desktop__link-text">{{ item_title | escape }}</span>
                   </a>
                 </li>

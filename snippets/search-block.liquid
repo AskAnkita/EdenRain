@@ -39,6 +39,7 @@
           >
 
           <input type="hidden" name="options[prefix]" value="last">
+          <input type="hidden" name="type" value="product">
           {%- unless bl_stts.result_type == 'all' -%}
             <input type="hidden" name="type" value="{{ bl_stts.result_type }}">
           {%- endunless -%}

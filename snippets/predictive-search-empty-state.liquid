@@ -40,7 +40,7 @@
           {%- assign arr_k_search = settings.quick_keywords | split: ',' -%}
           {%- for k_search in arr_k_search -%}
             <li class="predictive-search-results__card--query">
-              <a href="{{ routes.search_url }}?q={{ k_search }}" class="pills__pill predictive-search-results__pill link">
+              <a href="{{ routes.search_url }}?q={{ k_search }}&amp;type=product" class="pills__pill predictive-search-results__pill link">
                 <span class="svg-wrapper">
                   {{ 'icon-search-pill.svg' | inline_asset_content }}
                 </span>

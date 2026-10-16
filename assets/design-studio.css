@@ -503,3 +503,117 @@
     grid-template-columns: repeat(var(--ds-gallery-columns-mobile, 2), minmax(0, 1fr));
   }
 }
+
+/* --------------------------------------------------------- progress bar */
+
+/* A row of in-page links over a hairline track, at the top of the section and
+   optionally stuck under the header. Driven by assets/design-studio-progress.js
+   (<ds-progress>); with JavaScript off it is still a usable list of anchors. */
+.ds-progress {
+  display: block;
+  margin-bottom: var(--ds-progress-gap, clamp(24px, 3vw, 44px));
+  background: var(--ds-progress-bg, var(--ds-section-bg, #fff));
+}
+
+.ds-progress--sticky {
+  position: sticky;
+  top: var(--ds-progress-top, 90px);
+  z-index: 3;
+}
+
+.ds-progress__list {
+  display: flex;
+  align-items: center;
+  justify-content: var(--ds-progress-justify, center);
+  flex-wrap: wrap;
+  gap: clamp(12px, 2vw, 32px);
+  margin: 0;
+  padding: 0 0 14px;
+  list-style: none;
+}
+
+.ds-progress__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ds-progress-color, var(--ds-muted));
+  font-size: var(--ds-progress-size, 1.25rem);
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+/* The step being read is the only one in full ink, so the row reads as
+   progress rather than as a menu. A step already passed sits between the
+   two. */
+.ds-progress__link.is-done {
+  color: var(--ds-progress-done-color, var(--ds-ink));
+  opacity: 0.6;
+}
+
+.ds-progress__link.is-current {
+  color: var(--ds-progress-current-color, var(--ds-ink));
+}
+
+.ds-progress__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border: 1px solid currentColor;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+}
+
+.ds-progress__link.is-current .ds-progress__num {
+  background: currentColor;
+  color: var(--ds-progress-bg, var(--ds-section-bg, #fff));
+}
+
+.ds-progress__track {
+  position: relative;
+  height: var(--ds-progress-track-height, 2px);
+  background: var(--ds-progress-track-color, var(--ds-line));
+}
+
+.ds-progress__fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--ds-progress-fill-color, var(--ds-ink));
+  transition: width 0.15s linear;
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  .ds-progress__fill {
+    transition: none;
+  }
+}
+
+/* The steps are anchor targets; keep them clear of the sticky bar when the
+   browser does the scrolling (deep link, back button, no JavaScript). */
+.ds-step {
+  scroll-margin-top: var(--ds-progress-scroll-margin, 120px);
+}
+
+@media screen and (max-width: 749px) {
+  /* Too many steps to wrap on a phone: one line that scrolls sideways. */
+  .ds-progress__list {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ds-progress__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-progress__link {
+    white-space: nowrap;
+  }
+}

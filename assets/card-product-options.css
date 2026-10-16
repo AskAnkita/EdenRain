@@ -132,3 +132,33 @@
 /* No hover override is needed alongside the rule above: the chosen photo keeps
    full opacity on hover by itself, and picks up the same slight zoom every other
    card image gets. */
+
+/* Mobile: the card is half the screen wide here, so a row of 28px beads and a
+   22px shape icon takes more of it than the price and the name together. The
+   active swatch still carries its code, so the dot cannot shrink past what two
+   uppercase letters need. */
+@media screen and (max-width: 749px) {
+  .card-shapes {
+    gap: 0.4rem 0.8rem;
+  }
+
+  .card-shapes__item,
+  .card-metals__item {
+    padding-bottom: 0.4rem;
+  }
+
+  .card-shapes__item .icon-diamond-shape {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  .card-metals {
+    gap: 0.4rem 0.8rem;
+  }
+
+  .card-metals__dot {
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 1rem;
+  }
+}

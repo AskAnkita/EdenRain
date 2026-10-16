@@ -3409,6 +3409,13 @@
         "info": "Example: fashion,dresses,skirts,etc.."
       },
       {
+        "type": "text",
+        "id": "search_hidden_page_titles",
+        "label": "Hide pages whose title contains",
+        "info": "Separate with |. Keeps app-generated pages (the HTML sitemaps) out of the search results and the search dropdown. Leave empty to show every page. Delete the pages in Content > Pages to be rid of them properly.",
+        "default": "sitemap"
+      },
+      {
         "type": "link_list",
         "id": "quick_links",
         "label": "t:settings.quick_links"

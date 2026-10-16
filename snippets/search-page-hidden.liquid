@@ -1,0 +1,30 @@
+{%- comment -%}
+  Outputs "hidden" when a page should be kept out of search results.
+
+  Shopify's search covers every published page, which drops app-generated
+  pages (the Avada SEO HTML sitemaps) into the results next to the rings. The
+  real fix is deleting those pages in the admin; this keeps them off the
+  storefront in the meantime, and keeps any other page a merchant does not
+  want found out of the results without unpublishing it.
+
+  Matched on the title, case-insensitively, against the terms in
+  Theme settings > Search behaviour > "Hide pages whose title contains".
+
+  Usage:
+    {%- capture hide_page -%}
+      {%- render 'search-page-hidden', page_title: item.title -%}
+    {%- endcapture -%}
+    {%- if hide_page contains 'hidden' -%}...{%- endif -%}
+{%- endcomment -%}
+{%- liquid
+  assign hidden_terms = settings.search_hidden_page_titles | downcase | split: '|'
+  assign haystack = page_title | downcase
+
+  for term in hidden_terms
+    assign needle = term | strip
+    if needle != blank and haystack contains needle
+      echo 'hidden'
+      break
+    endif
+  endfor
+-%}

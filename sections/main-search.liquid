@@ -13,7 +13,7 @@
 {%- liquid
   assign sort_by = search.sort_by | default: search.default_sort_by
   assign terms = search.terms | escape
-  assign search_url = '?q=' | append: terms | append: '&options%5Bprefix%5D=last&sort_by=' | append: sort_by
+  assign search_url = '?q=' | append: terms | append: '&type=product&options%5Bprefix%5D=last&sort_by=' | append: sort_by
 
   if cart.attributes.pagination != blank and cart.attributes.pagination
     assign paginate_by = cart.attributes.pagination
@@ -31,9 +31,24 @@
 -%}
 
 <div class="product-grid-container spacing-style color-{{ section.settings.color_scheme }}">
+  {%- liquid
+    # The search forms ask Shopify for products only, so results_count is already
+    # the product count and nothing is dropped below. A search reached without that
+    # parameter -- an old link, a bookmark, a crawler -- still comes back with pages
+    # and articles, and those are dropped from the grid, so the figure shown to the
+    # shopper drops them too. Otherwise the heading and the filter bar report
+    # different totals for the same search.
+    assign hidden_results = 0
+    for item in search.results
+      unless item.object_type == 'product'
+        assign hidden_results = hidden_results | plus: 1
+      endunless
+    endfor
+    assign visible_results_count = search.results_count | minus: hidden_results
+  -%}
   {% paginate search.results by limit %}
     <div
-      class="template-search{% unless search.performed and search.results_count > 0 %} template-search--empty{% endunless %}"
+      class="template-search{% unless search.performed and visible_results_count > 0 %} template-search--empty{% endunless %}"
       style="
         --p-spacing-t: {{ section.settings.padding_top }}px;
         --p-spacing-b: {{ section.settings.padding_bottom }}px;
@@ -76,6 +91,13 @@
                     {%- endif -%}
                   >
                   <input name="options[prefix]" type="hidden" value="last">
+                  {%- comment -%}
+                    Products only. Without this Shopify also searches every published
+                    page and article, which is how the app-generated Avada HTML sitemap
+                    pages ended up in the grid -- and why the heading and the filter bar
+                    disagreed about how many results there were.
+                  {%- endcomment -%}
+                  <input name="type" type="hidden" value="product">
 
                   {%- if settings.predictive_search_enabled -%}
                     <div
@@ -116,16 +138,16 @@
           </div>
           {%- if search.performed -%}
             {%- unless section.settings.enable_filtering -%}
-              {%- if search.results_count > 0 -%}
+              {%- if visible_results_count > 0 -%}
                 <p role="status">
                   {{
                     'content.results_with_count_and_term'
-                    | t: terms: search.terms, count: search.results_count
+                    | t: terms: search.terms, count: visible_results_count
                   }}
                 </p>
               {%- endif -%}
             {%- endunless -%}
-            {%- if search.results_count == 0 and search.filters == empty -%}
+            {%- if visible_results_count == 0 and search.filters == empty -%}
               <p role="status">{{ 'content.no_results' | t: terms: search.terms }}</p>
             {%- endif -%}
           {%- endif -%}
@@ -137,7 +159,7 @@
                 type: 'filters',
                 id: 'filters',
                 results: search,
-                results_size: search.results_count,
+                results_size: visible_results_count,
                 limit: limit
               %}
             {%- endif -%}
@@ -177,6 +199,16 @@
                     <div class="loading-overlay"></div>
                     {% capture children %}
                       {% for item in search.results %}
+                        {%- comment -%}
+                          Products only, matching the type=product the search forms
+                          send. This also catches a search that arrives without that
+                          parameter. The article and page branches below are left in
+                          place so the other result types can be switched back on by
+                          removing this guard.
+                        {%- endcomment -%}
+                        {%- unless item.object_type == 'product' -%}
+                          {%- continue -%}
+                        {%- endunless -%}
                         <li
                           id="{{ section.id }}-{{ item.id }}"
                           class="product-grid__item product-grid__item--{{ forloop.index0 }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"

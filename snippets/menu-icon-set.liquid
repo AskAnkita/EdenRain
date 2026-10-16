@@ -1,0 +1,54 @@
+{% comment %}
+  Which set of drawings a menu group's names carry, named by the group rather than by the panel
+  that draws it. 'menu-link-icon' takes the answer and draws one.
+
+  The desktop panel names its sets by hand, per column, in `browse_columns`
+  ('header-menu-drawer-links'): its columns are chosen one at a time and some of them deliberately
+  carry no drawings - every Jewellery column, where 'icon-jewellery-type' draws the earrings and
+  the necklaces but none of the rings, the men's pieces or the metal filters, so a set there would
+  leave half the names with an empty box beside them. The mobile drawer has no such list: it walks
+  the navigation itself, so it asks here instead. The rules below are the desktop panel's, which is
+  what keeps the two menus drawing the same name the same way.
+
+  Accepts:
+  - group: {String} the group's title, e.g. "Shop by Style"
+  - parent: {String} the top-level item's title, e.g. "Engagement"
+
+  Outputs one of "ring-styles", "band-styles", "shapes", "stones", or nothing.
+{% endcomment %}
+
+{%- liquid
+  assign icon_group = group | handle
+  assign icon_parent = parent | handle
+
+  comment
+    A cut is a cut under any menu, and so is a stone, so those two are answered on the group alone.
+    Style is not: Engagement's styles are settings and Wedding's are bands, and the two sets draw
+    different things. "Women's" is the form Wedding's group takes in the navigation.
+  endcomment
+  comment
+    Liquid reads `and` and `or` right to left and has no brackets to say otherwise, so the two
+    tests that need both a parent and a group are nested rather than joined with `and`.
+  endcomment
+  assign icon_set = ''
+
+  if icon_group == 'by-shape' or icon_group == 'shop-by-shape'
+    assign icon_set = 'shapes'
+  elsif icon_group == 'by-stone' or icon_group == 'shop-by-stone'
+    assign icon_set = 'stones'
+  elsif icon_parent == 'diamonds'
+    if icon_group == 'lab-grown-diamonds'
+      assign icon_set = 'shapes'
+    endif
+  elsif icon_parent == 'engagement'
+    if icon_group == 'by-style' or icon_group == 'shop-by-style'
+      assign icon_set = 'ring-styles'
+    endif
+  elsif icon_parent == 'wedding'
+    if icon_group == 'by-style' or icon_group == 'womens'
+      assign icon_set = 'band-styles'
+    endif
+  endif
+
+  echo icon_set
+-%}

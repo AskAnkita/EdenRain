@@ -8,11 +8,13 @@ class SearchForm extends HTMLElement {
       if (this.input.form) {
         this.input.form.addEventListener('reset', this.onFormReset.bind(this));
       }
+      // 300ms of silence after the last keystroke read as a stall on a fast
+      // connection; 200ms still collapses a burst of typing into one request.
       this.input.addEventListener(
         'input',
         theme.utils.debounce((event) => {
           this.onChange(event);
-        }, 300).bind(this)
+        }, 200).bind(this)
       );
     }
   }

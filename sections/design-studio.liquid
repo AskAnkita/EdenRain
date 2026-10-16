@@ -31,6 +31,7 @@
 {% endcomment %}
 
 {{ 'design-studio.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'design-studio-progress.js' | asset_url }}" defer="defer"></script>
 
 {%- liquid
   assign transparent = 'rgba(0,0,0,0)'
@@ -48,6 +49,10 @@
   assign step_num_size = section.settings.step_num_size | plus: 0
   assign step_heading_size = section.settings.step_heading_size | plus: 0
   assign caption_size = section.settings.caption_size | plus: 0
+  assign progress_size = section.settings.progress_size | plus: 0
+  assign progress_gap = section.settings.progress_gap | plus: 0
+  assign progress_top = section.settings.progress_top | plus: 0
+  assign progress_track_height = section.settings.progress_track_height | plus: 0
   assign faq_size = section.settings.faq_size | plus: 0
   assign fallback_height = section.settings.fallback_height | plus: 0
   assign fallback_height_mobile = section.settings.fallback_height_mobile | plus: 0
@@ -74,6 +79,15 @@
 
   assign notes = section.settings.notes | split: '|'
 
+  # The progress bar is the same list of steps as the "how it works" band, read
+  # from the same blocks, so a step added in the editor appears in both. It
+  # points at anchors in that band, so it hides itself when the band is off.
+  assign step_blocks = section.blocks | where: 'type', 'step'
+  assign show_progress = false
+  if section.settings.show_progress and section.settings.show_steps and step_blocks.size > 0
+    assign show_progress = true
+  endif
+
   # The first button jumps down to the tool when no link is set, so the hero
   # works on a page where the builder is the whole point. Built here rather
   # than with `default:` in the markup: chaining `append` onto `default` would
@@ -98,6 +112,12 @@
   {%- if section.settings.frame_border != blank and section.settings.frame_border != transparent -%}--ds-frame-border: {{ section.settings.frame_border }};{%- endif -%}
   {%- if section.settings.rule_color != blank and section.settings.rule_color != transparent -%}--ds-step-line: {{ section.settings.rule_color }};--ds-faq-line: {{ section.settings.rule_color }};{%- endif -%}
   {%- if section.settings.step_num_color != blank and section.settings.step_num_color != transparent -%}--ds-step-num-color: {{ section.settings.step_num_color }};{%- endif -%}
+  {%- if section.settings.progress_background != blank and section.settings.progress_background != transparent -%}--ds-progress-bg: {{ section.settings.progress_background }};{%- endif -%}
+  {%- if section.settings.progress_color != blank and section.settings.progress_color != transparent -%}--ds-progress-color: {{ section.settings.progress_color }};{%- endif -%}
+  {%- if section.settings.progress_done_color != blank and section.settings.progress_done_color != transparent -%}--ds-progress-done-color: {{ section.settings.progress_done_color }};{%- endif -%}
+  {%- if section.settings.progress_current_color != blank and section.settings.progress_current_color != transparent -%}--ds-progress-current-color: {{ section.settings.progress_current_color }};{%- endif -%}
+  {%- if section.settings.progress_track_color != blank and section.settings.progress_track_color != transparent -%}--ds-progress-track-color: {{ section.settings.progress_track_color }};{%- endif -%}
+  {%- if section.settings.progress_fill_color != blank and section.settings.progress_fill_color != transparent -%}--ds-progress-fill-color: {{ section.settings.progress_fill_color }};{%- endif -%}
   {%- if section.settings.cta_background != blank and section.settings.cta_background != transparent -%}--ds-cta-bg: {{ section.settings.cta_background }};{%- endif -%}
   {%- if section.settings.cta_text_color != blank and section.settings.cta_text_color != transparent -%}--ds-cta-ink: {{ section.settings.cta_text_color }};{%- endif -%}
 
@@ -110,6 +130,14 @@
   {%- if step_num_size > 0 -%}--ds-step-num-size: {{ step_num_size }}px;{%- endif -%}
   {%- if step_heading_size > 0 -%}--ds-step-heading-size: {{ step_heading_size }}px;{%- endif -%}
   {%- if caption_size > 0 -%}--ds-caption-size: {{ caption_size }}px;{%- endif -%}
+  {%- if progress_size > 0 -%}--ds-progress-size: {{ progress_size }}px;{%- endif -%}
+  {%- if progress_gap > 0 -%}--ds-progress-gap: {{ progress_gap }}px;{%- endif -%}
+  {%- if progress_track_height > 0 -%}--ds-progress-track-height: {{ progress_track_height }}px;{%- endif -%}
+  {%- if show_progress -%}
+    {%- assign scroll_margin = progress_top | plus: 40 -%}
+    --ds-progress-top: {{ progress_top }}px;--ds-progress-scroll-margin: {{ scroll_margin }}px;
+    {%- if section.settings.progress_alignment == 'left' -%}--ds-progress-justify: flex-start;{%- elsif section.settings.progress_alignment == 'right' -%}--ds-progress-justify: flex-end;{%- endif -%}
+  {%- endif -%}
   {%- if faq_size > 0 -%}--ds-faq-size: {{ faq_size }}px;{%- endif -%}
   {%- if fallback_height > 0 -%}--ds-fallback-height: {{ fallback_height }}px;{%- endif -%}
   {%- if fallback_height_mobile > 0 -%}--ds-fallback-height-mobile: {{ fallback_height_mobile }}px;{%- endif -%}
@@ -143,6 +171,53 @@
     style="{{ section_styles }}"
   {% endif %}
 >
+  {%- if show_progress -%}
+    <ds-progress
+      class="ds-progress{% if section.settings.progress_sticky %} ds-progress--sticky{% endif %}"
+      role="navigation"
+      aria-label="{{ section.settings.progress_aria_label | default: 'Design steps' | escape }}"
+      {% if section.settings.progress_sticky %}data-sticky{% endif %}
+    >
+      <div class="ds-shell">
+        <ol class="ds-progress__list">
+          {%- for block in step_blocks -%}
+            {%- liquid
+              assign progress_label = block.settings.progress_label
+              if progress_label == blank
+                assign progress_label = block.settings.heading
+              endif
+              if progress_label == blank
+                assign progress_label = block.settings.label
+              endif
+              if progress_label == blank
+                capture progress_label
+                  echo section.settings.step_word | default: 'Step'
+                  echo ' '
+                  echo forloop.index
+                endcapture
+              endif
+            -%}
+            <li class="ds-progress__item">
+              <a
+                class="ds-progress__link"
+                href="#DesignStudioStep-{{ section.id }}-{{ forloop.index }}"
+                data-ds-progress-link
+              >
+                {%- if section.settings.progress_numbers -%}
+                  <span class="ds-progress__num">{{ forloop.index }}</span>
+                {%- endif -%}
+                <span class="ds-progress__label">{{ progress_label | strip | escape }}</span>
+              </a>
+            </li>
+          {%- endfor -%}
+        </ol>
+        <div class="ds-progress__track" aria-hidden="true">
+          <span class="ds-progress__fill" data-ds-progress-fill></span>
+        </div>
+      </div>
+    </ds-progress>
+  {%- endif -%}
+
   {%- if section.settings.show_hero -%}
     <div class="ds-shell">
       <div class="ds-hero{% unless hero_image_set %} ds-hero--no-media{% endunless %}">
@@ -308,7 +383,11 @@
                 {%- assign step_image_set = true -%}
               {%- endif -%}
 
-              <div class="ds-step" {{ block.shopify_attributes }}>
+              <div
+                class="ds-step"
+                id="DesignStudioStep-{{ section.id }}-{{ step_index }}"
+                {{ block.shopify_attributes }}
+              >
                 {%- if step_image_set -%}
                   <div class="ds-step__media">
                     {%- render 'homepage-journey-image',
@@ -485,6 +564,7 @@
     { "type": "checkbox", "id": "show_hero", "label": "Show the hero", "default": true },
     { "type": "checkbox", "id": "show_builder", "label": "Show the design tool", "default": true },
     { "type": "checkbox", "id": "show_steps", "label": "Show how it works", "default": true },
+    { "type": "checkbox", "id": "show_progress", "label": "Show the progress bar at the top", "info": "The steps from \"How it works\", at the top of the page. Clicking one scrolls down this page - it never leaves it. Needs \"Show how it works\" on.", "default": true },
     { "type": "checkbox", "id": "show_gallery", "label": "Show the inspiration wall", "default": true },
     { "type": "checkbox", "id": "show_faqs", "label": "Show the questions", "default": true },
     { "type": "checkbox", "id": "show_cta", "label": "Show the closing panel", "default": true },
@@ -558,6 +638,15 @@
     { "type": "color", "id": "cta_background", "label": "Panel background", "default": "rgba(0,0,0,0)", "info": "Clear a colour to use the stylesheet default." },
     { "type": "color", "id": "cta_text_color", "label": "Panel text", "default": "rgba(0,0,0,0)" },
 
+    { "type": "header", "content": "Progress bar", "info": "One link per step block, over a line that fills as the page is read." },
+    { "type": "checkbox", "id": "progress_sticky", "label": "Keep it on screen while scrolling", "default": true },
+    { "type": "range", "id": "progress_top", "label": "Distance from the top when stuck", "min": 0, "max": 200, "step": 10, "unit": "px", "default": 90, "info": "Clear of the sticky header." },
+    { "type": "checkbox", "id": "progress_numbers", "label": "Show the step numbers", "default": true },
+    { "type": "select", "id": "progress_alignment", "label": "Alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centre" }, { "value": "right", "label": "Right" } ], "default": "center" },
+    { "type": "text", "id": "progress_aria_label", "label": "Label for screen readers", "default": "Design steps" },
+    { "type": "range", "id": "progress_gap", "label": "Space under the bar", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the theme's responsive spacing (24-44px)." },
+    { "type": "range", "id": "progress_track_height", "label": "Line thickness", "min": 0, "max": 12, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the default of 2px." },
+
     { "type": "header", "content": "Colours", "info": "Clear a colour to use the stylesheet default." },
     { "type": "color", "id": "section_background", "label": "Section background", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "heading_color", "label": "Headings", "default": "rgba(0,0,0,0)" },
@@ -569,6 +658,12 @@
     { "type": "color", "id": "wash_background", "label": "Tinted band background", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "rule_color", "label": "Hairlines", "info": "The rule above each step and between the questions.", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "step_num_color", "label": "Step number", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "progress_background", "label": "Progress bar background", "info": "Needed when the bar is sticky, so the page does not show through it.", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "progress_color", "label": "Progress bar steps", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "progress_done_color", "label": "Progress bar steps already passed", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "progress_current_color", "label": "Progress bar current step", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "progress_track_color", "label": "Progress line", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "progress_fill_color", "label": "Progress line fill", "default": "rgba(0,0,0,0)" },
 
     { "type": "header", "content": "Typography", "info": "Set a size to 0 to keep the stylesheet's responsive default." },
     { "type": "range", "id": "hero_size", "label": "Hero heading size (desktop)", "min": 0, "max": 90, "step": 1, "unit": "px", "default": 0 },
@@ -580,6 +675,7 @@
     { "type": "range", "id": "step_num_size", "label": "Step number size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
     { "type": "range", "id": "step_heading_size", "label": "Step heading size", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0 },
     { "type": "range", "id": "caption_size", "label": "Tile caption size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "progress_size", "label": "Progress bar text size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
     { "type": "range", "id": "faq_size", "label": "Question size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
 
     { "type": "header", "content": "Content width" },
@@ -600,6 +696,7 @@
       "name": "Step",
       "settings": [
         { "type": "text", "id": "label", "label": "Label above the heading", "info": "Leave empty to number the step from its position." },
+        { "type": "text", "id": "progress_label", "label": "Short label for the progress bar", "info": "Optional. Leave empty to use the heading." },
         { "type": "text", "id": "heading", "label": "Heading", "default": "Tell us the idea" },
         { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Describe the piece, send a photo, or start from one of our settings.</p>" },
         { "type": "image_picker", "id": "image", "label": "Image", "info": "Optional. Leave all three empty for a text-only step." },

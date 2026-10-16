@@ -1,8 +1,23 @@
 {% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
 {%- if predictive_search.performed -%}
+  {%- comment -%}
+    Pages hidden by Theme settings > Search behaviour (the app-generated HTML
+    sitemaps) are counted out here, so an empty "Pages" heading is not left
+    behind when every page in the dropdown is one of them.
+  {%- endcomment -%}
+  {%- assign visible_pages_count = 0 -%}
+  {%- for page in predictive_search.resources.pages -%}
+    {%- capture hide_page -%}
+      {%- render 'search-page-hidden', page_title: page.title -%}
+    {%- endcapture -%}
+    {%- unless hide_page contains 'hidden' -%}
+      {%- assign visible_pages_count = visible_pages_count | plus: 1 -%}
+    {%- endunless -%}
+  {%- endfor -%}
+
   {% assign first_column_results_size = predictive_search.resources.queries.size
     | plus: predictive_search.resources.collections.size
-    | plus: predictive_search.resources.pages.size
+    | plus: visible_pages_count
     | plus: predictive_search.resources.articles.size
     | plus: predictive_search.resources.queries.size
   %}
@@ -57,7 +72,7 @@
           </ul>
         </div>
       {%- endif -%}
-      {%- if predictive_search.resources.pages.size > 0 -%}
+      {%- if visible_pages_count > 0 -%}
         <div class="predictive-search__pages-wrapper">
           <h6
             id="predictive-search-pages-desktop"
@@ -72,6 +87,12 @@
             aria-labelledby="predictive-search-pages-desktop"
           >
             {%- for page in predictive_search.resources.pages -%}
+              {%- capture hide_page -%}
+                {%- render 'search-page-hidden', page_title: page.title -%}
+              {%- endcapture -%}
+              {%- if hide_page contains 'hidden' -%}
+                {%- continue -%}
+              {%- endif -%}
               <li
                 id="predictive-search-option-page-desktop-{{ forloop.index }}"
                 class="predictive-search__list-item"
@@ -93,7 +114,7 @@
       {%- endif -%}
       {%- if predictive_search.resources.products.size > 0
         or predictive_search.resources.articles.size > 0
-        or predictive_search.resources.pages.size > 0
+        or visible_pages_count > 0
       -%}
 
         {%- liquid
@@ -119,7 +140,7 @@
               </div>
             {% endif %}
           {%- endif -%}
-          {%- if predictive_search.resources.pages.size > 0 -%}
+          {%- if visible_pages_count > 0 -%}
             <div class="predictive-search__pages-wrapper">
               <h6
                 id="predictive-search-pages-desktop"
@@ -134,6 +155,12 @@
                 aria-labelledby="predictive-search-pages-desktop"
               >
                 {%- for page in predictive_search.resources.pages -%}
+                  {%- capture hide_page -%}
+                    {%- render 'search-page-hidden', page_title: page.title -%}
+                  {%- endcapture -%}
+                  {%- if hide_page contains 'hidden' -%}
+                    {%- continue -%}
+                  {%- endif -%}
                   <li
                     id="predictive-search-option-page-desktop-{{ forloop.index }}"
                     class="predictive-search__list-item"
@@ -221,8 +248,8 @@
           assign count = predictive_search.resources.queries.size | plus: predictive_search.resources.collections.size
           echo 'content.results_suggestions_with_count' | t: count: count | append: ', '
         endif
-        if predictive_search.resources.pages.size > 0
-          assign count = predictive_search.resources.pages.size | plus: predictive_search.resources.articles.size
+        if visible_pages_count > 0
+          assign count = visible_pages_count | plus: predictive_search.resources.articles.size
           echo 'content.results_pages_with_count' | t: count: count | append: ', '
         endif
         if predictive_search.resources.products.size > 0

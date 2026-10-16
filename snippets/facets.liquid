@@ -9,9 +9,19 @@
   - filter_type: {String} Type of filter
   - filter_variant_pill: {Object}
   - paginate: {Object}
+  - results_size: {Number} Optional. The number of results the caller actually renders,
+    used in place of results.results_count when the two differ -- the search template
+    shows products only, Shopify still counts the pages and articles it returned.
   Usage:
   {% render 'facets', results: collection, enable_filtering: true, enable_sorting: true, enable_products_per_page: true, enable_grid_view: true, filter_type: 'vertical', filter_variant_pill: 'filter_variant_pill', paginate: paginate %}
 {% endcomment %}
+
+{%- liquid
+  assign results_count_display = results.results_count
+  if results_size
+    assign results_count_display = results_size
+  endif
+-%}
 
 {{ 'component-show-more.css' | asset_url | stylesheet_tag }}
 {{ 'component-swatch-input.css' | asset_url | stylesheet_tag }}
@@ -42,7 +52,7 @@
         <span class="results">
           <span id="ProductCountMobile">
             {%- if results.results_count -%}
-              {{ 'content.results_with_count' | t: terms: results.terms, count: results.results_count }}
+              {{ 'content.results_with_count' | t: terms: results.terms, count: results_count_display }}
             {%- elsif results.products_count == results.all_products_count -%}
               {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
             {%- else -%}
@@ -128,7 +138,7 @@
                         {%- if results.results_count -%}
                           {{
                             'content.results_with_count'
-                            | t: terms: results.terms, count: results.results_count
+                            | t: terms: results.terms, count: results_count_display
                           }}
                         {%- elsif results.products_count == results.all_products_count -%}
                           {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
@@ -873,7 +883,7 @@
                 <span class="results">
                   <span id="ProductCount">
                     {%- if results.results_count -%}
-                      {{ 'content.results_with_count' | t: terms: results.terms, count: results.results_count }}
+                      {{ 'content.results_with_count' | t: terms: results.terms, count: results_count_display }}
                     {%- elsif results.products_count == results.all_products_count -%}
                       {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
                     {%- else -%}
@@ -945,7 +955,7 @@
         <p class="collection-filter-toolbar__count" role="status">
           <span id="ProductCount">
             {%- if results.results_count -%}
-              {{ 'content.results_with_count' | t: terms: results.terms, count: results.results_count }}
+              {{ 'content.results_with_count' | t: terms: results.terms, count: results_count_display }}
             {%- elsif results.products_count == results.all_products_count -%}
               {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
             {%- else -%}
