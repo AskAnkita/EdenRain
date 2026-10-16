@@ -105,7 +105,7 @@
 {%- endcapture -%}
 
 <section
-  class="ds-split"
+  class="ds-split{% if section.settings.full_width %} ds-split--full-width{% endif %}"
   style="{{ section_styles | strip_newlines | strip }}"
   {{ section.shopify_attributes }}
 >

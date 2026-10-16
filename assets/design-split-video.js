@@ -29,6 +29,12 @@ if (!customElements.get('dsp-video')) {
         // 'ended' should never fire while loop is set, but a stalled loop lands there.
         this.video.addEventListener('ended', this.play);
         this.video.addEventListener('pause', this.onPause.bind(this));
+        this.video.addEventListener('error', () => {
+          this.closest('.dsp-media')?.setAttribute('data-video-fallback', '');
+        });
+        this.video.addEventListener('loadeddata', () => {
+          this.closest('.dsp-media')?.removeAttribute('data-video-fallback');
+        });
         document.addEventListener('visibilitychange', this.onVisibility);
 
         if ('IntersectionObserver' in window) {
