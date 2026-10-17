@@ -46,6 +46,13 @@
     assign media_share = 50
   endif
   assign media_height = section.settings.media_height | plus: 0
+
+  comment
+    The focal point is a real percentage, so 0 means "the left edge", not "use the default";
+    it falls back to the centre only when the template predates the setting.
+  endcomment
+  assign focal_x = section.settings.media_focal_x | default: 50
+  assign focal_y = section.settings.media_focal_y | default: 50
   assign pad_inline = section.settings.padding_horizontal | plus: 0
   assign pad_block = section.settings.padding_vertical | plus: 0
   assign pad_top = section.settings.padding_top | plus: 0
@@ -87,6 +94,8 @@
   --ecb-media-share: {{ media_share }}%;
   {%- if media_height > 0 -%}--ecb-media-height: {{ media_height }}px;{%- endif -%}
   --ecb-media-ratio: {{ section.settings.media_ratio | default: '4 / 3' }};
+  --ecb-media-focal-x: {{ focal_x }}%;
+  --ecb-media-focal-y: {{ focal_y }}%;
 
   {%- if section.settings.full_width -%}
     --ecb-shell-max: none;
@@ -116,9 +125,6 @@
           width: 1600,
           height: 1200
         -%}
-        <div class="ecb-media__brand" aria-label="Eden Raine">
-          <img src="{{ 'eden-raine-logo.png' | asset_url }}" alt="Eden Raine" width="1188" height="158" loading="lazy">
-        </div>
       </div>
 
       <div class="ecb-panel">
@@ -270,6 +276,8 @@
       ],
       "default": "4 / 3"
     },
+    { "type": "range", "id": "media_focal_x", "label": "Part of the picture kept in frame, left to right", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 50, "info": "The picture is cropped to fill its half of the band. Raise this to keep the right of the shot, lower it for the left." },
+    { "type": "range", "id": "media_focal_y", "label": "Part of the picture kept in frame, top to bottom", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 50 },
     { "type": "checkbox", "id": "centre_text", "label": "Centre the copy", "default": false },
     { "type": "checkbox", "id": "full_width", "label": "Full width", "default": true },
     { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "Ignored when the box above is ticked." },

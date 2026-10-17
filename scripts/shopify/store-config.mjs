@@ -318,10 +318,12 @@ export const menu = {
           items: [
             { title: 'All Bracelets', collection: 'bracelets' },
             ...[
-              ['Tennis Bracelet', 'tennis'],
-              ['Chain Link Bracelet', 'chain'],
-              ['Charm Bracelet', 'charm'],
-              ['Station Bracelet', 'station'],
+              // No "Bracelet" on the labels: the heading over the column already says it, and
+              // no other column repeats its category in its rows.
+              ['Tennis', 'tennis'],
+              ['Chain Link', 'chain'],
+              ['Charm', 'charm'],
+              ['Station', 'station'],
             ].map(([title, slug]) => ({ title, url: `/collections/bracelets?filter.p.tag=style:${slug}` })),
           ],
         },

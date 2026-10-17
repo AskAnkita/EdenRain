@@ -117,11 +117,12 @@
     be created for them to work and nothing goes stale if the range changes. Swap one for a
     collection once that collection exists and has something in it.
 
-    The labels carry the word "Bracelet" even under a heading that already says it: these are the
-    names the trade and the product titles use, and "Station" or "Chain Link" on its own does not
-    read as a bracelet. Drop to the bare word here if the column ever gets tight.
+    The labels drop the word "Bracelet", which the column heading over them already says. No
+    other column repeats its category in its rows - Necklaces lists Pendants and Chains, not
+    Pendant Necklaces - and four rows each ending in the same word read as a block of repetition
+    rather than a list of ranges.
   endcomment
-  assign bracelet_styles = 'Tennis Bracelet|tennis,Chain Link Bracelet|chain,Charm Bracelet|charm,Station Bracelet|station' | split: ','
+  assign bracelet_styles = 'Tennis|tennis,Chain Link|chain,Charm|charm,Station|station' | split: ','
   assign jewellery_bracelets = ''
   for bracelet_style in bracelet_styles
     assign bracelet_parts = bracelet_style | split: '|'
