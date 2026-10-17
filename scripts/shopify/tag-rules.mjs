@@ -109,6 +109,18 @@ export const style = [
   rule('signet', [/\bsignet\b/], { from: 'all' }),
   rule('pave', [/\bpav[eé]\b/], { from: 'all' }),
   rule('vintage', [/\bvintage\b/], { from: 'all' }),
+  // The four kinds a bracelet comes in, which the Bracelets column of the mega menu browses by,
+  // plus the tennis necklace the Necklaces column leads with (snippets/menu-static-items.liquid).
+  // They are styles rather than categories because the same word describes a bracelet and a
+  // necklace - there are tennis necklaces, charm necklaces and station necklaces too - and the
+  // menu scopes each row to its own collection. "Chain" takes the link patterns with it: a cuban
+  // link, a bolo or a curb bracelet is a chain bracelet by any other name. `category:charm` is a
+  // different tag and stays what it is: a charm sold on its own, which is what the Charms
+  // collection under Necklaces holds.
+  rule('tennis', [/\btennis\b/], { from: 'all' }),
+  rule('chain', [/\bchains?\b/, /\bcuban\b/, /\bbolo\b/, /\bcurb\b/, /\bfigaro\b/, /\bpaperclip\b/], { from: 'all' }),
+  rule('charm', [/\bcharms?\b/], { from: 'all' }),
+  rule('station', [/\bstations?\b/], { from: 'all' }),
 ];
 
 // ---------- type ----------

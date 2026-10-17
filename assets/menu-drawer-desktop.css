@@ -1266,8 +1266,8 @@ a.menu-drawer-desktop__group-heading:hover {
   align-items: center;
   justify-content: center;
   padding: 1.2rem 2.4rem;
-  border: 1px solid rgba(0, 0, 0, 0.45);
-  color: #111;
+  border: 1px solid #000;
+  color: #000;
   font-size: 1.2rem;
   letter-spacing: 0.16em;
   line-height: 1.2;
@@ -1278,8 +1278,8 @@ a.menu-drawer-desktop__group-heading:hover {
 }
 
 .menu-drawer-desktop__button:hover {
-  background-color: #111;
-  border-color: #111;
+  background-color: #000;
+  border-color: #000;
   color: #fff;
 }
 

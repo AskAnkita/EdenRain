@@ -14,11 +14,11 @@
 .eden-consult {
   --ecb-section-bg: #ffffff;
   --ecb-panel-bg: #ffffff;
-  --ecb-heading-color: #171714;
-  --ecb-text-color: rgba(23, 23, 20, 0.72);
-  --ecb-mode-color: #171714;
-  --ecb-icon-color: #171714;
-  --ecb-divider-color: rgba(23, 23, 20, 0.22);
+  --ecb-heading-color: #000000;
+  --ecb-text-color: #999999;
+  --ecb-mode-color: #000000;
+  --ecb-icon-color: #000000;
+  --ecb-divider-color: #ceada7;
 
   --ecb-heading-size: 48px;
   --ecb-heading-size-mobile: 32px;
@@ -78,6 +78,24 @@
   object-fit: cover;
 }
 
+.ecb-media__brand {
+  position: absolute;
+  z-index: 1;
+  top: 1.6rem;
+  right: 1.6rem;
+  width: clamp(130px, 24%, 220px);
+  padding: 1.2rem 1.4rem;
+  background: rgba(244, 244, 240, 0.94);
+}
+
+.ecb-media__brand img {
+  position: static;
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
 /* ------------------------------------------------------------------- panel */
 
 .ecb-panel {
@@ -112,6 +130,7 @@
   align-items: center;
   gap: 1rem;
   color: var(--ecb-mode-color);
+  font-family: var(--font-body--family);
   font-size: var(--ecb-mode-size);
   letter-spacing: 0.02em;
   line-height: 1.2;
@@ -151,6 +170,7 @@
   max-width: var(--ecb-measure);
   margin: 0;
   color: var(--ecb-text-color);
+  font-family: var(--font-body--family);
   font-size: var(--ecb-text-size);
   line-height: 1.6;
 }

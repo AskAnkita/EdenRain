@@ -27,17 +27,20 @@
   padding: 1.6rem 2.4rem;
   background: transparent;
   color: var(--color-foreground, #000);
-  border: 1px solid rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--color-foreground, #000);
   border-radius: 999px;
   font-size: 1.3rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Outline with ink text at rest, ink fill with the page colour reversed out of
+   it on hover - the only two looks a button in this theme takes. */
 .infinite-scrolling-wrapper[data-load-mode='button'] .infinite-scrolling-btn:hover {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.45);
+  background: var(--color-foreground, #000);
+  border-color: var(--color-foreground, #000);
+  color: var(--color-background, #fff);
 }
 
 .pagination-back-to-top {

@@ -87,7 +87,15 @@
     category at a time for anything that asks for a category on its own.
   endcomment
   assign jewellery_earrings = 'Studs|studs~Hoops & Huggies|hoops-huggies~Dangles & Drops|dangles-drops~Climbers, Jackets & Cuffs|climbers-jackets-cuffs'
-  assign jewellery_necklaces = 'Pendants|pendants~Chains|chains~Charms|charms'
+  comment
+    Tennis leads the column: it is the necklace the shop is known for and the one the featured
+    card and the home carousel both push, so it should not sit below three sub-ranges that get
+    less traffic. There is no tennis-necklaces collection - store-config.mjs leaves a category
+    uncreated until the shop stocks it - so the row opens the necklace collection with the
+    `style:tennis` tag filter applied, the same tag 'tag-rules.mjs' derives and the same kind of
+    URL the metal rows have always used. Swap it for a collection once one exists.
+  endcomment
+  assign jewellery_necklaces = 'Tennis|/collections/necklaces?filter.p.tag=style:tennis~Pendants|pendants~Chains|chains~Charms|charms'
 
   comment
     Rings has no sub-ranges of its own under Jewellery, so rather than invent names for it the
@@ -98,21 +106,29 @@
   assign jewellery_rings = 'Engagement|engagement-rings~Wedding Bands|wedding-bands~Eternity|eternity-rings~Anniversary|anniversary-rings~Stackable|stackable-rings~Promise|promise'
 
   comment
-    Bracelets has no sub-ranges and no sub-collections either - the shop sells bracelets, not
-    bangles and tennis bracelets, and store-config.mjs leaves a category it does not stock
-    uncreated rather than empty. So instead of names that would 404, the column opens the
-    bracelet collection with a metal filter applied, on the same `metal:` tags the Metal group
-    in the filter drawer filters on ('static-filters'). These are URLs, not collections, so
-    nothing has to be created for them to work and nothing goes stale if the range changes.
+    Bracelets is broken down by the four kinds the range actually comes in - tennis, chain link,
+    charm and station - rather than by metal, which said nothing about the piece and repeated the
+    Metal group in the filter drawer four rows deep.
+
+    None of the four is a collection: store-config.mjs leaves a category uncreated until the shop
+    stocks it, and a row that 404s is worse than one that filters. So each opens the bracelet
+    collection with a `style:` tag filter applied, on the same tags 'tag-rules.mjs' derives and
+    the Style group in the filter drawer uses. These are URLs, not collections, so nothing has to
+    be created for them to work and nothing goes stale if the range changes. Swap one for a
+    collection once that collection exists and has something in it.
+
+    The labels carry the word "Bracelet" even under a heading that already says it: these are the
+    names the trade and the product titles use, and "Station" or "Chain Link" on its own does not
+    read as a bracelet. Drop to the bare word here if the column ever gets tight.
   endcomment
-  assign bracelet_metals = 'Yellow Gold|yellow-gold,White Gold|white-gold,Rose Gold|rose-gold,Sterling Silver|sterling-silver' | split: ','
+  assign bracelet_styles = 'Tennis Bracelet|tennis,Chain Link Bracelet|chain,Charm Bracelet|charm,Station Bracelet|station' | split: ','
   assign jewellery_bracelets = ''
-  for bracelet_metal in bracelet_metals
-    assign bracelet_parts = bracelet_metal | split: '|'
+  for bracelet_style in bracelet_styles
+    assign bracelet_parts = bracelet_style | split: '|'
     unless forloop.first
       assign jewellery_bracelets = jewellery_bracelets | append: '~'
     endunless
-    assign jewellery_bracelets = jewellery_bracelets | append: bracelet_parts[0] | append: '|/collections/bracelets?filter.p.tag=metal:' | append: bracelet_parts[1]
+    assign jewellery_bracelets = jewellery_bracelets | append: bracelet_parts[0] | append: '|/collections/bracelets?filter.p.tag=style:' | append: bracelet_parts[1]
   endfor
 
   comment
@@ -207,9 +223,9 @@
       echo stones
     when 'jewellery/more' or 'jewelry/more'
       comment
-        Bracelets and Rings have no sub-ranges to list - the shop sells bracelets, not tennis
-        bracelets and bangles - so the text-only panel gives them a line each in a column with
-        the two featured listings rather than a column apiece with one name under it.
+        Bracelets and Rings get a line each here rather than a column apiece: the text-only
+        panel has no room to repeat their sub-ranges, so the two sit with the featured listings
+        and open the category itself.
       endcomment
       echo '::'
       echo jewellery_more

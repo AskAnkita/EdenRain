@@ -2743,7 +2743,7 @@
                     "title": "Delivery & Returns",
                     "custom_content_type": "all",
                     "product_tab_key_metafield": "",
-                    "content": "<p><strong>COMPLIMENTARY SHIPPING</strong>Each Eden Raine piece is handcrafted to order in about 2–3 weeks. Every order ships insured and signature-required via FedEx 2Day within the U.S. or DHL Express Worldwide (2–5 days, 50+ countries). FedEx Overnight is available at checkout for U.S. customers.<br/><br/><strong>60-DAY RETURNS & EXCHANGES</strong>We're confident you'll love your Eden Raine jewellery, but if it isn't exactly as you imagined, you have 60 days from the shipment date to return or exchange it, complimentary. No restocking fees. Items must be unworn, in original condition, with the Eden Raine silver tag attached.<br/><br/></p>",
+                    "content": "<p><strong>COMPLIMENTARY SHIPPING</strong>Each Eden Raine piece is handcrafted to order in about 2–3 weeks. Every order ships insured and signature-required via FedEx 2Day within the U.S. or DHL Express Worldwide (2–5 days, 50+ countries). FedEx Overnight is available at checkout for U.S. customers.<br/><br/><strong>30-DAY RETURNS & EXCHANGES</strong>We're confident you'll love your Eden Raine jewellery, but if it isn't exactly as you imagined, you have 30 days from the shipment date to return or exchange it, complimentary. No restocking fees. Items must be unworn, in original condition, with the Eden Raine silver tag attached.<br/><br/></p>",
                     "page": "",
                     "view_content": "default",
                     "accordion_icon": "none",
@@ -3407,7 +3407,7 @@
       "type": "product-delivery-returns",
       "settings": {
         "heading": "Delivery and returns",
-        "description": "<p>Complimentary worldwide delivery with all orders and 28 day return policy (excluding bespoke items)</p>",
+        "description": "<p>Complimentary worldwide delivery with all orders and 30 day return policy (excluding bespoke items)</p>",
         "button_label": "Read more",
         "button_link": "",
         "background_color": "#eeeeee",
@@ -3576,7 +3576,7 @@
             "open_by_default": false,
             "custom_content_type": "all",
             "product_tab_key_metafield": "",
-            "content": "<p><strong>COMPLIMENTARY SHIPPING</strong><br/>Each Eden Raine piece is handcrafted to order in approximately 2–3 weeks. Need it sooner? Shop Ready to Ship. All orders ship insured via FedEx 2Day (U.S.) or FedEx International Economy (2–5 days, 50+ countries) and require a signature on delivery. Expedited FedEx Overnight is available at checkout for U.S. customers.</p><p><strong>60-DAY RETURNS & EXCHANGES</strong><br/>We're confident you'll love your Eden Raine jewellery, but if it isn't exactly as you imagined, you have 60 days from the shipment date to return or exchange it, complimentary. No restocking fees. Items must be unworn, in original condition, with the Eden Raine silver tag attached.</p>",
+            "content": "<p><strong>COMPLIMENTARY SHIPPING</strong><br/>Each Eden Raine piece is handcrafted to order in approximately 2–3 weeks. Need it sooner? Shop Ready to Ship. All orders ship insured via FedEx 2Day (U.S.) or FedEx International Economy (2–5 days, 50+ countries) and require a signature on delivery. Expedited FedEx Overnight is available at checkout for U.S. customers.</p><p><strong>30-DAY RETURNS & EXCHANGES</strong><br/>We're confident you'll love your Eden Raine jewellery, but if it isn't exactly as you imagined, you have 30 days from the shipment date to return or exchange it, complimentary. No restocking fees. Items must be unworn, in original condition, with the Eden Raine silver tag attached.</p>",
             "page": ""
           }
         },
@@ -4407,7 +4407,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Free 60-Day Returns</p>",
+                    "text": "<p>Free 30-Day Returns</p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,

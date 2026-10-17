@@ -209,7 +209,7 @@
     height: 4.4rem;
     margin-top: 0;
     padding: 0 2.2rem;
-    border: 0;
+    border: 1px solid {{ stts.button_background }};
     background: {{ stts.button_background }};
     color: {{ stts.button_text_color }};
     font-family: inherit;
@@ -219,11 +219,14 @@
     text-transform: uppercase;
     cursor: pointer;
     white-space: nowrap;
-    transition: opacity 0.25s ease, background 0.25s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
-  #{{ footer_id }} .fc-submit:hover {
-    opacity: 0.88;
+  /* The fill and the label swap places rather than the whole button fading. */
+  #{{ footer_id }} .fc-submit:hover,
+  #{{ footer_id }} .fc-submit:focus-visible {
+    background: {{ stts.button_text_color }};
+    color: {{ stts.button_background }};
   }
 
   #{{ footer_id }} .fc-form-message {
@@ -263,10 +266,6 @@
   }
 
   /* Bottom Row */
-  #{{ footer_id }} .fc-bottom {
-    border-top: 1px solid {{ stts.border_color }};
-  }
-
   #{{ footer_id }} .fc-bottom-inner {
     max-width: {{ stts.content_width }}px;
     margin: 0 auto;
@@ -454,11 +453,6 @@
       padding: 0.2rem 0;
       font-size: 1.35rem;
       color: #555555;
-    }
-
-    /* Mobile Bottom Row */
-    #{{ footer_id }} .fc-bottom {
-      border-top: none;
     }
 
     #{{ footer_id }} .fc-bottom-inner {

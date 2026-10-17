@@ -568,11 +568,24 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     line-height: 1;
-    transition: opacity 0.25s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
-  .{{ root_class }} .signature-editorial__button:hover {
-    opacity: 0.82;
+  /*
+    Both halves turn over on hover - the label takes the arrow's ink and the arrow
+    takes the label's ground - rather than the button fading as a whole, which
+    only ever produced a washed-out version of the colours the merchant picked.
+  */
+  .{{ root_class }} .signature-editorial__button:hover .signature-editorial__button-label,
+  .{{ root_class }} .signature-editorial__button:focus-visible .signature-editorial__button-label {
+    background: var(--sig-button-text, #1a1a1a);
+    color: var(--sig-button-bg, #ffffff);
+  }
+
+  .{{ root_class }} .signature-editorial__button:hover .signature-editorial__button-icon,
+  .{{ root_class }} .signature-editorial__button:focus-visible .signature-editorial__button-icon {
+    background: var(--sig-button-icon-text, #ffffff);
+    color: var(--sig-button-icon-bg, #1a1a1a);
   }
 
   .{{ root_class }} .signature-editorial__button-label {
@@ -580,6 +593,7 @@
     background: var(--sig-button-bg, #ffffff);
     color: var(--sig-button-text, #1a1a1a);
     white-space: nowrap;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   .{{ root_class }} .signature-editorial__button-icon {
@@ -590,6 +604,7 @@
     padding: 0 0.6em;
     background: var(--sig-button-icon-bg, #1a1a1a);
     color: var(--sig-button-icon-text, #ffffff);
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   .{{ root_class }} .signature-editorial__button-icon svg {

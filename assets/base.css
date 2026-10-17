@@ -6415,7 +6415,7 @@ a {
     color var(--animation-speed) var(--animation-easing);
 
   @media screen and (min-width: 1025px) {
-    &:not(.button, .button-secondary):hover {
+    &:not(.button, .button-secondary, .eden-action, .eden-link):hover {
       color: var(--color-primary-hover);
     }
   }
@@ -12561,11 +12561,40 @@ product-recommendations:has([data-has-recommendations='false']) {
   height: auto;
 }
 
+/*
+  Outlined style. Two things were wrong with taking the label straight from
+  --button-color: on a scheme whose button is a fill, that variable holds the
+  colour meant to sit ON the fill (white), so the label went white on nothing;
+  and a flat background-color:transparent here out-weighed the base .button
+  background, so the hover fill could never arrive. The rule and the label now
+  come from the scheme's button border - black on every light scheme, white on
+  the dark and over-photo ones - and the fill is held in the variable the hover
+  rules already rebind, so an outlined button fills in on hover like the rest.
+*/
 .button.button--outline,
 .button-secondary.button--outline {
+  --button-background-color: transparent;
   --border-outline-color: var(--button-color);
-  background-color: transparent;
+  background-color: var(--button-background-color);
   border: 1px solid var(--border-outline-color);
+}
+
+.button.button--outline {
+  --button-color: var(--color-primary-button-border);
+}
+
+.button-secondary.button--outline {
+  --button-color: var(--color-secondary-button-border);
+}
+
+@media (hover: hover) {
+  .button.button--outline:hover:not([disabled]) {
+    --border-outline-color: var(--color-primary-button-hover-border);
+  }
+
+  .button-secondary.button--outline:hover:not([disabled]) {
+    --border-outline-color: var(--color-secondary-button-hover-border);
+  }
 }
 
 .button:not(.button-unstyled) {
@@ -20182,8 +20211,9 @@ ul.items-same-height > li {
 .ai-video-hero-content-awm5mywfkk1mvedrruaigenblockf88815bygc4pc
 .ai-video-hero-buttons-awm5mywfkk1mvedrruaigenblockf88815bygc4pc
 .ai-video-hero-button-primary-awm5mywfkk1mvedrruaigenblockf88815bygc4pc:hover {
+  background:#000000 !important;
   color: #ffffff !important;
-  border:#000000 !important;
+  border-color:#000000 !important;
 }
 
 /* Secondary button */
@@ -20191,7 +20221,7 @@ ul.items-same-height > li {
 .ai-video-hero-buttons-awm5mywfkk1mvedrruaigenblockf88815bygc4pc
 .ai-video-hero-button-secondary-awm5mywfkk1mvedrruaigenblockf88815bygc4pc:hover {
   color: #ffffff !important;
-  border:#000000 !important;
+  border-color:#000000 !important;
   background:#000000 !important;
 }
 .ai-video-hero-button-secondary-awm5mywfkk1mvedrruaigenblockf88815bygc4pc {
@@ -20331,7 +20361,6 @@ Specificity: (0,6,0)
 
 .add-to-cart-button-container .add-to-cart-button-inner .add-to-cart-button {
   width: 600px !important;
-  border-radius:35px !important;
 }
 
 @media (max-width: 787px) {
@@ -20441,9 +20470,13 @@ Specificity: (0,6,0)
 }
 
 /* 3. HOVER STATE (For Unselected Items) */
+/* No grey wash: an unselected pill firms up its outline, and the ink fill below
+   stays the one signal that a pill is selected. */
 .product-form__input--pill input[type="radio"]:not(:checked) + label:hover {
-  background-color: #f5f5f5 !important;
-  opacity: 0.9;
+  background-color: #ffffff !important;
+  color: #001514 !important;
+  border-color: #001514 !important;
+  box-shadow: inset 0 0 0 1px #001514 !important;
 }
 
 /* 4. OPTIONAL: Clean & Consistent Red Cross-out for Sold Out Items */

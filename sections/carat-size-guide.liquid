@@ -208,11 +208,12 @@
     letter-spacing: .02em;
     color: var(--carat-step-color, #1c1c1c);
     cursor: pointer;
-    transition: background-color .18s ease, color .18s ease;
+    transition: background-color .18s ease, color .18s ease, box-shadow .18s ease;
   }
 
+  /* An outline rather than a grey wash, so only the active step is filled. */
   .{{ root_class }} .carat-guide__step:hover {
-    background: rgba(0,0,0,.06);
+    box-shadow: inset 0 0 0 1px var(--carat-step-active-bg, #1c1c1c);
   }
 
   .{{ root_class }} .carat-guide__step.is-active {

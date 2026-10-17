@@ -298,21 +298,31 @@ export const menu = {
           collection: 'necklaces',
           items: [
             { title: 'All Necklaces', collection: 'necklaces' },
+            // Tennis leads: the range's best known piece, and no collection of its own yet, so
+            // it filters the necklace collection on the tag tag-rules.mjs derives.
+            { title: 'Tennis', url: '/collections/necklaces?filter.p.tag=style:tennis' },
             { title: 'Pendants', collection: 'pendants' },
             { title: 'Chains', collection: 'chains' },
             { title: 'Charms', collection: 'charms' },
           ],
         },
-        // Bracelets has no sub-categories to list: the shop sells bracelets, not tennis
-        // bracelets and bangles, and a collection for a range it does not stock would be the
-        // dead link this set exists to avoid. The menu breaks it down by metal filter instead
-        // (snippets/menu-static-items.liquid).
+        // Bracelets breaks down by the four kinds the range comes in - tennis, chain link, charm
+        // and station - not by metal, which said nothing about the piece and repeated the Metal
+        // group in the filter drawer. None of the four is a collection (a category the shop does
+        // not stock yet is left uncreated rather than empty), so each one filters the bracelet
+        // collection on the `style:` tag tag-rules.mjs derives. Keep in step with
+        // snippets/menu-static-items.liquid, which builds the same four links.
         {
           title: 'Bracelets',
           collection: 'bracelets',
           items: [
             { title: 'All Bracelets', collection: 'bracelets' },
-            ...metalItems('/collections/bracelets'),
+            ...[
+              ['Tennis Bracelet', 'tennis'],
+              ['Chain Link Bracelet', 'chain'],
+              ['Charm Bracelet', 'charm'],
+              ['Station Bracelet', 'station'],
+            ].map(([title, slug]) => ({ title, url: `/collections/bracelets?filter.p.tag=style:${slug}` })),
           ],
         },
         {
