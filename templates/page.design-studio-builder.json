@@ -1,48 +1,89 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "studio": {
       "type": "ijewel-studio",
       "settings": {
-        "embed_url": "",
-        "embed_title": "Design your own jewellery",
+        "embed_url": "https://share.ijewel.info/ring-configurator-demo/engagement-ring-builder-cart.html",
+        "embed_title": "Build your ring - Este Lalonde Collection",
         "lazy_load": true,
-        "frame_height": 760,
-        "frame_height_mobile": 560,
-        "loading_label": "Loading the designer",
-        "eyebrow": "DESIGN STUDIO",
-        "heading": "Design your ring in 3D",
-        "heading_is_h1": true,
-        "intro": "<p>Choose the setting, the stone and the metal, and turn the ring to see it from every side. Every change is priced as you make it, and nothing is made until you have approved the design.<\/p>",
+        "frame_height": 1000,
+        "frame_height_mobile": 760,
+        "loading_label": "",
+        "eyebrow": "",
+        "heading": "",
+        "heading_is_h1": false,
+        "intro": "",
         "alignment": "center",
-        "poster_image_asset": "featured-engagement-signature.jpg",
-        "poster_image_alt": "A lab-grown diamond ring made to order",
-        "notes": "No design fee | Made to order | Free insured delivery",
+        "poster_image_asset": "",
+        "poster_image_url": "",
+        "poster_image_alt": "",
+        "notes": "",
         "primary_label": "",
         "primary_link": "",
         "primary_style": "solid",
         "primary_new_tab": false,
-        "secondary_label": "Talk to a designer",
-        "secondary_link": "/pages/bespoke-jewellery-request",
+        "secondary_label": "",
+        "secondary_link": "",
         "secondary_style": "outline",
         "aside": "",
         "fallback_heading": "Designed with you, by hand",
-        "fallback_text": "<p>Tell us what you have in mind - a stone, a setting, a piece you want remade - and we will come back with a sketch and a price.<\/p>",
+        "fallback_text": "<p>Tell us what you have in mind - a stone, a setting, a piece you want remade - and we will come back with a sketch and a price.</p>",
         "fallback_label": "Start a bespoke enquiry",
         "fallback_link": "/pages/bespoke-jewellery-request",
+        "section_background": "rgba(0,0,0,0)",
+        "heading_color": "rgba(0,0,0,0)",
+        "eyebrow_color": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "note_color": "rgba(0,0,0,0)",
+        "frame_background": "rgba(0,0,0,0)",
+        "frame_border": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
         "heading_size": 0,
         "eyebrow_size": 0,
         "text_size": 0,
         "note_size": 0,
-        "full_width": false,
+        "full_width": true,
         "content_width": 0,
         "padding_horizontal": 0,
-        "custom_padding": false,
-        "padding_top": 40,
-        "padding_bottom": 60
+        "custom_padding": true,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "fill_screen": true
+      }
+    },
+    "1792391324512c4c70": {
+      "type": "apps",
+      "disabled": true,
+      "blocks": {
+        "pencil_shop_iframe_q3bj9C": {
+          "type": "shopify://apps/pencil-shop/blocks/iframe/0199ce71-3c2c-7767-9198-9591e64f6d23",
+          "settings": {
+            "iframe_url": "https://shopify.pencildesign.co/partner/a074cbc5/landing-pages/engagement-ring-gallery-layout",
+            "title": "Embedded Content",
+            "height": "1000"
+          }
+        }
+      },
+      "block_order": [
+        "pencil_shop_iframe_q3bj9C"
+      ],
+      "settings": {
+        "include_margins": true
       }
     }
   },
   "order": [
-    "studio"
+    "studio",
+    "1792391324512c4c70"
   ]
 }

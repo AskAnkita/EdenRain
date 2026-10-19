@@ -95,7 +95,7 @@
 {%- endcapture -%}
 
 <section
-  class="ijewel-studio{% if section.settings.full_width %} ijewel-studio--wide{% endif %}"
+  class="ijewel-studio{% if section.settings.full_width %} ijewel-studio--wide{% endif %}{% if section.settings.fill_screen %} ijewel-studio--fullscreen{% endif %}"
   style="{{ section_styles }}"
 >
   <div class="ijw-shell">
@@ -231,6 +231,7 @@
     { "type": "textarea", "id": "embed_url", "label": "Embed URL or iframe code", "info": "Paste either the bare URL or the whole <iframe> snippet - the src is taken out of it either way. Leave empty to show the enquiry card instead. An app block added to this section wins over whatever is here." },
     { "type": "text", "id": "embed_title", "label": "Frame title for screen readers", "default": "Design your own jewellery" },
     { "type": "checkbox", "id": "lazy_load", "label": "Load the designer when it scrolls into view", "default": true, "info": "Untick to load it with the page. A 3D scene is a heavy first load." },
+    { "type": "checkbox", "id": "fill_screen", "label": "Fill the screen", "default": false, "info": "The designer takes the whole window below the header, with no border, padding or wash. The two heights below are ignored." },
     { "type": "range", "id": "frame_height", "label": "Frame height (desktop)", "min": 400, "max": 1400, "step": 20, "unit": "px", "default": 760 },
     { "type": "range", "id": "frame_height_mobile", "label": "Frame height (mobile)", "min": 320, "max": 1200, "step": 20, "unit": "px", "default": 560 },
     { "type": "text", "id": "loading_label", "label": "Line shown while it loads", "info": "Leave empty to hide it.", "default": "Loading the designer" },

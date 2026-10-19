@@ -34,6 +34,36 @@
   max-width: none;
 }
 
+/* "Fill the screen": the configurator is the whole page, not a band on it, so
+   the frame takes the viewport less whatever the sticky header group occupies,
+   and the section drops its padding, its gutters, the border and the wash.
+   svh rather than vh so a phone's collapsing browser chrome cannot push the
+   add-to-cart button below the fold; vh first as the fallback for anything
+   that does not know the unit. The mobile toolbar is fixed over the bottom of
+   the window, so its height comes off too or it sits on top of add-to-cart -
+   the variable is unset on desktop, where it resolves to 0px. The selectors are two classes deep so they
+   outrank the desktop frame heights further down the file whatever the order. */
+.ijewel-studio--fullscreen {
+  --ijw-fill: calc(100vh - var(--header-group-height, 0px) - var(--toolbar-mobile-height, 0px));
+  --ijw-fill: calc(100svh - var(--header-group-height, 0px) - var(--toolbar-mobile-height, 0px));
+  padding: 0;
+}
+
+.ijewel-studio--fullscreen .ijw-shell {
+  max-width: none;
+}
+
+.ijewel-studio--fullscreen .ijw-frame {
+  border: 0;
+  background: var(--ijw-frame-bg, transparent);
+  min-height: var(--ijw-fill);
+}
+
+.ijewel-studio--fullscreen .ijw-frame iframe {
+  min-height: var(--ijw-fill);
+  height: var(--ijw-fill);
+}
+
 .ijewel-studio h1,
 .ijewel-studio h2,
 .ijewel-studio h3 {
