@@ -177,6 +177,24 @@
   background: var(--ds-frame-bg, var(--ds-wash));
 }
 
+/* An app block is not an iframe: a theme app extension lays itself out, brings
+   its own chrome and is as tall as its own content. So when one is in the slot
+   the frame stops being a frame - no wash, no border, no reserved canvas
+   height - and gets out of the block's way, which is also what keeps a builder
+   shorter than 720px from sitting in a band of empty grey. The selector is
+   two classes deep so it outranks the desktop min-height further down the file
+   whatever the source order. The merchant's frame colours still apply if they
+   set them, since those are what the custom properties are for. */
+.ds-builder .ds-builder__frame--app {
+  min-height: 0;
+  border-color: var(--ds-frame-border, transparent);
+  background: var(--ds-frame-bg, transparent);
+}
+
+.ds-builder__app {
+  width: 100%;
+}
+
 /* The enquiry card is not the builder, so it keeps its own, shorter height
    rather than reserving a 3D canvas worth of frame, and it runs the full width
    of the window rather than sitting inside the shell: it reads as a band, not

@@ -301,7 +301,7 @@
       {%- endif -%}
 
       <div
-        class="ds-builder__frame{% if app_blocks == 0 and section.settings.embed_url == blank %} ds-builder__frame--fallback{% endif %}"
+        class="ds-builder__frame{% if app_blocks > 0 %} ds-builder__frame--app{% endif %}{% if app_blocks == 0 and section.settings.embed_url == blank %} ds-builder__frame--fallback{% endif %}"
         {% if app_blocks == 0 and section.settings.embed_url == blank %}
           style="--ds-fallback-art: url('{{ 'bespoke-jewelry-atelier-bg.png' | asset_url }}');"
         {% endif %}

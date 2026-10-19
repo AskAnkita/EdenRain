@@ -223,12 +223,12 @@
 
 {% schema %}
 {
-  "name": "iJewel 3D studio",
+  "name": "3D design studio",
   "tag": "section",
   "class": "section-ijewel-studio",
   "settings": [
-    { "type": "header", "content": "The 3D designer", "info": "In iJewel Drive open the file, go to Embedding, and copy what it gives you. The file must be set to public or the frame loads empty." },
-    { "type": "textarea", "id": "embed_url", "label": "Embed URL or iframe code", "info": "Paste either the URL (https://ijewel3d.com/.../files/.../embedded) or the whole <iframe> snippet - the src is taken out of it. Leave empty to show the enquiry card instead." },
+    { "type": "header", "content": "The 3D designer", "info": "Paste the embed your builder gives you. Pencil: the share or embed link for the builder. iJewel: open the file in iJewel Drive, go to Embedding, and copy what it gives you - the file must be public or the frame loads empty." },
+    { "type": "textarea", "id": "embed_url", "label": "Embed URL or iframe code", "info": "Paste either the bare URL or the whole <iframe> snippet - the src is taken out of it either way. Leave empty to show the enquiry card instead. An app block added to this section wins over whatever is here." },
     { "type": "text", "id": "embed_title", "label": "Frame title for screen readers", "default": "Design your own jewellery" },
     { "type": "checkbox", "id": "lazy_load", "label": "Load the designer when it scrolls into view", "default": true, "info": "Untick to load it with the page. A 3D scene is a heavy first load." },
     { "type": "range", "id": "frame_height", "label": "Frame height (desktop)", "min": 400, "max": 1400, "step": 20, "unit": "px", "default": 760 },
@@ -293,6 +293,6 @@
     { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 60 }
   ],
   "blocks": [{ "type": "@app" }],
-  "presets": [{ "name": "iJewel 3D studio" }]
+  "presets": [{ "name": "3D design studio" }]
 }
 {% endschema %}

@@ -101,7 +101,7 @@
       ],
       "settings": {
         "show_hero": true,
-        "show_builder": true,
+        "show_builder": false,
         "show_steps": true,
         "show_gallery": false,
         "show_faqs": true,
@@ -113,7 +113,7 @@
         "notes": "No design fee | Free 3D preview | Made to order",
         "hero_alignment": "left",
         "primary_label": "Start designing",
-        "primary_link": "",
+        "primary_link": "/pages/design-studio-builder",
         "secondary_label": "Talk to a designer",
         "secondary_link": "/pages/bespoke-jewellery-request",
         "hero_image": "shopify://shop_images/category-rings.png",
