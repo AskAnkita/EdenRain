@@ -257,6 +257,23 @@ Google Storage URL rather than a CDN one, and a name Shopify had to change becau
 already called that would leave the theme's reference resolving to nothing. Either one is reported
 and stops the prune.
 
+### Replacing a picture that is already up there
+
+`upload-theme-images.mjs` never writes over a file already in Files - that is what makes it safe
+to re-run - so a drawing that has actually been redrawn goes through `replace-theme-image.mjs`
+instead. It keeps the file's name and its id, so every `images['...']` lookup in the theme goes on
+resolving; only the bytes and the CDN version string change, and caches hold the old picture for a
+few minutes afterwards.
+
+```bash
+node scripts/shopify/replace-theme-image.mjs shape-outline-heart.png           # preview
+node scripts/shopify/replace-theme-image.mjs --apply shape-outline-heart.png
+```
+
+The new copy is read from `assets/`, and the old one is downloaded to `backups/` as
+`<name>.before-replace` before anything is written, so a swap can be undone by putting that copy
+back in `assets/` and running this again.
+
 ### How the theme resolves a name
 
 Every photograph goes through `snippets/image-source.liquid`:

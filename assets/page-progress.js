@@ -36,6 +36,7 @@
   let tickTimer = null;
   let watchdogTimer = null;
   let hideTimer = null;
+  let positionFrame = null;
 
   function mount() {
     if (root) return;
@@ -52,10 +53,31 @@
     if (bar) bar.style.width = `${(progress * 100).toFixed(2)}%`;
   }
 
+  /* The bar hangs off the bottom of the nav bar, so it reads as part of the header
+     rather than as something floating over the announcement bar above it.
+     That edge is measured, never assumed: the header is sticky on most templates,
+     transparent on some, and slides out of the way on scroll-up, and the announcement
+     bar above it is editable, so its height is not ours to hardcode. */
+  function syncPosition() {
+    positionFrame = null;
+    const header = document.querySelector('#header-component');
+    const bottom = header ? header.getBoundingClientRect().bottom : 0;
+    /* A header that has scrolled away, or slid up out of view, leaves the bar at the
+       top of the viewport rather than following it off-screen. */
+    const top = Math.max(0, Math.min(bottom, window.innerHeight));
+    document.documentElement.style.setProperty('--page-progress-top', `${Math.round(top)}px`);
+  }
+
+  function queueSync() {
+    if (positionFrame !== null) return;
+    positionFrame = requestAnimationFrame(syncPosition);
+  }
+
   /* Steps shrink as the bar advances, so it never looks stalled and never looks about
      to finish -- the one thing a fake progress bar must not promise. */
   function tick() {
     progress = Math.min(CEILING, progress + Math.max((CEILING - progress) * 0.12, 0.004));
+    queueSync();
     paint();
   }
 
@@ -74,6 +96,7 @@
        to be present the instant it is asked for, not slide in from nothing. */
     bar.style.transition = 'none';
     progress = START_AT;
+    syncPosition();
     paint();
     root.dataset.state = 'loading';
 
@@ -169,6 +192,18 @@
     },
     true
   );
+
+  /* Only while the bar is on screen: there is nothing to reposition otherwise, and a
+     scroll listener that measures on every page in the store is not worth its cost. */
+  ['scroll', 'resize'].forEach((type) => {
+    window.addEventListener(
+      type,
+      () => {
+        if (root && root.dataset.state) queueSync();
+      },
+      { passive: true }
+    );
+  });
 
   window.addEventListener('beforeunload', finish);
   window.addEventListener('pagehide', finish);

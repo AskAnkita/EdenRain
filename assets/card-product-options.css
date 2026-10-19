@@ -115,12 +115,17 @@
   border-radius: 50%;
 }
 
+/* Every bead is labelled, not just the chosen one: a shopper picking a metal needs to
+   read the row before they click it, and white gold, platinum and silver are three
+   near-identical pale beads otherwise. The underline still marks the selection, and the
+   chosen code is darkened so the row does not read as four equal labels. */
 .card-metals__code {
-  display: none;
+  display: block;
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .card-metals__item.is-active .card-metals__code {
-  display: block;
+  color: rgba(0, 0, 0, 0.85);
 }
 
 /* With a swatch chosen, the card keeps that photo instead of swapping to the
@@ -134,9 +139,9 @@
    card image gets. */
 
 /* Mobile: the card is half the screen wide here, so a row of 28px beads and a
-   22px shape icon takes more of it than the price and the name together. The
-   active swatch still carries its code, so the dot cannot shrink past what two
-   uppercase letters need. */
+   22px shape icon takes more of it than the price and the name together. Every
+   swatch carries its code, so the dot cannot shrink past what two uppercase
+   letters need. */
 @media screen and (max-width: 749px) {
   .card-shapes {
     gap: 0.4rem 0.8rem;

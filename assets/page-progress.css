@@ -3,13 +3,17 @@
  *
  * A document navigation reports no progress of its own, so the bar is a stand-in for
  * "still working": page-progress.js eases it towards 90% on a timer and drives it to
- * 100% when the wait ends. Fixed to the viewport so it sits above the sticky header
- * without joining its layout, and non-interactive so it can never swallow a click
- * meant for the header beneath it.
+ * 100% when the wait ends. Fixed to the viewport rather than placed in the header's
+ * layout -- a bar that joined the flow would shift the page down the moment it
+ * appeared -- and parked on the header's own bottom edge, which page-progress.js
+ * measures, because that edge moves with the sticky, transparent and slide-away
+ * header states. Non-interactive, so it can never swallow a click meant for the
+ * header above it.
  */
 .page-progress {
   position: fixed;
-  top: 0;
+  /* Written by page-progress.js; 0 only until the first measurement. */
+  top: var(--page-progress-top, 0px);
   left: 0;
   right: 0;
   height: 3px;

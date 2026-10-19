@@ -8,6 +8,11 @@
   opens on the same metal (nothing shifts between page loads, filters or pagination)
   while neighbouring cards land on different ones.
 
+  Silver is left out of that rotation. It is the entry variant across this catalogue, so
+  it sits first in nearly every option list and the card was opening a 2.3 CTW diamond
+  eternity band on sterling silver. It stays a clickable swatch and it still wins when
+  the shopper filters to it; it is just not a metal a card opens on by itself.
+
   A metal filter beats the rotation. When the shopper has narrowed the grid to one metal
   — from the menu's Shop by Metal, which links at a filtered collection
   ('menu-static-items'), or from the Metal group in the filter drawer — every card opens
@@ -15,8 +20,8 @@
   shuffling a rose gold card into a Yellow Gold result.
 
   Outputs "<option index>||<option value>" for the chosen metal, or nothing when the
-  product has no metal option or sells only one metal — callers then keep the product's
-  own featured image.
+  product has no metal option, sells only one metal, or sells nothing but silver —
+  callers then keep the product's own featured image.
 
   @param {object} card_product - Product Liquid object
 
@@ -98,6 +103,7 @@
   # first value of each tone is kept because that is the one with a variant behind it.
   assign seen_tones = '|'
   assign metal_unique = ''
+  assign metal_rotation_source = ''
   assign filtered_pick = ''
   for value in metal_values_raw
     assign dedupe_text = value | strip | downcase
@@ -120,6 +126,13 @@
     unless seen_tones contains tone_key
       assign seen_tones = seen_tones | append: dedupe_tone | append: '|'
       assign metal_unique = metal_unique | append: '||' | append: value
+      # Silver is the entry variant on most of this catalogue -- it is what "From £360"
+      # is quoting -- so it sits first in the option list and the rotation kept opening
+      # diamond pieces on it. It stays a swatch the shopper can click, but it is not a
+      # metal a card opens on; the rotation runs over the golds and platinum instead.
+      unless dedupe_tone == 'ss'
+        assign metal_rotation_source = metal_rotation_source | append: '||' | append: value
+      endunless
       # The filtered metal is read off the same pass rather than tested again below:
       # this is the first value of its tone, so it is the one with a variant behind it.
       if dedupe_tone == filtered_tone and filtered_pick == ''
@@ -129,6 +142,7 @@
   endfor
 
   assign metal_values = metal_unique | remove_first: '||' | split: '||'
+  assign metal_rotation = metal_rotation_source | remove_first: '||' | split: '||'
 -%}
 {%- if metal_index >= 0 and filtered_pick != '' -%}
   {%- comment -%}
@@ -137,19 +151,19 @@
     pointing the photo and the link at, rather than falling back to the featured image.
   {%- endcomment -%}
   {{- metal_index }}||{{ filtered_pick -}}
-{%- elsif metal_index >= 0 and metal_values.size > 1 -%}
+{%- elsif metal_index >= 0 and metal_values.size > 1 and metal_rotation.size > 0 -%}
   {%- liquid
     # The product id alone is no good as a seed: this catalogue was imported in bulk, so
     # Shopify handed out ids in a regular stride and every one of them leaves the same
     # remainder -- `id | modulo: 4` picked White Gold for the whole grid. Dividing the id
     # by a prime brings the digits that do differ down into the low bits, and the title's
     # length moves products whose ids sit close together apart. Checked against the live
-    # catalogue: all four metals come up, and no long run of cards shares one.
+    # catalogue: every metal in the pool comes up, and no long run of cards shares one.
     assign seed_text = card_product.handle | append: '-' | append: card_product.title
     assign seed_size = seed_text | size
     assign seed = card_product.id | divided_by: 7 | plus: seed_size
-    assign pick_position = seed | modulo: metal_values.size
-    assign picked = metal_values[pick_position] | strip
+    assign pick_position = seed | modulo: metal_rotation.size
+    assign picked = metal_rotation[pick_position] | strip
   -%}
   {{- metal_index }}||{{ picked -}}
 {%- endif -%}

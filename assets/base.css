@@ -2752,7 +2752,11 @@ button.shopify-payment-button__button--unbranded {
 
 @media (hover: hover) {
 
-  .button:hover:not([disabled]):not(.button-unstyled),
+  /* Header icons wear .button for layout only. Repainting them in the primary
+     button's hover text colour turns the heart and the bag white on this white
+     header, so they vanish under the cursor and only the count bubble is left;
+     the 1.15 scale on .header__icon is the hover feedback they need. */
+  .button:hover:not([disabled]):not(.button-unstyled):not(.header__icon),
   .shopify-challenge__button:hover:not([disabled]):not(.button-unstyled),
   button.shopify-payment-button__button--unbranded:hover:not([disabled]) {
     --shadow-horizontal-offset: 0;

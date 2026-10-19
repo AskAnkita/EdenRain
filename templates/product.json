@@ -2813,10 +2813,10 @@
                     "padding-inline-end": 50
                   },
                   "blocks": {
-                    "text_DREyFK": {
-                      "type": "text",
+                    "product_description_body_Y4HyfT": {
+                      "type": "_product-description-body",
                       "settings": {
-                        "text": "{{ closest.product.description }}",
+                        "drop_label": true,
                         "collection_description_only": false,
                         "collapse_text": false,
                         "typing_text": false,
@@ -2896,7 +2896,7 @@
                     }
                   },
                   "block_order": [
-                    "text_DREyFK"
+                    "product_description_body_Y4HyfT"
                   ]
                 },
                 "accordion_row_A3WmwK": {
@@ -2927,10 +2927,12 @@
                     "padding-inline-end": 50
                   },
                   "blocks": {
-                    "text_hD4mcq": {
-                      "type": "text",
+                    "product_style_details_A3WmwK": {
+                      "type": "_product-style-details",
                       "settings": {
-                        "text": "{{ closest.product.metafields.custom.style_details | metafield_tag }}",
+                        "details_source": "auto",
+                        "metafield_namespace": "custom",
+                        "metafield_key": "style_details",
                         "collection_description_only": false,
                         "collapse_text": false,
                         "typing_text": false,
@@ -3010,7 +3012,7 @@
                     }
                   },
                   "block_order": [
-                    "text_hD4mcq"
+                    "product_style_details_A3WmwK"
                   ]
                 }
               },
