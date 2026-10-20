@@ -1,26 +1,29 @@
 {% comment %}
   Consultation booking - the page that turns "meet a consultant" into a time in the diary.
 
-  The shape is a chooser on one side and a diary on the other: each way to meet is a block with
-  its own booking link, and picking one swaps what the diary shows. Below 990px the chooser
-  stacks above the diary, which is the order it is read in anyway.
+  Three bands and a dialog. The hero makes the invitation and carries the one button that
+  matters; the cards below it are the kinds of appointment, and any of them opens the same
+  dialog on its own calendar; the band under those is every way of reaching us that is not an
+  appointment at all - telephone, WhatsApp, email, Instagram - because a good half of the people
+  who land here would rather send a message than keep a slot.
 
-  The scheduling is the provider's (Cal.com by default, Calendly or a plain booking URL by
-  setting). Availability, timezones, the calendar invitation, the video link and the reminder
-  emails are all theirs; this section owns the page around them, so the booking reads as Eden
-  Raine rather than as somebody's scheduling tool. assets/consultation-booking.js loads that
-  embed when the section comes into view and switches it when the choice changes.
+  The calendar lives in the dialog rather than on the page. Pinned beside the copy it leaves a
+  tall empty column whenever it is not the thing being looked at, which is most of the time.
 
-  With no link pasted into any block - the editor before the Cal.com account exists - the diary
-  is replaced by the fallback panel, so the page still asks for the enquiry instead of printing
-  an empty rectangle. The same panel catches a provider script a customer's browser blocks.
+  What fills the dialog depends on what the shop has set up. With a booking link on a card, the
+  provider's own calendar (Cal.com by default, Calendly or any booking URL by setting) takes
+  over: it alone knows what is free, sends the confirmation, and issues the Google Meet or Zoom
+  link - which is set on the event type in the provider's admin, not here. With no link, the
+  dialog shows our own month calendar and times over the shop's contact form, so the page asks
+  for a specific day and hour by email rather than printing "get in touch".
 
   A signed-in customer's name and email are handed to the embed as prefill, and a note is built
   from the query string, so /pages/book-a-consultation?piece=Aurora+solitaire from a product
   page reaches the consultant with the piece already named.
 
-  Looks come from assets/consultation-booking.css; buttons from assets/eden-actions.css, whose
-  ink is rebound here so they follow this section's own button colours.
+  Looks come from assets/consultation-booking.css, behaviour from
+  assets/consultation-booking.js; buttons from assets/eden-actions.css, whose ink is rebound
+  here so they follow this section's own button colours.
 
   Every restylable setting is written onto the section element as a CSS custom property, with
   the stylesheet's own value as the fallback, so a setting left at "use the default" (a cleared
@@ -44,15 +47,14 @@
   assign heading_tracking = section.settings.heading_tracking | plus: 0
   assign text_size = section.settings.text_size | plus: 0
   assign measure = section.settings.text_measure | plus: 0
-  assign choice_label_size = section.settings.choice_label_size | plus: 0
-  assign choice_meta_size = section.settings.choice_meta_size | plus: 0
-  assign choice_text_size = section.settings.choice_text_size | plus: 0
+  assign card_label_size = section.settings.card_label_size | plus: 0
+  assign card_meta_size = section.settings.card_meta_size | plus: 0
+  assign card_text_size = section.settings.card_text_size | plus: 0
+  assign contact_value_size = section.settings.contact_value_size | plus: 0
   assign icon_size = section.settings.icon_size | plus: 0
-  assign notes_size = section.settings.notes_size | plus: 0
   assign button_radius = section.settings.button_radius | plus: 0
   assign content_width = section.settings.content_width | plus: 0
-  assign aside_width = section.settings.aside_width | plus: 0
-  assign column_gap = section.settings.column_gap | plus: 0
+  assign dialog_width = section.settings.dialog_width | plus: 0
   assign stage_height = section.settings.stage_height | plus: 0
   assign stage_height_mobile = section.settings.stage_height_mobile | plus: 0
   assign pad_top = section.settings.padding_top | plus: 0
@@ -61,32 +63,53 @@
   assign pad_bottom_mobile = section.settings.padding_bottom_mobile | plus: 0
 
   assign meeting_blocks = section.blocks | where: 'type', 'meeting'
+  assign contact_blocks = section.blocks | where: 'type', 'contact'
 
   comment
-    The first block holding a link is what the diary opens on, so a "Showroom visit" block with
-    no link yet does not leave the page on the fallback panel while the others are ready.
+    The hero's button opens the dialog on the first appointment that has a link, so a kind of
+    meeting whose link has not been pasted in yet does not decide what the main button does.
   endcomment
-  assign opening_index = -1
+  assign hero_link = ''
+  assign hero_label = ''
+  assign hero_meta = ''
   for block in meeting_blocks
-    if opening_index == -1 and block.settings.booking_link != blank
-      assign opening_index = forloop.index0
-    endif
-  endfor
-  if opening_index == -1
-    assign opening_index = 0
-  endif
-
-  assign has_any_link = false
-  for block in meeting_blocks
-    if block.settings.booking_link != blank
-      assign has_any_link = true
-      break
+    if block.settings.booking_link != blank and hero_link == blank
+      assign hero_link = block.settings.booking_link
+      assign hero_label = block.settings.label
+      assign hero_meta = block.settings.meta
     endif
   endfor
 
   assign has_media = false
   if section.settings.media_image != blank or section.settings.media_asset != blank or section.settings.media_image_url != blank
     assign has_media = true
+  endif
+
+  assign open_days = ''
+  if section.settings.open_mon
+    assign open_days = open_days | append: '1,'
+  endif
+  if section.settings.open_tue
+    assign open_days = open_days | append: '2,'
+  endif
+  if section.settings.open_wed
+    assign open_days = open_days | append: '3,'
+  endif
+  if section.settings.open_thu
+    assign open_days = open_days | append: '4,'
+  endif
+  if section.settings.open_fri
+    assign open_days = open_days | append: '5,'
+  endif
+  if section.settings.open_sat
+    assign open_days = open_days | append: '6,'
+  endif
+  if section.settings.open_sun
+    assign open_days = open_days | append: '0,'
+  endif
+  assign open_days = open_days | split: ',' | join: ','
+  if open_days == blank
+    assign open_days = '1,2,3,4,5'
   endif
 -%}
 
@@ -97,14 +120,15 @@
   {%- if section.settings.text_color != blank and section.settings.text_color != transparent -%}--ebk-text-color: {{ section.settings.text_color }};{%- endif -%}
   {%- if section.settings.accent_color != blank and section.settings.accent_color != transparent -%}--ebk-accent-color: {{ section.settings.accent_color }};{%- endif -%}
   {%- if section.settings.rule_color != blank and section.settings.rule_color != transparent -%}--ebk-rule-color: {{ section.settings.rule_color }};{%- endif -%}
-  {%- if section.settings.choice_background != blank and section.settings.choice_background != transparent -%}--ebk-choice-bg: {{ section.settings.choice_background }};{%- endif -%}
-  {%- if section.settings.choice_background_active != blank and section.settings.choice_background_active != transparent -%}--ebk-choice-bg-active: {{ section.settings.choice_background_active }};{%- endif -%}
-  {%- if section.settings.choice_text_color != blank and section.settings.choice_text_color != transparent -%}--ebk-choice-color: {{ section.settings.choice_text_color }};{%- endif -%}
-  {%- if section.settings.choice_border_color != blank and section.settings.choice_border_color != transparent -%}--ebk-choice-border: {{ section.settings.choice_border_color }};{%- endif -%}
-  {%- if section.settings.choice_border_active != blank and section.settings.choice_border_active != transparent -%}--ebk-choice-border-active: {{ section.settings.choice_border_active }};{%- endif -%}
+  {%- if section.settings.card_background != blank and section.settings.card_background != transparent -%}--ebk-card-bg: {{ section.settings.card_background }};{%- endif -%}
+  {%- if section.settings.card_background_hover != blank and section.settings.card_background_hover != transparent -%}--ebk-card-bg-hover: {{ section.settings.card_background_hover }};{%- endif -%}
+  {%- if section.settings.card_text_color != blank and section.settings.card_text_color != transparent -%}--ebk-card-color: {{ section.settings.card_text_color }};{%- endif -%}
+  {%- if section.settings.card_border_color != blank and section.settings.card_border_color != transparent -%}--ebk-card-border: {{ section.settings.card_border_color }};{%- endif -%}
+  {%- if section.settings.card_border_hover != blank and section.settings.card_border_hover != transparent -%}--ebk-card-border-hover: {{ section.settings.card_border_hover }};{%- endif -%}
   {%- if section.settings.icon_color != blank and section.settings.icon_color != transparent -%}--ebk-icon-color: {{ section.settings.icon_color }};{%- endif -%}
-  {%- if section.settings.stage_background != blank and section.settings.stage_background != transparent -%}--ebk-stage-bg: {{ section.settings.stage_background }};{%- endif -%}
-  {%- if section.settings.stage_border_color != blank and section.settings.stage_border_color != transparent -%}--ebk-stage-border: {{ section.settings.stage_border_color }};{%- endif -%}
+  {%- if section.settings.contact_background != blank and section.settings.contact_background != transparent -%}--ebk-contact-bg: {{ section.settings.contact_background }};{%- endif -%}
+  {%- if section.settings.dialog_background != blank and section.settings.dialog_background != transparent -%}--ebk-dialog-bg: {{ section.settings.dialog_background }};{%- endif -%}
+  {%- if section.settings.dialog_backdrop != blank and section.settings.dialog_backdrop != transparent -%}--ebk-dialog-backdrop: {{ section.settings.dialog_backdrop }};{%- endif -%}
 
   {%- comment -%}
     The buttons take their fill and their text from eden-actions.css, so a button colour is set
@@ -122,17 +146,16 @@
   {%- if section.settings.uppercase_heading -%}--ebk-heading-case: uppercase;{%- endif -%}
   {%- if text_size > 0 -%}--ebk-text-size: {{ text_size }}px;{%- endif -%}
   {%- if measure > 0 -%}--ebk-measure: {{ measure }}ch;{%- endif -%}
-  {%- if choice_label_size > 0 -%}--ebk-choice-label-size: {{ choice_label_size }}px;{%- endif -%}
-  {%- if choice_meta_size > 0 -%}--ebk-choice-meta-size: {{ choice_meta_size }}px;{%- endif -%}
-  {%- if choice_text_size > 0 -%}--ebk-choice-text-size: {{ choice_text_size }}px;{%- endif -%}
+  {%- if card_label_size > 0 -%}--ebk-card-label-size: {{ card_label_size }}px;{%- endif -%}
+  {%- if card_meta_size > 0 -%}--ebk-card-meta-size: {{ card_meta_size }}px;{%- endif -%}
+  {%- if card_text_size > 0 -%}--ebk-card-text-size: {{ card_text_size }}px;{%- endif -%}
+  {%- if contact_value_size > 0 -%}--ebk-contact-value-size: {{ contact_value_size }}px;{%- endif -%}
   {%- if icon_size > 0 -%}--ebk-icon-size: {{ icon_size }}px;{%- endif -%}
-  {%- if notes_size > 0 -%}--ebk-notes-size: {{ notes_size }}px;{%- endif -%}
 
+  {%- if dialog_width > 0 -%}--ebk-dialog-width: {{ dialog_width }}px;{%- endif -%}
   {%- if stage_height > 0 -%}--ebk-stage-min-height: {{ stage_height }}px;{%- endif -%}
   {%- if stage_height_mobile > 0 -%}--ebk-stage-min-height-mobile: {{ stage_height_mobile }}px;{%- endif -%}
-  {%- if aside_width > 0 -%}--ebk-aside-width: {{ aside_width }}px;{%- endif -%}
-  {%- if column_gap > 0 -%}--ebk-gap: {{ column_gap }}px;{%- endif -%}
-  --ebk-media-ratio: {{ section.settings.media_ratio | default: '4 / 3' }};
+  --ebk-media-ratio: {{ section.settings.media_ratio | default: '4 / 5' }};
 
   {%- if section.settings.full_width -%}
     --ebk-shell-max: none;
@@ -143,175 +166,327 @@
 {%- endcapture -%}
 
 <section
-  class="eden-booking eden-booking--chooser-{{ section.settings.chooser_side }}{% if section.settings.centre_intro %} eden-booking--centred{% endif %}"
+  class="eden-booking eden-booking--media-{{ section.settings.media_side }}{% unless has_media %} eden-booking--no-media{% endunless %}{% if section.settings.centre_intro %} eden-booking--centred{% endif %}"
   style="{{ section_styles | strip_newlines | strip }}"
   {{ section.shopify_attributes }}
 >
-  <div class="ebk-shell">
-    {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.text != blank -%}
-      <header class="ebk-intro">
-        {%- if section.settings.eyebrow != blank -%}
-          <p class="ebk-eyebrow">{{ section.settings.eyebrow | escape }}</p>
-        {%- endif -%}
-        {%- if section.settings.heading != blank -%}
-          <h1 class="ebk-heading">{{ section.settings.heading | escape }}</h1>
-        {%- endif -%}
-        {%- if section.settings.text != blank -%}
-          <div class="ebk-text">{{ section.settings.text }}</div>
-        {%- endif -%}
-      </header>
-    {%- endif -%}
+  <consultation-booking
+    data-section-id="{{ section.id }}"
+    data-provider="{{ section.settings.provider }}"
+    {% if section.settings.provider_origin != blank %}data-origin="{{ section.settings.provider_origin | escape }}"{% endif %}
+    data-layout="{{ section.settings.embed_layout }}"
+    data-theme="{{ section.settings.embed_theme }}"
+    data-brand-color="{{ section.settings.embed_brand_color | default: '#171714' }}"
+    data-hide-details="{% if section.settings.hide_event_details %}true{% else %}false{% endif %}"
+    data-frame-title="{{ section.settings.dialog_title | default: 'Book an appointment' | escape }}"
+    {% if section.settings.prefill_customer and customer %}
+      data-name="{{ customer.name | escape }}"
+      data-email="{{ customer.email | escape }}"
+    {% endif %}
+  >
+    <div class="ebk-shell">
+      <div class="ebk-band ebk-hero">
+        <div class="ebk-hero__copy">
+          {%- if section.settings.eyebrow != blank -%}
+            <p class="ebk-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            <h1 class="ebk-heading">{{ section.settings.heading | escape }}</h1>
+          {%- endif -%}
+          {%- if section.settings.text != blank -%}
+            <div class="ebk-text">{{ section.settings.text }}</div>
+          {%- endif -%}
 
-    <consultation-booking
-      class="ebk-layout"
-      data-section-id="{{ section.id }}"
-      data-provider="{{ section.settings.provider }}"
-      {% if section.settings.provider_origin != blank %}data-origin="{{ section.settings.provider_origin | escape }}"{% endif %}
-      data-layout="{{ section.settings.embed_layout }}"
-      data-theme="{{ section.settings.embed_theme }}"
-      data-brand-color="{{ section.settings.embed_brand_color | default: '#171714' }}"
-      data-hide-details="{% if section.settings.hide_event_details %}true{% else %}false{% endif %}"
-      data-lazy="{% if section.settings.lazy_load %}true{% else %}false{% endif %}"
-      data-frame-title="{{ section.settings.heading | default: 'Book a consultation' | escape }}"
-      {% if section.settings.prefill_customer and customer %}
-        data-name="{{ customer.name | escape }}"
-        data-email="{{ customer.email | escape }}"
-      {% endif %}
-    >
-      <div class="ebk-aside">
-        {%- if meeting_blocks.size > 0 -%}
-          <div class="ebk-choices{% if meeting_blocks.size == 1 %} ebk-choices--single{% endif %}" role="group" aria-label="{{ section.settings.chooser_label | default: 'Ways to meet' | escape }}">
-            {%- for block in meeting_blocks -%}
-              {%- liquid
-                assign is_open = false
-                if forloop.index0 == opening_index
-                  assign is_open = true
-                endif
-
-                assign has_icon_image = false
-                if block.settings.icon_image != blank or block.settings.icon_asset != blank
-                  assign has_icon_image = true
-                endif
-              -%}
-              {%- capture choice_inner -%}
-                {%- if has_icon_image -%}
-                  <span class="ebk-choice__icon">
-                    {%- render 'homepage-journey-image',
-                      image: block.settings.icon_image,
-                      asset: block.settings.icon_asset,
-                      alt: '',
-                      sizes: '48px',
-                      width: 48,
-                      height: 48
-                    -%}
-                  </span>
-                {%- elsif block.settings.icon != 'none' -%}
-                  <span class="ebk-choice__icon" aria-hidden="true">
-                    {%- render 'icon-consultation', icon: block.settings.icon -%}
-                  </span>
-                {%- endif -%}
-                <span class="ebk-choice__body">
-                  {%- if block.settings.label != blank -%}
-                    <span class="ebk-choice__label">{{ block.settings.label | escape }}</span>
-                  {%- endif -%}
-                  {%- if block.settings.meta != blank -%}
-                    <span class="ebk-choice__meta">{{ block.settings.meta | escape }}</span>
-                  {%- endif -%}
-                  {%- if block.settings.text != blank -%}
-                    <span class="ebk-choice__text">{{ block.settings.text | escape }}</span>
-                  {%- endif -%}
-                  {%- if block.settings.badge != blank -%}
-                    <span class="ebk-choice__badge">{{ block.settings.badge | escape }}</span>
-                  {%- endif -%}
-                </span>
-              {%- endcapture -%}
-
-              {%- if meeting_blocks.size == 1 -%}
-                <div
-                  class="ebk-choice"
-                  data-booking-choice
-                  data-booking-link="{{ block.settings.booking_link | escape }}"
-                  {{ block.shopify_attributes }}
-                >
-                  {{ choice_inner }}
-                </div>
-              {%- else -%}
-                <button
-                  type="button"
-                  class="ebk-choice"
-                  data-booking-choice
-                  data-booking-link="{{ block.settings.booking_link | escape }}"
-                  aria-pressed="{% if is_open %}true{% else %}false{% endif %}"
-                  {{ block.shopify_attributes }}
-                >
-                  {{ choice_inner }}
-                </button>
-              {%- endif -%}
-            {%- endfor -%}
-          </div>
-        {%- endif -%}
-
-        {%- if section.settings.notes_text != blank -%}
-          <div class="ebk-notes">
-            {%- if section.settings.notes_heading != blank -%}
-              <h2 class="ebk-notes__heading">{{ section.settings.notes_heading | escape }}</h2>
+          <div class="ebk-actions">
+            {%- if section.settings.button_label != blank -%}
+              <button
+                type="button"
+                class="eden-action eden-action--{{ section.settings.button_style }}"
+                data-booking-open
+                data-booking-link="{{ hero_link | escape }}"
+                data-booking-label="{{ hero_label | escape }}"
+                data-booking-meta="{{ hero_meta | escape }}"
+              >
+                {{- section.settings.button_label | escape -}}
+              </button>
             {%- endif -%}
-            <div class="ebk-notes__body">{{ section.settings.notes_text }}</div>
+            {%- if section.settings.link_label != blank -%}
+              <a class="eden-link" href="{{ section.settings.link_url | default: '/pages/contact' }}">
+                {{- section.settings.link_label | escape -}}
+              </a>
+            {%- endif -%}
           </div>
-        {%- endif -%}
+
+          {%- if section.settings.smallprint != blank -%}
+            <p class="ebk-smallprint">{{ section.settings.smallprint | escape }}</p>
+          {%- endif -%}
+        </div>
 
         {%- if has_media -%}
-          <figure class="ebk-aside__media">
+          <figure class="ebk-hero__media">
             {%- render 'homepage-journey-image',
               image: section.settings.media_image,
               asset: section.settings.media_asset,
               image_url: section.settings.media_image_url,
               alt: section.settings.media_alt,
               placeholder: 'lifestyle-2',
-              sizes: '(min-width: 990px) 360px, 100vw',
-              width: 900,
-              height: 675
+              sizes: '(min-width: 900px) 540px, 100vw',
+              width: 1080,
+              height: 1350
             -%}
           </figure>
         {%- endif -%}
-
-        {%- if section.settings.link_1_label != blank or section.settings.link_2_label != blank -%}
-          <div class="ebk-aside__links">
-            {%- if section.settings.link_1_label != blank -%}
-              <a class="eden-link" href="{{ section.settings.link_1_url | default: '/pages/contact' }}">
-                {{- section.settings.link_1_label | escape -}}
-              </a>
-            {%- endif -%}
-            {%- if section.settings.link_2_label != blank -%}
-              <a class="eden-link" href="{{ section.settings.link_2_url | default: '/pages/contact' }}">
-                {{- section.settings.link_2_label | escape -}}
-              </a>
-            {%- endif -%}
-          </div>
-        {%- endif -%}
       </div>
 
-      <div class="ebk-stage{% unless has_any_link %} ebk-stage--fallback{% endunless %}" data-booking-stage{% unless has_any_link %} data-ready="true"{% endunless %}>
-        <div class="ebk-stage__frame" data-booking-frame></div>
-
-        <p class="ebk-stage__status">{{ section.settings.loading_text | default: 'Opening the diary' | escape }}</p>
-
-        <div class="ebk-fallback" data-booking-fallback{% if has_any_link %} hidden{% endif %}>
-          {%- if section.settings.fallback_heading != blank -%}
-            <h2 class="ebk-fallback__heading">{{ section.settings.fallback_heading | escape }}</h2>
+      {%- if meeting_blocks.size > 0 -%}
+        <div class="ebk-band">
+          {%- if section.settings.ways_heading != blank -%}
+            <h2 class="ebk-band__heading">{{ section.settings.ways_heading | escape }}</h2>
           {%- endif -%}
-          {%- if section.settings.fallback_text != blank -%}
-            <div class="ebk-fallback__text">{{ section.settings.fallback_text }}</div>
+
+          <div class="ebk-ways">
+            {%- for block in meeting_blocks -%}
+              {%- liquid
+                assign has_icon_image = false
+                if block.settings.icon_image != blank or block.settings.icon_asset != blank
+                  assign has_icon_image = true
+                endif
+              -%}
+              <button
+                type="button"
+                class="ebk-way"
+                data-booking-open
+                data-booking-link="{{ block.settings.booking_link | escape }}"
+                data-booking-label="{{ block.settings.label | escape }}"
+                data-booking-meta="{{ block.settings.meta | escape }}"
+                {{ block.shopify_attributes }}
+              >
+                <span class="ebk-way__top">
+                  {%- if has_icon_image -%}
+                    <span class="ebk-way__icon">
+                      {%- render 'homepage-journey-image',
+                        image: block.settings.icon_image,
+                        asset: block.settings.icon_asset,
+                        alt: '',
+                        sizes: '48px',
+                        width: 48,
+                        height: 48
+                      -%}
+                    </span>
+                  {%- elsif block.settings.icon != 'none' -%}
+                    <span class="ebk-way__icon" aria-hidden="true">
+                      {%- render 'icon-consultation', icon: block.settings.icon -%}
+                    </span>
+                  {%- endif -%}
+                  {%- if block.settings.badge != blank -%}
+                    <span class="ebk-way__badge">{{ block.settings.badge | escape }}</span>
+                  {%- endif -%}
+                </span>
+                {%- if block.settings.label != blank -%}
+                  <span class="ebk-way__label">{{ block.settings.label | escape }}</span>
+                {%- endif -%}
+                {%- if block.settings.meta != blank -%}
+                  <span class="ebk-way__meta">{{ block.settings.meta | escape }}</span>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <span class="ebk-way__text">{{ block.settings.text | escape }}</span>
+                {%- endif -%}
+                <span class="ebk-way__cue">{{ section.settings.card_cue | default: 'Choose a time' | escape }}</span>
+              </button>
+            {%- endfor -%}
+          </div>
+
+          {%- if section.settings.notes_text != blank -%}
+            <div class="ebk-notes">{{ section.settings.notes_text }}</div>
           {%- endif -%}
-          {%- if section.settings.fallback_button_label != blank -%}
-            <a class="eden-action eden-action--{{ section.settings.button_style }}" href="{{ section.settings.fallback_button_link | default: '/pages/contact' }}">
-              {{- section.settings.fallback_button_label | escape -}}
-            </a>
+        </div>
+      {%- endif -%}
+
+      {%- if contact_blocks.size > 0 -%}
+        <div class="ebk-band">
+          <div class="ebk-contact">
+            {%- if section.settings.contact_heading != blank or section.settings.contact_text != blank -%}
+              <div class="ebk-contact__intro">
+                {%- if section.settings.contact_heading != blank -%}
+                  <h2 class="ebk-band__heading">{{ section.settings.contact_heading | escape }}</h2>
+                {%- endif -%}
+                {%- if section.settings.contact_text != blank -%}
+                  <div class="ebk-text">{{ section.settings.contact_text }}</div>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+
+            <ul class="ebk-contact__list">
+              {%- for block in contact_blocks -%}
+                <li {{ block.shopify_attributes }}>
+                  {%- render 'booking-contact-link', block: block -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}
+      An overlay rather than a native <dialog>: showModal() would make Shopify's own hCaptcha
+      challenge, which is appended to <body>, unreachable, and the request form could never be
+      verified. assets/consultation-booking.css says more.
+    {%- endcomment -%}
+    <div
+      class="ebk-dialog"
+      data-booking-dialog
+      role="dialog"
+      aria-modal="true"
+      aria-label="{{ section.settings.dialog_title | default: 'Book an appointment' | escape }}"
+      hidden
+    >
+      <div class="ebk-dialog__inner">
+        <div class="ebk-dialog__head">
+          <div class="ebk-dialog__titles">
+            <span class="ebk-dialog__eyebrow" data-booking-eyebrow data-default="{{ section.settings.dialog_eyebrow | escape }}">{{ section.settings.dialog_eyebrow | escape }}</span>
+            <h2 class="ebk-dialog__title" data-booking-title>{{ section.settings.dialog_title | default: 'Book an appointment' | escape }}</h2>
+          </div>
+          <button type="button" class="ebk-dialog__close" data-booking-close aria-label="{{ section.settings.close_label | default: 'Close' | escape }}">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </button>
+        </div>
+
+        <div class="ebk-dialog__body">
+          {%- if meeting_blocks.size > 1 -%}
+            <div class="ebk-switch" role="group" aria-label="{{ section.settings.ways_heading | default: 'Ways to meet' | escape }}">
+              {%- for block in meeting_blocks -%}
+                <button
+                  type="button"
+                  class="ebk-switch__button"
+                  data-booking-switch
+                  data-booking-link="{{ block.settings.booking_link | escape }}"
+                  data-booking-label="{{ block.settings.label | escape }}"
+                  data-booking-meta="{{ block.settings.meta | escape }}"
+                  aria-pressed="false"
+                >
+                  {{- block.settings.label | escape -}}
+                </button>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          <div class="ebk-stage" data-booking-stage hidden>
+            <div class="ebk-stage__frame" data-booking-frame></div>
+            <p class="ebk-stage__status">{{ section.settings.loading_text | default: 'Opening the diary' | escape }}</p>
+          </div>
+
+          <div class="ebk-request" data-booking-request>
+            <div class="ebk-request__picker">
+              {%- if section.settings.request_lead != blank -%}
+                <p class="ebk-request__lead">{{ section.settings.request_lead | escape }}</p>
+              {%- endif -%}
+
+              <div
+                class="ebk-cal"
+                data-booking-calendar
+                data-open-days="{{ open_days }}"
+                data-slots="{{ section.settings.slot_times | escape }}"
+                data-lead-days="{{ section.settings.lead_days | default: 1 }}"
+                data-window-days="{{ section.settings.window_days | default: 60 }}"
+              ></div>
+
+              <div class="ebk-cal__slots" data-booking-slots data-empty-text="{{ section.settings.slots_empty_text | default: 'Pick a day to see the times we keep free.' | escape }}"></div>
+            </div>
+
+            <div class="ebk-request__form">
+              {%- comment -%}
+                The contact form posts to /contact, not to this page, and it is Shopify that
+                sends the visitor back here afterwards. Where it sends them is not ours to
+                assume: behind the storefront password gate, or after a bot protection
+                challenge, the journey back can end anywhere but this page - which is what a
+                Send that "does nothing", or lands on a bare page, actually is. return_to names
+                the page and the flag the thank-you is keyed on, so the way back is ours.
+              {%- endcomment -%}
+              {%- assign request_form_id = 'EbkRequest-' | append: section.id -%}
+              {%- form 'contact', id: request_form_id, class: 'ebk-form' -%}
+                <input type="hidden" name="return_to" value="{{ request.path }}?contact_posted=true">
+
+                {%- if form.posted_successfully? -%}
+                  <p class="ebk-form__message">{{ section.settings.success_text | default: 'Thank you - your request is with us. We will confirm the time by email shortly.' | escape }}</p>
+                {%- endif -%}
+
+                {%- if form.errors -%}
+                  <p class="ebk-form__message ebk-form__message--error">{{ form.errors | default_errors }}</p>
+                {%- endif -%}
+
+                <p class="ebk-chosen" data-booking-chosen data-prefix="{{ section.settings.chosen_prefix | default: 'You have asked for' | escape }}" hidden></p>
+
+                <input type="hidden" name="contact[Appointment]" data-booking-field-type value="{{ section.settings.dialog_title | default: 'Appointment' | escape }}">
+                <input type="hidden" name="contact[Requested time]" data-booking-field-slot value="">
+
+                <div class="ebk-field">
+                  <label for="ebk-name-{{ section.id }}">{{ section.settings.name_label | default: 'Name' | escape }}</label>
+                  <input id="ebk-name-{{ section.id }}" type="text" name="contact[name]" autocomplete="name" required value="{% if customer %}{{ customer.name | escape }}{% endif %}">
+                </div>
+
+                <div class="ebk-field">
+                  <label for="ebk-email-{{ section.id }}">{{ section.settings.email_label | default: 'Email' | escape }}</label>
+                  <input id="ebk-email-{{ section.id }}" type="email" name="contact[email]" autocomplete="email" required value="{% if customer %}{{ customer.email | escape }}{% endif %}">
+                </div>
+
+                {%- comment -%}
+                  A name and an email are what a confirmation needs; a telephone number is not,
+                  and a field nobody reads is a field that loses requests. Off by default, and
+                  never required when it is on.
+                {%- endcomment -%}
+                {%- if section.settings.ask_for_phone -%}
+                  <div class="ebk-field">
+                    <label for="ebk-phone-{{ section.id }}">{{ section.settings.phone_label | default: 'Telephone' | escape }}</label>
+                    <input id="ebk-phone-{{ section.id }}" type="tel" name="contact[phone]" autocomplete="tel">
+                  </div>
+                {%- endif -%}
+
+                <div class="ebk-field">
+                  <label for="ebk-body-{{ section.id }}">{{ section.settings.message_label | default: 'What would you like to talk about?' | escape }}</label>
+                  <textarea id="ebk-body-{{ section.id }}" name="contact[body]"></textarea>
+                </div>
+
+                <button type="submit" class="eden-action eden-action--{{ section.settings.button_style }}">
+                  {{- section.settings.request_button_label | default: 'Send the request' | escape -}}
+                </button>
+
+                {%- if section.settings.request_note != blank -%}
+                  <p class="ebk-form__note">{{ section.settings.request_note | escape }}</p>
+                {%- endif -%}
+              {%- endform -%}
+
+              {%- comment -%}
+                Said out loud, outside the form, so it survives the form being hidden once the
+                request has gone. Every line the sending takes is a setting rather than a
+                string in the script.
+              {%- endcomment -%}
+              <p
+                class="ebk-form__message ebk-form__status"
+                data-booking-status
+                role="status"
+                aria-live="polite"
+                data-pick="{{ section.settings.pick_first_text | default: 'Choose a day and a time first and we will ask for that one.' | escape }}"
+                data-sending="{{ section.settings.sending_text | default: 'Sending your request' | escape }}"
+                data-sent="{{ section.settings.success_text | default: 'Thank you - your request is with us. We will confirm the time by email shortly.' | escape }}"
+                data-error="{{ section.settings.error_text | default: 'That did not send. Please try again, or write to us and we will book it for you.' | escape }}"
+                {%- comment -%}
+                  Only ever seen on 127.0.0.1, so it is not a setting: a merchant would never
+                  meet it, and a line in the theme editor nobody can use is clutter.
+                {%- endcomment -%}
+                data-local="Form posts cannot complete on the local preview. Try this on a theme preview URL or the live storefront."
+                hidden
+              ></p>
+            </div>
+          </div>
+
+          {%- if section.settings.dialog_footnote != blank -%}
+            <p class="ebk-fallback-note">{{ section.settings.dialog_footnote | escape }}</p>
           {%- endif -%}
         </div>
       </div>
-    </consultation-booking>
-  </div>
+    </div>
+  </consultation-booking>
 </section>
 
 {% schema %}
@@ -319,17 +494,30 @@
   "name": "Consultation booking",
   "tag": "section",
   "class": "section-consultation-booking",
-  "max_blocks": 6,
+  "max_blocks": 12,
   "settings": [
-    { "type": "header", "content": "Content" },
+    { "type": "header", "content": "Hero" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Private appointments" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Book a consultation" },
-    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Meet one to one with an Eden Raine jewellery specialist. Choose how you would like to meet, pick a time that suits you, and we will confirm it by email straight away.<\/p>" },
-    { "type": "text", "id": "chooser_label", "label": "Name of the chooser for screen readers", "default": "Ways to meet" },
-    { "type": "text", "id": "loading_text", "label": "Text while the diary loads", "default": "Opening the diary" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Book an appointment" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Meet one to one with an Eden Raine jewellery specialist, in our showroom or by video call. Pick a time that suits you and your confirmation arrives by email.<\/p>" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Book an appointment" },
+    { "type": "text", "id": "smallprint", "label": "Line under the button", "default": "Free, and never any obligation to buy." },
+    { "type": "text", "id": "link_label", "label": "Link beside the button", "default": "Prefer to write to us?" },
+    { "type": "url", "id": "link_url", "label": "Link", "info": "Left empty it goes to \/pages\/contact." },
+
+    { "type": "header", "content": "Ways to meet" },
+    { "type": "paragraph", "content": "The cards come from the \"Way to meet\" blocks at the bottom of this panel. Each one opens the booking dialog on its own calendar." },
+    { "type": "text", "id": "ways_heading", "label": "Heading above the cards", "default": "Ways to meet" },
+    { "type": "text", "id": "card_cue", "label": "Line at the foot of each card", "default": "Choose a time" },
+    { "type": "richtext", "id": "notes_text", "label": "What happens next", "default": "<ul><li>A confirmation email with a calendar invitation arrives within a minute.<\/li><li>For a video call we send the link; there is nothing to install.<\/li><li>Every confirmation carries a link to move or cancel the time.<\/li><\/ul>" },
+
+    { "type": "header", "content": "Other ways to reach us" },
+    { "type": "paragraph", "content": "The row of telephone, WhatsApp, email and Instagram comes from the \"Contact\" blocks at the bottom of this panel." },
+    { "type": "text", "id": "contact_heading", "label": "Heading", "default": "Or reach us directly" },
+    { "type": "richtext", "id": "contact_text", "label": "Text", "default": "<p>No appointment needed. We answer Monday to Saturday, and usually within a few hours.<\/p>" },
 
     { "type": "header", "content": "The diary" },
-    { "type": "paragraph", "content": "The appointment itself is kept by a scheduling provider. Paste the link for each way to meet into its block below - a Cal.com event link looks like cal.com\/eden-raine\/showroom-visit." },
+    { "type": "paragraph", "content": "The appointment itself is kept by a scheduling provider. Paste the link for each way to meet into its block below - a Cal.com event link looks like cal.com\/eden-raine\/showroom-visit. The Google Meet or Zoom link is set on the event type in the provider's own admin, and goes out with the confirmation." },
     {
       "type": "select",
       "id": "provider",
@@ -339,8 +527,7 @@
         { "value": "calendly", "label": "Calendly" },
         { "value": "iframe", "label": "Any other booking page (plain frame)" }
       ],
-      "default": "cal",
-      "info": "Cal.com and Calendly load their own embed, which resizes itself and takes the customer's details. Anything else is shown in a plain frame at the height set below."
+      "default": "cal"
     },
     { "type": "text", "id": "provider_origin", "label": "Self-hosted address", "info": "Only for a Cal.com instance of your own, e.g. https:\/\/book.edenraine.co.uk. Leave empty for cal.com." },
     {
@@ -366,44 +553,72 @@
       ],
       "default": "light"
     },
-    { "type": "color", "id": "embed_brand_color", "label": "Diary accent", "default": "#171714", "info": "The colour the provider uses for the selected day and the booking button." },
-    { "type": "checkbox", "id": "hide_event_details", "label": "Hide the provider's own title and duration", "default": true, "info": "They are already in the card beside the diary." },
+    { "type": "color", "id": "embed_brand_color", "label": "Diary accent", "default": "#171714" },
+    { "type": "checkbox", "id": "hide_event_details", "label": "Hide the provider's own title and duration", "default": true, "info": "They are already on the card the visitor came from." },
     { "type": "checkbox", "id": "prefill_customer", "label": "Fill in a signed-in customer's name and email", "default": true },
-    { "type": "checkbox", "id": "lazy_load", "label": "Load the diary when it is scrolled to", "default": true, "info": "Untick if the diary is the first thing on the page." },
 
-    { "type": "header", "content": "Beside the chooser" },
-    { "type": "text", "id": "notes_heading", "label": "Heading", "default": "What happens next" },
-    { "type": "richtext", "id": "notes_text", "label": "Text", "default": "<ul><li>You will have a confirmation email with a calendar invitation within a minute.<\/li><li>For a video call we send a link; nothing to install.<\/li><li>Need to move it? Every confirmation has a reschedule link.<\/li><\/ul>" },
-    { "type": "text", "id": "link_1_label", "label": "First link label", "default": "Prefer to write to us?" },
-    { "type": "url", "id": "link_1_url", "label": "First link", "info": "Left empty it goes to \/pages\/contact." },
-    { "type": "text", "id": "link_2_label", "label": "Second link label" },
-    { "type": "url", "id": "link_2_url", "label": "Second link" },
+    { "type": "header", "content": "The dialog" },
+    { "type": "text", "id": "dialog_eyebrow", "label": "Eyebrow", "default": "Eden Raine" },
+    { "type": "text", "id": "dialog_title", "label": "Title", "default": "Book an appointment" },
+    { "type": "text", "id": "close_label", "label": "Close button label for screen readers", "default": "Close" },
+    { "type": "text", "id": "loading_text", "label": "Text while the diary loads", "default": "Opening the diary" },
+    { "type": "text", "id": "dialog_footnote", "label": "Line at the foot of the dialog", "default": "Times are shown in your own timezone." },
+
+    { "type": "header", "content": "If there is no diary yet" },
+    { "type": "paragraph", "content": "Without a booking link the dialog shows a calendar of its own and emails the request to your shop's contact address. It cannot know what is already taken, so it asks rather than books." },
+    { "type": "text", "id": "request_lead", "label": "Line above the calendar", "default": "Choose a day and a time that suit you and we will confirm it by email." },
+    { "type": "text", "id": "slot_times", "label": "Times offered", "default": "10:00, 11:00, 12:00, 14:00, 15:00, 16:00", "info": "Separated by commas, in your own opening hours." },
+    { "type": "text", "id": "slots_empty_text", "label": "Text before a day is chosen", "default": "Pick a day to see the times we keep free." },
+    { "type": "checkbox", "id": "open_mon", "label": "Open Monday", "default": true },
+    { "type": "checkbox", "id": "open_tue", "label": "Open Tuesday", "default": true },
+    { "type": "checkbox", "id": "open_wed", "label": "Open Wednesday", "default": true },
+    { "type": "checkbox", "id": "open_thu", "label": "Open Thursday", "default": true },
+    { "type": "checkbox", "id": "open_fri", "label": "Open Friday", "default": true },
+    { "type": "checkbox", "id": "open_sat", "label": "Open Saturday", "default": true },
+    { "type": "checkbox", "id": "open_sun", "label": "Open Sunday", "default": false },
+    { "type": "range", "id": "lead_days", "label": "Earliest a day can be asked for", "min": 0, "max": 14, "step": 1, "unit": "d", "default": 1 },
+    { "type": "range", "id": "window_days", "label": "How far ahead a day can be asked for", "min": 7, "max": 182, "step": 7, "unit": "d", "default": 63 },
+    { "type": "text", "id": "chosen_prefix", "label": "Wording before the chosen time", "default": "You have asked for" },
+    { "type": "text", "id": "name_label", "label": "Name field", "default": "Name" },
+    { "type": "text", "id": "email_label", "label": "Email field", "default": "Email" },
+    { "type": "checkbox", "id": "ask_for_phone", "label": "Ask for a telephone number", "default": false, "info": "Off by default. A name and an email are all a confirmation needs, and the number is never required when the field is shown." },
+    { "type": "text", "id": "phone_label", "label": "Telephone field", "default": "Telephone" },
+    { "type": "text", "id": "message_label", "label": "Message field", "default": "What would you like to talk about?" },
+    { "type": "text", "id": "request_button_label", "label": "Submit button", "default": "Send the request" },
+    { "type": "text", "id": "request_note", "label": "Line under the form", "default": "We reply to every request, usually the same working day." },
+    { "type": "text", "id": "success_text", "label": "Message once it is sent", "default": "Thank you - your request is with us. We will confirm the time by email shortly." },
+    { "type": "text", "id": "sending_text", "label": "Message while it sends", "default": "Sending your request" },
+    { "type": "text", "id": "error_text", "label": "Message if it will not send", "default": "That did not send. Please try again, or write to us and we will book it for you." },
+    { "type": "text", "id": "pick_first_text", "label": "Message if no day was chosen", "default": "Choose a day and a time first and we will ask for that one." },
 
     { "type": "header", "content": "Picture" },
-    { "type": "paragraph", "content": "A picked image wins, then a file in Content > Files or assets\/, then a pasted URL. Leave all three empty for no picture." },
+    { "type": "paragraph", "content": "A picked image wins, then a file in Content > Files or assets\/, then a pasted URL. Leave all three empty for a full width hero with no picture." },
     { "type": "image_picker", "id": "media_image", "label": "Image" },
     { "type": "text", "id": "media_asset", "label": "File name" },
     { "type": "text", "id": "media_image_url", "label": "Image URL" },
-    { "type": "text", "id": "media_alt", "label": "Alt text", "default": "Our consultation showroom" },
+    { "type": "text", "id": "media_alt", "label": "Alt text", "default": "A jeweller at the bench in our London workshop" },
+    {
+      "type": "select",
+      "id": "media_side",
+      "label": "Picture side",
+      "options": [
+        { "value": "right", "label": "Right" },
+        { "value": "left", "label": "Left" }
+      ],
+      "default": "right"
+    },
     {
       "type": "select",
       "id": "media_ratio",
       "label": "Picture shape",
       "options": [
-        { "value": "4 / 3", "label": "Landscape (4:3)" },
-        { "value": "3 / 2", "label": "Landscape (3:2)" },
-        { "value": "16 / 9", "label": "Wide (16:9)" },
-        { "value": "1 / 1", "label": "Square" }
+        { "value": "4 / 5", "label": "Portrait (4:5)" },
+        { "value": "3 / 4", "label": "Portrait (3:4)" },
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 3", "label": "Landscape (4:3)" }
       ],
-      "default": "4 / 3"
+      "default": "4 / 5"
     },
-
-    { "type": "header", "content": "If the diary cannot be shown" },
-    { "type": "paragraph", "content": "Shown in place of the diary while no booking link is set, and if a visitor's browser blocks the provider's script." },
-    { "type": "text", "id": "fallback_heading", "label": "Heading", "default": "Tell us when suits you" },
-    { "type": "richtext", "id": "fallback_text", "label": "Text", "default": "<p>Send us two or three times that work for you and the way you would like to meet, and we will confirm one by return.<\/p>" },
-    { "type": "text", "id": "fallback_button_label", "label": "Button label", "default": "Request an appointment" },
-    { "type": "url", "id": "fallback_button_link", "label": "Button link", "info": "Left empty it goes to \/pages\/contact." },
 
     { "type": "header", "content": "Colours" },
     { "type": "color", "id": "section_background", "label": "Page background", "default": "rgba(0,0,0,0)" },
@@ -412,14 +627,15 @@
     { "type": "color", "id": "text_color", "label": "Body text", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "accent_color", "label": "Badge", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "rule_color", "label": "Dividing lines", "default": "rgba(0,0,0,0)" },
-    { "type": "color", "id": "choice_background", "label": "Way to meet card", "default": "rgba(0,0,0,0)" },
-    { "type": "color", "id": "choice_background_active", "label": "Way to meet card when chosen", "default": "rgba(0,0,0,0)" },
-    { "type": "color", "id": "choice_text_color", "label": "Way to meet text", "default": "rgba(0,0,0,0)" },
-    { "type": "color", "id": "choice_border_color", "label": "Way to meet border", "default": "rgba(0,0,0,0)" },
-    { "type": "color", "id": "choice_border_active", "label": "Way to meet border when chosen", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "card_background", "label": "Card", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "card_background_hover", "label": "Card when hovered", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "card_text_color", "label": "Card text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "card_border_color", "label": "Card border", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "card_border_hover", "label": "Card border when hovered", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "icon_color", "label": "Icons", "default": "rgba(0,0,0,0)" },
-    { "type": "color", "id": "stage_background", "label": "Diary background", "default": "rgba(0,0,0,0)" },
-    { "type": "color", "id": "stage_border_color", "label": "Diary border", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "contact_background", "label": "Contact band", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "dialog_background", "label": "Dialog", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "dialog_backdrop", "label": "Behind the dialog", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "button_background", "label": "Button fill", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "button_text_color", "label": "Button text", "default": "rgba(0,0,0,0)" },
 
@@ -431,29 +647,18 @@
     { "type": "range", "id": "heading_tracking", "label": "Heading letter spacing", "min": 0, "max": 20, "step": 1, "unit": "%", "default": 0 },
     { "type": "checkbox", "id": "uppercase_heading", "label": "Heading in capitals", "default": false },
     { "type": "range", "id": "text_size", "label": "Body text size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
-    { "type": "range", "id": "text_measure", "label": "Body text line length", "min": 0, "max": 90, "step": 2, "unit": "ch", "default": 0, "info": "0 keeps the default of 60 characters." },
-    { "type": "range", "id": "choice_label_size", "label": "Way to meet name size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
-    { "type": "range", "id": "choice_meta_size", "label": "Way to meet duration size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
-    { "type": "range", "id": "choice_text_size", "label": "Way to meet description size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
-    { "type": "range", "id": "notes_size", "label": "What happens next size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "text_measure", "label": "Body text line length", "min": 0, "max": 90, "step": 2, "unit": "ch", "default": 0, "info": "0 keeps the default of 48 characters." },
+    { "type": "range", "id": "card_label_size", "label": "Card name size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "card_meta_size", "label": "Card duration size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "card_text_size", "label": "Card description size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "contact_value_size", "label": "Contact detail size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
 
     { "type": "header", "content": "Layout" },
     { "type": "range", "id": "icon_size", "label": "Icon size", "min": 0, "max": 60, "step": 2, "unit": "px", "default": 0 },
-    {
-      "type": "select",
-      "id": "chooser_side",
-      "label": "Chooser side",
-      "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "right", "label": "Right" }
-      ],
-      "default": "left"
-    },
-    { "type": "range", "id": "aside_width", "label": "Width of the chooser column", "min": 0, "max": 520, "step": 20, "unit": "px", "default": 0, "info": "0 keeps the default of 360px. From 990px up." },
-    { "type": "range", "id": "column_gap", "label": "Space between the chooser and the diary", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the default of 40px." },
-    { "type": "range", "id": "stage_height", "label": "Least height of the diary", "min": 0, "max": 1400, "step": 20, "unit": "px", "default": 0, "info": "0 keeps the default of 760px. The provider's own embed grows past this as it needs to." },
-    { "type": "range", "id": "stage_height_mobile", "label": "Least height of the diary on mobile", "min": 0, "max": 1600, "step": 20, "unit": "px", "default": 0, "info": "0 keeps the default of 1020px." },
-    { "type": "checkbox", "id": "centre_intro", "label": "Centre the heading and text", "default": false },
+    { "type": "range", "id": "dialog_width", "label": "Dialog width", "min": 0, "max": 1600, "step": 20, "unit": "px", "default": 0, "info": "0 keeps the default of 1040px." },
+    { "type": "range", "id": "stage_height", "label": "Least height of the diary", "min": 0, "max": 1200, "step": 20, "unit": "px", "default": 0, "info": "0 keeps the default of 640px. The provider's own embed grows past this as it needs to." },
+    { "type": "range", "id": "stage_height_mobile", "label": "Least height of the diary on mobile", "min": 0, "max": 1600, "step": 20, "unit": "px", "default": 0, "info": "0 keeps the default of 900px." },
+    { "type": "checkbox", "id": "centre_intro", "label": "Centre the hero", "default": false },
     {
       "type": "select",
       "id": "button_style",
@@ -466,7 +671,7 @@
     },
     { "type": "range", "id": "button_radius", "label": "Button corner", "min": 0, "max": 60, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the theme's square corner." },
     { "type": "checkbox", "id": "full_width", "label": "Full width", "default": false },
-    { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "0 keeps the default of 1440px. Ignored when the box above is ticked." },
+    { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "0 keeps the default of 1340px. Ignored when the box above is ticked." },
     { "type": "checkbox", "id": "custom_padding", "label": "Set the space above and below", "default": false },
     { "type": "range", "id": "padding_top", "label": "Space above", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 48 },
     { "type": "range", "id": "padding_bottom", "label": "Space below", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 72 },
@@ -482,7 +687,7 @@
         { "type": "text", "id": "meta", "label": "Duration or place", "default": "30 minutes, by video" },
         { "type": "text", "id": "text", "label": "Description", "default": "A one to one call with a specialist, wherever you are." },
         { "type": "text", "id": "badge", "label": "Badge", "info": "A small label on the card, e.g. \"Most booked\". Leave empty for none." },
-        { "type": "text", "id": "booking_link", "label": "Booking link", "info": "The event link from your provider, e.g. cal.com\/eden-raine\/virtual-consultation. Without one this card falls back to the enquiry panel." },
+        { "type": "text", "id": "booking_link", "label": "Booking link", "info": "The event link from your provider, e.g. cal.com\/eden-raine\/virtual-consultation. Without one this card opens the request calendar instead." },
         {
           "type": "select",
           "id": "icon",
@@ -500,6 +705,31 @@
         { "type": "image_picker", "id": "icon_image", "label": "Icon image", "info": "Replaces the drawn icon above." },
         { "type": "text", "id": "icon_asset", "label": "Icon file name" }
       ]
+    },
+    {
+      "type": "contact",
+      "name": "Contact",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Kind",
+          "options": [
+            { "value": "phone", "label": "Telephone" },
+            { "value": "whatsapp", "label": "WhatsApp" },
+            { "value": "email", "label": "Email" },
+            { "value": "instagram", "label": "Instagram" },
+            { "value": "address", "label": "Address" },
+            { "value": "other", "label": "Other" }
+          ],
+          "default": "phone",
+          "info": "Chooses the icon, and the link when the field below is left empty: a telephone number becomes tel:, WhatsApp becomes wa.me, an email becomes mailto: and a handle becomes an Instagram profile."
+        },
+        { "type": "text", "id": "label", "label": "Label", "default": "Call us" },
+        { "type": "text", "id": "value", "label": "Detail", "default": "+44 (0) 203 554 887" },
+        { "type": "text", "id": "note", "label": "Line underneath", "info": "e.g. \"Mon to Sat, 9am to 6pm\". Leave empty for none." },
+        { "type": "url", "id": "link", "label": "Link", "info": "Only needed when the guessed link is wrong." }
+      ]
     }
   ],
   "presets": [
@@ -507,8 +737,12 @@
       "name": "Consultation booking",
       "blocks": [
         { "type": "meeting", "settings": { "icon": "virtual", "label": "Virtual consultation", "meta": "30 minutes, by video", "text": "A one to one call with a specialist, wherever you are." } },
-        { "type": "meeting", "settings": { "icon": "showroom", "label": "Showroom visit", "meta": "60 minutes, in London", "text": "See and try the pieces in person, with a specialist beside you." } },
-        { "type": "meeting", "settings": { "icon": "phone", "label": "Telephone call", "meta": "20 minutes, by phone", "text": "A quick conversation about stones, sizing or timings." } }
+        { "type": "meeting", "settings": { "icon": "showroom", "label": "Showroom visit", "meta": "60 minutes, in person", "text": "See and try the pieces in person, with a specialist beside you." } },
+        { "type": "meeting", "settings": { "icon": "in-person", "label": "Speak with a designer", "meta": "45 minutes, video or in person", "text": "For a bespoke piece or a reset: bring the idea and we will draw it with you." } },
+        { "type": "contact", "settings": { "icon": "phone", "label": "Call us", "value": "+44 (0) 203 554 887" } },
+        { "type": "contact", "settings": { "icon": "whatsapp", "label": "WhatsApp", "value": "+44 203 554 887" } },
+        { "type": "contact", "settings": { "icon": "email", "label": "Email", "value": "hello@edenraine.co.uk" } },
+        { "type": "contact", "settings": { "icon": "instagram", "label": "Instagram", "value": "@edenraine" } }
       ]
     }
   ]

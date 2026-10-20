@@ -1,31 +1,33 @@
 /*
-  Puts the booking diary into the consultation page, and switches it when someone picks a
-  different way to meet.
+  The booking dialog for the consultation page.
 
-  The scheduling itself is not ours: availability, timezones, double-booking, the calendar
-  invitation and the reminder emails all belong to the provider (Cal.com, Calendly, or any
-  booking page handed to us as a URL). What is ours is the page around it - the chooser, the
-  copy and the photograph - so this file does the smallest possible job: load the provider's
-  embed on demand, and point it at the link belonging to the chosen way to meet.
+  Every "Book an appointment" button on the page - the one in the hero, and one per kind of
+  appointment - opens the same dialog, and what goes inside it depends on what the shop has set
+  up:
 
-  Three providers, in order of how much they give back:
+    a booking link   the provider's own calendar (Cal.com, Calendly, or any booking page given
+                     as a URL). It owns availability, timezones, the confirmation email and the
+                     Google Meet or Zoom link, which is set on the event type in the provider's
+                     own admin, not here.
 
-    cal        the official embed.js. Resizes itself, takes prefill and brand colour.
-    calendly   the official widget.js. Same idea, prefill under different names.
-    iframe     the link in a plain <iframe>, for a provider with no embed script of its own
-               (or a self-hosted Cal instance behind a sign-in).
+    no link yet      our own picker: a month calendar and a row of times, over the shop's
+                     contact form. It cannot know what is free, so it asks rather than books -
+                     the request arrives by email and someone confirms it.
 
-  Either official script can fail to load - an ad blocker, a content blocker on the customer's
-  phone, a bad day at the CDN - so both fall back to the plain iframe, which is the same page
-  the embed would have shown and still books an appointment. If even that does not paint, the
-  section's own fallback panel is revealed instead, so nobody reaches a dead rectangle.
+  The second one is not a stand-in for the first. A shop with a diary wants instant confirmation;
+  a shop without one still needs the page to work today, and a request with a date and a time on
+  it is a far better message than "please get in touch".
 
-  The frame is only built once the section is near the viewport: the provider's bundle is heavy
-  and the page is often reached by scrolling past the intro.
+  Either official embed script can fail - an ad blocker, a content blocker on a phone, a bad day
+  at the CDN - so both fall back to a plain iframe of the same booking page, and that falls back
+  to our own picker. Nobody reaches a dead rectangle.
 
-  What is prefilled: the signed-in customer's name and email, which the section writes onto the
-  element, and a note built from the query string - /pages/book-a-consultation?piece=... from a
-  product page, so the consultant arrives at the call already knowing what it is about.
+  The dialog is an ordinary overlay, not a native <dialog> opened with showModal(). A modal
+  dialog lives in the browser's top layer, which makes every other element inert - including
+  the hCaptcha challenge Shopify's bot protection appends to <body> when it wants a visitor
+  verified. Inside showModal() that challenge cannot be clicked at any z-index, so the request
+  form could never be sent. The cost is that Esc, the backdrop, the scroll lock and focus are
+  ours to handle, which is what openDialog and closeDialog below do.
 
   It is a custom element rather than a <script> in the section so it re-arms every time the
   section re-renders in the theme editor.
@@ -35,39 +37,20 @@ const CAL_EMBED_SRC = 'https://app.cal.com/embed/embed.js';
 const CALENDLY_SCRIPT_SRC = 'https://assets.calendly.com/assets/external/widget.js';
 const CALENDLY_STYLE_HREF = 'https://assets.calendly.com/assets/external/widget.css';
 
-// A note is built from whichever of these the page was reached with, so a "book a consultation"
-// button on a product page can say what the appointment is about without a form field for it.
+// A note is built from whichever of these the page was reached with, so a "book an appointment"
+// button on a product page can say what the appointment is about without a field for it.
 const NOTE_PARAMS = ['piece', 'product', 'design', 'notes', 'note', 'ref'];
 
 const loadedScripts = new Map();
 
-/* Loads a script once per page, however many sections or switches ask for it. */
 function loadScript(src) {
   if (loadedScripts.has(src)) return loadedScripts.get(src);
 
   const pending = new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${src}"]`);
-    if (existing) {
-      if (existing.dataset.loaded === 'true') {
-        resolve();
-        return;
-      }
-      existing.addEventListener('load', () => resolve(), { once: true });
-      existing.addEventListener('error', () => reject(new Error(src)), { once: true });
-      return;
-    }
-
     const script = document.createElement('script');
     script.src = src;
     script.async = true;
-    script.addEventListener(
-      'load',
-      () => {
-        script.dataset.loaded = 'true';
-        resolve();
-      },
-      { once: true }
-    );
+    script.addEventListener('load', () => resolve(), { once: true });
     script.addEventListener('error', () => reject(new Error(src)), { once: true });
     document.head.appendChild(script);
   });
@@ -85,13 +68,11 @@ function loadStylesheet(href) {
 }
 
 /*
-  Cal's embed.js expects the queue stub from its own snippet to already exist on window, and
+  Cal's embed.js expects the queue stub from its own snippet to already exist on window and
   throws if it does not, so the stub is planted before the script is asked for. This is Cal's
-  published snippet, written out rather than minified into one line.
+  published snippet, written out rather than minified onto one line.
 */
 function calStub() {
-  if (window.Cal && window.Cal.loaded !== undefined) return window.Cal;
-
   const push = (api, args) => api.q.push(args);
 
   window.Cal =
@@ -105,7 +86,7 @@ function calStub() {
         cal.q = cal.q || [];
         cal.loaded = true;
         loadScript(CAL_EMBED_SRC).catch(() => {
-          // The caller watches for this through its own timeout and falls back to an iframe.
+          // The caller watches for this with its own timeout and falls back to an iframe.
         });
       }
 
@@ -132,27 +113,25 @@ function calStub() {
 }
 
 /*
-  Turns whatever was pasted into the setting into the two things an embed needs: the origin it
-  is served from and the link within it. "cal.com/eden-raine/showroom",
-  "https://cal.com/eden-raine/showroom?month=2026-11" and "eden-raine/showroom" all land on the
+  Turns whatever was pasted into the setting into the two things an embed needs: the origin it is
+  served from and the link within it. "cal.com/eden-raine/showroom",
+  "https://cal.com/eden-raine/showroom?month=2026-11" and "eden-raine/showroom" all land in the
   same place, because a merchant copying from the provider's own UI gets a full URL, not a slug.
 */
 function splitLink(value, fallbackOrigin) {
   const raw = (value || '').trim();
   if (!raw) return null;
 
-  const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  const hasScheme = /^https?:\/\//i.test(raw);
   let url;
   try {
-    url = new URL(withScheme);
+    url = new URL(hasScheme ? raw : `https://${raw}`);
   } catch (error) {
-    // Not a URL at all - treat it as a bare slug on the default origin.
     return { origin: fallbackOrigin, path: raw.replace(/^\/+/, ''), search: '' };
   }
 
   // A bare slug ("eden-raine/showroom") parses as a hostname, which is not what was meant.
-  const looksLikeHost = /^https?:\/\//i.test(raw) || url.hostname.includes('.');
-  if (!looksLikeHost) {
+  if (!hasScheme && !url.hostname.includes('.')) {
     return { origin: fallbackOrigin, path: raw.replace(/^\/+/, ''), search: '' };
   }
 
@@ -163,56 +142,83 @@ function splitLink(value, fallbackOrigin) {
   };
 }
 
+const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+const addDays = (date, days) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+const isoDate = (date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
 if (!customElements.get('consultation-booking')) {
   customElements.define(
     'consultation-booking',
     class ConsultationBooking extends HTMLElement {
       connectedCallback() {
+        this.dialog = this.querySelector('[data-booking-dialog]');
         this.stage = this.querySelector('[data-booking-stage]');
         this.frame = this.querySelector('[data-booking-frame]');
-        this.choices = Array.from(this.querySelectorAll('[data-booking-choice]'));
-        this.fallback = this.querySelector('[data-booking-fallback]');
+        this.request = this.querySelector('[data-booking-request]');
+        this.openers = Array.from(this.querySelectorAll('[data-booking-open]'));
+        this.switches = Array.from(this.querySelectorAll('[data-booking-switch]'));
 
-        if (!this.stage || !this.frame) return;
+        if (!this.dialog) return;
 
         this.provider = this.dataset.provider || 'cal';
-        this.defaultOrigin = this.dataset.origin || (this.provider === 'calendly' ? 'https://calendly.com' : 'https://cal.com');
+        this.defaultOrigin =
+          this.dataset.origin || (this.provider === 'calendly' ? 'https://calendly.com' : 'https://cal.com');
         this.prefill = this.readPrefill();
         this.sequence = 0;
+        this.builtLink = null;
 
-        this.choices.forEach((choice) => {
-          choice.addEventListener('click', () => this.choose(choice));
+        this.titleEl = this.querySelector('[data-booking-title]');
+        this.eyebrowEl = this.querySelector('[data-booking-eyebrow]');
+        this.typeField = this.querySelector('[data-booking-field-type]');
+
+        this.openers.forEach((opener) => {
+          opener.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.open(opener);
+          });
         });
 
-        this.active = this.choices.find((choice) => choice.getAttribute('aria-pressed') === 'true') || this.choices[0];
-        this.link = this.active?.dataset.bookingLink || this.dataset.link || '';
+        this.switches.forEach((button) => {
+          button.addEventListener('click', () => this.open(button, { keepOpen: true }));
+        });
 
-        // Nothing to embed: the links have not been pasted in yet, so the fallback panel is
-        // the whole stage and the provider is never asked for.
-        if (!this.link) {
-          this.showFallback();
-          return;
+        this.querySelectorAll('[data-booking-close]').forEach((button) => {
+          button.addEventListener('click', () => this.closeDialog());
+        });
+
+        // A click on the backdrop lands on the overlay element itself, never on its contents.
+        this.dialog.addEventListener('click', (event) => {
+          if (event.target === this.dialog) this.closeDialog();
+        });
+
+        this.onKeydown = (event) => {
+          if (event.key === 'Escape') this.closeDialog();
+          if (event.key === 'Tab') this.keepFocusInside(event);
+        };
+
+        this.setupRequest();
+
+        // Coming back from a posted contact form, the dialog reopens on the thank-you message
+        // rather than leaving the visitor looking at the page wondering whether it sent.
+        const posted =
+          this.dataset.posted === 'true' ||
+          new URLSearchParams(window.location.search).get('contact_posted') === 'true';
+        if (posted) {
+          this.open(this.openers[0] || null, { silent: true });
+          // The slow path has come back: the request did go, so show the thank-you in the
+          // place the form was rather than the form again under it.
+          this.requestSent();
         }
-
-        if (this.dataset.lazy === 'false' || !('IntersectionObserver' in window)) {
-          this.build();
-          return;
-        }
-
-        this.observer = new IntersectionObserver(
-          (entries) => {
-            if (!entries.some((entry) => entry.isIntersecting)) return;
-            this.observer.disconnect();
-            this.build();
-          },
-          { rootMargin: '600px 0px' }
-        );
-        this.observer.observe(this);
       }
 
       disconnectedCallback() {
-        this.observer?.disconnect();
         clearTimeout(this.timer);
+        document.removeEventListener('keydown', this.onKeydown);
+        if (this.isOpen) document.body.style.overflow = this.scrollWas || '';
+        // A re-render in the theme editor replaces the section but not the overlay we moved
+        // out of it, which would otherwise be left behind on every edit.
+        this.portalHost?.remove();
       }
 
       readPrefill() {
@@ -222,55 +228,154 @@ if (!customElements.get('consultation-booking')) {
           .join(' - ');
 
         return {
-          name: this.dataset.name || params.get('name') || '',
-          email: this.dataset.email || params.get('email') || '',
-          notes: notes || this.dataset.notes || '',
+          name: this.dataset.name || '',
+          email: this.dataset.email || '',
+          notes: notes || '',
         };
       }
 
-      /* A different way to meet is a different link in the same stage. */
-      choose(choice) {
-        const link = choice.dataset.bookingLink || '';
-        this.choices.forEach((other) => other.setAttribute('aria-pressed', String(other === choice)));
-        this.active = choice;
+      /* ------------------------------------------------------------ opening */
 
-        if (!link || link === this.link) {
-          this.link = link || this.link;
-          if (!link) this.showFallback();
+      open(trigger, { keepOpen = false, silent = false } = {}) {
+        // A card on the page and a button in the dialog's own row stand for the same
+        // appointment, so opening from either marks the same one as chosen. The hero button
+        // names no kind at all, and stands for the first one offered.
+        if (trigger && this.switches.length && !this.switches.includes(trigger)) {
+          const label = trigger.dataset.bookingLabel;
+          trigger = this.switches.find((button) => button.dataset.bookingLabel === label) || (label ? trigger : this.switches[0]);
+        }
+
+        const link = trigger?.dataset.bookingLink || this.dataset.link || '';
+        const label = trigger?.dataset.bookingLabel || '';
+        const meta = trigger?.dataset.bookingMeta || '';
+
+        if (label && this.titleEl) this.titleEl.textContent = label;
+        if (this.eyebrowEl) this.eyebrowEl.textContent = meta || this.eyebrowEl.dataset.default || '';
+        if (this.typeField && label) this.typeField.value = meta ? `${label} (${meta})` : label;
+
+        this.switches.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button === trigger));
+        });
+
+        if (!silent) this.show(link);
+        else this.show(link, true);
+
+        if (!keepOpen) this.openDialog();
+      }
+
+      /*
+        What a native modal would have done for us: hold the page still behind the overlay,
+        put focus where the visitor is now, close on Esc, and give focus back on the way out.
+      */
+      openDialog() {
+        if (this.isOpen) return;
+        this.isOpen = true;
+
+        /*
+          The overlay is moved to <body> the first time it opens. Where the section renders it,
+          it sits inside main.content-for-layout, which has position:relative and z-index:2 and
+          so is a stacking context of its own: inside it no z-index, however large, can rise
+          above the sticky header, which paints over the top of the dialog. A native modal
+          escaped this through the top layer; without one, the element has to leave.
+        */
+        if (!this.portalHost) {
+          const section = this.closest('.eden-booking');
+          const host = document.createElement('div');
+          // Every --ebk- token is set on the section element, by the stylesheet and by the
+          // settings written inline, so the overlay travels inside a copy of it or it would
+          // lose its colours, borders and sizes on the way out.
+          host.className = `${section ? section.className : 'eden-booking'} eden-booking--portal`;
+          host.setAttribute('style', section ? section.getAttribute('style') || '' : '');
+          host.appendChild(this.dialog);
+          document.body.appendChild(host);
+          this.portalHost = host;
+        }
+
+        this.lastFocused = document.activeElement;
+        this.scrollWas = document.body.style.overflow;
+
+        this.dialog.hidden = false;
+        document.body.style.overflow = 'hidden';
+        document.addEventListener('keydown', this.onKeydown);
+
+        const first = this.dialog.querySelector('[data-booking-close]');
+        first?.focus({ preventScroll: true });
+      }
+
+      closeDialog() {
+        if (!this.isOpen) return;
+        this.isOpen = false;
+
+        this.dialog.hidden = true;
+        document.body.style.overflow = this.scrollWas || '';
+        document.removeEventListener('keydown', this.onKeydown);
+
+        if (this.lastFocused instanceof HTMLElement) this.lastFocused.focus({ preventScroll: true });
+      }
+
+      /*
+        Tab stays inside the overlay, with one exception: while Shopify's bot protection has a
+        challenge open, focus has to be allowed to reach it, because it lives outside this
+        element and the visitor cannot send the form without answering it.
+      */
+      keepFocusInside(event) {
+        if (document.querySelector('iframe[src*="hcaptcha"], iframe[src*="recaptcha"], .h-captcha')) return;
+
+        const focusable = Array.from(
+          this.dialog.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])')
+        ).filter((el) => el.offsetParent !== null);
+
+        if (!focusable.length) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+
+      show(link, silent = false) {
+        if (!link) {
+          this.showRequest();
           return;
         }
 
-        this.link = link;
+        if (this.builtLink === link) return;
+
+        this.builtLink = link;
         this.frame.replaceChildren();
         this.stage.removeAttribute('data-ready');
         this.stage.classList.remove('ebk-stage--fallback');
-        if (this.fallback) this.fallback.hidden = true;
-        this.built = false;
-        this.build();
+        if (this.request) this.request.hidden = true;
+        this.stage.hidden = false;
+        this.build(link, silent);
       }
 
-      build() {
-        if (this.built || !this.link) return;
-        this.built = true;
-        this.sequence += 1;
+      /* ----------------------------------------------------- the provider's diary */
 
-        const parts = splitLink(this.link, this.defaultOrigin);
+      build(link, silent) {
+        const parts = splitLink(link, this.defaultOrigin);
         if (!parts || !parts.path) {
-          this.showFallback();
+          this.showRequest();
           return;
         }
+
+        this.sequence += 1;
 
         if (this.provider === 'iframe') {
           this.buildIframe(parts);
           return;
         }
-
         if (this.provider === 'calendly') {
           this.buildCalendly(parts);
           return;
         }
-
-        this.buildCal(parts);
+        this.buildCal(parts, silent);
       }
 
       buildCal(parts) {
@@ -299,10 +404,7 @@ if (!customElements.get('consultation-booking')) {
             styles: { branding: { brandColor: this.dataset.brandColor || '#171714' } },
           });
 
-          Cal.ns[namespace]('on', {
-            action: 'linkReady',
-            callback: () => this.ready(),
-          });
+          Cal.ns[namespace]('on', { action: 'linkReady', callback: () => this.ready() });
         } catch (error) {
           this.buildIframe(parts);
           return;
@@ -339,11 +441,6 @@ if (!customElements.get('consultation-booking')) {
         this.watch(parts);
       }
 
-      /*
-        The provider's booking page in a frame of our own. No auto-resize, so the stage's
-        minimum height from the stylesheet is what holds the shape - which is why that height
-        is a setting rather than a guess.
-      */
       buildIframe(parts) {
         const params = new URLSearchParams(parts.search);
 
@@ -366,8 +463,7 @@ if (!customElements.get('consultation-booking')) {
         const query = params.toString();
         const iframe = document.createElement('iframe');
         iframe.src = `${parts.origin}/${parts.path}${query ? `?${query}` : ''}`;
-        iframe.title = this.dataset.frameTitle || 'Book a consultation';
-        iframe.loading = 'lazy';
+        iframe.title = this.dataset.frameTitle || 'Book an appointment';
         iframe.setAttribute('allow', 'camera; microphone; fullscreen; payment');
         iframe.addEventListener('load', () => this.ready());
         this.frame.replaceChildren(iframe);
@@ -376,9 +472,9 @@ if (!customElements.get('consultation-booking')) {
       }
 
       /*
-        A provider script that loads but never paints would otherwise leave the spinner turning
-        for good. If nothing has appeared in the stage by the deadline, the embed is given up on
-        for the plain iframe, and the iframe in turn gives up for the fallback panel.
+        A provider script that loads but never paints would leave the spinner turning for good.
+        If nothing has appeared by the deadline the embed is given up on for the plain iframe,
+        and the iframe in turn gives up for our own picker.
       */
       watch(parts, isIframe = false) {
         clearTimeout(this.timer);
@@ -387,7 +483,7 @@ if (!customElements.get('consultation-booking')) {
         this.timer = setTimeout(() => {
           if (this.stage.dataset.ready === 'true') return;
           if (isIframe) {
-            this.showFallback();
+            this.showRequest();
             return;
           }
           this.frame.replaceChildren();
@@ -400,11 +496,299 @@ if (!customElements.get('consultation-booking')) {
         this.stage.dataset.ready = 'true';
       }
 
-      showFallback() {
+      /* ------------------------------------------------- our own date and time picker */
+
+      showRequest() {
         clearTimeout(this.timer);
+        this.builtLink = null;
+        this.stage.hidden = true;
         this.stage.dataset.ready = 'true';
-        this.stage.classList.add('ebk-stage--fallback');
-        if (this.fallback) this.fallback.hidden = false;
+        if (this.request) {
+          this.request.hidden = false;
+          this.buildCalendar();
+        }
+      }
+
+      setupRequest() {
+        if (!this.request) return;
+
+        this.calendarEl = this.request.querySelector('[data-booking-calendar]');
+        this.slotsEl = this.request.querySelector('[data-booking-slots]');
+        this.slotField = this.request.querySelector('[data-booking-field-slot]');
+        this.chosenEl = this.request.querySelector('[data-booking-chosen]');
+
+        this.form = this.request.querySelector('form');
+        this.statusEl = this.request.querySelector('[data-booking-status]');
+        this.form?.addEventListener('submit', (event) => this.sendRequest(event));
+
+        const settings = this.calendarEl?.dataset || {};
+        this.openDays = (settings.openDays || '1,2,3,4,5')
+          .split(',')
+          .map((day) => Number(day.trim()))
+          .filter((day) => !Number.isNaN(day));
+        this.slotTimes = (settings.slots || '10:00,11:00,12:00,14:00,15:00,16:00')
+          .split(',')
+          .map((slot) => slot.trim())
+          .filter(Boolean);
+        this.leadDays = Number(settings.leadDays || 1);
+        this.windowDays = Number(settings.windowDays || 60);
+        // A bare "en" formats dates the American way ("Wednesday, October 21"), which is not
+        // how a London diary reads, so it is treated as en-GB; a locale with a region is kept.
+        const lang = document.documentElement.lang;
+        this.locale = !lang || lang.toLowerCase() === 'en' ? 'en-GB' : lang;
+
+        this.firstDay = addDays(startOfDay(new Date()), this.leadDays);
+        this.lastDay = addDays(startOfDay(new Date()), this.windowDays);
+        this.viewMonth = new Date(this.firstDay.getFullYear(), this.firstDay.getMonth(), 1);
+      }
+
+      buildCalendar() {
+        if (!this.calendarEl || this.calendarBuilt) return;
+        this.calendarBuilt = true;
+        this.renderCalendar();
+      }
+
+      renderCalendar() {
+        const monthLabel = new Intl.DateTimeFormat(this.locale, { month: 'long', year: 'numeric' }).format(this.viewMonth);
+        const dayNames = [];
+        // A week that starts on Monday, which is how a British diary reads.
+        for (let i = 0; i < 7; i += 1) {
+          const sample = new Date(2024, 0, 1 + i); // 1 Jan 2024 was a Monday
+          dayNames.push(new Intl.DateTimeFormat(this.locale, { weekday: 'narrow' }).format(sample));
+        }
+
+        const first = new Date(this.viewMonth.getFullYear(), this.viewMonth.getMonth(), 1);
+        const offset = (first.getDay() + 6) % 7;
+        const daysInMonth = new Date(this.viewMonth.getFullYear(), this.viewMonth.getMonth() + 1, 0).getDate();
+
+        const prevDisabled = new Date(this.viewMonth.getFullYear(), this.viewMonth.getMonth(), 1) <= new Date(this.firstDay.getFullYear(), this.firstDay.getMonth(), 1);
+        const nextDisabled = new Date(this.viewMonth.getFullYear(), this.viewMonth.getMonth(), 1) >= new Date(this.lastDay.getFullYear(), this.lastDay.getMonth(), 1);
+
+        this.calendarEl.replaceChildren();
+
+        const head = document.createElement('div');
+        head.className = 'ebk-cal__head';
+        const prev = document.createElement('button');
+        prev.type = 'button';
+        prev.className = 'ebk-cal__nav';
+        prev.innerHTML = '&#8592;';
+        prev.setAttribute('aria-label', 'Previous month');
+        prev.disabled = prevDisabled;
+        prev.addEventListener('click', () => {
+          this.viewMonth = new Date(this.viewMonth.getFullYear(), this.viewMonth.getMonth() - 1, 1);
+          this.renderCalendar();
+        });
+        const label = document.createElement('span');
+        label.className = 'ebk-cal__month';
+        label.textContent = monthLabel;
+        const next = document.createElement('button');
+        next.type = 'button';
+        next.className = 'ebk-cal__nav';
+        next.innerHTML = '&#8594;';
+        next.setAttribute('aria-label', 'Next month');
+        next.disabled = nextDisabled;
+        next.addEventListener('click', () => {
+          this.viewMonth = new Date(this.viewMonth.getFullYear(), this.viewMonth.getMonth() + 1, 1);
+          this.renderCalendar();
+        });
+        head.append(prev, label, next);
+
+        const grid = document.createElement('div');
+        grid.className = 'ebk-cal__grid';
+
+        dayNames.forEach((name) => {
+          const cell = document.createElement('span');
+          cell.className = 'ebk-cal__dayname';
+          cell.textContent = name;
+          grid.appendChild(cell);
+        });
+
+        for (let i = 0; i < offset; i += 1) {
+          const blank = document.createElement('span');
+          blank.className = 'ebk-cal__day ebk-cal__day--empty';
+          grid.appendChild(blank);
+        }
+
+        for (let day = 1; day <= daysInMonth; day += 1) {
+          const date = new Date(this.viewMonth.getFullYear(), this.viewMonth.getMonth(), day);
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'ebk-cal__day';
+          button.textContent = String(day);
+          button.dataset.date = isoDate(date);
+
+          const closed = !this.openDays.includes(date.getDay());
+          const tooSoon = date < this.firstDay;
+          const tooFar = date > this.lastDay;
+          button.disabled = closed || tooSoon || tooFar;
+          button.setAttribute('aria-pressed', String(this.chosenDate === button.dataset.date));
+          button.setAttribute(
+            'aria-label',
+            new Intl.DateTimeFormat(this.locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(date)
+          );
+
+          if (!button.disabled) {
+            button.addEventListener('click', () => this.chooseDate(date));
+          }
+
+          grid.appendChild(button);
+        }
+
+        this.calendarEl.append(head, grid);
+        this.renderSlots();
+      }
+
+      chooseDate(date) {
+        this.chosenDate = isoDate(date);
+        this.chosenDateLabel = new Intl.DateTimeFormat(this.locale, {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+        }).format(date);
+        this.chosenSlot = null;
+        this.renderCalendar();
+        this.updateChosen();
+      }
+
+      renderSlots() {
+        if (!this.slotsEl) return;
+        this.slotsEl.replaceChildren();
+
+        if (!this.chosenDate) {
+          const empty = document.createElement('p');
+          empty.className = 'ebk-cal__empty';
+          empty.textContent = this.slotsEl.dataset.emptyText || 'Pick a day to see the times we keep free.';
+          this.slotsEl.appendChild(empty);
+          return;
+        }
+
+        const heading = document.createElement('h4');
+        heading.className = 'ebk-cal__slots-heading';
+        heading.textContent = this.chosenDateLabel;
+
+        const list = document.createElement('div');
+        list.className = 'ebk-cal__slot-list';
+
+        this.slotTimes.forEach((time) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'ebk-cal__slot';
+          button.textContent = time;
+          button.setAttribute('aria-pressed', String(this.chosenSlot === time));
+          button.addEventListener('click', () => {
+            this.chosenSlot = time;
+            this.renderSlots();
+            this.updateChosen();
+          });
+          list.appendChild(button);
+        });
+
+        this.slotsEl.append(heading, list);
+      }
+
+      /*
+        Sending the request.
+
+        This is Shopify's own contact form and it is left to post the way Shopify means it to:
+        a real navigation to /contact and a redirect back. That is slower than posting it in
+        the background, and it was tempting to do the latter - but this shop has Shopify's bot
+        protection switched on, and the hCaptcha token it attaches is put there by Shopify's
+        own script listening for exactly this submit. A background post would arrive without
+        the token, be refused at the edge, and have to be sent a second time anyway; worse, the
+        two scripts would each believe they owned the submit and the shop could receive the
+        request twice.
+
+        So all this does is the part Shopify cannot: refuse a request with no day on it, and
+        say that something is happening while the page goes. return_to in the markup brings the
+        visitor back to this page with the posted flag, and connectedCallback reopens the
+        dialog on the thank-you, so the round trip reads as one movement rather than a page
+        that blinked and lost what they chose.
+      */
+      sendRequest(event) {
+        if (!this.form) return;
+
+        // A day and a time are the whole point of the request; without them this is a message,
+        // and the shop has a contact page for those.
+        if (this.slotField && !this.slotField.value) {
+          event.preventDefault();
+          this.setStatus(this.statusEl?.dataset.pick, 'error');
+          this.statusEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          return;
+        }
+
+        /*
+          Nothing can post from a local preview. shopify theme dev serves the storefront from
+          127.0.0.1, Shopify's edge answers a form post from there with a bot challenge (403,
+          cf-mitigated: challenge), and that challenge cannot load its own assets on a local
+          origin - it arrives as a blank page. Better to say so here than to let a developer
+          read the blank page as a broken form.
+        */
+        if (this.isLocalPreview) {
+          event.preventDefault();
+          console.warn(
+            '[consultation-booking] Form posts cannot complete through `shopify theme dev`: Shopify refuses a POST from %s with a bot challenge. Test the request panel on a theme preview URL or the live storefront.',
+            window.location.origin
+          );
+          this.setStatus(this.statusEl?.dataset.local, 'error');
+          return;
+        }
+
+        if (this.sending) {
+          event.preventDefault();
+          return;
+        }
+
+        this.sending = true;
+        this.setStatus(this.statusEl?.dataset.sending, 'pending');
+      }
+
+      // shopify theme dev proxies the real storefront through a local origin, which every edge
+      // check downstream treats as what it is: not the shop.
+      get isLocalPreview() {
+        return ['127.0.0.1', 'localhost', '[::1]', '::1'].includes(window.location.hostname);
+      }
+
+      requestSent() {
+        if (!this.form) return;
+        this.sending = false;
+        this.form.hidden = true;
+        this.setStatus(this.statusEl?.dataset.sent, 'sent');
+      }
+
+      setStatus(text, state) {
+        if (!this.statusEl) return;
+
+        if (!text) {
+          this.statusEl.hidden = true;
+          this.statusEl.textContent = '';
+          return;
+        }
+
+        this.statusEl.textContent = text;
+        this.statusEl.classList.toggle('ebk-form__message--error', state === 'error');
+        this.statusEl.classList.toggle('ebk-form__message--pending', state === 'pending');
+        this.statusEl.hidden = false;
+      }
+
+      updateChosen() {
+        // A day has just been chosen, so "choose a day first" has had its answer.
+        if (this.statusEl && this.statusEl.classList.contains('ebk-form__message--error')) this.setStatus(null);
+
+        if (!this.chosenEl) return;
+
+        if (!this.chosenDate) {
+          this.chosenEl.hidden = true;
+          if (this.slotField) this.slotField.value = '';
+          return;
+        }
+
+        const text = this.chosenSlot
+          ? `${this.chosenDateLabel} at ${this.chosenSlot}`
+          : `${this.chosenDateLabel} - no time chosen yet`;
+
+        this.chosenEl.hidden = false;
+        this.chosenEl.textContent = `${this.chosenEl.dataset.prefix || 'You have asked for'} ${text}.`;
+        if (this.slotField) this.slotField.value = this.chosenSlot ? `${this.chosenDateLabel} at ${this.chosenSlot}` : this.chosenDateLabel;
       }
     }
   );

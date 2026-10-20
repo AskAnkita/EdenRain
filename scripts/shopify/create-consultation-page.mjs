@@ -14,8 +14,12 @@
  * not got yet and falls back to the default one - a bare title.
  *
  * Re-running is safe: a page already on that handle is reported and left alone, except that
- * --fix-template puts an existing one back on the right template. The created page is written to
- * backups/ so it can be found and deleted again.
+ * --fix-template puts an existing one back on the right template and --publish makes a hidden one
+ * visible. The created page is written to backups/ so it can be found and deleted again.
+ *
+ * A page can exist and still 404: one added in the admin and saved as hidden ("Visibility:
+ * hidden") has no storefront URL at all, which looks exactly like a missing page. That is what
+ * --publish is for, and it is why this reports the visibility of a page it finds.
  *
  * The booking links themselves are not set here. They are settings on the section, because they
  * belong to whoever owns the Cal.com account: Theme editor > Book a consultation > each "Way to
@@ -31,6 +35,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const backupDir = resolve(here, 'backups');
 const apply = process.argv.includes('--apply');
 const fixTemplate = process.argv.includes('--fix-template');
+const publish = process.argv.includes('--publish');
 const log = (...m) => console.log(...m);
 
 const HANDLE = process.env.CONSULTATION_HANDLE || 'book-a-consultation';
@@ -40,12 +45,12 @@ const TITLE = process.env.CONSULTATION_TITLE || 'Book a Consultation';
 // The body stays empty on purpose: the template carries the whole page. A body would print above it.
 const BODY = '';
 
-const PAGES = `query($cursor:String){ pages(first:100, after:$cursor){ pageInfo{hasNextPage endCursor} nodes{ id title handle templateSuffix } } }`;
+const PAGES = `query($cursor:String){ pages(first:100, after:$cursor){ pageInfo{hasNextPage endCursor} nodes{ id title handle templateSuffix isPublished } } }`;
 const PAGE_CREATE = `mutation($page: PageCreateInput!) {
   pageCreate(page: $page) { page { id title handle templateSuffix } userErrors { field message } }
 }`;
 const PAGE_UPDATE = `mutation($id: ID!, $page: PageUpdateInput!) {
-  pageUpdate(id: $id, page: $page) { page { id handle templateSuffix } userErrors { field message } }
+  pageUpdate(id: $id, page: $page) { page { id handle templateSuffix isPublished } userErrors { field message } }
 }`;
 
 try {
@@ -63,27 +68,38 @@ try {
 
   if (existing) {
     const current = existing.templateSuffix || '';
-    if (current === TEMPLATE) {
-      log(`/pages/${HANDLE} already exists on template "${TEMPLATE}"; nothing to do.`);
+    const wrongTemplate = current !== TEMPLATE;
+    const hidden = existing.isPublished === false;
+
+    log(`/pages/${HANDLE} already exists: template "${current || '(default)'}", ${hidden ? 'HIDDEN' : 'visible'}.`);
+
+    const changes = [];
+    if (wrongTemplate && fixTemplate) changes.push(['templateSuffix', `template ${current || '(default)'} -> ${TEMPLATE}`]);
+    if (hidden && publish) changes.push(['isPublished', 'visibility hidden -> visible']);
+
+    if (!changes.length) {
+      if (wrongTemplate) log('Add --fix-template --apply to move it onto the right template.');
+      if (hidden) log('It is hidden, so it 404s on the storefront. Add --publish --apply to make it visible.');
+      if (!wrongTemplate && !hidden) log('Nothing to do.');
       process.exit(0);
     }
-    log(`/pages/${HANDLE} already exists, on template "${current || '(default)'}" rather than "${TEMPLATE}".`);
-    if (!fixTemplate) {
-      log('Add --fix-template --apply to move it, or delete the page in the admin and re-run.');
-      process.exit(0);
-    }
-    log(`${apply ? 'Applying' : 'Would apply'} 1 change:`);
-    log(`  - page: /pages/${HANDLE}  template ${current || '(default)'}  ->  ${TEMPLATE}`);
+
+    log(`${apply ? 'Applying' : 'Would apply'} ${changes.length} change${changes.length === 1 ? '' : 's'}:`);
+    changes.forEach(([, why]) => log(`  - page: /pages/${HANDLE}  ${why}`));
     if (!apply) { log('\nNothing written. Add --apply to write.'); process.exit(0); }
 
     mkdirSync(backupDir, { recursive: true });
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const before = resolve(backupDir, `page-${HANDLE}-template-before-${stamp}.json`);
+    const before = resolve(backupDir, `page-${HANDLE}-before-${stamp}.json`);
     writeFileSync(before, JSON.stringify(existing, null, 2));
-    log(`\nSaved the page's current template to ${before}`);
+    log(`\nSaved the page as it stands to ${before}`);
 
-    await gql(cfg, PAGE_UPDATE, { id: existing.id, page: { templateSuffix: TEMPLATE } }, 'pageUpdate');
-    log(`/pages/${HANDLE} -> template "${TEMPLATE}"`);
+    const page = {};
+    if (changes.some(([field]) => field === 'templateSuffix')) page.templateSuffix = TEMPLATE;
+    if (changes.some(([field]) => field === 'isPublished')) page.isPublished = true;
+
+    const d = await gql(cfg, PAGE_UPDATE, { id: existing.id, page }, 'pageUpdate');
+    log(`/pages/${HANDLE} -> template "${d.pageUpdate.page.templateSuffix}", ${d.pageUpdate.page.isPublished ? 'visible' : 'hidden'}`);
     log('\nDone.');
     process.exit(0);
   }

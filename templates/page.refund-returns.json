@@ -111,17 +111,18 @@
     },
     "page_media": {
       "type": "page-content",
-      "blocks": {},
-      "block_order": [],
       "settings": {
         "content_width": 1200,
         "text_measure": 1200,
         "media_width": 40,
         "column_gap": 48,
+        "media_ratio": "1 / 1",
+        "media_align": "center",
         "panel_gap": 48,
         "custom_padding": false,
         "padding_top": 16,
         "padding_bottom": 96,
+        "table_style": "rules",
         "uppercase_labels": true,
         "label_size": 14,
         "label_tracking": 26,
@@ -130,10 +131,7 @@
         "price_size": 20,
         "table_head_size": 11,
         "button_label": "",
-        "button_link": "",
-        "media_ratio": "1 / 1",
-        "media_align": "center",
-        "table_style": "rules"
+        "button_link": ""
       }
     }
   },
