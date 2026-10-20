@@ -3116,6 +3116,24 @@ class WishlistView extends HTMLElement {
     }
   }
 
+  renderEmptyWishlist() {
+    if (this.wishlistContainer) {
+      this.wishlistContainer.classList.add('is-empty');
+      this.wishlistContainer.innerHTML = `
+        <div class="page-margin wishlist-content-empty center">
+          <span class="wishlist-content-text block">${window.wishlist.empty}</span>
+          <div class="wishlist-content-actions">
+            <a class="button" href="${window.routes?.collection_all}">
+              ${window.wishlist.continue_shopping}
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    if (this.wishlistFooter) this.wishlistFooter.style.display = 'none';
+  }
+
   async initWishlistPage() {
     if (typeof(Storage) !== 'undefined') {
       const wishlistList = localStorage.getItem('wishlistItem') ? JSON.parse(localStorage.getItem('wishlistItem')) : [];
@@ -3123,6 +3141,12 @@ class WishlistView extends HTMLElement {
       if (wishlistList.length > 0) {
         try {
           await Promise.all(wishlistList.map((handle, index) => this.setProductForWishlistPage(handle, index, wishlistList.length)));
+
+          if (!this.gridViewContainer || this.gridViewContainer.children.length === 0) {
+            this.renderEmptyWishlist();
+            return;
+          }
+
           this.updateShareWishlistViaMail();
           this.gridViewContainer?.classList.add('is-loaded');
           this.wishlistPagination();
@@ -3147,21 +3171,7 @@ class WishlistView extends HTMLElement {
           console.error(err);
         }
       } else {
-        if (this.wishlistContainer) {
-          this.wishlistContainer.classList.add('is-empty');
-          this.wishlistContainer.innerHTML = `
-            <div class="page-margin wishlist-content-empty center">
-              <span class="wishlist-content-text block">${window.wishlist.empty}</span>
-              <div class="wishlist-content-actions">
-                <a class="button" href="${window.routes?.collection_all}">
-                  ${window.wishlist.continue_shopping}
-                </a>
-              </div>
-            </div>
-          `;
-        }
-
-        if (this.wishlistFooter) this.wishlistFooter.style.display = 'none';
+        this.renderEmptyWishlist();
       }
     } else {
       alert('Sorry! No web storage support..');
@@ -3183,7 +3193,8 @@ class WishlistView extends HTMLElement {
     try {
       if (!this.gridViewContainer || !handle) return;
 
-      const res = await fetch(`${window.routes.shop_origin}/products/${handle}?view=block_wishlist_card`);
+      const rootUrl = window.routes?.root || '';
+      const res = await fetch(`${rootUrl}/products/${handle}?view=block_wishlist_card`);
       const data = await res.text();
       const parser = new DOMParser();
 

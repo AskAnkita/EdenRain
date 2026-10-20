@@ -1,0 +1,29 @@
+{%- comment -%}
+  Turns on section-level lazy rendering: every section past the first few is
+  handed to the browser to skip until it is scrolled near. See lazy-section.css
+  for what that means and lazy-section.js for how it is undone.
+
+  The classes go on <html> from here, inline and ahead of the first paint, so the
+  deferral is in place for the very first frame. With JavaScript off, in a browser
+  without content-visibility, or in the theme editor, nothing is set and every
+  section renders exactly as it did before.
+
+  Reads settings.enable_lazy_sections and settings.lazy_sections_skip.
+{%- endcomment -%}
+
+{%- if settings.enable_lazy_sections -%}
+  {%- unless request.design_mode -%}
+    {{ 'lazy-section.css' | asset_url | stylesheet_tag }}
+    <script>
+      // content-visibility is the whole mechanism and the observer is what takes
+      // it off again. Without both, leave the page alone.
+      if (window.CSS && CSS.supports('content-visibility', 'auto') && 'IntersectionObserver' in window) {
+        document.documentElement.classList.add(
+          'lazy-sections',
+          'lazy-sections--skip-{{ settings.lazy_sections_skip | default: 2 }}'
+        );
+      }
+    </script>
+    <script src="{{ 'lazy-section.js' | asset_url }}" defer="defer"></script>
+  {%- endunless -%}
+{%- endif -%}

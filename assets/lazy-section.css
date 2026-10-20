@@ -1,0 +1,47 @@
+/*
+  Section-level lazy rendering.
+
+  A page here can run to a dozen sections, and the browser lays out and paints
+  every one of them before the first frame even though the visitor can only see
+  the top. content-visibility: auto lets it skip that work for the sections
+  further down until they are scrolled near.
+
+  How many sections at the top are exempt is a theme setting, and it arrives as a
+  class on <html>. The rule is written out once per allowed count rather than
+  built in Liquid, so this file stays a cacheable asset.
+
+  content-visibility also brings paint containment, which clips anything leaning
+  out of its section: a sticky column, a peeking carousel slide, a drop shadow.
+  lazy-section.js therefore marks a section .section--seen while it is still well
+  below the fold and the deferral comes off for good, so a section the visitor
+  can actually see is never contained.
+*/
+
+.lazy-sections--skip-1 #MainContent > .shopify-section:nth-child(n + 2):not(.section--seen),
+.lazy-sections--skip-2 #MainContent > .shopify-section:nth-child(n + 3):not(.section--seen),
+.lazy-sections--skip-3 #MainContent > .shopify-section:nth-child(n + 4):not(.section--seen),
+.lazy-sections--skip-4 #MainContent > .shopify-section:nth-child(n + 5):not(.section--seen),
+.lazy-sections .shopify-section-group-footer-group:not(.section--seen) {
+  content-visibility: auto;
+  /*
+    A stand-in height for a section that has not been laid out yet, so the
+    scrollbar does not jump about as the real heights arrive. The `auto` keyword
+    lets the browser use each section's own measured height once it has one; the
+    plain length above it is for browsers that take the property but not `auto`.
+  */
+  contain-intrinsic-size: var(--deferred-section-height, 800px);
+  contain-intrinsic-size: auto var(--deferred-section-height, 800px);
+}
+
+/*
+  A printed page has no viewport to be below, so nothing may be skipped. The
+  deferral rules above carry an id and three classes between them, hence the
+  !important rather than a longer selector.
+*/
+@media print {
+  .lazy-sections #MainContent > .shopify-section,
+  .lazy-sections .shopify-section-group-footer-group {
+    content-visibility: visible !important;
+    contain-intrinsic-size: none !important;
+  }
+}

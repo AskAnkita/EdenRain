@@ -25,7 +25,7 @@
             if customer
               echo 'Hi, ' | append: customer.name | default: 'Guest'
             else
-              echo 'Login'
+              echo 'Sign in'
             endif
           -%}
         </h2>
@@ -66,15 +66,6 @@
 
                 <li class="drawer__list-item flex justify-between items-center relative cursor-pointer" role="listItem">
                   <a
-                    href="{{ routes.account_login_url }}#recover"
-                    class="link flex justify-between items-center flex-1 underline link--hover-underline paragraph"
-                  >
-                    <span class="text">{{ 'customer.recover_password.title' | t }}</span>
-                  </a>
-                </li>
-
-                <li class="drawer__list-item flex justify-between items-center relative cursor-pointer" role="listItem">
-                  <a
                     href="{{ routes.account_logout_url }}"
                     class="link flex justify-between items-center flex-1 underline link--hover-underline paragraph"
                   >
@@ -83,81 +74,67 @@
                 </li>
               </ul>
             {% else %}
-              {%- form 'customer_login', id: 'CustomerLoginForm', class: 'customer-drawer__form' -%}
-                <div class="drawer__form-field flex flex-column" style="--gap-y: 0.8rem;">
-                  <label for="CustomerEmail">
-                    {{ 'customer.login_page.email' | t }}
-                  </label>
-                  <input
-                    class="field__input"
-                    type="email"
-                    name="customer[email]"
-                    id="CustomerEmail"
-                    autocomplete="email"
-                    autocorrect="off"
-                    autocapitalize="off"
-                    required
-                    {% if form.errors contains 'form' %}
-                      aria-invalid="true"
-                    {% endif %}
-                    placeholder="{{ 'customer.login_page.email' | t }}"
-                  >
-                </div>
+              {%- liquid
+                assign gw_text = sec_stts.account_drawer_text
+                assign gw_benefits = sec_stts.account_drawer_benefits
+                assign gw_button = sec_stts.account_drawer_button_label | default: 'Continue to sign in'
+                assign gw_note = sec_stts.account_drawer_note
+              -%}
 
-                {%- if form.password_needed -%}
-                  <div class="drawer__form-field flex flex-column" style="--gap-y: 0.8rem; --mt: 1.2rem;">
-                    <label for="CustomerPassword">
-                      {{ 'customer.login_page.password' | t }}
-                    </label>
-                    <input
-                      class="field__input"
-                      type="password"
-                      value=""
-                      name="customer[password]"
-                      id="CustomerPassword"
-                      autocomplete="current-password"
-                      required
-                      {% if form.errors contains 'password' %}
-                        aria-invalid="true"
-                      {% endif %}
-                      placeholder="{{ 'customer.login_page.password' | t }}"
-                    >
-                  </div>
+              {%- comment -%}
+                The store is on new customer accounts, so /account/login leaves the theme
+                entirely: Shopify serves sign-in from its own origin and no theme markup
+                reaches it. A customer_login form here would post into that redirect and
+                never sign anyone in, which is what used to sit in this branch.
+
+                So the drawer stops being a login form and becomes the last screen that is
+                ours - brand, type and copy - before one deliberate tap hands the customer
+                over. The icon no longer drops them onto Shopify's page unannounced.
+              {%- endcomment -%}
+
+              <div class="customer-drawer__signin flex flex-column" style="--gap-y: var(--margin-xl);">
+                {%- if gw_text != blank -%}
+                  <p class="paragraph m-0">{{ gw_text }}</p>
                 {%- endif -%}
-                <div class="flex flex-column items-center gap-2xl" style="--mt: var(--margin-2xl)">
-                  <button class="button w-full" type="submit">
-                    <span
-                      class="button-overflow relative overflow-hidden"
-                      data-button-text="{{ 'customer.login_page.title' | t }}"
-                    >
-                      <span class="button-text-main inline-block relative z-1">
-                        {{ 'customer.login_page.title' | t }}
-                      </span>
-                    </span>
-                  </button>
-                  <a class="link link--hover-underline paragraph" href="{{ routes.account_login_url }}#recover">
-                    <span class="text">
-                      {{ 'customer.login_page.forgot_password' | t }}
-                    </span>
-                  </a>
-                </div>
-                <div style="--mt: var(--margin-2xl);">
-                  <a
-                    href="{{ routes.account_register_url }}"
-                    class="size-style button-secondary w-full"
-                    style="--button-text-case: uppercase;"
+
+                {%- if gw_benefits != blank -%}
+                  <ul
+                    class="drawer__list list-unstyled m-0 p-0 flex flex-column"
+                    style="--gap-y: 1.2rem;"
+                    role="list"
                   >
-                    <span
-                      class="button-overflow relative overflow-hidden"
-                      data-button-text="{{ 'customer.login_page.create_account' | t }}"
-                    >
-                      <span class="button-text-main inline-block relative z-1">
-                        {{ 'customer.login_page.create_account' | t }}
-                      </span>
+                    {%- assign gw_lines = gw_benefits | newline_to_br | split: '<br />' -%}
+                    {%- for gw_line in gw_lines -%}
+                      {%- assign gw_line_text = gw_line | strip -%}
+                      {%- if gw_line_text != blank -%}
+                        <li class="flex items-center paragraph" style="--gap-x: 1rem;" role="listItem">
+                          <span class="svg-wrapper shrink-0" aria-hidden="true">
+                            {{- 'icon-checkmark.svg' | inline_asset_content -}}
+                          </span>
+                          <span class="text">{{ gw_line_text }}</span>
+                        </li>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+
+                <a href="{{ routes.account_login_url }}" class="button w-full">
+                  <span
+                    class="button-overflow relative overflow-hidden"
+                    data-button-text="{{ gw_button | escape }}"
+                  >
+                    <span class="button-text-main inline-block relative z-1">
+                      {{ gw_button }}
                     </span>
-                  </a>
-                </div>
-              {%- endform -%}
+                  </span>
+                </a>
+
+                {%- if gw_note != blank -%}
+                  <p class="paragraph m-0 opacity-70" style="--font-body-size: var(--font-size--xs);">
+                    {{ gw_note }}
+                  </p>
+                {%- endif -%}
+              </div>
             {% endif %}
           </div>
         </div>

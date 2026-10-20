@@ -79,6 +79,12 @@
 
     {%- render 'global-script' -%}
 
+    {%- comment -%}
+      Lets the browser skip laying out and painting the sections below the fold
+      until they are scrolled near. Must sit in the head to catch the first frame.
+    {%- endcomment -%}
+    {%- render 'lazy-sections' -%}
+
     {{ content_for_header }}
 
     

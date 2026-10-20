@@ -197,7 +197,7 @@
         "message_position": "left",
         "message_row": "top",
         "show_account": true,
-        "enable_account_drawer": false,
+        "enable_account_drawer": true,
         "account_type": "icon",
         "account_display_type": "block",
         "account_row": "top",

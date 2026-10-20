@@ -154,14 +154,20 @@
 {%- elsif metal_index >= 0 and metal_values.size > 1 and metal_rotation.size > 0 -%}
   {%- liquid
     # The product id alone is no good as a seed: this catalogue was imported in bulk, so
-    # Shopify handed out ids in a regular stride and every one of them leaves the same
-    # remainder -- `id | modulo: 4` picked White Gold for the whole grid. Dividing the id
-    # by a prime brings the digits that do differ down into the low bits, and the title's
-    # length moves products whose ids sit close together apart. Checked against the live
-    # catalogue: every metal in the pool comes up, and no long run of cards shares one.
-    assign seed_text = card_product.handle | append: '-' | append: card_product.title
-    assign seed_size = seed_text | size
-    assign seed = card_product.id | divided_by: 7 | plus: seed_size
+    # Shopify handed out ids in a regular stride. Measured against the live catalogue the
+    # gap between any two ids is a multiple of 32768 -- every id ends in the same low 15
+    # bits -- so `id | modulo: 4` picked White Gold for the whole grid, and dividing by a
+    # number that does not clear that stride (`divided_by: 7`) only hides it. Dividing by
+    # the stride itself leaves the part of the id that actually counts products, which is
+    # what the pick runs on.
+    #
+    # The title's length used to be added on top to separate ids sitting close together.
+    # It does the opposite: a product family shares a title shape, so its lengths land on
+    # the same remainder and cancel the id term for the whole family -- Trending Styles
+    # came out rose, rose, rose, yellow, yellow, rose with no white gold in seven cards.
+    # Checked against the live catalogue without it: every metal in the pool comes up,
+    # the three tones split 10/8/7, and the carousel opens on three different metals.
+    assign seed = card_product.id | divided_by: 32768
     assign pick_position = seed | modulo: metal_rotation.size
     assign picked = metal_rotation[pick_position] | strip
   -%}

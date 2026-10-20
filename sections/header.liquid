@@ -107,7 +107,7 @@
   endcapture
 
   if shop.customer_accounts_enabled
-    render 'account-drawer'
+    render 'account-drawer', sec_stts: sec_stts
   endif
 
   # Handle localization positioning
@@ -2122,7 +2122,33 @@
         "type": "checkbox",
         "id": "enable_account_drawer",
         "label": "Enable account drawer",
-        "default": false
+        "default": true,
+        "info": "Opens a themed panel instead of sending the customer straight to Shopify's sign-in page."
+      },
+      {
+        "type": "textarea",
+        "id": "account_drawer_text",
+        "label": "Account drawer text",
+        "default": "Sign in to track your order, revisit the pieces you have saved and check out faster next time."
+      },
+      {
+        "type": "textarea",
+        "id": "account_drawer_benefits",
+        "label": "Account drawer list",
+        "info": "One per line. Leave empty to hide the list.",
+        "default": "Follow your order from workshop to door\nKeep your saved pieces in one place\nCheck out without retyping your details"
+      },
+      {
+        "type": "text",
+        "id": "account_drawer_button_label",
+        "label": "Account drawer button",
+        "default": "Continue to sign in"
+      },
+      {
+        "type": "textarea",
+        "id": "account_drawer_note",
+        "label": "Account drawer note",
+        "default": "You will be asked for your email and sent a one-time code. There is no password to remember."
       },
       {
         "type": "select",

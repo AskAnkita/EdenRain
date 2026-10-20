@@ -103,6 +103,7 @@
         "show_hero": true,
         "show_builder": false,
         "show_steps": true,
+        "show_progress": false,
         "show_gallery": false,
         "show_faqs": true,
         "show_cta": true,

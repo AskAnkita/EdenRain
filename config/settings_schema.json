@@ -3559,6 +3559,32 @@
     ]
   },
   {
+    "name": "Performance",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Lazy rendering lets the browser skip the sections below the fold until the visitor scrolls near them, so the top of a long page paints sooner. Turn it off if a section further down a page looks clipped."
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_lazy_sections",
+        "label": "Lazy render sections below the fold",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "lazy_sections_skip",
+        "min": 1,
+        "max": 4,
+        "step": 1,
+        "default": 2,
+        "label": "Sections rendered straight away",
+        "info": "How many sections at the top of a page are never deferred. Raise this if the section just under the hero flashes in as the page loads.",
+        "visible_if": "{{ settings.enable_lazy_sections == true }}"
+      }
+    ]
+  },
+  {
     "name": "Education guide images",
     "settings": [
       {
