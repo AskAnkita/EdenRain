@@ -9,11 +9,14 @@
 
   Accepts: image (image_picker), asset (string, a file name in Content > Files
   or assets/), image_url (string), alt (string), placeholder (string),
-  sizes (string), width, height.
+  sizes (string), width, height, and - for a caller outside the homepage
+  journey - class / placeholder_class to name the element it gets back.
 {%- endcomment -%}
 
 {%- liquid
   assign asset_file = asset | strip
+  assign image_class = class | default: 'hj-image'
+  assign image_placeholder_class = placeholder_class | default: 'hj-placeholder'
   assign placeholder_name = placeholder | default: 'lifestyle-1'
   assign fallback_width = width | default: 1600
   assign fallback_height = height | default: 1200
@@ -58,7 +61,7 @@
       widths: '480, 660, 900, 1200, 1500, 1800',
       sizes: image_sizes,
       alt: image_alt,
-      class: 'hj-image'
+      class: image_class
   }}
 {%- elsif fallback_src != blank -%}
   <img
@@ -71,8 +74,8 @@
     loading="lazy"
     width="{{ fallback_width }}"
     height="{{ fallback_height }}"
-    class="hj-image"
+    class="{{ image_class }}"
   >
 {%- else -%}
-  {{ placeholder_name | placeholder_svg_tag: 'hj-placeholder' }}
+  {{ placeholder_name | placeholder_svg_tag: image_placeholder_class }}
 {%- endif -%}

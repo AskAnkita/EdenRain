@@ -1,0 +1,519 @@
+/*
+  The default page template - the title from sections/main-page.liquid, and the page body from
+  sections/page-content.liquid. Behind /pages/delivery-returns and
+  /pages/bespoke-jewellery-request.
+
+  The body of those pages was pasted into the Shopify admin editor: <h1> used as a label above
+  each table, tables carrying inline column widths, a first row standing in for a header, bulleted
+  lists inside the cells. None of it was styled, so the content ran the full width of the browser,
+  the tables were a grey wireframe, and the title sat flush against the header.
+
+  Nothing here changes the content - it still lives in the admin and the merchant still edits it
+  there. This file gives that markup a measure, a masthead, a table that reads like the rest of the
+  shop, and a panel that sets a photograph beside each table.
+
+  The admin editor writes inline styles (width, text-align) onto the cells, so the handful of
+  !important declarations below are there to out-rank those attributes - not to win an argument
+  with the theme's own CSS.
+
+  Everything a merchant can change is a custom property, written onto the section element by
+  sections/page-content.liquid from its schema. The values here are only the fallbacks, so this
+  file stays readable on its own.
+*/
+
+.section-page {
+  /* One measure for text: wide enough for a two-column table, narrow enough that a paragraph is
+     still a comfortable line to read. */
+  --page-content-measure: 76rem;
+  --page-content-rule: rgb(var(--color-foreground-rgb, 0 0 0) / 0.16);
+}
+
+.section-page .custom-section-content {
+  padding-block: clamp(3.2rem, 4vw, 5.6rem) clamp(4rem, 5vw, 6.4rem);
+}
+
+/* With the body moved to its own section, the title section holds only the title, and its
+   generous tail would open a hole between the two. */
+.section-page:not(:has(.rte)) .custom-section-content {
+  padding-block-end: 0;
+}
+
+/* ------------------------------------------------------------- masthead */
+
+.section-page .section-content-wrapper > .text-block:not(.rte):first-child {
+  align-self: center;
+  width: 100%;
+  max-width: var(--page-content-measure);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.section-page .section-content-wrapper > .text-block:not(.rte):first-child > * {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-heading--family);
+  font-size: clamp(2.8rem, 4vw, 4.2rem);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+/* A short rule under the title, the same hairline the tables are drawn with. */
+.section-page .section-content-wrapper > .text-block:not(.rte):first-child::after {
+  content: "";
+  display: block;
+  width: 6rem;
+  height: 1px;
+  margin: clamp(1.4rem, 1.8vw, 2rem) auto 0;
+  background: var(--color-foreground);
+  opacity: 0.35;
+}
+
+/* --------------------------------------------------- the body and its panels */
+
+.section-page-content {
+  display: block;
+  padding-block: var(--pc-pad-top, clamp(1.2rem, 1.5vw, 1.8rem)) var(--pc-pad-bottom, clamp(4rem, 5vw, 6.4rem));
+  background: var(--pc-section-bg, transparent);
+  color: var(--pc-text-color, inherit);
+}
+
+.pc-shell {
+  max-width: var(--pc-shell-max, 112rem);
+  margin-inline: auto;
+  padding-inline: 2.4rem;
+}
+
+/*
+  Content first in the markup, whichever side the photograph is shown on: a phone and a screen
+  reader both get the shipping rates before the picture of them.
+*/
+/*
+  Centred, not top-aligned: the tables on a page are rarely the same height, and a picture pinned
+  to the top of a short one leaves a hole under it that reads as a mistake.
+*/
+.pc-panel {
+  display: grid;
+  grid-template-columns: var(--pc-content-col, 60fr) var(--pc-media-col, 40fr);
+  gap: var(--pc-column-gap, 4.8rem);
+  align-items: var(--pc-media-align, center);
+  margin-bottom: var(--pc-panel-gap, clamp(3.2rem, 4.5vw, 5.6rem));
+}
+
+.pc-panel--media-left {
+  grid-template-columns: var(--pc-media-col, 40fr) var(--pc-content-col, 60fr);
+}
+
+.pc-panel--media-left .pc-panel__body {
+  order: 2;
+}
+
+.pc-panel--media-left .pc-panel__media {
+  order: 1;
+}
+
+/* A table with no picture beside it keeps the measure the prose below it reads at, rather than
+   stretching the rates across the whole shell. */
+.pc-panel--no-media {
+  grid-template-columns: 1fr;
+}
+
+.pc-panel--no-media .pc-panel__body {
+  max-width: var(--pc-measure, var(--page-content-measure));
+  margin-inline: auto;
+}
+
+/* Every picture is cut to the same shape and sits in a column of the same width, so one panel's
+   photograph is the size of the next one's. */
+.pc-panel__media {
+  overflow: hidden;
+  aspect-ratio: var(--pc-media-ratio, 1 / 1);
+}
+
+/*
+  "Match the table": the picture takes the height of the rates beside it, so no panel ends in a
+  band of white where one column ran longer than the other. Stretching is what gives the box a
+  height at all - it has none of its own - and the picture then fills it.
+*/
+/*
+  The picture is taken out of flow so it contributes no height of its own: the row is then as tall
+  as the rates, the stretched box takes exactly that, and the picture fills it. Left in flow it
+  would set the row height itself and the matching would never happen.
+*/
+.pc-panel__media--match {
+  position: relative;
+  align-self: stretch;
+  aspect-ratio: auto;
+}
+
+.pc-panel__media--natural {
+  align-self: center;
+}
+
+.pc-panel__media--match .pc-media__image {
+  position: absolute;
+  inset: 0;
+}
+
+.pc-media__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--pc-media-focus, center);
+}
+
+.pc-panel__media--natural {
+  aspect-ratio: auto;
+}
+
+.pc-panel__media--natural .pc-media__image {
+  height: auto;
+}
+
+/* Anything after the last table - Delivery Information, Dispatch - is only words. It takes the
+   same measure as everything above it, centred, so the page is one column under one title. */
+.pc-prose {
+  max-width: var(--pc-measure, var(--page-content-measure));
+  margin-inline: auto;
+}
+
+/* The gap between the last panel and this is the panel gap's to give, not the heading's. */
+.pc-prose > h2:first-of-type {
+  margin-top: 0;
+}
+
+/*
+  A numbered list in the prose - the four steps of a return - is prose, not a table cell's detail
+  column, so the table rules above never reach it and it would come out at the browser's own
+  spacing: tighter than the paragraphs either side of it.
+*/
+.section-page .pc-prose ol,
+.section-page .pc-prose ul {
+  margin: 0 0 1.6rem;
+  padding-left: 2.4rem;
+}
+
+.section-page .pc-prose li {
+  margin-bottom: 1.2rem;
+  padding-left: 0.4rem;
+  font-size: var(--pc-text-size, 1.6rem);
+  line-height: 1.75;
+}
+
+.section-page .pc-prose li:last-child {
+  margin-bottom: 0;
+}
+
+/* A table is the last thing in its panel, so its tail would only push the picture past it. */
+.pc-panel__body > table:last-child {
+  margin-bottom: 0;
+}
+
+/* ------------------------------------------------------- rich text, anywhere */
+
+/* The admin content leaves empty shells behind, and the title block wraps its text in a <p> the
+   browser closes early. */
+.section-page .rte p:empty,
+.section-page .rte h1:empty,
+.section-page .rte h2:empty {
+  display: none;
+}
+
+.section-page rte-formatter.rte,
+.section-page .text-block.rte {
+  display: block;
+  width: 100%;
+  max-width: var(--page-content-measure);
+  margin-inline: auto;
+  align-self: center;
+}
+
+.section-page .rte p {
+  margin: 0 0 1.4rem;
+  font-size: var(--pc-text-size, 1.6rem);
+  line-height: 1.75;
+}
+
+/* <h1> is used in the admin as the label above each table, so it is set as a label - not as a page
+   title competing with the masthead. */
+.section-page .rte h1 {
+  margin: clamp(3.2rem, 4vw, 4.8rem) 0 clamp(1.2rem, 1.4vw, 1.6rem);
+  color: var(--pc-label-color, inherit);
+  font-family: var(--font-heading--family);
+  font-size: var(--pc-label-size, 1.4rem);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: var(--pc-label-tracking, 0.26em);
+  text-transform: var(--pc-label-case, uppercase);
+}
+
+.section-page .rte h1:first-of-type {
+  margin-top: 0;
+}
+
+/*
+  Inside a panel the label is the top of its own column, and the panel supplies the space above
+  it. Panel two opens with an empty <h1> the admin left behind, which :first-of-type would
+  otherwise spend the exemption on.
+
+  The admin centres these labels inline, which was right when they sat over the full width and
+  reads as a mistake over a column half that wide - hence the !important, out-ranking the
+  attribute rather than the theme.
+*/
+.section-page .pc-panel__body h1 {
+  margin-top: 0;
+  text-align: left !important;
+}
+
+.section-page .rte h2 {
+  margin: clamp(2.8rem, 3.5vw, 4rem) 0 1rem;
+  color: var(--pc-heading-color, inherit);
+  font-family: var(--font-heading--family);
+  font-size: var(--pc-heading-size, clamp(2.1rem, 2.4vw, 2.6rem));
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.section-page .rte h2 + p {
+  margin-top: 0;
+}
+
+/* ------------------------------------------------------------- tables */
+
+.section-page .rte table {
+  width: 100%;
+  margin: 0 0 clamp(1.6rem, 2vw, 2.4rem);
+  /* Fixed, so the price column is the same width in every table on the page - the admin wrote a
+     different percentage into each one. */
+  table-layout: fixed;
+  border-collapse: collapse;
+  border: 0;
+  /* The theme draws a 1px shadow ring around a bare table, which is a frame nobody asked for. */
+  box-shadow: none;
+}
+
+.section-page .rte table td {
+  width: auto !important;
+  padding: clamp(1.4rem, 1.8vw, 2rem);
+  border: 0;
+  font-size: calc(var(--pc-text-size, 1.6rem) * 0.94);
+  line-height: 1.6;
+  text-align: left;
+  vertical-align: top;
+}
+
+/*
+  ---- Rules only ----------------------------------------------------------------------------
+
+  The quiet default. A rate is a line of its own under a hairline, flush with the label above it:
+  no frame, no fill, no vertical rules, and the "cost / shipping info" row hidden, because a price
+  and what it buys need no column headings to be read. Nothing boxes the content in.
+*/
+.pc-shell.pc-tables-rules .rte table tr:first-child {
+  display: none;
+}
+
+.pc-shell.pc-tables-rules .rte table td {
+  padding-inline: 0;
+  padding-block: clamp(1.4rem, 1.6vw, 1.8rem);
+  border-top: 1px solid var(--page-content-rule);
+}
+
+.pc-shell.pc-tables-rules .rte table td:first-child {
+  padding-right: clamp(1.6rem, 2vw, 2.4rem);
+  border-right: 0;
+}
+
+/* Closes the group, so the last rate does not run into the white below it. */
+.pc-shell.pc-tables-rules .rte table tr:last-child td {
+  border-bottom: 1px solid var(--page-content-rule);
+}
+
+/*
+  ---- Boxed ---------------------------------------------------------------------------------
+*/
+.pc-shell.pc-tables-boxed .rte table {
+  border: 1px solid var(--page-content-rule);
+}
+
+.pc-shell.pc-tables-boxed .rte table tr + tr td {
+  border-top: 1px solid var(--page-content-rule);
+}
+
+/* The price column. The admin sets 10%-16% inline, which leaves "£ 5.9" adrift in a column too
+   narrow to hold it and the row's text crushed beside it. */
+.section-page .rte table td:first-child {
+  /* A fixed width, not a share of the table: as a percentage it grew with the measure and opened
+     a stripe of empty page between the price and what it buys. */
+  width: 11rem !important;
+  min-width: 0;
+  border-right: 1px solid var(--page-content-rule);
+  font-family: var(--font-heading--family);
+  font-size: var(--pc-price-size, clamp(1.8rem, 2vw, 2.1rem));
+  line-height: 1.2;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* First row is the header the admin editor never marked up as one. */
+.pc-shell.pc-tables-boxed .rte table tr:first-child td {
+  padding-block: 1.4rem;
+  border-right-color: rgb(var(--color-background-rgb, 255 255 255) / 0.24);
+  background: var(--pc-table-head-bg, var(--color-foreground));
+  color: var(--pc-table-head-color, var(--color-background));
+  font-size: var(--pc-table-head-size, 1.1rem);
+  letter-spacing: 0.2em;
+  line-height: 1.4;
+  text-align: left !important;
+  text-transform: uppercase;
+}
+
+.pc-shell.pc-tables-boxed .rte table tr:first-child td:first-child {
+  font-family: var(--font-body--family);
+  font-size: var(--pc-table-head-size, 1.1rem);
+  white-space: normal;
+}
+
+/* Lists inside a cell are the row's detail, not a bulleted list in prose. */
+.section-page .rte table ul,
+.section-page .rte table ol {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.section-page .rte table li {
+  position: relative;
+  margin: 0;
+  padding-left: 1.9rem;
+  font-size: calc(var(--pc-text-size, 1.6rem) * 0.94);
+  line-height: 1.5;
+  list-style: none;
+}
+
+.section-page .rte table li::before {
+  content: "";
+  position: absolute;
+  top: 0.78em;
+  left: 0;
+  width: 0.9rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.45;
+}
+
+/* ------------------------------------------------------------- button */
+
+.pc-actions {
+  max-width: var(--pc-measure, var(--page-content-measure));
+  margin: clamp(3.2rem, 4vw, 4.8rem) auto 0;
+  text-align: center;
+}
+
+.pc-button {
+  display: inline-block;
+  padding: 1.5rem 3.2rem;
+  border: 1px solid var(--pc-button-bg, var(--color-foreground));
+  background: var(--pc-button-bg, var(--color-foreground));
+  color: var(--pc-button-color, var(--color-background));
+  font-size: 1.2rem;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background var(--duration-short, 150ms) ease, color var(--duration-short, 150ms) ease;
+}
+
+@media (hover: hover) {
+  .pc-button:hover {
+    border-color: var(--pc-button-bg-hover, var(--pc-button-bg, var(--color-foreground)));
+    background: var(--pc-button-bg-hover, transparent);
+    color: var(--pc-button-color-hover, var(--color-foreground));
+  }
+}
+
+/* --------------------------------------------------------- tablet and below */
+
+/* A table and a photograph cannot share this width and both stay legible, so the panel stacks and
+   the picture leads. */
+@media screen and (max-width: 989px) {
+  .pc-panel,
+  .pc-panel--media-left {
+    grid-template-columns: 1fr;
+    gap: clamp(2.4rem, 4vw, 3.2rem);
+  }
+
+  .pc-panel__body,
+  .pc-panel--media-left .pc-panel__body {
+    order: 2;
+  }
+
+  /*
+    Full width now, so the chosen shape is kept but stopped from taking a whole screen before the
+    rates it belongs to. The width has to be stated: with a height capped and nothing holding the
+    other axis, a box with an aspect ratio sizes itself from that cap and comes out narrow.
+  */
+  .pc-panel__media,
+  .pc-panel--media-left .pc-panel__media {
+    order: 1;
+    width: 100%;
+    max-height: 52vh;
+  }
+
+  /* Stacked, there is no second column left to match, so the picture takes a shape of its own. */
+  .pc-panel__media--match {
+    align-self: auto;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* --------------------------------------------------------------- phone */
+
+@media screen and (max-width: 749px) {
+  .pc-shell {
+    padding-inline: 1.6rem;
+  }
+
+  /* A two-column table cannot hold a four-line list at this width, so each row becomes its own
+     card: the price as the heading, the detail under it. */
+  .section-page .rte table,
+  .section-page .rte table tbody,
+  .section-page .rte table tr,
+  .section-page .rte table td,
+  .section-page .rte table td:first-child {
+    display: block;
+    width: auto !important;
+  }
+
+  .section-page .rte table {
+    border: 0;
+    border-top: 1px solid var(--page-content-rule);
+  }
+
+  /* The header band labels columns that no longer exist. */
+  .section-page .rte table tr:first-child {
+    display: none;
+  }
+
+  .section-page .rte table tr {
+    padding: 1.8rem 0;
+    border-bottom: 1px solid var(--page-content-rule);
+  }
+
+  /* Stacked, a cell is a line in a card and owns none of the spacing: the row sets it. Written at
+     the weight the two table styles use, or their padding would outrank this. */
+  .pc-shell.pc-tables-rules .rte table td,
+  .pc-shell.pc-tables-rules .rte table td:first-child,
+  .pc-shell.pc-tables-boxed .rte table td,
+  .pc-shell.pc-tables-boxed .rte table td:first-child {
+    padding: 0;
+    border: 0 !important;
+  }
+
+  .section-page .rte table td:first-child {
+    min-width: 0;
+    margin-bottom: 0.8rem;
+    font-size: calc(var(--pc-price-size, 2rem) * 1.1);
+  }
+}

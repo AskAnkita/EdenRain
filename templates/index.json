@@ -231,7 +231,7 @@
             "heading": "Speak with a designer",
             "text": "<p>Have an idea in mind? Get personal guidance and bring your perfect ring to life.</p>",
             "button_label": "Talk to a designer",
-            "button_link": "/pages/bespoke-jewellery-request"
+            "button_link": "/pages/book-a-consultation"
           }
         }
       },
@@ -1118,7 +1118,7 @@
         "heading": "Book a private appointment",
         "text": "<p>Meet one to one with an Eden Raine jewellery specialist. Share what you have in mind, explore stones and settings together, and receive thoughtful guidance as you shape a piece that feels entirely your own.</p>",
         "button_label": "Book a consultation",
-        "button_link": "/pages/contact",
+        "button_link": "/pages/book-a-consultation",
         "button_style": "solid",
         "button_radius": 0,
         "show_button_arrow": false,

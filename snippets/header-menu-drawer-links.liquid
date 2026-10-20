@@ -70,7 +70,7 @@
   assign promo_height = 1448
   assign promo_style = 'studio'
   assign promo_text = 'Have a piece made to your own design, or ask us to remake something you love.'
-  assign promo_actions = 'Explore the studio|/pages/design-studio,Talk to a designer|/pages/contact' | split: ','
+  assign promo_actions = 'Explore the studio|/pages/design-studio,Talk to a designer|/pages/book-a-consultation' | split: ','
 
   comment
     An optional second picture, standing beside the promo in the same half as
@@ -87,7 +87,7 @@
     gives it a column of its own.
 
     Every studio action has to land somewhere that exists: the builder page is the setting-first
-    route ('design-studio-builder'), and the designer route is the bespoke enquiry page. 'Label|url'
+    route ('design-studio-builder'), and the designer route is the booking page. 'Label|url'
     each, and the two of them are what sits over the foot of the picture.
   endcomment
   case parent_key
@@ -95,7 +95,7 @@
       assign browse_columns = 'By Style|Shop by Style|ring-styles split,By Shape|Shop by Shape|shapes split,Guides|Guides|' | split: ','
       assign view_all_label = 'View all engagement rings'
       assign promo_text = 'Build a ring from the setting up, or start from the stone and let us set it.'
-      assign promo_actions = 'Create your own design|/pages/design-studio-builder,Talk to our designer|/pages/bespoke-jewellery-request' | split: ','
+      assign promo_actions = 'Create your own design|/pages/design-studio-builder,Talk to our designer|/pages/book-a-consultation' | split: ','
     when 'wedding'
       comment
         Four columns, where there were three. Three lists of four short names left the browse half

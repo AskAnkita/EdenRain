@@ -1,0 +1,131 @@
+/*
+  Shopify's own policy pages - /policies/refund-policy and its siblings.
+
+  A policy does not render through a theme section. Shopify prints its own
+  .shopify-policy__container markup straight into the layout, so nothing a page template sets -
+  measure, masthead, type - ever reaches it. Left alone the container is Shopify's default 517px
+  wide with no padding of its own, which on a desktop is a narrow ribbon of text pressed against
+  the bottom of the sticky header.
+
+  This gives a policy the same masthead and measure a page gets from sections/page-content.liquid:
+  the title centred over a hairline rule, a comfortable space above and below it, and a body set
+  at the measure the rest of the shop reads at.
+
+  Nothing here is a merchant setting, because a policy has no section and so no schema to hang one
+  on. The values are the clamps assets/page-content.css uses, kept in step by hand.
+*/
+
+.shopify-policy__container {
+  /* Shopify's own rule for this is a single class as well and lands after this file, so the width
+     has to out-rank it rather than merely follow it.
+
+     The sum is the measure a page body reads at (112rem, the text_measure sections/page-content
+     .liquid is set to) plus this container's own gutter on both sides, so a policy and a page come
+     out the same width to the pixel. */
+  max-width: calc(112rem + 4.8rem) !important;
+  margin-inline: auto;
+  /* Shopify's own 2rem gutter lands after this file too, and the sum above counts on the
+     theme's, so this has to out-rank it the same way the width does. */
+  padding-inline: 2.4rem !important;
+}
+
+/* ------------------------------------------------------------- masthead */
+
+/*
+  The space the header no longer leaves. A policy has no section above it to give the title room,
+  so the title gives itself the same room .section-page .custom-section-content gives a page.
+*/
+.shopify-policy__title {
+  padding-block: clamp(3.2rem, 4vw, 5.6rem) 0;
+}
+
+.shopify-policy__title h1 {
+  margin: 0;
+  color: var(--color-foreground);
+  font-family: var(--font-heading--family);
+  font-size: clamp(2.8rem, 4vw, 4.2rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: normal;
+  text-align: center;
+  text-transform: none;
+}
+
+/* The short rule under a page title, drawn the same hairline the tables are. */
+.shopify-policy__title::after {
+  content: "";
+  display: block;
+  width: 6rem;
+  height: 1px;
+  margin: clamp(1.4rem, 1.8vw, 2rem) auto 0;
+  background: var(--color-foreground);
+  opacity: 0.35;
+}
+
+/* ----------------------------------------------------------------- body */
+
+.shopify-policy__body {
+  padding-block: clamp(2.4rem, 3vw, 3.6rem) clamp(4rem, 5vw, 6.4rem);
+}
+
+.shopify-policy__body .rte p {
+  margin: 0 0 1.4rem;
+  font-size: 1.6rem;
+  line-height: 1.75;
+}
+
+/*
+  A policy is written in <h3> - that is what the admin's editor puts in - but it is a section
+  heading here, the same job .section-page .rte h2 does on a page, so it is set to match rather
+  than to whatever the theme's h3 happens to be.
+*/
+.shopify-policy__body .rte h3 {
+  margin: clamp(2.8rem, 3.5vw, 4rem) 0 1rem;
+  color: var(--color-foreground);
+  font-family: var(--font-heading--family);
+  font-size: clamp(2.1rem, 2.4vw, 2.6rem);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* The masthead already gave the space above the first one. */
+.shopify-policy__body .rte h3:first-child {
+  margin-top: 0;
+}
+
+.shopify-policy__body .rte h3 + p {
+  margin-top: 0;
+}
+
+.shopify-policy__body .rte ul,
+.shopify-policy__body .rte ol {
+  margin: 0 0 1.4rem;
+  padding-left: 2.4rem;
+}
+
+.shopify-policy__body .rte li {
+  margin-bottom: 0.8rem;
+  padding-left: 0.4rem;
+  font-size: 1.6rem;
+  line-height: 1.75;
+}
+
+.shopify-policy__body .rte li:last-child {
+  margin-bottom: 0;
+}
+
+.shopify-policy__body .rte a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+/* --------------------------------------------------------------- phone */
+
+@media screen and (max-width: 749px) {
+  .shopify-policy__container {
+    padding-inline: 1.6rem !important;
+  }
+}

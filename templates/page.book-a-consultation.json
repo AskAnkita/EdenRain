@@ -1,0 +1,123 @@
+{
+  "sections": {
+    "booking": {
+      "type": "consultation-booking",
+      "blocks": {
+        "virtual": {
+          "type": "meeting",
+          "settings": {
+            "label": "Virtual consultation",
+            "meta": "30 minutes, by video",
+            "text": "A one to one call with a specialist, wherever you are. Share a sketch, a photograph or an idea and we will talk it through.",
+            "badge": "Most booked",
+            "booking_link": "",
+            "icon": "virtual"
+          }
+        },
+        "showroom": {
+          "type": "meeting",
+          "settings": {
+            "label": "Showroom visit",
+            "meta": "60 minutes, in person",
+            "text": "See the stones and the settings in daylight, try the shapes on your hand, and leave knowing exactly what you are commissioning.",
+            "booking_link": "",
+            "icon": "showroom"
+          }
+        },
+        "designer": {
+          "type": "meeting",
+          "settings": {
+            "label": "Speak with a designer",
+            "meta": "45 minutes, video or in person",
+            "text": "For a bespoke piece or a reset: bring the idea, however rough, and we will draw it with you.",
+            "booking_link": "",
+            "icon": "in-person"
+          }
+        },
+        "phone": {
+          "type": "meeting",
+          "settings": {
+            "label": "Telephone call",
+            "meta": "20 minutes, by phone",
+            "text": "A short conversation about stones, sizing, timings or a piece you have already seen.",
+            "booking_link": "",
+            "icon": "phone"
+          }
+        }
+      },
+      "block_order": ["virtual", "showroom", "designer", "phone"],
+      "settings": {
+        "eyebrow": "Private appointments",
+        "heading": "Book a consultation",
+        "text": "<p>Meet one to one with an Eden Raine jewellery specialist. Choose how you would like to meet, pick a time that suits you, and your confirmation arrives by email straight away.<\/p>",
+        "chooser_label": "Ways to meet",
+        "loading_text": "Opening the diary",
+        "provider": "cal",
+        "provider_origin": "",
+        "embed_layout": "month_view",
+        "embed_theme": "light",
+        "embed_brand_color": "#171714",
+        "hide_event_details": true,
+        "prefill_customer": true,
+        "lazy_load": false,
+        "notes_heading": "What happens next",
+        "notes_text": "<ul><li>A confirmation email with a calendar invitation arrives within a minute.<\/li><li>For a video call we send the link; there is nothing to install.<\/li><li>Need to move it? Every confirmation carries a reschedule link.<\/li><li>Appointments are free and there is never any obligation to buy.<\/li><\/ul>",
+        "link_1_label": "Prefer to write to us?",
+        "link_1_url": "/pages/contact",
+        "link_2_label": "How a bespoke piece is made",
+        "link_2_url": "/pages/design-your-own",
+        "media_asset": "about-craft-workshop.png",
+        "media_alt": "A jeweller at the bench in our London workshop",
+        "media_ratio": "4 / 3",
+        "fallback_heading": "Tell us when suits you",
+        "fallback_text": "<p>Send us two or three times that work for you and how you would like to meet, and we will confirm one by return.<\/p>",
+        "fallback_button_label": "Request an appointment",
+        "fallback_button_link": "/pages/contact",
+        "section_background": "rgba(0,0,0,0)",
+        "heading_color": "rgba(0,0,0,0)",
+        "eyebrow_color": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "accent_color": "rgba(0,0,0,0)",
+        "rule_color": "rgba(0,0,0,0)",
+        "choice_background": "rgba(0,0,0,0)",
+        "choice_background_active": "rgba(0,0,0,0)",
+        "choice_text_color": "rgba(0,0,0,0)",
+        "choice_border_color": "rgba(0,0,0,0)",
+        "choice_border_active": "rgba(0,0,0,0)",
+        "icon_color": "rgba(0,0,0,0)",
+        "stage_background": "rgba(0,0,0,0)",
+        "stage_border_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "eyebrow_size": 0,
+        "heading_size": 0,
+        "heading_size_mobile": 0,
+        "heading_tracking": 0,
+        "uppercase_heading": false,
+        "text_size": 0,
+        "text_measure": 0,
+        "choice_label_size": 0,
+        "choice_meta_size": 0,
+        "choice_text_size": 0,
+        "notes_size": 0,
+        "icon_size": 0,
+        "chooser_side": "left",
+        "aside_width": 0,
+        "column_gap": 0,
+        "stage_height": 0,
+        "stage_height_mobile": 0,
+        "centre_intro": false,
+        "button_style": "solid",
+        "button_radius": 0,
+        "full_width": false,
+        "content_width": 0,
+        "custom_padding": false,
+        "padding_top": 48,
+        "padding_bottom": 72,
+        "padding_top_mobile": 32,
+        "padding_bottom_mobile": 48
+      }
+    }
+  },
+  "order": ["booking"]
+}

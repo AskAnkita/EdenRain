@@ -1,0 +1,455 @@
+{% comment %}
+  Page content, with a photograph beside each of its tables.
+
+  The body of a page still lives in the admin, where it always has - this section renders
+  page.content rather than holding a copy of it, so Online Store > Pages stays the one place the
+  words are edited. What the theme adds is the pictures: the content is cut at each </table>, and
+  every piece that ends in a table becomes a panel with a photograph next to it, taken in order
+  from this section's blocks. Anything after the last table (on Shipping & Handling that is
+  Delivery Information and Dispatch) runs full width underneath.
+
+  So on a page with two tables and two blocks: table one takes the first block's picture, table
+  two the second. A table with no block beside it simply renders full width, and a page with no
+  tables at all - /pages/bespoke-jewellery-request is one - renders exactly as it did before.
+
+  Panels keep the content first in the markup and move the picture with grid, so a screen reader
+  and a phone both get the words before the photograph whichever side it is shown on.
+
+  Every size, colour and picture is a setting, written onto the section element as a custom
+  property; assets/page-content.css holds the defaults, so this still reads on its own.
+{% endcomment %}
+
+{{ 'page-content.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign transparent = 'rgba(0,0,0,0)'
+
+  # A template saved before a setting existed has no value for it, so every size is coerced with
+  # 'plus: 0' and 0 means "keep the stylesheet's own default".
+  assign content_width = section.settings.content_width | plus: 0
+  assign media_width = section.settings.media_width | plus: 0
+  assign column_gap = section.settings.column_gap | plus: 0
+  assign panel_gap = section.settings.panel_gap | plus: 0
+  assign measure = section.settings.text_measure | plus: 0
+  assign pad_top = section.settings.padding_top | plus: 0
+  assign pad_bottom = section.settings.padding_bottom | plus: 0
+  assign label_size = section.settings.label_size | plus: 0
+  assign label_tracking = section.settings.label_tracking | plus: 0
+  assign heading_size = section.settings.heading_size | plus: 0
+  assign text_size = section.settings.text_size | plus: 0
+  assign price_size = section.settings.price_size | plus: 0
+  assign table_head_size = section.settings.table_head_size | plus: 0
+
+  # One shape for every picture, so two panels side by side on a page never show two different
+  # sizes. A block may still ask for its own.
+  assign section_ratio = section.settings.media_ratio | default: '1 / 1'
+
+  assign panel_blocks = section.blocks | where: 'type', 'panel'
+
+  # The admin editor leaves a paragraph holding nothing but a non-breaking space wherever a
+  # return was pressed between sections. Each one is invisible and still takes a line, so they
+  # open gaps nobody chose. Both spellings the editor writes are taken out.
+  assign content = page.content | replace: '<p> </p>', '' | replace: '<p>&nbsp;</p>', ''
+  assign chunks = content | split: '</table>'
+-%}
+
+{%- capture section_styles -%}
+  {%- if content_width > 0 -%}--pc-shell-max: {{ content_width }}px;{%- endif -%}
+  {%- if measure > 0 -%}--pc-measure: {{ measure }}px;{%- endif -%}
+  {%- if media_width > 0 -%}--pc-media-col: {{ media_width }}fr;--pc-content-col: {{ 100 | minus: media_width }}fr;{%- endif -%}
+  {%- if column_gap > 0 -%}--pc-column-gap: {{ column_gap }}px;{%- endif -%}
+  {%- if section.settings.media_align != blank -%}--pc-media-align: {{ section.settings.media_align }};{%- endif -%}
+  {%- if panel_gap > 0 -%}--pc-panel-gap: {{ panel_gap }}px;{%- endif -%}
+  {%- if section.settings.custom_padding -%}--pc-pad-top: {{ pad_top }}px;--pc-pad-bottom: {{ pad_bottom }}px;{%- endif -%}
+
+  {%- if label_size > 0 -%}--pc-label-size: {{ label_size }}px;{%- endif -%}
+  {%- if label_tracking > 0 -%}--pc-label-tracking: {{ label_tracking | divided_by: 100.0 }}em;{%- endif -%}
+  {%- unless section.settings.uppercase_labels -%}--pc-label-case: none;{%- endunless -%}
+  {%- if heading_size > 0 -%}--pc-heading-size: {{ heading_size }}px;{%- endif -%}
+  {%- if text_size > 0 -%}--pc-text-size: {{ text_size }}px;{%- endif -%}
+  {%- if price_size > 0 -%}--pc-price-size: {{ price_size }}px;{%- endif -%}
+  {%- if table_head_size > 0 -%}--pc-table-head-size: {{ table_head_size }}px;{%- endif -%}
+
+  {%- if section.settings.section_background != blank and section.settings.section_background != transparent -%}--pc-section-bg: {{ section.settings.section_background }};{%- endif -%}
+  {%- if section.settings.text_color != blank and section.settings.text_color != transparent -%}--pc-text-color: {{ section.settings.text_color }};{%- endif -%}
+  {%- if section.settings.label_color != blank and section.settings.label_color != transparent -%}--pc-label-color: {{ section.settings.label_color }};{%- endif -%}
+  {%- if section.settings.heading_color != blank and section.settings.heading_color != transparent -%}--pc-heading-color: {{ section.settings.heading_color }};{%- endif -%}
+  {%- if section.settings.rule_color != blank and section.settings.rule_color != transparent -%}--page-content-rule: {{ section.settings.rule_color }};{%- endif -%}
+  {%- if section.settings.table_head_bg != blank and section.settings.table_head_bg != transparent -%}--pc-table-head-bg: {{ section.settings.table_head_bg }};{%- endif -%}
+  {%- if section.settings.table_head_color != blank and section.settings.table_head_color != transparent -%}--pc-table-head-color: {{ section.settings.table_head_color }};{%- endif -%}
+
+  {%- if section.settings.button_background != blank and section.settings.button_background != transparent -%}--pc-button-bg: {{ section.settings.button_background }};{%- endif -%}
+  {%- if section.settings.button_color != blank and section.settings.button_color != transparent -%}--pc-button-color: {{ section.settings.button_color }};{%- endif -%}
+  {%- if section.settings.button_background_hover != blank and section.settings.button_background_hover != transparent -%}--pc-button-bg-hover: {{ section.settings.button_background_hover }};{%- endif -%}
+  {%- if section.settings.button_color_hover != blank and section.settings.button_color_hover != transparent -%}--pc-button-color-hover: {{ section.settings.button_color_hover }};{%- endif -%}
+{%- endcapture -%}
+
+<div
+  class="pc-shell pc-tables-{{ section.settings.table_style | default: 'rules' }}"
+  style="{{ section_styles | strip_newlines | strip }}"
+>
+  {%- for chunk in chunks -%}
+    {%- if forloop.last -%}
+      {%- assign trailing = chunk | strip -%}
+      {%- if trailing != blank -%}
+        <div class="pc-prose rte">{{ chunk }}</div>
+      {%- endif -%}
+
+    {%- else -%}
+      {%- liquid
+        assign panel = panel_blocks[forloop.index0]
+
+        assign has_media = false
+        if panel.settings.image != blank or panel.settings.image_asset != blank or panel.settings.image_url != blank
+          assign has_media = true
+        endif
+
+        assign media_side = panel.settings.image_position | default: 'right'
+
+        assign media_ratio = panel.settings.image_ratio | default: 'inherit'
+        if media_ratio == 'inherit'
+          assign media_ratio = section_ratio
+        endif
+
+        # Put back the closing tag the split ate. It is built here rather than typed into the
+        # markup below, where a bare </table> reads as a stray close tag to theme check.
+        assign closing_tag = '</table' | append: '>'
+        assign panel_body = chunk | append: closing_tag
+      -%}
+
+      <div
+        class="pc-panel pc-panel--media-{{ media_side }}{% unless has_media %} pc-panel--no-media{% endunless %}"
+        {%- if panel != blank %} {{ panel.shopify_attributes }}{% endif %}
+      >
+        {%- comment -%}
+          Everything from the previous table's end up to this one is one piece of the admin's own
+          markup, so it is printed as it was written.
+        {%- endcomment -%}
+        <div class="pc-panel__body rte">{{ panel_body }}</div>
+
+        {%- if has_media -%}
+          <div
+            class="pc-panel__media{% if media_ratio == 'natural' %} pc-panel__media--natural{% elsif media_ratio == 'match' %} pc-panel__media--match{% endif %}"
+            style="
+              {%- unless media_ratio == 'natural' or media_ratio == 'match' -%}--pc-media-ratio: {{ media_ratio }};{%- endunless -%}
+              {%- if panel.settings.image_focus != blank -%}--pc-media-focus: {{ panel.settings.image_focus }};{%- endif -%}
+            "
+          >
+            {%- render 'homepage-journey-image',
+              image: panel.settings.image,
+              asset: panel.settings.image_asset,
+              image_url: panel.settings.image_url,
+              alt: panel.settings.image_alt,
+              class: 'pc-media__image',
+              placeholder_class: 'pc-media__image pc-media__placeholder',
+              placeholder: 'lifestyle-2',
+              sizes: '(min-width: 990px) 40vw, 100vw',
+              width: 1120,
+              height: 1400
+            -%}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if section.settings.button_label != blank -%}
+    <div class="pc-actions">
+      <a class="pc-button" href="{{ section.settings.button_link | default: '#' }}">
+        {{- section.settings.button_label | escape -}}
+      </a>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Page content + media",
+  "tag": "section",
+  "class": "section-page section-page-content",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Renders this page's body from Online Store > Pages. Each table in it is paired with the picture in the matching block below - first table, first block."
+    },
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content width",
+      "min": 720,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 1120
+    },
+    {
+      "type": "range",
+      "id": "text_measure",
+      "label": "Width of text after the last table",
+      "info": "Delivery Information, Dispatch, and anything else below the tables.",
+      "min": 480,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 760
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "label": "Picture column",
+      "info": "Share of the panel the photograph takes. The table gets the rest.",
+      "min": 25,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Gap between table and picture",
+      "min": 16,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Picture shape",
+      "info": "Every picture is cropped to this, so the panels down the page match each other.",
+      "options": [
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 5", "label": "Portrait (4:5)" },
+        { "value": "3 / 4", "label": "Portrait (3:4)" },
+        { "value": "4 / 3", "label": "Landscape (4:3)" },
+        { "value": "16 / 9", "label": "Landscape (16:9)" },
+        { "value": "match", "label": "Match each table's height" },
+        { "value": "natural", "label": "As uploaded" }
+      ],
+      "default": "1 / 1"
+    },
+    {
+      "type": "select",
+      "id": "media_align",
+      "label": "Picture position",
+      "info": "Where the picture sits against the table beside it.",
+      "options": [
+        { "value": "center", "label": "Centred" },
+        { "value": "start", "label": "Top" },
+        { "value": "end", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "panel_gap",
+      "label": "Gap between panels",
+      "min": 24,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 88
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_padding",
+      "label": "Set the space above and below",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 16,
+      "visible_if": "{{ section.settings.custom_padding }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 96,
+      "visible_if": "{{ section.settings.custom_padding }}"
+    },
+    {
+      "type": "select",
+      "id": "table_style",
+      "label": "Table style",
+      "info": "Rules only is the quieter of the two: no frame, no header band, each rate on its own line under a hairline.",
+      "options": [
+        { "value": "rules", "label": "Rules only" },
+        { "value": "boxed", "label": "Boxed, with a header band" }
+      ],
+      "default": "rules"
+    },
+    { "type": "header", "content": "Type" },
+    {
+      "type": "checkbox",
+      "id": "uppercase_labels",
+      "label": "Uppercase the labels above each table",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "label": "Label size",
+      "info": "UK Shipping, International Shipping.",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "label_tracking",
+      "label": "Label letter spacing",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "%",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "info": "Delivery Information, Dispatch.",
+      "min": 16,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Body text size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "label": "Price size",
+      "info": "The first column of each table.",
+      "min": 12,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "table_head_size",
+      "label": "Table header size",
+      "min": 8,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    { "type": "header", "content": "Colours" },
+    { "type": "color", "id": "section_background", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Body text" },
+    { "type": "color", "id": "label_color", "label": "Labels" },
+    { "type": "color", "id": "heading_color", "label": "Headings" },
+    { "type": "color", "id": "rule_color", "label": "Table rules" },
+    { "type": "color", "id": "table_head_bg", "label": "Table header background" },
+    { "type": "color", "id": "table_head_color", "label": "Table header text" },
+    { "type": "header", "content": "Button", "info": "Leave the label empty to hide it." },
+    { "type": "text", "id": "button_label", "label": "Button label" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "color", "id": "button_background", "label": "Button background" },
+    { "type": "color", "id": "button_color", "label": "Button text" },
+    { "type": "color", "id": "button_background_hover", "label": "Button background on hover" },
+    { "type": "color", "id": "button_color_hover", "label": "Button text on hover" }
+  ],
+  "blocks": [
+    {
+      "type": "panel",
+      "name": "Picture beside a table",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Blocks are matched to the page's tables in order: the first block sits beside the first table."
+        },
+        { "type": "image_picker", "id": "image", "label": "Picture" },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "Picture file name (fallback)",
+          "info": "A file name in Content > Files (or assets/), e.g. shipping-gift-box.jpg. Only used when no picture is chosen above."
+        },
+        {
+          "type": "text",
+          "id": "image_url",
+          "label": "Picture URL (fallback)",
+          "info": "Only used when neither of the two above is set."
+        },
+        { "type": "text", "id": "image_alt", "label": "Alt text", "info": "What the picture shows, for screen readers." },
+        {
+          "type": "select",
+          "id": "image_position",
+          "label": "Picture side",
+          "options": [
+            { "value": "left", "label": "Left of the table" },
+            { "value": "right", "label": "Right of the table" }
+          ],
+          "default": "right"
+        },
+        {
+          "type": "select",
+          "id": "image_ratio",
+          "label": "Picture shape",
+          "info": "Leave as it is unless this one picture should break the set.",
+          "options": [
+            { "value": "inherit", "label": "Same as the rest" },
+            { "value": "match", "label": "Match the table height" },
+            { "value": "natural", "label": "As uploaded" },
+            { "value": "1 / 1", "label": "Square" },
+            { "value": "4 / 5", "label": "Portrait (4:5)" },
+            { "value": "3 / 4", "label": "Portrait (3:4)" },
+            { "value": "4 / 3", "label": "Landscape (4:3)" },
+            { "value": "16 / 9", "label": "Landscape (16:9)" }
+          ],
+          "default": "inherit"
+        },
+        {
+          "type": "select",
+          "id": "image_focus",
+          "label": "Keep in frame",
+          "info": "The part of the picture to hold on to when it is cropped to the shape above.",
+          "options": [
+            { "value": "center", "label": "Centre" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "center"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Page content + media",
+      "blocks": [{ "type": "panel" }, { "type": "panel" }]
+    }
+  ]
+}
+{% endschema %}

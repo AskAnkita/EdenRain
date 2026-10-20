@@ -16,7 +16,7 @@
           "type": "text",
           "name": "Heading",
           "settings": {
-            "text": "<p>{{ closest.page.title }}<\/p>",
+            "text": "<p>{{ closest.page.title }}</p>",
             "typing_text": false,
             "primary_text": "Welcome to our store!",
             "secondary_text": "Exclusive offers just for you.",
@@ -75,75 +75,10 @@
             "padding-inline-end": 0
           },
           "blocks": {}
-        },
-        "text_4Jqeij": {
-          "type": "text",
-          "name": "Text",
-          "settings": {
-            "text": "<p>{{ closest.page.content }}<\/p>",
-            "typing_text": false,
-            "primary_text": "Welcome to our store!",
-            "secondary_text": "Exclusive offers just for you.",
-            "third_text": "Shop now and enjoy deals!",
-            "highlight_text": false,
-            "highlight_text_content": "",
-            "highlight_text_type": "text",
-            "highlight_text_color": "#000000",
-            "highlight_underline_color": "#000000",
-            "spacing_text": false,
-            "spacing_text_content": "",
-            "spacing_text_left": 0,
-            "spacing_text_right": 0,
-            "stroke_text": false,
-            "stroke_text_content": "",
-            "width": "fit-content",
-            "unit": "percent",
-            "custom_width": 100,
-            "custom_width_pixel": 500,
-            "inherit_text_alignment": true,
-            "alignment": "left",
-            "width_tablet": "fit-content",
-            "unit_tablet": "percent",
-            "custom_width_tablet": 100,
-            "custom_width_tablet_pixel": 100,
-            "inherit_text_alignment_tablet": true,
-            "alignment_tablet": "left",
-            "width_mobile": "fit-content",
-            "unit_mobile": "percent",
-            "custom_width_mobile": 100,
-            "custom_width_mobile_pixel": 100,
-            "inherit_text_alignment_mobile": true,
-            "alignment_mobile": "left",
-            "type_preset": "rte",
-            "font": "var(--font-body--family)",
-            "font_size": "1.6rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "color": "var(--color-foreground)",
-            "background": false,
-            "background_color": "#00000026",
-            "enable_border": false,
-            "enable_border_bottom": false,
-            "border": "none",
-            "border_width": 0,
-            "border_width_type": "100%",
-            "border_custom_width": 100,
-            "border_radius": 0,
-            "text_effect": "none",
-            "animation_repeat": false,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
         }
       },
       "block_order": [
-        "text_q48tHr",
-        "text_4Jqeij"
+        "text_q48tHr"
       ],
       "settings": {
         "content_direction": "column",
@@ -173,9 +108,37 @@
         "padding-block-start": 0,
         "padding-block-end": 0
       }
+    },
+    "page_media": {
+      "type": "page-content",
+      "blocks": {},
+      "block_order": [],
+      "settings": {
+        "content_width": 1200,
+        "text_measure": 1120,
+        "media_width": 40,
+        "column_gap": 48,
+        "media_ratio": "1 / 1",
+        "media_align": "center",
+        "table_style": "rules",
+        "panel_gap": 48,
+        "custom_padding": false,
+        "padding_top": 16,
+        "padding_bottom": 96,
+        "uppercase_labels": true,
+        "label_size": 14,
+        "label_tracking": 26,
+        "heading_size": 25,
+        "text_size": 16,
+        "price_size": 20,
+        "table_head_size": 11,
+        "button_label": "",
+        "button_link": ""
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "page_media"
   ]
 }

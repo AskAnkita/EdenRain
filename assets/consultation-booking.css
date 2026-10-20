@@ -1,0 +1,410 @@
+/*
+  Consultation booking - the page where someone picks a way to meet us and takes a slot in the
+  diary. The section is sections/consultation-booking.liquid, the behaviour is
+  assets/consultation-booking.js.
+
+  The page is ours and the diary is not: the chooser, the copy, the reassurance list and the
+  photograph are the theme's own, and the only thing the booking provider (Cal.com, Calendly)
+  owns is the rectangle on the right. That rectangle is given a minimum height here so the page
+  does not jump as the provider's own script measures itself and resizes.
+
+  At desktop the chooser is a column on the left and the diary fills the rest. Below 990px the
+  chooser becomes a row of cards above the diary, which is the order someone reads anyway:
+  choose how to meet, then choose when.
+
+  Every look is a custom property with its default written in this file, so a setting left at
+  "use the default" (a cleared colour, a size of 0) writes nothing onto the section element and
+  the value here stands.
+*/
+
+.eden-booking {
+  --ebk-section-bg: #ffffff;
+  --ebk-heading-color: #171714;
+  --ebk-eyebrow-color: #8a8a80;
+  --ebk-text-color: #6f6f66;
+  --ebk-accent-color: #ceada7;
+  --ebk-rule-color: rgba(23, 23, 20, 0.14);
+
+  --ebk-eyebrow-size: 13px;
+  --ebk-heading-size: 44px;
+  --ebk-heading-size-mobile: 30px;
+  --ebk-heading-tracking: 0.01em;
+  --ebk-heading-case: none;
+  --ebk-text-size: 17px;
+  --ebk-measure: 60ch;
+
+  --ebk-choice-bg: #ffffff;
+  --ebk-choice-bg-active: #faf6f4;
+  --ebk-choice-color: #171714;
+  --ebk-choice-border: rgba(23, 23, 20, 0.16);
+  --ebk-choice-border-active: #171714;
+  --ebk-choice-label-size: 17px;
+  --ebk-choice-meta-size: 13px;
+  --ebk-choice-text-size: 14px;
+  --ebk-icon-size: 26px;
+  --ebk-icon-color: #171714;
+
+  --ebk-notes-heading-size: 13px;
+  --ebk-notes-size: 15px;
+
+  --ebk-stage-bg: #ffffff;
+  --ebk-stage-border: rgba(23, 23, 20, 0.14);
+  --ebk-stage-min-height: 760px;
+  --ebk-stage-min-height-mobile: 1020px;
+
+  --ebk-aside-width: 360px;
+  --ebk-gap: 4rem;
+  --ebk-shell-max: 1440px;
+  --ebk-pad-inline: 2rem;
+  --ebk-pad-top: 48px;
+  --ebk-pad-bottom: 72px;
+  --ebk-pad-top-mobile: 32px;
+  --ebk-pad-bottom-mobile: 48px;
+
+  display: block;
+  background: var(--ebk-section-bg);
+  padding-block: var(--ebk-pad-top-mobile) var(--ebk-pad-bottom-mobile);
+}
+
+@media screen and (min-width: 750px) {
+  .eden-booking {
+    --ebk-pad-inline: 4rem;
+    padding-block: var(--ebk-pad-top) var(--ebk-pad-bottom);
+  }
+}
+
+.ebk-shell {
+  max-width: var(--ebk-shell-max);
+  margin-inline: auto;
+  padding-inline: var(--ebk-pad-inline);
+}
+
+/* ------------------------------------------------------------------- the intro */
+
+.ebk-intro {
+  max-width: var(--ebk-measure);
+  margin-bottom: 3.6rem;
+}
+
+.eden-booking--centred .ebk-intro {
+  max-width: none;
+  text-align: center;
+}
+
+.eden-booking--centred .ebk-intro .ebk-text {
+  max-width: var(--ebk-measure);
+  margin-inline: auto;
+}
+
+.ebk-eyebrow {
+  margin: 0 0 1.4rem;
+  color: var(--ebk-eyebrow-color);
+  font-family: var(--font-body--family);
+  font-size: var(--ebk-eyebrow-size);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ebk-heading {
+  margin: 0;
+  color: var(--ebk-heading-color);
+  font-family: var(--font-heading--family);
+  font-size: var(--ebk-heading-size-mobile);
+  font-weight: 400;
+  letter-spacing: var(--ebk-heading-tracking);
+  line-height: 1.12;
+  text-transform: var(--ebk-heading-case);
+}
+
+.ebk-text {
+  margin-top: 1.6rem;
+  color: var(--ebk-text-color);
+  font-size: var(--ebk-text-size);
+  line-height: 1.6;
+}
+
+.ebk-text > :first-child { margin-top: 0; }
+.ebk-text > :last-child { margin-bottom: 0; }
+
+@media screen and (min-width: 750px) {
+  .ebk-heading { font-size: var(--ebk-heading-size); }
+}
+
+/* ------------------------------------------------------------------ the layout */
+
+.ebk-layout {
+  display: grid;
+  gap: var(--ebk-gap);
+  align-items: start;
+}
+
+@media screen and (min-width: 990px) {
+  .ebk-layout {
+    grid-template-columns: var(--ebk-aside-width) minmax(0, 1fr);
+  }
+
+  .eden-booking--chooser-right .ebk-layout {
+    grid-template-columns: minmax(0, 1fr) var(--ebk-aside-width);
+  }
+
+  .eden-booking--chooser-right .ebk-aside { order: 2; }
+}
+
+.ebk-aside {
+  display: grid;
+  gap: 3.2rem;
+}
+
+/* ----------------------------------------------------------------- the chooser */
+
+.ebk-choices {
+  display: grid;
+  gap: 1.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media screen and (min-width: 560px) and (max-width: 989px) {
+  .ebk-choices {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}
+
+.ebk-choice {
+  display: flex;
+  gap: 1.6rem;
+  width: 100%;
+  border: 0.1rem solid var(--ebk-choice-border);
+  border-radius: 0;
+  padding: 1.8rem 2rem;
+  background: var(--ebk-choice-bg);
+  color: var(--ebk-choice-color);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.ebk-choice:hover { border-color: var(--ebk-choice-border-active); }
+
+.ebk-choice[aria-pressed='true'] {
+  border-color: var(--ebk-choice-border-active);
+  background: var(--ebk-choice-bg-active);
+}
+
+.ebk-choice:focus-visible {
+  outline: 0.2rem solid var(--ebk-choice-border-active);
+  outline-offset: 0.2rem;
+}
+
+.ebk-choice__icon {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ebk-icon-size);
+  height: var(--ebk-icon-size);
+  color: var(--ebk-icon-color);
+}
+
+.ebk-choice__icon svg,
+.ebk-choice__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ebk-choice__body { display: grid; gap: 0.4rem; }
+
+.ebk-choice__label {
+  font-family: var(--font-body--family);
+  font-size: var(--ebk-choice-label-size);
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+}
+
+.ebk-choice__meta {
+  color: var(--ebk-eyebrow-color);
+  font-size: var(--ebk-choice-meta-size);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ebk-choice__text {
+  color: var(--ebk-text-color);
+  font-size: var(--ebk-choice-text-size);
+  line-height: 1.5;
+}
+
+.ebk-choice__badge {
+  justify-self: start;
+  margin-top: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  background: var(--ebk-accent-color);
+  color: #171714;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* A single way to meet needs no chooser; the card is printed as plain copy instead. */
+.ebk-choices--single .ebk-choice {
+  cursor: default;
+  border-color: var(--ebk-choice-border);
+  background: var(--ebk-choice-bg-active);
+}
+
+/* ------------------------------------------------------------- reassurance list */
+
+.ebk-notes {
+  border-top: 0.1rem solid var(--ebk-rule-color);
+  padding-top: 2.4rem;
+}
+
+.ebk-notes__heading {
+  margin: 0 0 1.2rem;
+  color: var(--ebk-eyebrow-color);
+  font-family: var(--font-body--family);
+  font-size: var(--ebk-notes-heading-size);
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ebk-notes__body {
+  color: var(--ebk-text-color);
+  font-size: var(--ebk-notes-size);
+  line-height: 1.6;
+}
+
+.ebk-notes__body ul,
+.ebk-notes__body ol { margin: 0; padding-left: 1.8rem; }
+.ebk-notes__body li { margin-bottom: 0.6rem; }
+.ebk-notes__body > :first-child { margin-top: 0; }
+.ebk-notes__body > :last-child { margin-bottom: 0; }
+
+.ebk-aside__media { margin: 0; }
+
+.ebk-aside__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--ebk-media-ratio, 4 / 3);
+  object-fit: cover;
+}
+
+.ebk-aside__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6rem 2.4rem;
+}
+
+/* ------------------------------------------------------------------- the diary */
+
+.ebk-stage {
+  position: relative;
+  display: block;
+  min-height: var(--ebk-stage-min-height-mobile);
+  border: 0.1rem solid var(--ebk-stage-border);
+  background: var(--ebk-stage-bg);
+}
+
+@media screen and (min-width: 990px) {
+  .ebk-stage { min-height: var(--ebk-stage-min-height); }
+}
+
+.ebk-stage__frame { display: block; }
+
+.ebk-stage__frame iframe,
+.ebk-stage__frame cal-inline,
+.ebk-stage__frame .calendly-inline-widget {
+  display: block;
+  width: 100%;
+  min-height: var(--ebk-stage-min-height-mobile);
+  border: 0;
+}
+
+@media screen and (min-width: 990px) {
+  .ebk-stage__frame iframe,
+  .ebk-stage__frame cal-inline,
+  .ebk-stage__frame .calendly-inline-widget {
+    min-height: var(--ebk-stage-min-height);
+  }
+}
+
+/*
+  The status line sits behind the diary rather than above it, so the provider's own loader
+  covers it as soon as it paints. It is removed outright once a frame reports it has loaded.
+*/
+.ebk-stage__status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  margin: 0;
+  padding: 2rem;
+  color: var(--ebk-text-color);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  pointer-events: none;
+}
+
+.ebk-stage__status::before {
+  content: '';
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 0.15rem solid var(--ebk-rule-color);
+  border-top-color: var(--ebk-heading-color);
+  border-radius: 50%;
+  animation: ebk-spin 0.9s linear infinite;
+}
+
+.ebk-stage[data-ready='true'] .ebk-stage__status { display: none; }
+
+@keyframes ebk-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ebk-stage__status::before { animation: none; }
+}
+
+/*
+  With no diary link set - the editor before the Cal.com links are pasted in, or a provider
+  script that will not load - the stage prints this panel instead, so the page still asks for
+  the enquiry rather than showing an empty box.
+*/
+.ebk-fallback {
+  display: grid;
+  gap: 1.6rem;
+  justify-items: start;
+  padding: 4rem;
+}
+
+.eden-booking--centred .ebk-fallback { justify-items: center; text-align: center; }
+
+.ebk-fallback__heading {
+  margin: 0;
+  color: var(--ebk-heading-color);
+  font-family: var(--font-heading--family);
+  font-size: calc(var(--ebk-heading-size-mobile) * 0.8);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.ebk-fallback__text {
+  max-width: 46ch;
+  color: var(--ebk-text-color);
+  font-size: var(--ebk-text-size);
+  line-height: 1.6;
+}
+
+.ebk-fallback__text > :first-child { margin-top: 0; }
+.ebk-fallback__text > :last-child { margin-bottom: 0; }
+
+/* The stage keeps no minimum height when all it holds is this panel. */
+.ebk-stage--fallback { min-height: 0; }
