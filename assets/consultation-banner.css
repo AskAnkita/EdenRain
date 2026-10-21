@@ -36,6 +36,7 @@
   --ecb-media-focal-x: 50%;
   --ecb-media-focal-y: 50%;
   --ecb-pad-inline: 6rem;
+  --ecb-pad-inline-mobile: 2.4rem;
   --ecb-pad-block: 6rem;
   --ecb-pad-top: 0px;
   --ecb-pad-bottom: 0px;
@@ -83,6 +84,11 @@
 
 /* ------------------------------------------------------------------- panel */
 
+/*
+  The side padding is the desktop one from 750px up. On a phone a 60-72px gutter either side
+  leaves the copy in a narrow column down the middle of the screen, so the panel falls back to
+  its own, much smaller mobile gutter and the words run the width of the band.
+*/
 .ecb-panel {
   display: flex;
   flex-direction: column;
@@ -90,7 +96,7 @@
   justify-content: center;
   gap: 2.8rem;
   background: var(--ecb-panel-bg);
-  padding: var(--ecb-pad-block) var(--ecb-pad-inline);
+  padding: var(--ecb-pad-block) var(--ecb-pad-inline-mobile);
   text-align: left;
 }
 
@@ -207,6 +213,10 @@
 
   .eden-consult--media-right .ecb-panel {
     grid-area: 1 / 1;
+  }
+
+  .ecb-panel {
+    padding-inline: var(--ecb-pad-inline);
   }
 
   .ecb-heading {

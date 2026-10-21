@@ -412,25 +412,27 @@
   text-align: center;
 }
 
+/*
+  The paint and the hover both come from eden-actions.css, which .pc-button is
+  named in: it only declares its colours as the shared --cta-* pairs so the one
+  sweep every call to action in the shop uses carries it too. The hover fill
+  used to default to `transparent`, which the sweep cannot wipe across, so it
+  now falls back to the resting ink - the same swap, with something to see.
+*/
 .pc-button {
   display: inline-block;
   padding: 1.5rem 3.2rem;
-  border: 1px solid var(--pc-button-bg, var(--color-foreground));
-  background: var(--pc-button-bg, var(--color-foreground));
-  color: var(--pc-button-color, var(--color-background));
+  border: 1px solid transparent;
   font-size: 1.2rem;
   letter-spacing: 0.18em;
   text-decoration: none;
   text-transform: uppercase;
-  transition: background var(--duration-short, 150ms) ease, color var(--duration-short, 150ms) ease;
-}
-
-@media (hover: hover) {
-  .pc-button:hover {
-    border-color: var(--pc-button-bg-hover, var(--pc-button-bg, var(--color-foreground)));
-    background: var(--pc-button-bg-hover, transparent);
-    color: var(--pc-button-color-hover, var(--color-foreground));
-  }
+  --cta-fill: var(--pc-button-bg, var(--color-foreground));
+  --cta-ink: var(--pc-button-color, var(--color-background));
+  --cta-edge: var(--pc-button-bg, var(--color-foreground));
+  --cta-fill-hover: var(--pc-button-bg-hover, var(--pc-button-color, var(--color-background)));
+  --cta-ink-hover: var(--pc-button-color-hover, var(--pc-button-bg, var(--color-foreground)));
+  --cta-edge-hover: var(--pc-button-bg-hover, var(--pc-button-bg, var(--color-foreground)));
 }
 
 /* --------------------------------------------------------- tablet and below */

@@ -3102,8 +3102,8 @@
                   "type": "button",
                   "name": "t:names.button",
                   "settings": {
-                    "label": "Email Us",
-                    "link": "mailto:hello@edenraine.co.uk",
+                    "label": "Call Us",
+                    "link": "tel:+44203554887",
                     "open_in_new_tab": false,
                     "show_icon_button": false,
                     "icon": "arrow_right",

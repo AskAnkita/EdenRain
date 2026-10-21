@@ -429,41 +429,44 @@
     flex-wrap: wrap;
   }
 
+  {%- comment -%}
+    The paint, the hover and the lift all come from assets/eden-actions.css,
+    which matches these buttons on their class prefix and gives every call to
+    action in the shop the same fill: a colour that wipes in from the left.
+    This block only says how big the button is and which two colours it
+    crosses between - it must not write a :hover of its own, or the hero falls
+    back out of step with add to cart and the rest of the homepage.
+  {%- endcomment -%}
   .ai-luxury-video-hero-button-{{ ai_gen_id }} {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.3s ease;
     width: {{ block.settings.button_width }}px;
     height: {{ block.settings.button_height }}px;
     padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
+    border-width: 2px;
+    border-style: solid;
     border-radius: {{ block.settings.button_border_radius }}px;
     font-size: {{ block.settings.button_font_size }}px;
     font-weight: {{ block.settings.button_font_weight }};
     letter-spacing: {{ block.settings.button_letter_spacing }}px;
     {% if block.settings.button_style == 'solid' %}
-      background-color: {{ block.settings.button_background_color }};
-      color: {{ block.settings.button_text_color }};
-      border: 2px solid {{ block.settings.button_background_color }};
+      --cta-fill: {{ block.settings.button_background_color }};
+      --cta-ink: {{ block.settings.button_text_color }};
+      --cta-edge: {{ block.settings.button_background_color }};
+      --cta-fill-hover: {{ block.settings.button_hover_background_color }};
+      --cta-ink-hover: {{ block.settings.button_hover_text_color }};
+      --cta-edge-hover: {{ block.settings.button_hover_background_color }};
     {% else %}
-      background-color: transparent;
-      color: {{ block.settings.button_text_color }};
-      border: 2px solid {{ block.settings.button_border_color }};
+      --cta-fill: transparent;
+      --cta-ink: {{ block.settings.button_text_color }};
+      --cta-edge: {{ block.settings.button_border_color }};
+      --cta-fill-hover: {{ block.settings.button_border_color }};
+      --cta-ink-hover: {{ block.settings.button_background_color }};
+      --cta-edge-hover: {{ block.settings.button_border_color }};
     {% endif %}
-  }
-
-  .ai-luxury-video-hero-button-{{ ai_gen_id }}:hover {
-    {% if block.settings.button_style == 'solid' %}
-      background-color: {{ block.settings.button_hover_background_color }};
-      border-color: {{ block.settings.button_hover_background_color }};
-      color: {{ block.settings.button_hover_text_color }};
-    {% else %}
-      background-color: {{ block.settings.button_border_color }};
-      color: {{ block.settings.button_background_color }};
-    {% endif %}
-    transform: translateY(-2px);
   }
 
   .ai-luxury-video-hero-mobile-content-{{ ai_gen_id }} {
@@ -530,40 +533,40 @@
       width: 100%;
     }
 
+    {%- comment -%}
+      As above: size here, colours as the shared --cta-* pairs, hover in
+      assets/eden-actions.css.
+    {%- endcomment -%}
     .ai-luxury-video-hero-mobile-button-{{ ai_gen_id }} {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       text-decoration: none;
       cursor: pointer;
-      transition: all 0.3s ease;
       box-sizing: border-box;
       width: 100%;
       min-height: max(48px, {{ block.settings.mobile_button_height }}px);
       padding: {{ block.settings.mobile_button_padding_vertical }}px {{ block.settings.mobile_button_padding_horizontal }}px;
+      border-width: 2px;
+      border-style: solid;
       border-radius: {{ block.settings.button_border_radius }}px;
       font-size: {{ block.settings.mobile_button_font_size }}px;
       font-weight: {{ block.settings.mobile_button_font_weight }};
       letter-spacing: {{ block.settings.mobile_button_letter_spacing }}px;
       {% if block.settings.button_style == 'solid' %}
-        background-color: {{ block.settings.button_background_color }};
-        color: {{ block.settings.button_text_color }};
-        border: 2px solid {{ block.settings.button_background_color }};
+        --cta-fill: {{ block.settings.button_background_color }};
+        --cta-ink: {{ block.settings.button_text_color }};
+        --cta-edge: {{ block.settings.button_background_color }};
+        --cta-fill-hover: {{ block.settings.button_hover_background_color }};
+        --cta-ink-hover: {{ block.settings.button_hover_text_color }};
+        --cta-edge-hover: {{ block.settings.button_hover_background_color }};
       {% else %}
-        background-color: transparent;
-        color: {{ block.settings.button_text_color }};
-        border: 2px solid {{ block.settings.button_border_color }};
-      {% endif %}
-    }
-
-    .ai-luxury-video-hero-mobile-button-{{ ai_gen_id }}:hover {
-      {% if block.settings.button_style == 'solid' %}
-        background-color: {{ block.settings.button_hover_background_color }};
-        border-color: {{ block.settings.button_hover_background_color }};
-        color: {{ block.settings.button_hover_text_color }};
-      {% else %}
-        background-color: {{ block.settings.button_border_color }};
-        color: {{ block.settings.button_background_color }};
+        --cta-fill: transparent;
+        --cta-ink: {{ block.settings.button_text_color }};
+        --cta-edge: {{ block.settings.button_border_color }};
+        --cta-fill-hover: {{ block.settings.button_border_color }};
+        --cta-ink-hover: {{ block.settings.button_background_color }};
+        --cta-edge-hover: {{ block.settings.button_border_color }};
       {% endif %}
     }
   }

@@ -39,10 +39,16 @@
   }
   #shopify-section-{{ section.id }} .product-delivery__description { font-size: clamp(1.5rem, 1.3vw, 1.9rem); line-height: 1.55; }
   #shopify-section-{{ section.id }} .product-delivery__description p { margin: 0; }
+  /* The paint and the hover both come from assets/eden-actions.css, which names
+     .product-delivery__button in the one call-to-action family. This only says
+     which two colours the shared sweep crosses between.
+
+     The hover used to drop to `transparent`, leaving the section's grey ground
+     showing through; a fill that wipes in has to be a colour, so it swaps to
+     white and keeps the black outline. */
   #shopify-section-{{ section.id }} .product-delivery__button {
-    background: #000;
-    border: 1px solid #000;
-    color: #fff;
+    border-width: 1px;
+    border-style: solid;
     display: inline-block;
     font-size: 1.5rem;
     letter-spacing: .12em;
@@ -51,14 +57,12 @@
     padding: 13px 22px;
     text-decoration: none;
     text-transform: uppercase;
-    transition: background-color .2s ease, color .2s ease;
-  }
-  /* Black fill, then the same black as an outline. Fading the fill to 80% left a
-     light black sitting on the section's grey ground. */
-  #shopify-section-{{ section.id }} .product-delivery__button:hover,
-  #shopify-section-{{ section.id }} .product-delivery__button:focus-visible {
-    background: transparent;
-    color: #000;
+    --cta-fill: #000;
+    --cta-ink: #fff;
+    --cta-edge: #000;
+    --cta-fill-hover: #fff;
+    --cta-ink-hover: #000;
+    --cta-edge-hover: #000;
   }
   @media screen and (max-width: 749px) {
     #shopify-section-{{ section.id }} .product-delivery { margin-inline: 16px; padding: 28px 18px; }

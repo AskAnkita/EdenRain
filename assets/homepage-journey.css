@@ -196,42 +196,32 @@
 
 /* ------------------------------------------------------- merchant CTA colours
 
-   The section's button settings land here. Every property falls back to the
-   shared .eden-action token it would otherwise have used, so a colour left
-   cleared in the panel keeps the theme's own button, hover included. The
-   section selector is only here to out-specify .eden-action--solid. */
+   The section's button settings land here as the shared --cta-* pairs, so the
+   one hover sweep in eden-actions.css carries them; this file never writes a
+   :hover of its own. Every value falls back to the .eden-action token it would
+   otherwise have used, so a colour left cleared in the panel keeps the theme's
+   own button, hover included. The section selector is only here to out-specify
+   .eden-action--solid.
+
+   Where no hover colour is given the resting pair is simply swapped, which is
+   what the shared sweep needs: a fill that wipes in has to be an actual
+   colour, and "no fill" would leave nothing to see. */
 .homepage-journey .hj-cta { font-size: var(--hj-btn-size, var(--eden-action-font-size)); }
+
 .homepage-journey .hj-cta.eden-action--solid {
-  border-color: var(--hj-btn-border, var(--eden-action-ink));
-  background: var(--hj-btn-bg, var(--eden-action-ink));
-  color: var(--hj-btn-ink, var(--eden-action-on-ink));
+  --cta-fill: var(--hj-btn-bg, var(--eden-action-ink));
+  --cta-ink: var(--hj-btn-ink, var(--eden-action-on-ink));
+  --cta-edge: var(--hj-btn-border, var(--eden-action-ink));
+  --cta-fill-hover: var(--hj-btn-hover-bg, var(--hj-btn-ink, var(--eden-action-on-ink)));
+  --cta-ink-hover: var(--hj-btn-hover-ink, var(--hj-btn-bg, var(--eden-action-ink)));
+  --cta-edge-hover: var(--hj-btn-hover-border, var(--hj-btn-border, var(--eden-action-ink)));
 }
+
 .homepage-journey .hj-cta.eden-action--light {
-  border-color: var(--hj-btn-border, var(--eden-action-border-light));
-  background: var(--hj-btn-bg, transparent);
-  color: var(--hj-btn-ink, var(--eden-action-on-ink));
-}
-
-@media (hover: hover) {
-  .homepage-journey .hj-cta.eden-action--solid:hover {
-    border-color: var(--hj-btn-hover-border, var(--hj-btn-border, var(--eden-action-ink)));
-    background: var(--hj-btn-hover-bg, transparent);
-    color: var(--hj-btn-hover-ink, var(--eden-action-ink));
-  }
-  .homepage-journey .hj-cta.eden-action--light:hover {
-    border-color: var(--hj-btn-hover-border, var(--eden-action-on-ink));
-    background: var(--hj-btn-hover-bg, var(--eden-action-on-ink));
-    color: var(--hj-btn-hover-ink, var(--eden-action-ink));
-  }
-}
-
-.homepage-journey .hj-cta.eden-action--solid:focus-visible {
-  border-color: var(--hj-btn-hover-border, var(--hj-btn-border, var(--eden-action-ink)));
-  background: var(--hj-btn-hover-bg, transparent);
-  color: var(--hj-btn-hover-ink, var(--eden-action-ink));
-}
-.homepage-journey .hj-cta.eden-action--light:focus-visible {
-  border-color: var(--hj-btn-hover-border, var(--eden-action-on-ink));
-  background: var(--hj-btn-hover-bg, var(--eden-action-on-ink));
-  color: var(--hj-btn-hover-ink, var(--eden-action-ink));
+  --cta-fill: var(--hj-btn-bg, transparent);
+  --cta-ink: var(--hj-btn-ink, var(--eden-action-on-ink));
+  --cta-edge: var(--hj-btn-border, var(--eden-action-border-light));
+  --cta-fill-hover: var(--hj-btn-hover-bg, var(--eden-action-on-ink));
+  --cta-ink-hover: var(--hj-btn-hover-ink, var(--eden-action-ink));
+  --cta-edge-hover: var(--hj-btn-hover-border, var(--eden-action-on-ink));
 }

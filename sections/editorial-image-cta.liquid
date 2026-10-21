@@ -157,6 +157,9 @@
     margin: 0;
   }
 
+  /* The paint, the hover and the lift all come from assets/eden-actions.css,
+     which names .editorial-image-cta__button in the one call-to-action family.
+     This only says which two colours the shared sweep crosses between. */
   .editorial-image-cta__button {
     display: inline-flex;
     align-items: center;
@@ -165,9 +168,9 @@
     min-height: 64px;
     margin-top: 54px;
     padding: 16px 36px;
-    border: 2px solid currentColor;
+    border-width: 2px;
+    border-style: solid;
     border-radius: 999px;
-    color: inherit;
     font-family: var(--font-body--family);
     font-size: 15px;
     font-weight: 700;
@@ -176,13 +179,12 @@
     text-align: center;
     text-decoration: none;
     text-transform: uppercase;
-    transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
-  }
-
-  .editorial-image-cta__button:hover {
-    background: var(--editorial-text);
-    color: var(--editorial-background);
-    transform: translateY(-1px);
+    --cta-fill: transparent;
+    --cta-ink: var(--editorial-text);
+    --cta-edge: var(--editorial-text);
+    --cta-fill-hover: var(--editorial-text);
+    --cta-ink-hover: var(--editorial-background);
+    --cta-edge-hover: var(--editorial-text);
   }
 
   @media screen and (max-width: 989px) {

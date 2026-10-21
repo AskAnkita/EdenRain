@@ -328,7 +328,7 @@
     #fav-{{ section.id }} .fav-track {
       order: 35;
       margin-top: {{ section.settings.mobile_header_gap }}px;
-      grid-auto-columns: calc((100% - var(--fav-gap)) / {{ section.settings.per_row_mobile }});
+      grid-auto-columns: calc((100% - {{ section.settings.per_row_mobile | minus: 1 }} * var(--fav-gap)) / {{ section.settings.per_row_mobile }});
       {%- if section.settings.mobile_full_bleed and section.settings.page_padding_mobile > 0 %}
       /* The words keep the side padding; the pictures pull back out through it so the
          row runs edge to edge of the screen. */
@@ -337,12 +337,17 @@
     }
 
     /* Under the row by default: on a touch screen the pictures are swiped, so the
-       arrows are a hint rather than the main control and belong below them. */
+       arrows are a hint rather than the main control and belong below them - or they
+       go altogether, leaving the swipe as the only control. */
     #fav-{{ section.id }} .fav-arrows {
+    {%- if section.settings.show_arrows_mobile %}
       order: {% if section.settings.arrows_below_mobile %}40{% else %}30{% endif %};
       justify-self: center;
       gap: {{ section.settings.arrow_gap_mobile }}px;
       margin-top: {{ section.settings.mobile_arrow_gap }}px;
+    {%- else %}
+      display: none;
+    {%- endif %}
     }
 
     #fav-{{ section.id }} .fav-arrow {
@@ -577,6 +582,7 @@
 
     { "type": "header", "content": "Arrows" },
     { "type": "checkbox", "id": "show_arrows", "label": "Show the arrows", "default": true, "info": "The arrows hide themselves when there are too few panels to fill the row - there is nothing to scroll." },
+    { "type": "checkbox", "id": "show_arrows_mobile", "label": "Show the arrows on mobile", "default": true, "info": "Off: the row is swiped on a phone and the arrows are hidden below 990px." },
     { "type": "checkbox", "id": "loop_arrows", "label": "Loop at the ends", "default": false, "info": "On: the next arrow at the end of the row goes back to the first panel. Off: the row stops at the last panel and the arrow greys out." },
     { "type": "checkbox", "id": "show_progress", "label": "Show progress line under the arrows", "default": false },
     { "type": "range", "id": "arrow_size", "label": "Arrow size", "min": 20, "max": 64, "step": 2, "unit": "px", "default": 32 },

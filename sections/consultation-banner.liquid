@@ -54,6 +54,7 @@
   assign focal_x = section.settings.media_focal_x | default: 50
   assign focal_y = section.settings.media_focal_y | default: 50
   assign pad_inline = section.settings.padding_horizontal | plus: 0
+  assign pad_inline_mobile = section.settings.padding_horizontal_mobile | plus: 0
   assign pad_block = section.settings.padding_vertical | plus: 0
   assign pad_top = section.settings.padding_top | plus: 0
   assign pad_bottom = section.settings.padding_bottom | plus: 0
@@ -103,6 +104,7 @@
     --ecb-shell-max: {{ content_width }}px;
   {%- endif -%}
   {%- if pad_inline > 0 -%}--ecb-pad-inline: {{ pad_inline }}px;{%- endif -%}
+  {%- if pad_inline_mobile > 0 -%}--ecb-pad-inline-mobile: {{ pad_inline_mobile }}px;{%- endif -%}
   {%- if pad_block > 0 -%}--ecb-pad-block: {{ pad_block }}px;{%- endif -%}
   {%- if section.settings.custom_padding -%}--ecb-pad-top: {{ pad_top }}px;--ecb-pad-bottom: {{ pad_bottom }}px;--ecb-pad-top-mobile: {{ pad_top_mobile }}px;--ecb-pad-bottom-mobile: {{ pad_bottom_mobile }}px;{%- endif -%}
 {%- endcapture -%}
@@ -282,6 +284,7 @@
     { "type": "checkbox", "id": "full_width", "label": "Full width", "default": true },
     { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "Ignored when the box above is ticked." },
     { "type": "range", "id": "padding_horizontal", "label": "Side padding of the copy panel", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the default of 60px." },
+    { "type": "range", "id": "padding_horizontal_mobile", "label": "Side padding of the copy panel on mobile", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the default of 24px. The desktop setting above is too wide for a phone, so the panel uses this one below 750px." },
     { "type": "range", "id": "padding_vertical", "label": "Top and bottom padding of the copy panel", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the default of 60px." },
     { "type": "checkbox", "id": "custom_padding", "label": "Set the space above and below the band", "default": false },
     { "type": "range", "id": "padding_top", "label": "Space above the band", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 24 },

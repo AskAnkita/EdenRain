@@ -200,29 +200,28 @@
   justify-content: flex-start;
 }
 
-/* The hero's own two buttons, coloured from the schema. */
+/*
+  The hero's own two buttons, coloured from the schema and handed to the shared
+  sweep in eden-actions.css as the --cta-* pairs; nothing here writes a :hover.
+  The filled one used to drop to the photograph on hover, which gave the sweep
+  no colour to carry, so it swaps with its own ink instead.
+*/
 .about-page .ab-hero__button--primary {
-  border-color: var(--ab-hero-btn-bg, #ffffff);
-  background: var(--ab-hero-btn-bg, #ffffff);
-  color: var(--ab-hero-btn-ink, #171714);
+  --cta-fill: var(--ab-hero-btn-bg, #ffffff);
+  --cta-ink: var(--ab-hero-btn-ink, #171714);
+  --cta-edge: var(--ab-hero-btn-bg, #ffffff);
+  --cta-fill-hover: var(--ab-hero-btn-ink, #171714);
+  --cta-ink-hover: var(--ab-hero-btn-bg, #ffffff);
+  --cta-edge-hover: var(--ab-hero-btn-bg, #ffffff);
 }
 
 .about-page .ab-hero__button--secondary {
-  border-color: var(--ab-hero-btn2-ink, #ffffff);
-  background: transparent;
-  color: var(--ab-hero-btn2-ink, #ffffff);
-}
-
-@media (hover: hover) {
-  .about-page .ab-hero__button--primary:hover {
-    background: transparent;
-    color: var(--ab-hero-btn-bg, #ffffff);
-  }
-
-  .about-page .ab-hero__button--secondary:hover {
-    background: var(--ab-hero-btn2-ink, #ffffff);
-    color: var(--ab-hero-btn2-bg, #171714);
-  }
+  --cta-fill: transparent;
+  --cta-ink: var(--ab-hero-btn2-ink, #ffffff);
+  --cta-edge: var(--ab-hero-btn2-ink, #ffffff);
+  --cta-fill-hover: var(--ab-hero-btn2-ink, #ffffff);
+  --cta-ink-hover: var(--ab-hero-btn2-bg, #171714);
+  --cta-edge-hover: var(--ab-hero-btn2-ink, #ffffff);
 }
 
 /* --------------------------------------------------------------------- story */
@@ -589,27 +588,21 @@
 }
 
 .about-page .ab-cta__button--primary {
-  border-color: var(--ab-btn-bg, var(--ab-ink));
-  background: var(--ab-btn-bg, var(--ab-ink));
-  color: var(--ab-btn-ink, #ffffff);
+  --cta-fill: var(--ab-btn-bg, var(--ab-ink));
+  --cta-ink: var(--ab-btn-ink, #ffffff);
+  --cta-edge: var(--ab-btn-bg, var(--ab-ink));
+  --cta-fill-hover: var(--ab-btn-ink, #ffffff);
+  --cta-ink-hover: var(--ab-btn-bg, var(--ab-ink));
+  --cta-edge-hover: var(--ab-btn-bg, var(--ab-ink));
 }
 
 .about-page .ab-cta__button--secondary {
-  border-color: var(--ab-btn2-ink, var(--ab-ink));
-  background: transparent;
-  color: var(--ab-btn2-ink, var(--ab-ink));
-}
-
-@media (hover: hover) {
-  .about-page .ab-cta__button--primary:hover {
-    background: transparent;
-    color: var(--ab-btn-bg, var(--ab-ink));
-  }
-
-  .about-page .ab-cta__button--secondary:hover {
-    background: var(--ab-btn2-ink, var(--ab-ink));
-    color: var(--ab-btn2-bg, #ffffff);
-  }
+  --cta-fill: transparent;
+  --cta-ink: var(--ab-btn2-ink, var(--ab-ink));
+  --cta-edge: var(--ab-btn2-ink, var(--ab-ink));
+  --cta-fill-hover: var(--ab-btn2-ink, var(--ab-ink));
+  --cta-ink-hover: var(--ab-btn2-bg, #ffffff);
+  --cta-edge-hover: var(--ab-btn2-ink, var(--ab-ink));
 }
 
 /* ------------------------------------------------------- the page's own text */

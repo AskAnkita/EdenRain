@@ -64,7 +64,7 @@
 {%- endcapture -%}
 
 {%- capture media_html -%}
-  <div class="dsp-media">
+  <div class="dsp-media{% if section.settings.media_video_asset != blank %} dsp-media--video{% endif %}">
     {%- if section.settings.media_video_asset != blank -%}
       <dsp-video>
         <video

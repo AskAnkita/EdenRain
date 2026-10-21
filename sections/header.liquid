@@ -70,8 +70,18 @@
     render 'header-menu-snippet', header_settings: sec_stts, blocks: section.blocks, variant: 'mobile'
   endcapture
 
+  comment
+    The sticky toolbar at the foot of the page (sections/toolbar-mobile.liquid) already
+    carries Account, Cart and Wishlist on a phone, so the header's copies of them are
+    hidden there and the consultant link takes the space they leave.
+  endcomment
+  assign utility_mobile_class = ''
+  if sec_stts.hide_utilities_mobile != false
+    assign utility_mobile_class = 'max-md:hidden'
+  endif
+
   capture account
-    render 'header-account', sec_stts: sec_stts, custom_header_utility: sec_stts.custom_header_utility, header_utility_size: sec_stts.header_utility_size, header_utility_font: sec_stts.header_utility_font, header_utility_weight: sec_stts.header_utility_weight, header_utility_line_height: sec_stts.header_utility_line_height, header_utility_letter_spacing: sec_stts.header_utility_letter_spacing, header_utility_case: sec_stts.header_utility_case, header_utility_wrap: sec_stts.header_utility_wrap
+    render 'header-account', sec_stts: sec_stts, extra_class: utility_mobile_class, custom_header_utility: sec_stts.custom_header_utility, header_utility_size: sec_stts.header_utility_size, header_utility_font: sec_stts.header_utility_font, header_utility_weight: sec_stts.header_utility_weight, header_utility_line_height: sec_stts.header_utility_line_height, header_utility_letter_spacing: sec_stts.header_utility_letter_spacing, header_utility_case: sec_stts.header_utility_case, header_utility_wrap: sec_stts.header_utility_wrap
   endcapture
 
   capture account_mobile
@@ -79,12 +89,22 @@
   endcapture
 
   capture actions
-    render 'header-functions', sec_stts: sec_stts, blocks: section.blocks, enable_cart: true, enable_wishlist: settings.show_wishlist, custom_header_utility: sec_stts.custom_header_utility, header_utility_size: sec_stts.header_utility_size, header_utility_font: sec_stts.header_utility_font, header_utility_weight: sec_stts.header_utility_weight, header_utility_line_height: sec_stts.header_utility_line_height, header_utility_letter_spacing: sec_stts.header_utility_letter_spacing, header_utility_case: sec_stts.header_utility_case, header_utility_wrap: sec_stts.header_utility_wrap
+    render 'header-functions', sec_stts: sec_stts, blocks: section.blocks, extra_class: utility_mobile_class, enable_cart: true, enable_wishlist: settings.show_wishlist, custom_header_utility: sec_stts.custom_header_utility, header_utility_size: sec_stts.header_utility_size, header_utility_font: sec_stts.header_utility_font, header_utility_weight: sec_stts.header_utility_weight, header_utility_line_height: sec_stts.header_utility_line_height, header_utility_letter_spacing: sec_stts.header_utility_letter_spacing, header_utility_case: sec_stts.header_utility_case, header_utility_wrap: sec_stts.header_utility_wrap
   endcapture
 
   capture actions_mobile
     render 'header-functions', sec_stts: sec_stts, blocks: section.blocks, enable_cart: true, enable_wishlist: settings.show_wishlist, custom_header_utility: sec_stts.custom_header_utility, header_utility_size: sec_stts.header_utility_size, header_utility_font: sec_stts.header_utility_font, header_utility_weight: sec_stts.header_utility_weight, header_utility_line_height: sec_stts.header_utility_line_height, header_utility_letter_spacing: sec_stts.header_utility_letter_spacing, header_utility_case: sec_stts.header_utility_case, header_utility_wrap: sec_stts.header_utility_wrap, extra_class: 'lg:none'
   endcapture
+
+  comment
+    header-row pulls these two up into the top row on a phone when their own row is set to
+    "bottom". With the icons hidden on a phone there is nothing to pull up, so they are
+    emptied and the row stays as it is.
+  endcomment
+  if sec_stts.hide_utilities_mobile != false
+    assign account_mobile = ''
+    assign actions_mobile = ''
+  endif
 
   if shop.customer_accounts_enabled
     assign search_class = 'max-md:hidden'
@@ -1952,6 +1972,66 @@
         "label": "Show icon",
         "default": true,
         "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "checkbox",
+        "id": "hide_utilities_mobile",
+        "label": "Hide account and cart on mobile",
+        "info": "The sticky toolbar at the foot of the page already carries Account, Cart and Wishlist.",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "consultant_show_mobile",
+        "label": "Show on mobile",
+        "default": true,
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_mobile_display",
+        "label": "On mobile show",
+        "options": [
+          {
+            "value": "icon_text",
+            "label": "Icon and text"
+          },
+          {
+            "value": "icon",
+            "label": "Icon only"
+          },
+          {
+            "value": "text",
+            "label": "Text only"
+          }
+        ],
+        "default": "text",
+        "visible_if": "{{ section.settings.show_consultant and section.settings.consultant_show_mobile }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_mobile_font_size",
+        "label": "Size on mobile",
+        "options": [
+          {
+            "value": "1rem",
+            "label": "10px"
+          },
+          {
+            "value": "1.1rem",
+            "label": "11px"
+          },
+          {
+            "value": "1.2rem",
+            "label": "12px"
+          },
+          {
+            "value": "1.4rem",
+            "label": "14px"
+          }
+        ],
+        "default": "1rem",
+        "visible_if": "{{ section.settings.show_consultant and section.settings.consultant_show_mobile }}"
       },
       {
         "type": "select",

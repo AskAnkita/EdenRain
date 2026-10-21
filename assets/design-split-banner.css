@@ -256,6 +256,17 @@ dsp-video { display: contents; }
     object-fit: contain;
   }
 
+  /* The film is square. In a 1.45:1 letterbox it can only be as wide as the box is
+     tall, so it sat about two thirds of the way across the screen with white either
+     side. Giving the box the film's own shape on a phone lets it run the full width
+     of the row, matching the picture rows above and below it. */
+  .dsp-media--video,
+  .ds-split--full-width .dsp-media--video,
+  .dsp-media--video .dsp-media__video,
+  .dsp-media--video .dsp-media__poster {
+    aspect-ratio: 1 / 1;
+  }
+
   .dsp-media img { object-position: 62% 45%; }
   .dsp-content { padding: 32px clamp(4px, 3vw, 24px) 8px; }
 }

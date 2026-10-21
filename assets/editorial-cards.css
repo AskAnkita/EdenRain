@@ -279,23 +279,12 @@
 */
 .editorial-cards .eg-cta__button {
   flex-shrink: 0;
-  border-color: var(--eg-btn-bg, var(--eg-ink));
-  background: transparent;
-  color: var(--eg-btn-bg, var(--eg-ink));
-}
-
-@media (hover: hover) {
-  .editorial-cards .eg-cta__button:hover {
-    border-color: var(--eg-btn-bg, var(--eg-ink));
-    background: var(--eg-btn-bg, var(--eg-ink));
-    color: var(--eg-btn-ink, #ffffff);
-  }
-}
-
-.editorial-cards .eg-cta__button:focus-visible {
-  border-color: var(--eg-btn-bg, var(--eg-ink));
-  background: var(--eg-btn-bg, var(--eg-ink));
-  color: var(--eg-btn-ink, #ffffff);
+  --cta-fill: transparent;
+  --cta-ink: var(--eg-btn-bg, var(--eg-ink));
+  --cta-edge: var(--eg-btn-bg, var(--eg-ink));
+  --cta-fill-hover: var(--eg-btn-bg, var(--eg-ink));
+  --cta-ink-hover: var(--eg-btn-ink, #ffffff);
+  --cta-edge-hover: var(--eg-btn-bg, var(--eg-ink));
 }
 
 /* ------------------------------------------------------------- breakpoints */
@@ -1352,24 +1341,21 @@
   justify-content: flex-start;
 }
 
+/*
+  The banner sits on a photograph, so the hover fill has to be a colour of its
+  own: dropping to the picture, which is what this used to do, gave the shared
+  sweep nothing to wipe across and left the label unreadable half way through.
+  The resting pair is swapped instead, which holds its contrast whatever the
+  art behind it is doing.
+*/
 .editorial-cards .eg-banner__button {
   margin-top: 2.8rem;
-  border-color: var(--eg-banner-btn-bg, #ffffff);
-  background: var(--eg-banner-btn-bg, #ffffff);
-  color: var(--eg-banner-btn-ink, #171714);
-}
-
-@media (hover: hover) {
-  .editorial-cards .eg-banner__button:hover {
-    border-color: var(--eg-banner-btn-bg, #ffffff);
-    background: transparent;
-    color: var(--eg-banner-btn-bg, #ffffff);
-  }
-}
-
-.editorial-cards .eg-banner__button:focus-visible {
-  background: transparent;
-  color: var(--eg-banner-btn-bg, #ffffff);
+  --cta-fill: var(--eg-banner-btn-bg, #ffffff);
+  --cta-ink: var(--eg-banner-btn-ink, #171714);
+  --cta-edge: var(--eg-banner-btn-bg, #ffffff);
+  --cta-fill-hover: var(--eg-banner-btn-ink, #171714);
+  --cta-ink-hover: var(--eg-banner-btn-bg, #ffffff);
+  --cta-edge-hover: var(--eg-banner-btn-bg, #ffffff);
 }
 
 @media screen and (max-width: 749px) {

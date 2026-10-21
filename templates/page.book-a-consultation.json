@@ -14,21 +14,11 @@
             "icon": "virtual"
           }
         },
-        "showroom": {
-          "type": "meeting",
-          "settings": {
-            "label": "Showroom visit",
-            "meta": "60 minutes, in person",
-            "text": "See the stones and the settings in daylight, try the shapes on your hand, and leave knowing exactly what you are commissioning.",
-            "booking_link": "",
-            "icon": "showroom"
-          }
-        },
         "designer": {
           "type": "meeting",
           "settings": {
             "label": "Speak with a designer",
-            "meta": "45 minutes, video or in person",
+            "meta": "45 minutes, by video",
             "text": "For a bespoke piece or a reset: bring the idea, however rough, and we will draw it with you.",
             "booking_link": "",
             "icon": "in-person"
@@ -64,16 +54,6 @@
             "link": ""
           }
         },
-        "contact_email": {
-          "type": "contact",
-          "settings": {
-            "icon": "email",
-            "label": "Email",
-            "value": "hello@edenraine.co.uk",
-            "note": "We reply the same working day",
-            "link": ""
-          }
-        },
         "contact_instagram": {
           "type": "contact",
           "settings": {
@@ -87,18 +67,16 @@
       },
       "block_order": [
         "virtual",
-        "showroom",
         "designer",
         "phone_call",
         "contact_phone",
         "contact_whatsapp",
-        "contact_email",
         "contact_instagram"
       ],
       "settings": {
         "eyebrow": "Private appointments",
         "heading": "Book an appointment",
-        "text": "<p>Meet one to one with an Eden Raine jewellery specialist, in our showroom or by video call. Pick a time that suits you and your confirmation arrives by email.<\/p>",
+        "text": "<p>Meet one to one with an Eden Raine jewellery specialist, by video call or telephone. Pick a time that suits you and your confirmation arrives by email.<\/p>",
         "button_label": "Book an appointment",
         "smallprint": "Free, and never any obligation to buy.",
         "link_label": "Prefer to write to us?",

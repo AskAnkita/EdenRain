@@ -199,16 +199,42 @@ if (!customElements.get('consultation-booking')) {
 
         this.setupRequest();
 
-        // Coming back from a posted contact form, the dialog reopens on the thank-you message
-        // rather than leaving the visitor looking at the page wondering whether it sent.
-        const posted =
-          this.dataset.posted === 'true' ||
-          new URLSearchParams(window.location.search).get('contact_posted') === 'true';
-        if (posted) {
-          this.open(this.openers[0] || null, { silent: true });
+        /*
+          What the server made of the last request. Shopify answers a contact form with a new
+          page, so its answer is markup inside the form rather than something this script was
+          handed: a success note, or the reason it was refused. Both are read here, and the
+          query string is only one way of three to learn that something was sent - the way back
+          from /contact is Shopify's to choose, and behind a password gate or a redirect rule it
+          need not carry the flag.
+        */
+        const flagged = new URLSearchParams(window.location.search).get('contact_posted') === 'true';
+        const serverSaid = this.querySelector('[data-booking-posted]');
+        const serverErrors = this.querySelector('[data-booking-errors]');
+
+        if (serverSaid || flagged || this.dataset.posted === 'true') {
+          // Coming back from a posted contact form, the dialog reopens on the thank-you message
+          // rather than leaving the visitor looking at the page wondering whether it sent.
+          this.clearStash();
+          this.reopenOnRequest();
           // The slow path has come back: the request did go, so show the thank-you in the
           // place the form was rather than the form again under it.
           this.requestSent();
+        } else if (serverErrors) {
+          /*
+            And the other answer. A malformed address, a failed bot check, a shop having a bad
+            morning: Shopify sends the visitor back here with the reason rendered inside the
+            form, and the form is inside a dialog that is shut. Without this the page simply
+            reloads and the Send appears to have done nothing at all. So the dialog reopens, the
+            reason is said out loud where the dialog always speaks, and the day and time are put
+            back - a refused request is something to correct, not something to make twice.
+          */
+          this.reopenOnRequest();
+          this.restoreStash();
+          const reason = serverErrors.textContent.trim();
+          // Said once. The copy in the form would be a second voice saying the same thing, and
+          // it is about to be hidden behind the thank-you's place anyway.
+          serverErrors.remove();
+          this.setStatus(reason || this.statusEl?.dataset.error, 'error');
         }
       }
 
@@ -300,6 +326,99 @@ if (!customElements.get('consultation-booking')) {
 
         const first = this.dialog.querySelector('[data-booking-close]');
         first?.focus({ preventScroll: true });
+      }
+
+      /*
+        Back on the request panel with the dialog open, however the visitor arrived here. The
+        kind of appointment they had chosen is put back first, so what reopens is the dialog
+        they left rather than the first one in the row - and the request panel is what shows,
+        never the provider's diary, because an answer to our own form belongs on our own form.
+      */
+      reopenOnRequest() {
+        const stash = this.readStash();
+        const trigger =
+          (stash && this.switches.find((button) => button.dataset.bookingLabel === stash.label)) ||
+          this.switches[0] ||
+          null;
+
+        if (trigger) {
+          const label = trigger.dataset.bookingLabel || '';
+          const meta = trigger.dataset.bookingMeta || '';
+          if (label && this.titleEl) this.titleEl.textContent = label;
+          if (this.eyebrowEl) this.eyebrowEl.textContent = meta || this.eyebrowEl.dataset.default || '';
+          if (this.typeField && label) this.typeField.value = meta ? `${label} (${meta})` : label;
+          this.switches.forEach((button) => button.setAttribute('aria-pressed', String(button === trigger)));
+        }
+
+        this.showRequest();
+        this.openDialog();
+      }
+
+      /*
+        Shopify's answer is a new page, and a new page takes the chosen day and time with it: the
+        hidden field comes back empty and the calendar comes back blank. Holding them over the
+        round trip is the difference between correcting a request and making it again.
+      */
+      get stashKey() {
+        return `ebk-request-${this.dataset.sectionId || 'booking'}`;
+      }
+
+      stashChoice() {
+        try {
+          sessionStorage.setItem(
+            this.stashKey,
+            JSON.stringify({
+              date: this.chosenDate || '',
+              slot: this.chosenSlot || '',
+              label:
+                this.switches.find((button) => button.getAttribute('aria-pressed') === 'true')?.dataset.bookingLabel ||
+                '',
+            })
+          );
+        } catch (error) {
+          // Storage switched off, or a private window: the round trip loses the choice, which is
+          // what it did before any of this, not something worse.
+        }
+      }
+
+      readStash() {
+        try {
+          const raw = sessionStorage.getItem(this.stashKey);
+          return raw ? JSON.parse(raw) : null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      clearStash() {
+        try {
+          sessionStorage.removeItem(this.stashKey);
+        } catch (error) {
+          // Nothing was written, so there is nothing to clear.
+        }
+      }
+
+      restoreStash() {
+        const stash = this.readStash();
+        if (!stash || !stash.date) return;
+
+        const [year, month, day] = stash.date.split('-').map(Number);
+        if (!year || !month || !day) return;
+
+        const date = new Date(year, month - 1, day);
+        // A refused request can be corrected the next morning, by which time the day they chose
+        // may have fallen inside the lead time, or gone altogether.
+        if (date < this.firstDay || date > this.lastDay) return;
+        if (!this.openDays.includes(date.getDay())) return;
+
+        this.viewMonth = new Date(year, month - 1, 1);
+        this.chooseDate(date);
+
+        if (stash.slot && this.slotTimes.includes(stash.slot)) {
+          this.chosenSlot = stash.slot;
+          this.renderSlots();
+          this.updateChosen();
+        }
       }
 
       closeDialog() {
@@ -739,6 +858,7 @@ if (!customElements.get('consultation-booking')) {
         }
 
         this.sending = true;
+        this.stashChoice();
         this.setStatus(this.statusEl?.dataset.sending, 'pending');
       }
 

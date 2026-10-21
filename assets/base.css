@@ -21522,6 +21522,59 @@ footer.section-footer .email-signup__input {
   height: 100%;
 }
 
+/* On a phone the account and cart icons leave the header - the sticky toolbar at
+   the foot of the page carries them - and the chip takes that space. It is not a
+   button there: no fill, no border, just the words in the header's own small caps,
+   set to the right of the logo. The icon and the words can each be switched off
+   from the section's settings. */
+@media screen and (max-width: 1024px) {
+  #header-component .header-consultant,
+  #header-component .header-consultant:hover {
+    gap: 0.6rem;
+    min-height: 44px;
+    margin-inline-end: 0;
+    padding: 0.4rem 0;
+    background-color: transparent;
+    border-width: 0;
+    font-size: var(--consultant-font-size-mobile, 1rem);
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    /* Only wraps where the logo leaves it no room, and then onto two even lines. */
+    white-space: normal;
+    text-wrap: balance;
+    text-align: end;
+  }
+
+  /* The mobile header is a fixed five-track grid (two slots each side of the logo).
+     Account and cart held the two on the right, so the chip takes both of them
+     rather than auto-placing into one 44px slot and spilling past the edge. */
+  #header-component .header__columns .header-consultant {
+    grid-row: 1;
+    grid-column: rightA-start / rightB-end;
+    justify-self: end;
+    padding-inline-end: 1.2rem;
+  }
+
+  #header-component .header-consultant--m-icon .header-consultant__text,
+  #header-component .header-consultant--m-text .header-consultant__icon {
+    display: none;
+  }
+
+  #header-component .header-consultant__icon {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+}
+
+/* From tablet width there is room for the words on one line; the chip reaches
+   left into the empty space beside the logo rather than wrapping. */
+@media screen and (min-width: 600px) and (max-width: 1024px) {
+  #header-component .header-consultant {
+    white-space: nowrap;
+  }
+}
+
 /* The chip is wider than an icon, so the right column needs a little more air
    between it and the account icon that follows. */
 #header-component .header__column--right .header-consultant {
@@ -21652,21 +21705,44 @@ footer.section-footer .email-signup__input {
     justify-content: flex-start;
     gap: 0;
     height: 100%;
+    /* The pill used to take its height from the thumbnail's own padding. The
+       thumbnail now fills its cell instead, so the height is set here and the
+       cell stretches to it. This rule also catches the label's own content
+       row, which is why the cell stretches with align-self rather than this
+       being align-items: stretch — that would un-centre the label. */
+    min-height: 4.8rem;
   }
 
   /* The thumbnail keeps its own cell, divided off from the label the way the
-     desktop pill divides them. A blanket mobile rule further up pins every
-     group-block icon image to 42 x 42 with !important, so the thumbnail has
-     to outrank it. */
+     desktop pill divides them. The image fills that cell edge to edge: no
+     padding around it, and no gap between it and the pill's own border.
+     The divider is the same hairline the pill is drawn with in
+     collection-style-row.css, not --color-border-rgb: that token is #999 here
+     and reads as a dark bar between the two halves of a pill whose own border
+     is #eee. */
   .multicolumn--compact-mobile .grid__item .icon-block {
     flex: 0 0 auto;
-    padding: 0.6rem;
-    border-inline-end: 1px solid rgb(var(--color-border-rgb) / 1);
+    align-self: stretch;
+    width: 4.8rem;
+    padding: 0;
+    overflow: hidden;
+    border-inline-end: 1px solid #eee;
+  }
+
+  /* The media sits in an inline span sized from --size-style-width; here the
+     cell sets the size instead. A blanket mobile rule further up pins every
+     group-block icon image to 42 x 42 with !important, so the thumbnail has
+     to outrank it. */
+  .multicolumn--compact-mobile .grid__item .icon-block--size-style {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
   .multicolumn--compact-mobile .grid__item .icon-block--size-style img {
-    width: 3.6rem !important;
-    height: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
   }
 
   .multicolumn--compact-mobile .grid__item .icon-block + .group-block {

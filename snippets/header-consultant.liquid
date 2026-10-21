@@ -2,8 +2,9 @@
   Renders the "Meet a Consultant" chip that sits in the header's utility row,
   before the account / wishlist / cart icons.
 
-  Everything about it (label, link, icon, type, colours, border) is a setting on
-  the header section, so it can be edited in Theme editor > Header > Consultant.
+  Everything about it (label, link, icon, type, colours, border, and how it is
+  drawn on a phone) is a setting on the header section, so it can be edited in
+  Theme editor > Header > Consultant.
 
   Accepts:
   - sec_stts: {Object} section.settings
@@ -17,6 +18,16 @@
   assign label = sec_stts.consultant_text | strip
   assign link = sec_stts.consultant_link | default: '/pages/book-a-consultation'
   assign extra_class = extra_class | default: '' | strip
+
+  # Account and cart leave the header on a phone (the sticky toolbar carries them),
+  # and the chip takes the two slots they held. It is shown there only when they have
+  # gone, since the mobile header has no room for both, and can be drawn as the icon
+  # alone, the words alone, or both.
+  assign mobile_class = 'max-md:hidden'
+  if sec_stts.consultant_show_mobile != false and sec_stts.hide_utilities_mobile != false
+    assign mobile_display = sec_stts.consultant_mobile_display | default: 'text'
+    assign mobile_class = 'header-consultant--m-' | append: mobile_display
+  endif
 -%}
 
 {%- if sec_stts.show_consultant and label != blank -%}
@@ -30,10 +41,11 @@
     {% if sec_stts.consultant_hover_text_color != blank %}--consultant-color-hover: {{ sec_stts.consultant_hover_text_color }};{% endif %}
     {% if sec_stts.consultant_border_color != blank %}--consultant-border-color: {{ sec_stts.consultant_border_color }};{% endif %}
     --consultant-border-width: {{ sec_stts.consultant_border_width | default: 0 }}px;
+    --consultant-font-size-mobile: {{ sec_stts.consultant_mobile_font_size | default: '1rem' }};
   {%- endcapture -%}
 
   <a
-    class="header-consultant max-md:hidden{% if extra_class != blank %} {{ extra_class }}{% endif %}"
+    class="header-consultant {{ mobile_class }}{% if extra_class != blank %} {{ extra_class }}{% endif %}"
     {% if link != blank %}
       href="{{ link }}"
     {% else %}

@@ -321,3 +321,47 @@
   padding-inline: 0;
   margin-inline: 0;
 }
+
+/* ------------------------------------------------------------------
+   "Meet a Consultant"
+   The chip in the desktop header is hidden on a phone, so the drawer
+   carries the same link at its foot, above Wish lists and drawn the
+   same way: icon, then the words, no fill behind them.
+   ------------------------------------------------------------------ */
+.mnav__consultant {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: var(--gap-lg, 1.2rem);
+  padding: var(--padding-sm, 0.8rem) 0;
+  color: var(--mnav-consultant-color, var(--color-foreground));
+  font-family: var(--font-body--family);
+  font-size: var(--mnav-consultant-size, var(--button-font-size-link, var(--font-size--sm)));
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.mnav__consultant:hover,
+.mnav__consultant:focus-visible {
+  color: var(--mnav-consultant-color-hover, var(--mnav-consultant-color, var(--color-foreground)));
+}
+
+.mnav__consultant-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: var(--size-24, 2.4rem);
+  height: var(--size-24, 2.4rem);
+  color: var(--mnav-consultant-icon-color, currentColor);
+}
+
+.mnav__consultant-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Wish lists keeps its own 2rem of air above it; with the consultant link
+   directly over it the two rows read as one group instead. */
+.mnav__consultant + .menu-drawer__utility-links {
+  padding-block-start: 0;
+}

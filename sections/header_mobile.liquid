@@ -269,6 +269,40 @@
                   </ul>
                 </nav>
                 <div class="mnav__utility">
+                  {%- comment -%}
+                    The desktop header carries a "Meet a Consultant" chip; the drawer is the
+                    only place that link exists on a phone, so it sits at the foot of the
+                    drawer beside Wish lists, drawn the same way: icon, then the words.
+                  {%- endcomment -%}
+                  {%- liquid
+                    assign consultant_label = section.settings.consultant_text | default: 'Meet a Consultant' | strip
+                    assign consultant_link = section.settings.consultant_link | default: '/pages/book-a-consultation'
+                    assign consultant_size = section.settings.consultant_font_size
+                    if consultant_size == 'auto'
+                      assign consultant_size = blank
+                    endif
+                  -%}
+                  {%- if section.settings.show_consultant != false and consultant_label != blank -%}
+                    {%- capture consultant_styles -%}
+                      {%- if consultant_size != blank -%}--mnav-consultant-size: {{ consultant_size }};{%- endif -%}
+                      {%- if section.settings.consultant_text_color != blank -%}--mnav-consultant-color: {{ section.settings.consultant_text_color }};{%- endif -%}
+                      {%- if section.settings.consultant_hover_text_color != blank -%}--mnav-consultant-color-hover: {{ section.settings.consultant_hover_text_color }};{%- endif -%}
+                      {%- if section.settings.consultant_icon_color != blank -%}--mnav-consultant-icon-color: {{ section.settings.consultant_icon_color }};{%- endif -%}
+                    {%- endcapture -%}
+                    {%- assign consultant_styles = consultant_styles | strip_newlines | strip -%}
+                    <a
+                      class="mnav__consultant"
+                      href="{{ consultant_link }}"
+                      {% if consultant_styles != blank %}style="{{ consultant_styles }}"{% endif %}
+                    >
+                      {%- if section.settings.consultant_show_icon != false -%}
+                        <span class="mnav__consultant-icon svg-wrapper" aria-hidden="true">
+                          {{- 'icon-consultant.svg' | inline_asset_content -}}
+                        </span>
+                      {%- endif -%}
+                      <span class="mnav__consultant-text">{{ consultant_label }}</span>
+                    </a>
+                  {%- endif -%}
                   {%- render 'menu-drawer-utility', sec_settings: section.settings -%}
                 </div>
               </div>
@@ -370,6 +404,84 @@
       "label": "t:settings.width",
       "default": 50,
       "visible_if": "{{ section.settings.show_image_sub_menu == true }}"
+    },
+    {
+      "type": "header",
+      "content": "Consultant"
+    },
+    {
+      "type": "paragraph",
+      "content": "The \"Meet a Consultant\" call to action at the foot of the mobile menu. The desktop chip is set separately, under Header."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_consultant",
+      "label": "Show consultant link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "consultant_text",
+      "label": "Text",
+      "default": "Meet a Consultant",
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "url",
+      "id": "consultant_link",
+      "label": "Link",
+      "info": "Defaults to the booking page (\/pages\/book-a-consultation) when left empty.",
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "consultant_show_icon",
+      "label": "Show icon",
+      "default": true,
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "select",
+      "id": "consultant_font_size",
+      "label": "Size",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Match Wish lists"
+        },
+        {
+          "value": "1.3rem",
+          "label": "13px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        }
+      ],
+      "default": "auto",
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "color",
+      "id": "consultant_text_color",
+      "label": "Text",
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "color",
+      "id": "consultant_hover_text_color",
+      "label": "Text on hover",
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "color",
+      "id": "consultant_icon_color",
+      "label": "Icon",
+      "visible_if": "{{ section.settings.show_consultant and section.settings.consultant_show_icon }}"
     },
     {
       "type": "header",

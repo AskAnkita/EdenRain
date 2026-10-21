@@ -259,15 +259,10 @@
   text-align: left;
 }
 
-/* The solid button sits on a photograph here, where the shared hover - drop
-   the fill, keep the ink - leaves white-on-light text. Invert to a white fill
-   with ink text instead, which holds its contrast whatever the art does. */
-.ds-builder__frame--fallback .eden-action--solid:hover,
-.ds-builder__frame--fallback .eden-action--solid:focus-visible {
-  border-color: var(--eden-action-on-ink, #ffffff);
-  background: var(--eden-action-on-ink, #ffffff);
-  color: var(--eden-action-ink, #171714);
-}
+/* The solid button sits on a photograph here. It used to need its own hover,
+   because the shared one dropped the fill and left white-on-light text; the
+   shared sweep now brings a white fill with ink text across, which is exactly
+   what this rule was for, so there is nothing left to override. */
 
 .ds-builder__aside {
   margin: 14px 0 0;

@@ -407,12 +407,19 @@
               {%- form 'contact', id: request_form_id, class: 'ebk-form' -%}
                 <input type="hidden" name="return_to" value="{{ request.path }}?contact_posted=true">
 
+                {%- comment -%}
+                  Shopify answers a contact form with a new page, not with JSON, so both of its
+                  answers arrive as markup in here. They are marked so the script can find them
+                  and say them in the one place the dialog speaks, because a form inside a shut
+                  dialog is a message nobody reads - which is what a Send that appears to do
+                  nothing actually is.
+                {%- endcomment -%}
                 {%- if form.posted_successfully? -%}
-                  <p class="ebk-form__message">{{ section.settings.success_text | default: 'Thank you - your request is with us. We will confirm the time by email shortly.' | escape }}</p>
+                  <p class="ebk-form__message" data-booking-posted>{{ section.settings.success_text | default: 'Thank you - your request is with us. We will confirm the time by email shortly.' | escape }}</p>
                 {%- endif -%}
 
                 {%- if form.errors -%}
-                  <p class="ebk-form__message ebk-form__message--error">{{ form.errors | default_errors }}</p>
+                  <p class="ebk-form__message ebk-form__message--error" data-booking-errors>{{ form.errors | default_errors }}</p>
                 {%- endif -%}
 
                 <p class="ebk-chosen" data-booking-chosen data-prefix="{{ section.settings.chosen_prefix | default: 'You have asked for' | escape }}" hidden></p>
@@ -422,12 +429,12 @@
 
                 <div class="ebk-field">
                   <label for="ebk-name-{{ section.id }}">{{ section.settings.name_label | default: 'Name' | escape }}</label>
-                  <input id="ebk-name-{{ section.id }}" type="text" name="contact[name]" autocomplete="name" required value="{% if customer %}{{ customer.name | escape }}{% endif %}">
+                  <input id="ebk-name-{{ section.id }}" type="text" name="contact[name]" autocomplete="name" required value="{% if form.name %}{{ form.name | escape }}{% elsif customer %}{{ customer.name | escape }}{% endif %}">
                 </div>
 
                 <div class="ebk-field">
                   <label for="ebk-email-{{ section.id }}">{{ section.settings.email_label | default: 'Email' | escape }}</label>
-                  <input id="ebk-email-{{ section.id }}" type="email" name="contact[email]" autocomplete="email" required value="{% if customer %}{{ customer.email | escape }}{% endif %}">
+                  <input id="ebk-email-{{ section.id }}" type="email" name="contact[email]" autocomplete="email" required value="{% if form.email %}{{ form.email | escape }}{% elsif customer %}{{ customer.email | escape }}{% endif %}">
                 </div>
 
                 {%- comment -%}
@@ -444,7 +451,7 @@
 
                 <div class="ebk-field">
                   <label for="ebk-body-{{ section.id }}">{{ section.settings.message_label | default: 'What would you like to talk about?' | escape }}</label>
-                  <textarea id="ebk-body-{{ section.id }}" name="contact[body]"></textarea>
+                  <textarea id="ebk-body-{{ section.id }}" name="contact[body]">{{ form.body }}</textarea>
                 </div>
 
                 <button type="submit" class="eden-action eden-action--{{ section.settings.button_style }}">
@@ -499,7 +506,7 @@
     { "type": "header", "content": "Hero" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Private appointments" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Book an appointment" },
-    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Meet one to one with an Eden Raine jewellery specialist, in our showroom or by video call. Pick a time that suits you and your confirmation arrives by email.<\/p>" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Meet one to one with an Eden Raine jewellery specialist, by video call or telephone. Pick a time that suits you and your confirmation arrives by email.<\/p>" },
     { "type": "text", "id": "button_label", "label": "Button label", "default": "Book an appointment" },
     { "type": "text", "id": "smallprint", "label": "Line under the button", "default": "Free, and never any obligation to buy." },
     { "type": "text", "id": "link_label", "label": "Link beside the button", "default": "Prefer to write to us?" },
@@ -517,7 +524,7 @@
     { "type": "richtext", "id": "contact_text", "label": "Text", "default": "<p>No appointment needed. We answer Monday to Saturday, and usually within a few hours.<\/p>" },
 
     { "type": "header", "content": "The diary" },
-    { "type": "paragraph", "content": "The appointment itself is kept by a scheduling provider. Paste the link for each way to meet into its block below - a Cal.com event link looks like cal.com\/eden-raine\/showroom-visit. The Google Meet or Zoom link is set on the event type in the provider's own admin, and goes out with the confirmation." },
+    { "type": "paragraph", "content": "The appointment itself is kept by a scheduling provider. Paste the link for each way to meet into its block below - a Cal.com event link looks like cal.com\/eden-raine\/virtual-consultation. The Google Meet or Zoom link is set on the event type in the provider's own admin, and goes out with the confirmation." },
     {
       "type": "select",
       "id": "provider",
@@ -737,11 +744,9 @@
       "name": "Consultation booking",
       "blocks": [
         { "type": "meeting", "settings": { "icon": "virtual", "label": "Virtual consultation", "meta": "30 minutes, by video", "text": "A one to one call with a specialist, wherever you are." } },
-        { "type": "meeting", "settings": { "icon": "showroom", "label": "Showroom visit", "meta": "60 minutes, in person", "text": "See and try the pieces in person, with a specialist beside you." } },
-        { "type": "meeting", "settings": { "icon": "in-person", "label": "Speak with a designer", "meta": "45 minutes, video or in person", "text": "For a bespoke piece or a reset: bring the idea and we will draw it with you." } },
+        { "type": "meeting", "settings": { "icon": "in-person", "label": "Speak with a designer", "meta": "45 minutes, by video", "text": "For a bespoke piece or a reset: bring the idea and we will draw it with you." } },
         { "type": "contact", "settings": { "icon": "phone", "label": "Call us", "value": "+44 (0) 203 554 887" } },
         { "type": "contact", "settings": { "icon": "whatsapp", "label": "WhatsApp", "value": "+44 203 554 887" } },
-        { "type": "contact", "settings": { "icon": "email", "label": "Email", "value": "hello@edenraine.co.uk" } },
         { "type": "contact", "settings": { "icon": "instagram", "label": "Instagram", "value": "@edenraine" } }
       ]
     }
