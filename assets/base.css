@@ -6419,7 +6419,26 @@ a {
     color var(--animation-speed) var(--animation-easing);
 
   @media screen and (min-width: 1025px) {
-    &:not(.button, .button-secondary, .eden-action, .eden-link):hover {
+    /* The call-to-action families in eden-actions.css are excluded by name. That file paints
+       their hover label from --cta-ink-hover at (0,2,0); this rule scores (0,2,1), so without
+       the exclusion it quietly wins and every <a> CTA in the shop hovers to the scheme's
+       primary_hover instead of the colour its own tokens name - grey text on the hero's black
+       fill, where #fff was asked for. Keep this list in step with the selector families there. */
+    &:not(
+        .button,
+        .button-secondary,
+        .eden-action,
+        .eden-link,
+        .pc-button,
+        .gifting-banner__button,
+        .editorial-image-cta__button,
+        .product-delivery__button,
+        .signature-editorial__button-label,
+        .signature-editorial__button-icon,
+        .menu-drawer-desktop__button,
+        [class*='ai-luxury-video-hero-button-'],
+        [class*='ai-luxury-video-hero-mobile-button-']
+      ):hover {
       color: var(--color-primary-hover);
     }
   }

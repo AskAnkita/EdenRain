@@ -1261,26 +1261,33 @@ a.menu-drawer-desktop__group-heading:hover {
   opacity: 1;
 }
 
+/* The shape only. The paint and the hover come from eden-actions.css, which sweeps the fill
+   across from the left edge; this rule names the three --cta-* pairs and nothing else, the way
+   every other call to action in the shop does. It used to carry a 0.2s background cross-fade of
+   its own, which made the panel the one place where a button did not move with the rest.
+
+   No border-color, color or background-color here: this file loads after eden-actions.css, so a
+   colour written at this specificity would win over the sweep's resting paint rather than hand
+   it over. Width and style only, and the three pairs below do the painting. */
 .menu-drawer-desktop__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 1.2rem 2.4rem;
-  border: 1px solid #000;
-  color: #000;
+  border-width: 1px;
+  border-style: solid;
   font-size: 1.2rem;
   letter-spacing: 0.16em;
   line-height: 1.2;
   text-align: center;
   text-transform: uppercase;
   text-decoration: none;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.menu-drawer-desktop__button:hover {
-  background-color: #000;
-  border-color: #000;
-  color: #fff;
+  --cta-fill: transparent;
+  --cta-ink: #000;
+  --cta-edge: #000;
+  --cta-fill-hover: #000;
+  --cta-ink-hover: #fff;
+  --cta-edge-hover: #000;
 }
 
 /* ---------- Promo half: the picture, with the words over its foot ---------- */
@@ -1410,17 +1417,14 @@ a.menu-drawer-desktop__group-heading:hover {
   /* Tighter than the panel's other buttons: at the shared tracking "Start with a setting" wrapped
      onto two lines in half of the picture's width. */
   padding: 1.2rem 0.8rem;
-  border-color: rgba(255, 255, 255, 0.85);
-  color: #fff;
   font-size: 1.1rem;
   letter-spacing: 0.12em;
   white-space: nowrap;
-}
-
-.menu-drawer-desktop__button--on-image:hover {
-  background-color: #fff;
-  border-color: #fff;
-  color: #111;
+  --cta-ink: #fff;
+  --cta-edge: rgba(255, 255, 255, 0.85);
+  --cta-fill-hover: #fff;
+  --cta-ink-hover: #111;
+  --cta-edge-hover: #fff;
 }
 
 /* The second picture's one word is an outlined button, the same one the promo beside it carries
@@ -1433,13 +1437,9 @@ a.menu-drawer-desktop__group-heading:hover {
   width: 100%;
 }
 
-/* The tile is the hit area, so the button inverts on a hover anywhere over the picture rather
-   than on the words alone. */
-.menu-drawer-desktop__promo--secondary:hover .menu-drawer-desktop__promo-label {
-  background-color: #fff;
-  border-color: #fff;
-  color: #111;
-}
+/* The tile is the hit area, so the button fills on a hover anywhere over the picture rather than
+   on the words alone. That is what .eden-action-host on the anchor does - see eden-actions.css -
+   so there is no hover rule here. */
 
 /* Wide screens only. The browse half takes exactly what its four columns need and the pictures
    take the rest of the row, up to a ceiling of their own: past it the pair runs wider than it
@@ -1630,7 +1630,6 @@ a.menu-drawer-desktop__group-heading:hover {
 @media (prefers-reduced-motion: reduce) {
   .menu-drawer-desktop__link-text,
   .menu-drawer-desktop__link-icon,
-  .menu-drawer-desktop__button,
   .menu-drawer-desktop__promo-media img {
     transition: none;
   }

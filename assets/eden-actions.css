@@ -20,8 +20,8 @@
 
   HOVER IS WRITTEN ONCE HERE, FOR EVERY CALL TO ACTION IN THE SHOP - see "the
   one hover animation" below. Add to cart, the homepage CTAs, the About page,
-  the editorial banners, the gifting and delivery panels and the signature
-  tiles all fill the same way. A button joins in by naming its colours as the
+  the editorial banners, the gifting and delivery panels, the buttons over the
+  desktop menu's pictures and the signature tiles all fill the same way. A button joins in by naming its colours as the
   three --cta-* pairs; it must never write a :hover background of its own, or
   it drops back out of step with the rest of the shop.
 */
@@ -51,9 +51,11 @@
     otherwise looked done. It read as a fault rather than as an animation.
 
     The curve matters as much as the timing: it has to carry real speed into
-    the finish, or the trailing edge hangs about at the end however short the
-    duration is. This one does, and 0.32s is quick enough that no half-way
-    frame sits still long enough to study.
+    the finish, or the trailing edge hangs about at the end however long the
+    duration is. This one does, which is what lets the sweep take its time:
+    0.32s read as a flick rather than a gesture, so it is 0.5s here - long
+    enough to watch the fill cross the button, short enough that the button
+    never feels like it is catching up with the cursor.
 
     Timing alone was not enough, though. Colour saturates far faster than
     geometry: at seven eighths of the way through, a label that has travelled
@@ -64,13 +66,12 @@
     before the transition formally ends. That is what removes the sliver; the
     timing above is what stops anything else finishing early.
   */
-  --cta-sweep-speed: 0.32s;
+  --cta-sweep-speed: 0.5s;
   --cta-sweep-easing: cubic-bezier(0.2, 0.6, 0.35, 1);
   --cta-sweep-overshoot: -15%;
   --cta-ink-speed: var(--cta-sweep-speed);
   --cta-ink-delay: 0s;
   --cta-ink-easing: var(--cta-sweep-easing);
-  --cta-lift: -2px;
 }
 
 .eden-action,
@@ -207,7 +208,8 @@ button.shopify-payment-button__button--unbranded {
 [class*='ai-luxury-video-hero-button-'],
 [class*='ai-luxury-video-hero-mobile-button-'],
 .signature-editorial__button-label,
-.signature-editorial__button-icon {
+.signature-editorial__button-icon,
+.menu-drawer-desktop__button {
   background-color: var(--cta-fill, transparent);
   color: var(--cta-ink, inherit);
   border-color: var(--cta-edge, transparent);
@@ -223,6 +225,7 @@ button.shopify-payment-button__button--unbranded {
 [class*='ai-luxury-video-hero-mobile-button-'],
 .signature-editorial__button-label,
 .signature-editorial__button-icon,
+.menu-drawer-desktop__button,
 .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block),
 .shopify-challenge__button,
 button.shopify-payment-button__button--unbranded,
@@ -232,8 +235,7 @@ button.shopify-payment-button__button--unbranded,
   overflow: hidden;
   transition: color var(--cta-ink-speed) var(--cta-ink-delay) var(--cta-ink-easing),
     border-color var(--cta-ink-speed) var(--cta-ink-delay) var(--cta-ink-easing),
-    box-shadow var(--cta-sweep-speed) var(--cta-sweep-easing),
-    transform var(--cta-sweep-speed) var(--cta-sweep-easing);
+    box-shadow var(--cta-sweep-speed) var(--cta-sweep-easing);
 }
 
 /*
@@ -294,6 +296,7 @@ button.shopify-payment-button__button--unbranded,
 [class*='ai-luxury-video-hero-mobile-button-']::before,
 .signature-editorial__button-label::before,
 .signature-editorial__button-icon::before,
+.menu-drawer-desktop__button::before,
 .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block)::before,
 .shopify-challenge__button::before,
 button.shopify-payment-button__button--unbranded::before,
@@ -328,6 +331,8 @@ button.shopify-payment-button__button--unbranded::before,
   .eden-action-host:hover .signature-editorial__button-label::before,
   .signature-editorial__button-icon:hover::before,
   .eden-action-host:hover .signature-editorial__button-icon::before,
+  .menu-drawer-desktop__button:hover::before,
+  .eden-action-host:hover .menu-drawer-desktop__button::before,
   .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block):hover:not([disabled])::before,
   .shopify-challenge__button:hover:not([disabled])::before,
   button.shopify-payment-button__button--unbranded:hover:not([disabled])::before,
@@ -353,6 +358,8 @@ button.shopify-payment-button__button--unbranded::before,
   .eden-action-host:hover .signature-editorial__button-label,
   .signature-editorial__button-icon:hover,
   .eden-action-host:hover .signature-editorial__button-icon,
+  .menu-drawer-desktop__button:hover,
+  .eden-action-host:hover .menu-drawer-desktop__button,
   .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block):hover:not([disabled]),
   .shopify-challenge__button:hover:not([disabled]),
   button.shopify-payment-button__button--unbranded:hover:not([disabled]),
@@ -404,26 +411,10 @@ button.shopify-payment-button__button--unbranded::before,
   .accelerated-checkout-block.checkout--button-secondary button.shopify-payment-button__button--unbranded:hover {
     --button-background-color: transparent;
   }
-
-  /* The same quiet lift every call to action has always had. Only whole
-     buttons lift; half of one sliding up on its own would come apart. */
-  .eden-action:hover,
-  .pc-button:hover,
-  .gifting-banner__button:hover,
-  .editorial-image-cta__button:hover,
-  .product-delivery__button:hover,
-  [class*='ai-luxury-video-hero-button-']:hover,
-  [class*='ai-luxury-video-hero-mobile-button-']:hover,
-  .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block):hover:not([disabled]),
-  .shopify-challenge__button:hover:not([disabled]),
-  button.shopify-payment-button__button--unbranded:hover:not([disabled]),
-  .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button):hover:not([disabled]) {
-    transform: translateY(var(--cta-lift));
-  }
 }
 
-/* Keyboard focus lands on the filled state without the sweep or the lift,
-   which would read as drift while tabbing down a page. */
+/* Keyboard focus lands on the filled state without the sweep, which would
+   read as drift while tabbing down a page. */
 .eden-action:focus-visible::before,
 .eden-action-host:focus-visible .eden-action::before,
 .pc-button:focus-visible::before,
@@ -442,6 +433,8 @@ button.shopify-payment-button__button--unbranded::before,
 .eden-action-host:focus-visible .signature-editorial__button-label::before,
 .signature-editorial__button-icon:focus-visible::before,
 .eden-action-host:focus-visible .signature-editorial__button-icon::before,
+.menu-drawer-desktop__button:focus-visible::before,
+.eden-action-host:focus-visible .menu-drawer-desktop__button::before,
 .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block):focus-visible::before,
 .shopify-challenge__button:focus-visible::before,
 button.shopify-payment-button__button--unbranded:focus-visible::before {
@@ -467,6 +460,8 @@ button.shopify-payment-button__button--unbranded:focus-visible::before {
 .eden-action-host:focus-visible .signature-editorial__button-label,
 .signature-editorial__button-icon:focus-visible,
 .eden-action-host:focus-visible .signature-editorial__button-icon,
+.menu-drawer-desktop__button:focus-visible,
+.eden-action-host:focus-visible .menu-drawer-desktop__button,
 .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block):focus-visible,
 .shopify-challenge__button:focus-visible {
   color: var(--cta-ink-hover, var(--cta-ink, inherit));
@@ -506,7 +501,7 @@ button.shopify-payment-button__button--unbranded:focus-visible::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* The fill still arrives, it just arrives at once, and nothing lifts. */
+  /* The fill still arrives, it just arrives at once. */
   .eden-action,
   .pc-button,
   .gifting-banner__button,
@@ -520,6 +515,7 @@ button.shopify-payment-button__button--unbranded:focus-visible::before {
   .shopify-challenge__button,
   button.shopify-payment-button__button--unbranded,
   .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button),
+  .menu-drawer-desktop__button,
   .eden-action::before,
   .pc-button::before,
   .gifting-banner__button::before,
@@ -533,22 +529,9 @@ button.shopify-payment-button__button--unbranded:focus-visible::before {
   .shopify-challenge__button::before,
   button.shopify-payment-button__button--unbranded::before,
   .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button)::before,
+  .menu-drawer-desktop__button::before,
   .eden-link {
     transition: none;
-  }
-
-  .eden-action:hover,
-  .pc-button:hover,
-  .gifting-banner__button:hover,
-  .editorial-image-cta__button:hover,
-  .product-delivery__button:hover,
-  [class*='ai-luxury-video-hero-button-']:hover,
-  [class*='ai-luxury-video-hero-mobile-button-']:hover,
-  .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block):hover:not([disabled]),
-  .shopify-challenge__button:hover:not([disabled]),
-  button.shopify-payment-button__button--unbranded:hover:not([disabled]),
-  .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button):hover:not([disabled]) {
-    transform: none;
   }
 }
 

@@ -102,8 +102,7 @@
       ],
       "custom_css": [
         "[class*=\"ai-luxury-video-hero-button\"] {white-space: nowrap; min-width: 200px; width: auto !important;}",
-        "[class*=\"ai-luxury-video-hero-button\"]:hover,[class*=\"ai-luxury-video-hero-mobile-button\"]:hover {color: #fff;}",
-        "[class*=\"ai-luxury-video-hero-mobile-button\"] {border-color: #001514; color: #001514; white-space: nowrap;}"
+        "[class*=\"ai-luxury-video-hero-mobile-button\"] {--cta-ink: #001514; --cta-edge: #001514; white-space: nowrap;}"
       ],
       "settings": {}
     },
