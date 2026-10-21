@@ -211,7 +211,7 @@
               </button>
             {%- endif -%}
             {%- if section.settings.link_label != blank -%}
-              <a class="eden-link" href="{{ section.settings.link_url | default: '/pages/contact' }}">
+              <a class="eden-action eden-action--outline" href="{{ section.settings.link_url | default: '/pages/contact' }}">
                 {{- section.settings.link_label | escape -}}
               </a>
             {%- endif -%}

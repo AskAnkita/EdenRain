@@ -43,34 +43,6 @@
   color: var(--color-background, #fff);
 }
 
-.pagination-back-to-top {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-top: 1.6rem;
-  color: var(--color-foreground, #000);
-  font-size: 1.3rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  text-decoration: none;
-}
-
-.pagination-back-to-top .svg-wrapper,
-.pagination-back-to-top svg {
-  width: 1.6rem;
-  height: 1.6rem;
-}
-
-.pagination-back-to-top .svg-wrapper {
-  /* icon-arrow.svg points right */
-  transform: rotate(-90deg);
-}
-
-.pagination-back-to-top:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.4rem;
-}
-
 @media screen and (max-width: 749px) {
   .infinite-scrolling-wrapper[data-load-mode='button'] .infinite-scrolling-btn {
     min-height: 4.8rem;

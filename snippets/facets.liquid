@@ -42,6 +42,17 @@
   assign filter_variant_pill = filter_variant_pill | split: ',' | strip | downcase | handle
   assign filter_swatch = filter_swatch | split: ',' | strip | downcase | handle
   assign filter_label_all = filter_label_all | strip | default: 'More filters'
+
+  # The shop does not track inventory, so Shopify's availability facet
+  # ("In stock" / "Out of stock") is dropped everywhere it would render.
+  # visible_filter_count is what the "are there any filters?" checks ask,
+  # so a result set whose only facet is availability shows no filter UI.
+  assign visible_filter_count = 0
+  for filter in results.filters
+    unless filter.param_name contains 'availability'
+      assign visible_filter_count = visible_filter_count | plus: 1
+    endunless
+  endfor
 -%}
 
 <div class="facets-container w-full{% if filter_type == 'drawer' %} facets-container-drawer{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
@@ -100,7 +111,7 @@
               class="facets__form-wrapper small-hide medium-hide"
             {% endif %}
           >
-            {%- if filter_type == 'horizontal' and results.filters != empty -%}
+            {%- if filter_type == 'horizontal' and visible_filter_count > 0 -%}
               <h2
                 class="facets__heading caption-large flex items-center gap-lg"
                 id="verticalTitle"
@@ -118,7 +129,7 @@
               {%- if filter_type == 'vertical' -%}
                 <div class="active-facets flex flex-wrap w-full active-facets-desktop">
                   <div class="active-facets-vertical-filter w-full flex items-center justify-between flex-wrap gap-xs">
-                    {%- unless results.filters == empty -%}
+                    {%- unless visible_filter_count == 0 -%}
                       <h2
                         class="facets__heading facets__heading--vertical"
                         style="--font-h2--case: {{ heading_label_case }};--font-size--h2: {{ heading_label_font_size }};"
@@ -152,6 +163,7 @@
                     {% endif %}
                   </div>
                   {%- for filter in results.filters -%}
+                    {%- if filter.param_name contains 'availability' -%}{%- continue -%}{%- endif -%}
                     {%- for value in filter.active_values -%}
                       <facet-remove>
                         <a
@@ -195,6 +207,7 @@
               <script src="{{ 'show-more.js' | asset_url }}" defer="defer"></script>
               {% comment %} Filters for both horizontal and vertical filter {% endcomment %}
               {%- for filter in results.filters -%}
+                {%- if filter.param_name contains 'availability' -%}{%- continue -%}{%- endif -%}
                 {% liquid
                   assign filter_label = filter.label | escape
                   assign filter_label_downcase = filter_label | downcase
@@ -815,6 +828,7 @@
                     </a>
                   </facet-remove>
                   {%- for filter in results.filters -%}
+                    {%- if filter.param_name contains 'availability' -%}{%- continue -%}{%- endif -%}
                     {%- for value in filter.active_values -%}
                       <facet-remove>
                         <a
@@ -1130,6 +1144,7 @@
                   </p>
 
                   {%- for filter in results.filters -%}
+                    {%- if filter.param_name contains 'availability' -%}{%- continue -%}{%- endif -%}
                     {%- for value in filter.active_values -%}
                       <facet-remove>
                         <a
@@ -1174,6 +1189,7 @@
                 {{ sidebar_categories }}
                 {%- if enable_filtering -%}
                   {%- for filter in results.filters -%}
+                    {%- if filter.param_name contains 'availability' -%}{%- continue -%}{%- endif -%}
                     {% liquid
                       assign filter_label = filter.label | escape
                       assign filter_label_downcase = filter_label | downcase
@@ -1676,6 +1692,7 @@
         </a>
       </facet-remove>
       {%- for filter in results.filters -%}
+        {%- if filter.param_name contains 'availability' -%}{%- continue -%}{%- endif -%}
         {%- for value in filter.active_values -%}
           <facet-remove>
             <a
@@ -1748,6 +1765,7 @@
       <form id="FacetFiltersPillsForm" class="facets__form">
         <div class="active-facets flex flex-wrap w-full active-facets-desktop">
           {%- for filter in results.filters -%}
+            {%- if filter.param_name contains 'availability' -%}{%- continue -%}{%- endif -%}
             {%- for value in filter.active_values -%}
               <facet-remove>
                 <a

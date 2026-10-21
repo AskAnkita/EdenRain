@@ -4316,7 +4316,6 @@
         "pagination_type": "infinite",
         "pagination_load_mode": "button",
         "load_more_label": "View more",
-        "show_back_to_top_link": true,
         "padding-block-start-pagination": 50,
         "padding-block-end-pagination": 0,
         "padding_top": 36,

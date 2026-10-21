@@ -45,6 +45,15 @@
       endunless
     endfor
     assign visible_results_count = search.results_count | minus: hidden_results
+    # The shop does not track inventory, so the availability facet is hidden in
+    # facets.liquid. Count the rest here, or a result set whose only facet is
+    # availability opens an empty filter column.
+    assign visible_filter_count = 0
+    for filter in search.filters
+      unless filter.param_name contains 'availability'
+        assign visible_filter_count = visible_filter_count | plus: 1
+      endunless
+    endfor
   -%}
   {% paginate search.results by limit %}
     <div
@@ -147,14 +156,14 @@
                 </p>
               {%- endif -%}
             {%- endunless -%}
-            {%- if visible_results_count == 0 and search.filters == empty -%}
+            {%- if visible_results_count == 0 and visible_filter_count == 0 -%}
               <p role="status">{{ 'content.no_results' | t: terms: search.terms }}</p>
             {%- endif -%}
           {%- endif -%}
         </div>
         {%- if search.performed -%}
           <div class="collection-wrapper grid-base gap-style">
-            {%- if search.filters != empty -%}
+            {%- if visible_filter_count > 0 -%}
               {% content_for 'block',
                 type: 'filters',
                 id: 'filters',
@@ -174,7 +183,7 @@
               "
             >
               <div class="product-grid-container" id="ProductGridContainer">
-                {%- if search.results.size == 0 and search.filters != empty -%}
+                {%- if search.results.size == 0 and visible_filter_count > 0 -%}
                   <div
                     class="relative collection collection--empty{% if section.settings.filter_type != 'vertical' %} page-width{% endif %}"
                     id="product-grid"

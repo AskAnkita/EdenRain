@@ -537,6 +537,12 @@
 /* ------------------------------------------- our own picker, inside the dialog */
 
 .ebk-request { display: grid; gap: 0; padding: 0; }
+/*
+  A display of its own beats the browser's own [hidden] rule, so the panel has to be told again.
+  Without this line the request panel stays on screen underneath a provider's diary whenever a
+  card has a booking link, and the visitor is offered two ways to book the same appointment.
+*/
+.ebk-request[hidden] { display: none; }
 
 @media screen and (min-width: 860px) {
   .ebk-request { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
