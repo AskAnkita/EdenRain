@@ -169,6 +169,191 @@
   endcase
 
   comment
+    ---------------------------------------------------------------------------
+    Theme settings > Mega menu panels overrides everything above for the picture half, so the
+    picture, the words and both buttons are changed in the editor rather than in this file.
+    The four menus that have a panel are hard-wired to a prefix below; a menu not listed keeps
+    the defaults above and has no settings of its own.
+
+    Every field falls back to its default when it is left empty, so a half-filled group is
+    still a finished panel. A button is removed by typing "none" as its label, which is the
+    same switch 'Mega menu featured media' uses to drop a card's video - there is no empty
+    field that means "no button", because an empty field already means "keep the default".
+    ---------------------------------------------------------------------------
+  endcomment
+  assign promo_prefix = ''
+  case parent_key
+    when 'engagement'
+      assign promo_prefix = 'mm_promo_eng'
+    when 'wedding'
+      assign promo_prefix = 'mm_promo_wed'
+    when 'diamonds'
+      assign promo_prefix = 'mm_promo_dia'
+    when 'jewellery' or 'jewelry'
+      assign promo_prefix = 'mm_promo_jwl'
+  endcase
+
+  comment
+    The two buttons are taken apart here so a merchant can change one without retyping the
+    other, and put back together into the 'Label|url' pairs the markup walks at the end.
+  endcomment
+  assign promo_action_1 = promo_actions[0] | split: '|'
+  assign promo_action_1_label = promo_action_1[0]
+  assign promo_action_1_url = promo_action_1[1]
+  assign promo_action_2 = promo_actions[1] | split: '|'
+  assign promo_action_2_label = promo_action_2[0]
+  assign promo_action_2_url = promo_action_2[1]
+
+  assign promo_secondary_parts = promo_secondary | split: '|'
+  assign promo_secondary_label = promo_secondary_parts[0]
+  assign promo_secondary_url = promo_secondary_parts[1]
+  assign promo_secondary_image = promo_secondary_parts[2]
+  assign promo_secondary_width = promo_secondary_parts[3]
+  assign promo_secondary_height = promo_secondary_parts[4]
+
+  comment
+    An image_picker hands back an image object; the defaults above are file names resolved in
+    Content > Files by 'image-source'. Both are kept as they are here and turned into a src
+    and a srcset further down, so the markup never has to know which of the two it got.
+  endcomment
+  assign promo_picked = ''
+  assign promo_secondary_picked = ''
+
+  if promo_prefix != ''
+    assign promo_setting_key = promo_prefix | append: '_image'
+    assign promo_picked = settings[promo_setting_key]
+
+    assign promo_setting_key = promo_prefix | append: '_heading'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_heading = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_url'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_url = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_text'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_text = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_button_1_label'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_action_1_label = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_button_1_url'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_action_1_url = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_button_2_label'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_action_2_label = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_button_2_url'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_action_2_url = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_secondary_image'
+    assign promo_secondary_picked = settings[promo_setting_key]
+
+    assign promo_setting_key = promo_prefix | append: '_secondary_label'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_secondary_label = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_secondary_url'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_secondary_url = promo_setting_value
+    endif
+  endif
+
+  comment
+    Back into the pairs the markup walks. A label of "none" drops its button, and a button with
+    nowhere to go is dropped too rather than rendered as a dead link.
+  endcomment
+  assign promo_actions = ''
+  assign promo_action_1_switch = promo_action_1_label | downcase | strip
+  if promo_action_1_label != blank and promo_action_1_url != blank and promo_action_1_switch != 'none'
+    assign promo_actions = promo_action_1_label | append: '|' | append: promo_action_1_url
+  endif
+  assign promo_action_2_switch = promo_action_2_label | downcase | strip
+  if promo_action_2_label != blank and promo_action_2_url != blank and promo_action_2_switch != 'none'
+    assign promo_action_2_pair = promo_action_2_label | append: '|' | append: promo_action_2_url
+    if promo_actions == ''
+      assign promo_actions = promo_action_2_pair
+    else
+      assign promo_actions = promo_actions | append: ',' | append: promo_action_2_pair
+    endif
+  endif
+  assign promo_actions = promo_actions | split: ','
+
+  comment
+    The picture itself. A picked image carries its own proportions, so the width and height
+    attributes come off the object rather than off the numbers set per menu above - those are
+    the proportions of the file the theme ships, and holding a picked picture to them would
+    reserve the wrong amount of room and shift the panel as it loads.
+  endcomment
+  if promo_picked != blank
+    assign promo_src = promo_picked | image_url: width: 900
+    assign promo_srcset = promo_picked | image_url: width: 600 | append: ' 600w, '
+    assign promo_srcset = promo_srcset | append: promo_src | append: ' 900w'
+    assign promo_width = promo_picked.width
+    assign promo_height = promo_picked.height
+  else
+    capture promo_src_900
+      render 'image-source', file: promo_image, width: 900
+    endcapture
+    capture promo_src_600
+      render 'image-source', file: promo_image, width: 600
+    endcapture
+    assign promo_src = promo_src_900 | strip
+    assign promo_srcset = promo_src_600 | strip | append: ' 600w, '
+    assign promo_srcset = promo_srcset | append: promo_src | append: ' 900w'
+  endif
+
+  comment
+    The second picture, resolved the same way. It is drawn only when there is something to draw
+    and somewhere for it to go, and "none" as its label takes it off a menu that ships one.
+  endcomment
+  assign promo_secondary_switch = promo_secondary_label | downcase | strip
+  assign promo_secondary_show = false
+  if promo_secondary_url != blank and promo_secondary_switch != 'none'
+    if promo_secondary_picked != blank
+      assign promo_secondary_show = true
+      assign promo_secondary_src = promo_secondary_picked | image_url: width: 700
+      assign promo_secondary_srcset = promo_secondary_picked | image_url: width: 450 | append: ' 450w, '
+      assign promo_secondary_srcset = promo_secondary_srcset | append: promo_secondary_src | append: ' 700w'
+      assign promo_secondary_width = promo_secondary_picked.width
+      assign promo_secondary_height = promo_secondary_picked.height
+    elsif promo_secondary_image != blank
+      assign promo_secondary_show = true
+      capture promo_secondary_src_700
+        render 'image-source', file: promo_secondary_image, width: 700
+      endcapture
+      capture promo_secondary_src_450
+        render 'image-source', file: promo_secondary_image, width: 450
+      endcapture
+      assign promo_secondary_src = promo_secondary_src_700 | strip
+      assign promo_secondary_srcset = promo_secondary_src_450 | strip | append: ' 450w, '
+      assign promo_secondary_srcset = promo_secondary_srcset | append: promo_secondary_src | append: ' 700w'
+    endif
+  endif
+
+  comment
     A menu running compact columns gets a tighter gap between them as well: five columns at the
     gap the two- and three-column menus use would not hold their row beside the promo picture at
     the narrow end, and the fifth dropped to a row of its own. Read off the columns rather than
@@ -317,8 +502,8 @@
       >
         <span class="menu-drawer-desktop__promo-media" aria-hidden="true">
           <img
-            src="{% render 'image-source', file: promo_image, width: 900 %}"
-            srcset="{% render 'image-source', file: promo_image, width: 600 %} 600w, {% render 'image-source', file: promo_image, width: 900 %} 900w"
+            src="{{ promo_src }}"
+            srcset="{{ promo_srcset }}"
             sizes="(min-width: 1200px) 34vw, 30vw"
             alt=""
             width="{{ promo_width }}"
@@ -345,20 +530,19 @@
         the picture beside it carries the copy and the two buttons, and this is one more way in,
         so the whole tile is the hit area and the name over its foot is the only word on it.
       {%- endcomment -%}
-      {%- if promo_secondary != '' -%}
-        {%- assign secondary_parts = promo_secondary | split: '|' -%}
+      {%- if promo_secondary_show -%}
         <a
           class="menu-drawer-desktop__promo menu-drawer-desktop__promo--secondary eden-action-host"
-          href="{{ secondary_parts[1] }}"
+          href="{{ promo_secondary_url }}"
         >
           <span class="menu-drawer-desktop__promo-media" aria-hidden="true">
             <img
-              src="{% render 'image-source', file: secondary_parts[2], width: 700 %}"
-              srcset="{% render 'image-source', file: secondary_parts[2], width: 450 %} 450w, {% render 'image-source', file: secondary_parts[2], width: 700 %} 700w"
+              src="{{ promo_secondary_src }}"
+              srcset="{{ promo_secondary_srcset }}"
               sizes="(min-width: 1400px) 22vw, 30vw"
               alt=""
-              width="{{ secondary_parts[3] }}"
-              height="{{ secondary_parts[4] }}"
+              width="{{ promo_secondary_width }}"
+              height="{{ promo_secondary_height }}"
               loading="lazy"
             >
           </span>
@@ -372,7 +556,7 @@
               menu-drawer-desktop__button
               menu-drawer-desktop__button--on-image
               menu-drawer-desktop__promo-label
-            ">{{ secondary_parts[0] | escape }}</span>
+            ">{{ promo_secondary_label | escape }}</span>
           </span>
         </a>
       {%- endif -%}

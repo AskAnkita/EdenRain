@@ -3648,6 +3648,279 @@
     ]
   },
   {
+      "name": "Mega menu panels",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "The picture half of each mega menu panel — the large image on the right with the heading, one line of copy and two buttons over it. Leave a field empty to keep what the theme ships with."
+        },
+        {
+          "type": "paragraph",
+          "content": "Use a portrait picture: the half is taller than it is wide and a landscape shot is cropped to fit. The words and buttons sit over the foot of it, so keep that area clear and reasonably dark."
+        },
+        {
+          "type": "header",
+          "content": "Engagement"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_eng_image",
+          "label": "Picture",
+          "info": "Portrait. Ships as about-craft-workshop.png"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_eng_heading",
+          "label": "Heading",
+          "info": "Ships as “Design Studio”"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_eng_url",
+          "label": "Heading link"
+        },
+        {
+          "type": "textarea",
+          "id": "mm_promo_eng_text",
+          "label": "Text over the picture"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_eng_button_1_label",
+          "label": "Button 1 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_eng_button_1_url",
+          "label": "Button 1 link"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_eng_button_2_label",
+          "label": "Button 2 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_eng_button_2_url",
+          "label": "Button 2 link"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_eng_secondary_image",
+          "label": "Second picture",
+          "info": "Narrow tile beside the first one, drawn only on screens wider than 1400px. Needs a label and a link as well as a picture."
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_eng_secondary_label",
+          "label": "Second picture label",
+          "info": "Type none to drop the second picture"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_eng_secondary_url",
+          "label": "Second picture link"
+        },
+        {
+          "type": "header",
+          "content": "Wedding"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_wed_image",
+          "label": "Picture",
+          "info": "Portrait. Ships as category-wedding-bands.png"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_wed_heading",
+          "label": "Heading",
+          "info": "Ships as “Signature Wedding Bands”"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_wed_url",
+          "label": "Heading link"
+        },
+        {
+          "type": "textarea",
+          "id": "mm_promo_wed_text",
+          "label": "Text over the picture"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_wed_button_1_label",
+          "label": "Button 1 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_wed_button_1_url",
+          "label": "Button 1 link"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_wed_button_2_label",
+          "label": "Button 2 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_wed_button_2_url",
+          "label": "Button 2 link"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_wed_secondary_image",
+          "label": "Second picture",
+          "info": "Ships as featured-wedding-eternity.jpg. Narrow tile beside the first one, drawn only on screens wider than 1400px. Needs a label and a link as well as a picture."
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_wed_secondary_label",
+          "label": "Second picture label",
+          "info": "Type none to drop the second picture"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_wed_secondary_url",
+          "label": "Second picture link"
+        },
+        {
+          "type": "header",
+          "content": "Diamonds"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_dia_image",
+          "label": "Picture",
+          "info": "Portrait. Ships as about-craft-workshop.png"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_dia_heading",
+          "label": "Heading",
+          "info": "Ships as “Design Studio”"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_dia_url",
+          "label": "Heading link"
+        },
+        {
+          "type": "textarea",
+          "id": "mm_promo_dia_text",
+          "label": "Text over the picture"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_dia_button_1_label",
+          "label": "Button 1 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_dia_button_1_url",
+          "label": "Button 1 link"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_dia_button_2_label",
+          "label": "Button 2 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_dia_button_2_url",
+          "label": "Button 2 link"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_dia_secondary_image",
+          "label": "Second picture",
+          "info": "Narrow tile beside the first one, drawn only on screens wider than 1400px. Needs a label and a link as well as a picture."
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_dia_secondary_label",
+          "label": "Second picture label",
+          "info": "Type none to drop the second picture"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_dia_secondary_url",
+          "label": "Second picture link"
+        },
+        {
+          "type": "header",
+          "content": "Jewellery"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_jwl_image",
+          "label": "Picture",
+          "info": "Portrait. Ships as category-best-sellers.png"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_jwl_heading",
+          "label": "Heading",
+          "info": "Ships as “Best Sellers”"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_jwl_url",
+          "label": "Heading link"
+        },
+        {
+          "type": "textarea",
+          "id": "mm_promo_jwl_text",
+          "label": "Text over the picture"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_jwl_button_1_label",
+          "label": "Button 1 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_jwl_button_1_url",
+          "label": "Button 1 link"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_jwl_button_2_label",
+          "label": "Button 2 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_jwl_button_2_url",
+          "label": "Button 2 link"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_jwl_secondary_image",
+          "label": "Second picture",
+          "info": "Narrow tile beside the first one, drawn only on screens wider than 1400px. Needs a label and a link as well as a picture."
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_jwl_secondary_label",
+          "label": "Second picture label",
+          "info": "Type none to drop the second picture"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_jwl_secondary_url",
+          "label": "Second picture link"
+        }
+      ]
+    },
+  {
     "name": "Metal swatches",
     "settings": [
       {
