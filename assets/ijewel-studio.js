@@ -3,8 +3,10 @@
 
   The frame is only built once the section is near the viewport: a 3D scene is a
   heavy first load and the studio page is often reached by scrolling. The poster
-  under it is removed once the frame reports it has loaded, so a slow scene is
-  never a blank grey box.
+  over it is removed once the frame reports it has loaded, so a slow scene is
+  never a blank grey box - and when the section asks for it, the poster is an
+  opaque cover held a few seconds longer, because the viewer's own splash screen
+  runs on inside the frame after its document has loaded.
 
   The embed itself is whatever URL the merchant pasted from iJewel's Embedding
   tab (ijewel3d.com/<instance>/files/<id>/embedded, or a drive URL with a tag and
@@ -66,7 +68,26 @@ if (!customElements.get('ijewel-studio')) {
       ready() {
         clearTimeout(this.timer);
         this.setAttribute('data-ready', 'true');
-        this.parentElement?.querySelector('.ijw-poster')?.remove();
+
+        const poster = this.parentElement?.querySelector('.ijw-poster');
+        if (!poster) return;
+
+        // The frame's load event only says its document arrived - a 3D viewer
+        // spends the next few seconds on its own splash screen, which is inside
+        // the frame and cannot be styled from here. The cover is held over it
+        // for as long as the section says, then faded rather than cut, so an
+        // early reveal is a soft one.
+        const hold = parseInt(this.dataset.hold || '0', 10) || 0;
+        const fade = () => {
+          poster.setAttribute('data-fading', 'true');
+          setTimeout(() => poster.remove(), 500);
+        };
+
+        if (hold > 0 && poster.classList.contains('ijw-poster--cover')) {
+          setTimeout(fade, hold);
+        } else {
+          poster.remove();
+        }
       }
     }
   );

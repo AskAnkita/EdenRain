@@ -260,6 +260,85 @@ ijewel-studio {
   color: inherit;
 }
 
+/* The builder paints its own splash - its logo and a progress bar - while the
+   scene downloads, and that splash is inside the frame, out of reach. So the
+   poster stops being a faint placeholder and becomes an opaque cover: it holds
+   the stage for a beat after the frame reports it has loaded (the hold is a
+   setting; assets/ijewel-studio.js counts it), then fades out from under us.
+
+   The cover is the stage only, not the whole frame. The builder's own panel -
+   its heading, its price, its add-to-cart - is drawn and legible long before
+   the 3D scene is ready, and hiding it behind a white rectangle makes a page
+   that is merely loading look like a page that has lost its contents. So the
+   cover stops where the panel starts: beside it on desktop, above it on a
+   phone, and both edges are settings because that split belongs to the
+   builder, not to us. */
+.ijw-poster--cover {
+  inset: 0 auto auto 0;
+  width: var(--ijw-splash-stage-width-mobile, 100%);
+  height: var(--ijw-splash-stage-height-mobile, 44%);
+  background: var(--ijw-splash-bg, #ffffff);
+  opacity: 1;
+  transition: opacity 400ms ease;
+}
+
+.ijw-poster--cover[data-fading='true'] {
+  opacity: 0;
+}
+
+.ijw-poster__mark {
+  display: block;
+  width: var(--ijw-splash-logo-width-mobile, 150px);
+  max-width: 100%;
+  height: auto;
+}
+
+/* ------------------------------------------------------- the brand patch */
+
+/* The builder in the frame is the vendor's page on the vendor's domain, so its
+   logo cannot be restyled from here - a cross-origin frame takes none of our
+   CSS. The patch is the honest way round it: a panel over the frame's top-left
+   corner, painted in the builder's own background colour, carrying our mark.
+   It sits above the frame and keeps its clicks, so the vendor's logo
+   underneath cannot be followed. Mobile values first, desktop in the query
+   below, because where a builder puts its logo moves with the width. */
+.ijw-brand {
+  position: absolute;
+  top: var(--ijw-brand-top-mobile, 0px);
+  left: var(--ijw-brand-left-mobile, 0px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: var(--ijw-brand-justify, flex-start);
+  box-sizing: border-box;
+  width: var(--ijw-brand-width-mobile, 150px);
+  height: var(--ijw-brand-height-mobile, 92px);
+  max-width: 100%;
+  padding: 0 var(--ijw-brand-pad-mobile, 18px);
+  background: var(--ijw-brand-bg, #ffffff);
+}
+
+.ijw-brand--desktop {
+  display: none;
+}
+
+.ijw-brand__image {
+  display: block;
+  width: var(--ijw-brand-logo-width-mobile, 100px);
+  max-width: 100%;
+  height: auto;
+}
+
+.ijw-brand__text {
+  color: var(--ijw-brand-ink, var(--ijw-ink));
+  font-family: var(--font-heading--family);
+  font-size: var(--ijw-brand-text-size, 1.9rem);
+  letter-spacing: 0.22em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 @media screen and (min-width: 750px) {
   .ijw-frame {
     min-height: var(--ijw-frame-height, 760px);
@@ -268,5 +347,32 @@ ijewel-studio {
   .ijw-frame iframe {
     min-height: var(--ijw-frame-height, 760px);
     height: var(--ijw-frame-height, 760px);
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .ijw-brand {
+    top: var(--ijw-brand-top, 0px);
+    padding: 0 var(--ijw-brand-pad, 32px);
+    left: var(--ijw-brand-left, 0px);
+    width: var(--ijw-brand-width, 300px);
+    height: var(--ijw-brand-height, 132px);
+  }
+
+  .ijw-brand--desktop {
+    display: flex;
+  }
+
+  .ijw-brand__image {
+    width: var(--ijw-brand-logo-width, 150px);
+  }
+
+  .ijw-poster--cover {
+    width: var(--ijw-splash-stage-width, 66%);
+    height: var(--ijw-splash-stage-height, 100%);
+  }
+
+  .ijw-poster__mark {
+    width: var(--ijw-splash-logo-width, 240px);
   }
 }
