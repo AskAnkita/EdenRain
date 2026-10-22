@@ -484,6 +484,14 @@
 
 .ebk-stage--fallback { min-height: 0; }
 
+/*
+  An app block brings its own calendar, its own spacing and its own type. The stage hands it the
+  full width of the dialog and gets out of the way: no reserved height, because the app's widget
+  is what decides how tall booking is, and no spinner, because nothing is being waited for.
+*/
+.ebk-stage--app { min-height: 0; }
+.ebk-stage__app + .ebk-stage__app { margin-top: 24px; }
+
 .ebk-stage__frame { display: block; }
 
 .ebk-stage__frame iframe,

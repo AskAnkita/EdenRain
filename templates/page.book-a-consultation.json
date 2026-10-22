@@ -24,16 +24,6 @@
             "icon": "in-person"
           }
         },
-        "phone_call": {
-          "type": "meeting",
-          "settings": {
-            "label": "Telephone call",
-            "meta": "20 minutes, by phone",
-            "text": "A short conversation about stones, sizing, timings or a piece you have already seen.",
-            "booking_link": "",
-            "icon": "phone"
-          }
-        },
         "contact_phone": {
           "type": "contact",
           "settings": {
@@ -68,7 +58,6 @@
       "block_order": [
         "virtual",
         "designer",
-        "phone_call",
         "contact_phone",
         "contact_whatsapp",
         "contact_instagram"
@@ -76,7 +65,7 @@
       "settings": {
         "eyebrow": "Private appointments",
         "heading": "Book an appointment",
-        "text": "<p>Meet one to one with an Eden Raine jewellery specialist, by video call or telephone. Pick a time that suits you and your confirmation arrives by email.<\/p>",
+        "text": "<p>Meet one to one with an Eden Raine jewellery specialist by video call. Pick a time that suits you and your confirmation arrives by email.<\/p>",
         "button_label": "Book an appointment",
         "smallprint": "Free, and never any obligation to buy.",
         "link_label": "Prefer to write to us?",

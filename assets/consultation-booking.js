@@ -5,6 +5,11 @@
   appointment - opens the same dialog, and what goes inside it depends on what the shop has set
   up:
 
+    an app block     a booking app installed in the shop, added to the section in the theme
+                     editor. It is already rendered inside the dialog when the page is served,
+                     so there is nothing to load and nothing to fall back to - and it outranks
+                     both of the paths below, which are not consulted at all.
+
     a booking link   the provider's own calendar (Cal.com, Calendly, or any booking page given
                      as a URL). It owns availability, timezones, the confirmation email and the
                      Google Meet or Zoom link, which is set on the event type in the provider's
@@ -154,6 +159,7 @@ if (!customElements.get('consultation-booking')) {
       connectedCallback() {
         this.dialog = this.querySelector('[data-booking-dialog]');
         this.stage = this.querySelector('[data-booking-stage]');
+        this.appStage = this.querySelector('[data-booking-app]');
         this.frame = this.querySelector('[data-booking-frame]');
         this.request = this.querySelector('[data-booking-request]');
         this.openers = Array.from(this.querySelectorAll('[data-booking-open]'));
@@ -459,6 +465,19 @@ if (!customElements.get('consultation-booking')) {
       }
 
       show(link, silent = false) {
+        /*
+          An app block is the whole booking system and the server has already rendered it inside
+          the dialog: there is no link to resolve, no provider script to wait for and nothing to
+          fall back to. It only has to be uncovered - and the two paths it replaces have to be
+          put away, or the visitor meets a second calendar underneath it.
+        */
+        if (this.appStage) {
+          this.appStage.hidden = false;
+          if (this.stage) this.stage.hidden = true;
+          if (this.request) this.request.hidden = true;
+          return;
+        }
+
         if (!link) {
           this.showRequest();
           return;

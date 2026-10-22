@@ -66,6 +66,19 @@
   assign contact_blocks = section.blocks | where: 'type', 'contact'
 
   comment
+    An app block added to this section is a booking system in its own right: it knows what is
+    free, what is already taken, and it can take the deposit. So when one is present it owns the
+    dialog outright - no provider embed is loaded beside it and our own request form stays shut,
+    because two calendars in one dialog is a question no visitor should be asked.
+  endcomment
+  assign app_blocks = 0
+  for block in section.blocks
+    if block.type == '@app'
+      assign app_blocks = app_blocks | plus: 1
+    endif
+  endfor
+
+  comment
     The hero's button opens the dialog on the first appointment that has a link, so a kind of
     meeting whose link has not been pasted in yet does not decide what the main button does.
   endcomment
@@ -353,7 +366,11 @@
         </div>
 
         <div class="ebk-dialog__body">
-          {%- if meeting_blocks.size > 1 -%}
+          {%- comment -%}
+            The row that picks a kind of appointment chooses between booking links, so it says
+            nothing an app block would hear. The app does its own choosing.
+          {%- endcomment -%}
+          {%- if meeting_blocks.size > 1 and app_blocks == 0 -%}
             <div class="ebk-switch" role="group" aria-label="{{ section.settings.ways_heading | default: 'Ways to meet' | escape }}">
               {%- for block in meeting_blocks -%}
                 <button
@@ -371,12 +388,22 @@
             </div>
           {%- endif -%}
 
+          {%- if app_blocks > 0 -%}
+            <div class="ebk-stage ebk-stage--app" data-booking-app hidden>
+              {%- for block in section.blocks -%}
+                {%- if block.type == '@app' -%}
+                  <div class="ebk-stage__app" {{ block.shopify_attributes }}>{% render block %}</div>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
           <div class="ebk-stage" data-booking-stage hidden>
             <div class="ebk-stage__frame" data-booking-frame></div>
             <p class="ebk-stage__status">{{ section.settings.loading_text | default: 'Opening the diary' | escape }}</p>
           </div>
 
-          <div class="ebk-request" data-booking-request>
+          <div class="ebk-request" data-booking-request{% if app_blocks > 0 %} hidden{% endif %}>
             <div class="ebk-request__picker">
               {%- if section.settings.request_lead != blank -%}
                 <p class="ebk-request__lead">{{ section.settings.request_lead | escape }}</p>
@@ -506,7 +533,7 @@
     { "type": "header", "content": "Hero" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Private appointments" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Book an appointment" },
-    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Meet one to one with an Eden Raine jewellery specialist, by video call or telephone. Pick a time that suits you and your confirmation arrives by email.<\/p>" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Meet one to one with an Eden Raine jewellery specialist by video call. Pick a time that suits you and your confirmation arrives by email.<\/p>" },
     { "type": "text", "id": "button_label", "label": "Button label", "default": "Book an appointment" },
     { "type": "text", "id": "smallprint", "label": "Line under the button", "default": "Free, and never any obligation to buy." },
     { "type": "text", "id": "link_label", "label": "Link beside the button", "default": "Prefer to write to us?" },
@@ -524,6 +551,7 @@
     { "type": "richtext", "id": "contact_text", "label": "Text", "default": "<p>No appointment needed. We answer Monday to Saturday, and usually within a few hours.<\/p>" },
 
     { "type": "header", "content": "The diary" },
+    { "type": "paragraph", "content": "Installed a booking app? Use Add block at the foot of this panel, choose it under Apps, and its calendar fills the dialog on its own - every setting under this heading is then ignored, and so is the request form below. Leave the app block off to go on using a scheduling link instead." },
     { "type": "paragraph", "content": "The appointment itself is kept by a scheduling provider. Paste the link for each way to meet into its block below - a Cal.com event link looks like cal.com\/eden-raine\/virtual-consultation. The Google Meet or Zoom link is set on the event type in the provider's own admin, and goes out with the confirmation." },
     {
       "type": "select",
@@ -686,6 +714,7 @@
     { "type": "range", "id": "padding_bottom_mobile", "label": "Space below on mobile", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 48 }
   ],
   "blocks": [
+    { "type": "@app" },
     {
       "type": "meeting",
       "name": "Way to meet",
