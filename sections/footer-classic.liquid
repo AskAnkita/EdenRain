@@ -171,62 +171,109 @@
   }
 
   #{{ footer_id }} .fc-newsletter-text {
-    margin-bottom: 1.4rem;
-    color: #666666;
+    margin-bottom: 1.8rem;
+    max-width: 36rem;
+    color: {{ stts.text_color | color_modify: 'alpha', 0.7 }};
     font-size: 1.3rem;
-    line-height: 1.55;
+    line-height: 1.6;
   }
 
+  /* One outlined field with the submit tucked into its right edge. The whole
+     unit inverts to a white card on focus, so typing happens on paper rather
+     than on the black. Everything inside reads from --fc-field-bg/fg, which is
+     the only thing the focus rule swaps, and the arrow cell always inverts
+     against whichever of the two is currently showing. */
   #{{ footer_id }} .fc-form-fields {
+    --fc-field-bg: {{ stts.background }};
+    --fc-field-fg: {{ stts.text_color }};
+    --fc-field-rule: {{ stts.text_color | color_modify: 'alpha', 0.35 }};
+
     display: flex;
-    gap: 0.8rem;
     align-items: stretch;
     width: 100%;
     max-width: 36rem;
+    background: var(--fc-field-bg);
+    border: 1px solid var(--fc-field-rule);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  #{{ footer_id }} .fc-form-fields:hover {
+    --fc-field-rule: {{ stts.text_color }};
+  }
+
+  #{{ footer_id }} .fc-form-fields:focus-within {
+    --fc-field-bg: {{ stts.button_background }};
+    --fc-field-fg: {{ stts.button_text_color }};
+    --fc-field-rule: {{ stts.button_background }};
   }
 
   #{{ footer_id }} .fc-input {
     flex: 1;
     min-width: 0;
-    height: 4.4rem;
-    padding: 0 1.4rem;
-    border: 1px solid {{ stts.border_color }};
+    height: 4.6rem;
+    padding: 0 1.6rem;
+    border: 0;
     border-radius: 0;
-    background: #ffffff;
-    color: {{ stts.text_color }};
+    background: transparent;
+    color: var(--fc-field-fg);
     font-family: inherit;
     font-size: 1.3rem;
+    letter-spacing: 0.02em;
     outline: none;
-    transition: border-color 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: color 0.25s ease;
   }
 
-  #{{ footer_id }} .fc-input:focus {
-    border-color: {{ stts.text_color }};
+  #{{ footer_id }} .fc-input::placeholder {
+    color: var(--fc-field-fg);
+    opacity: 0.5;
+  }
+
+  /* Chrome paints its own slab over an autofilled field; follow the card. */
+  #{{ footer_id }} .fc-input:-webkit-autofill,
+  #{{ footer_id }} .fc-input:-webkit-autofill:hover,
+  #{{ footer_id }} .fc-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--fc-field-fg);
+    -webkit-box-shadow: 0 0 0 100rem var(--fc-field-bg) inset;
+    transition: background-color 9999s ease-out;
   }
 
   #{{ footer_id }} .fc-submit {
+    display: grid;
+    place-items: center;
     flex-shrink: 0;
-    height: 4.4rem;
+    width: 4.6rem;
+    height: 4.6rem;
     margin-top: 0;
-    padding: 0 2.2rem;
-    border: 1px solid {{ stts.button_background }};
-    background: {{ stts.button_background }};
-    color: {{ stts.button_text_color }};
-    font-family: inherit;
-    font-size: 1.2rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid var(--fc-field-rule);
+    background: transparent;
+    color: var(--fc-field-fg);
     cursor: pointer;
-    white-space: nowrap;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
   }
 
-  /* The fill and the label swap places rather than the whole button fading. */
+  /* Only the arrow cell fills, so the field keeps its weight on hover. */
   #{{ footer_id }} .fc-submit:hover,
   #{{ footer_id }} .fc-submit:focus-visible {
-    background: {{ stts.button_text_color }};
-    color: {{ stts.button_background }};
+    background: var(--fc-field-fg);
+    border-left-color: var(--fc-field-fg);
+    color: var(--fc-field-bg);
+    outline: none;
+  }
+
+  #{{ footer_id }} .fc-submit svg {
+    width: 1.6rem;
+    height: 0.9rem;
+    overflow: visible;
+    transition: transform 0.25s ease;
+  }
+
+  #{{ footer_id }} .fc-submit:hover svg,
+  #{{ footer_id }} .fc-submit:focus-visible svg {
+    transform: translateX(0.2rem);
   }
 
   #{{ footer_id }} .fc-form-message {
@@ -383,7 +430,12 @@
     /* Newsletter form on mobile */
     #{{ footer_id }} .fc-column--newsletter .fc-form-fields {
       margin: 1.4rem auto 0;
-      max-width: 100%;
+      max-width: 32rem;
+    }
+
+    #{{ footer_id }} .fc-column--newsletter .fc-newsletter-text {
+      margin-left: auto;
+      margin-right: auto;
     }
 
     /* Mobile Accordions */
@@ -579,7 +631,16 @@
                     autocomplete="email"
                     required
                   >
-                  <button class="fc-submit" type="submit">{{ block.settings.button_label | default: 'Sign up' | escape }}</button>
+                  <button
+                    class="fc-submit"
+                    type="submit"
+                    aria-label="{{ block.settings.button_label | default: 'Sign up' | escape }}"
+                    title="{{ block.settings.button_label | default: 'Sign up' | escape }}"
+                  >
+                    <svg viewBox="0 0 16 9" fill="none" aria-hidden="true" focusable="false">
+                      <path d="M0 4.5h13M10 1l3 3.5-3 3.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="square"/>
+                    </svg>
+                  </button>
                 </div>
                 {%- if form.errors -%}
                   <p class="fc-form-message fc-form-error">{{ form.errors.messages['email'] }}</p>
@@ -913,6 +974,7 @@
           "type": "text",
           "id": "button_label",
           "label": "Button label",
+          "info": "The submit button is an arrow icon, so this is used as its accessible name and tooltip.",
           "default": "JOIN"
         }
       ]

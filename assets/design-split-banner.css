@@ -173,6 +173,16 @@ dsp-video { display: contents; }
 .dsp-route__link:hover span:last-child { transform: translateX(4px); }
 .dsp-route__link:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
 
+/* The heading is the route on a phone, where the link beside it is hidden. It stays a
+   plain heading to look at - the underline is the only thing that marks it as a link. */
+.dsp-col__heading-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dsp-col__heading-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.dsp-col__heading-link:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+
 .dsp-footnote {
   margin: 22px 0 0;
   color: var(--dsp-footnote-color);
@@ -276,10 +286,19 @@ dsp-video { display: contents; }
   .dsp-media__poster { display: block !important; }
 }
 
+/* Phone: the route row put the copy and the link side by side, which left the text
+   wrapping in half a screen. The heading carries the link here, so the link is dropped
+   and the copy runs the full width of the row. */
+@media screen and (max-width: 749px) {
+  .dsp-col { grid-template-columns: minmax(0, 1fr); }
+  .dsp-col__text { max-width: none; }
+  .dsp-col--linked .dsp-route__link { display: none; }
+}
+
 @media screen and (max-width: 600px) {
   .dsp-content { padding: 26px 0 0; }
   .dsp-head__heading { font-size: var(--dsp-heading-size-mobile); }
-  .dsp-col { grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 20px 0; }
+  .dsp-col { gap: 12px; padding: 20px 0; }
   .dsp-col__heading { font-size: 22px; }
   .dsp-col__text { font-size: 14px; }
   .dsp-route__link { gap: 8px; font-size: 9px; letter-spacing: 0.08em; }

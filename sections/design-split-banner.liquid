@@ -125,10 +125,24 @@
         {%- endif -%}
         <div class="dsp-routes">
       {%- for block in column_blocks limit: 2 -%}
-        <div class="dsp-col" {{ block.shopify_attributes }}>
+        {%- liquid
+          # The heading carries the route itself when there is one to carry, so a phone
+          # does not need the separate link beside it and the copy can have the full row.
+          assign heading_links = false
+          if block.settings.heading != blank and block.settings.button_link != blank
+            assign heading_links = true
+          endif
+        -%}
+        <div class="dsp-col{% if heading_links %} dsp-col--linked{% endif %}" {{ block.shopify_attributes }}>
           <div class="dsp-col__copy">
             {%- if block.settings.heading != blank -%}
-              <{{ column_tag }} class="dsp-col__heading">{{ block.settings.heading | escape }}</{{ column_tag }}>
+              <{{ column_tag }} class="dsp-col__heading">
+                {%- if heading_links -%}
+                  <a class="dsp-col__heading-link" href="{{ block.settings.button_link }}">{{ block.settings.heading | escape }}</a>
+                {%- else -%}
+                  {{ block.settings.heading | escape }}
+                {%- endif -%}
+              </{{ column_tag }}>
             {%- endif -%}
             {%- if block.settings.text != blank -%}
               <div class="dsp-col__text">{{ block.settings.text }}</div>
