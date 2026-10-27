@@ -4,6 +4,7 @@
 //   node scripts/shopify/add-product-media.mjs                                     preview
 //   node scripts/shopify/add-product-media.mjs --apply                             add it
 //   node scripts/shopify/add-product-media.mjs --sku=AJLR257 --image=assets/x.png --alt="#Jewelry material_Cushion Gold" --apply
+//   node scripts/shopify/add-product-media.mjs --sku=AJLR137 --image=... --alt=... --include-archived --apply
 //
 // The defaults add the pear hand shot to the ring it was photographed on. That ring is a donor
 // SKU inside a merged product (merge-shape-products.mjs folded the pear AJLR262 into the cushion
@@ -22,6 +23,7 @@ import { config, gql, uploadImage } from './lib.mjs';
 
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');
+const includeArchived = args.includes('--include-archived');
 const flag = (name, fallback) => {
   const hit = args.find((a) => a.startsWith(`--${name}=`));
   return hit ? hit.slice(name.length + 3) : fallback;
@@ -67,7 +69,9 @@ try {
   // adding media to them would be work nobody ever sees.
   const data = await gql(cfg, PRODUCTS, { q: `sku:${SKU}*` });
   const candidates = data.products.nodes.filter((p) => p.variants.nodes.some((v) => (v.sku || '').toUpperCase().startsWith(SKU.toUpperCase())));
-  const live = candidates.filter((p) => p.status === 'ACTIVE');
+  // --include-archived is for staging a donor before a merge: the photos go on the archived donor
+  // so merge-shape-products.mjs can copy them onto the keeper, where they do get seen.
+  const live = includeArchived ? candidates : candidates.filter((p) => p.status === 'ACTIVE');
 
   if (!candidates.length) throw new Error(`No product has a variant whose SKU starts with ${SKU}`);
   if (!live.length) {

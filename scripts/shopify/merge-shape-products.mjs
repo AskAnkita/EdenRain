@@ -198,6 +198,98 @@ const MERGES = [
       '</ul>',
     ].join(''),
   },
+  {
+    id: 'bezel-set-engagement-ring',
+    option: 'Shape',
+    keep: { sku: 'AJLR248', shape: 'Emerald' },
+    donors: [
+      { sku: 'AJLR249', shape: 'Radiant' },
+      { sku: 'AJLR250', shape: 'Cushion' },
+      { sku: 'AJLR251', shape: 'Princess' },
+      { sku: 'AJLR252', shape: 'Asscher' },
+      { sku: 'AJLR253', shape: 'Pear' },
+    ],
+    title: 'Lab-Grown Diamond Bezel Set Engagement Ring',
+    handle: 'lab-grown-diamond-bezel-set-engagement-ring',
+    descriptionHtml: [
+      '<p><strong>Description</strong></p>',
+      '<p>A lab-grown diamond closed into a full bezel, the metal following the outline of the stone',
+      ' exactly and sitting flush against a plain band. Choose the centre stone below — the band and',
+      ' the setting are the same on every shape.</p>',
+      '<p>A bezel is the quietest way to set a stone and the safest: no claws to catch, no edges left',
+      ' exposed. It is the setting to choose for a ring that is worn through everything.</p>',
+      '<p><strong>Emerald cut</strong></p>',
+      '<p>Held in a full bezel with the metal stepped to follow the stone’s cut corners. The stepped',
+      ' frame echoes the step cut inside it.</p>',
+      '<p><strong>Radiant cut</strong></p>',
+      '<p>Brilliant-cut faceting inside an emerald outline, so it sparkles like a round but reads',
+      ' rectangular. The bezel traces the octagon exactly and keeps the shape crisp.</p>',
+      '<p><strong>Cushion cut</strong></p>',
+      '<p>The old mine cut softened — rounded corners, a deeper crown, light that pools rather than',
+      ' scatters. The bezel rounds it further still.</p>',
+      '<p><strong>Princess cut</strong></p>',
+      '<p>Princess cut keeps its corners sharp, which is exactly where a claw-set stone is most',
+      ' vulnerable. A bezel covers them and squares off the whole ring.</p>',
+      '<p><strong>Asscher cut</strong></p>',
+      '<p>A square emerald cut with deeper steps, drawing the eye down through the stone. Bezelled, it',
+      ' sits like a small tile on the finger.</p>',
+      '<p><strong>Pear cut</strong></p>',
+      '<p>The bezel follows the curve of the belly and closes over the point — the weak spot on any',
+      ' pear — without a V-claw sitting across the stone.</p>',
+      '<p><strong>Every shape</strong></p>',
+      '<ul>',
+      '<li>Color: E-F</li>',
+      '<li>Clarity: VVS-VS</li>',
+      '<li>Metal: 925 Sterling Silver, 10K, 14K &amp; 18K Gold</li>',
+      '<li>Style: Bezel Engagement Ring</li>',
+      '</ul>',
+    ].join(''),
+  },
+  {
+    id: 'plain-band-solitaire-engagement-ring',
+    option: 'Shape',
+    keep: { sku: 'AJLR133', shape: 'Round' },
+    // AJLR135 is the emerald solitaire; AJLR137 is the radiant. AJLR137's first renders came back
+    // emerald by mistake — its donor now carries only the three re-rendered front views (one per
+    // metal), so Radiant has one photo per metal where the other shapes have four. Drop the
+    // re-rendered Y2-Y4/W2-W4/R2-R4 onto the donor and re-run to fill the rest in.
+    donors: [
+      { sku: 'AJLR135', shape: 'Emerald' },
+      { sku: 'AJLR136', shape: 'Pear' },
+      { sku: 'AJLR137', shape: 'Radiant' },
+    ],
+    title: 'Lab-Grown Diamond Solitaire Engagement Ring',
+    handle: 'lab-grown-diamond-solitaire-engagement-ring',
+    descriptionHtml: [
+      '<p><strong>Description</strong></p>',
+      '<p>A lab-grown diamond raised on slim claws above a plain polished band, with nothing between the',
+      ' eye and the stone. Choose the centre stone below — the band and the setting are the same on',
+      ' every shape.</p>',
+      '<p>A solitaire has nowhere to hide: no accents, no detail on the band, nothing to carry the ring',
+      ' but the cut itself.</p>',
+      '<p><strong>Round brilliant</strong></p>',
+      '<p>Four slim claws and nothing else. The most forgiving of the cuts and the one that throws the',
+      ' most light — left on its own like this, it has only itself to answer for.</p>',
+      '<p><strong>Emerald cut</strong></p>',
+      '<p>An elongated step cut in a four-claw setting, longer than it is wide. The drawn-out table gives',
+      ' a stiller kind of light — long flashes down the length of the stone rather than scatter — and the',
+      ' extra length reads slimmer on the finger.</p>',
+      '<p><strong>Pear cut</strong></p>',
+      '<p>Set point upward, held by a V-claw at the tip and a pair of claws at the shoulders. The pear',
+      ' borrows from both the round and the marquise — brilliance at the belly, a taper at the point.</p>',
+      '<p><strong>Radiant cut</strong></p>',
+      '<p>An emerald outline with brilliant faceting inside it — the cut corners and long shape of a step',
+      ' cut, but the scatter of a round. It is the shape to choose for someone drawn to the emerald’s',
+      ' outline who wants the fire rather than the stillness.</p>',
+      '<p><strong>Every shape</strong></p>',
+      '<ul>',
+      '<li>Color: E-F</li>',
+      '<li>Clarity: VVS-VS</li>',
+      '<li>Metal: 925 Sterling Silver, 10K, 14K &amp; 18K Gold</li>',
+      '<li>Style: Solitaire Engagement Ring</li>',
+      '</ul>',
+    ].join(''),
+  },
 ];
 
 // ---------- arguments ----------
@@ -238,16 +330,24 @@ const PRODUCT_FIELDS = `
 
 // The style code is the SKU prefix, which is also in every photo's filename, so a plain product
 // search finds it whichever field Shopify happens to index.
-async function productBySkuPrefix(prefix) {
+// `exclude` is the keeper, when we are resolving a donor. Once a donor has been folded in, its
+// SKUs live on the keeper too, so a bare search matches both products and every completed group
+// would look ambiguous on a re-run. Dropping the keeper from the candidates leaves the donor's own
+// product, which is the one we need to archive and copy photos from.
+async function productBySkuPrefix(prefix, exclude) {
   const data = await gql(
     cfg,
     `query($q: String!) { products(first: 20, query: $q) { nodes { ${PRODUCT_FIELDS} } } }`,
     { q: prefix }
   );
-  const matches = data.products.nodes.filter((p) =>
+  let matches = data.products.nodes.filter((p) =>
     p.variants.nodes.some((v) => (v.sku || '').toUpperCase().startsWith(prefix.toUpperCase()))
   );
   if (matches.length === 0) throw new Error(`No product has a variant whose SKU starts with "${prefix}".`);
+  if (exclude && matches.length > 1) {
+    const withoutKeeper = matches.filter((p) => p.id !== exclude.id);
+    if (withoutKeeper.length) matches = withoutKeeper;
+  }
   if (matches.length > 1) {
     throw new Error(
       `"${prefix}" matches more than one product (${matches.map((p) => p.handle).join(', ')}); ` +
@@ -455,9 +555,12 @@ async function copyMedia(keeper, newMedia) {
 
 // A copied photo is fetched and processed in the background; it cannot be attached to a variant
 // until it is READY.
+// Waits for copied photos to finish processing and reports the ones Shopify gave up on rather
+// than throwing: a copy can fail just because the CDN read timed out, and the caller retries.
 async function waitForMedia(ids) {
   const pending = new Set(ids);
-  for (let attempt = 1; attempt <= 40 && pending.size; attempt++) {
+  const failed = [];
+  for (let attempt = 1; attempt <= 80 && pending.size; attempt++) {
     const data = await gql(
       cfg,
       `query($ids: [ID!]!) { nodes(ids: $ids) { ... on MediaImage { id status } } }`,
@@ -466,18 +569,82 @@ async function waitForMedia(ids) {
     for (const node of data.nodes) {
       if (!node) continue;
       if (node.status === 'READY') pending.delete(node.id);
-      if (node.status === 'FAILED') throw new Error(`Shopify could not process a copied photo (${node.id}).`);
+      if (node.status === 'FAILED') {
+        pending.delete(node.id);
+        failed.push(node.id);
+      }
     }
     if (pending.size) await sleep(1500);
   }
-  if (pending.size) throw new Error(`${pending.size} copied photo(s) were still processing after a minute.`);
+  if (pending.size) throw new Error(`${pending.size} copied photo(s) were still processing after two minutes.`);
+  return failed;
 }
 
-async function rescopeExistingAlts(keeper, shape) {
+// Which of the planned copies are already on the keeper, so a re-run after a failure resumes
+// instead of copying everything a second time. Shopify renames a copy ("AJLR301-2cts-Y1.png" ->
+// "AJLR301-2cts-Y1_<uuid>.png"), so a photo is matched by its donor filename plus its alt group.
+// Anything that failed to process is deleted here and copied again by the caller.
+async function existingCopies(keeper, newMedia) {
+  const data = await gql(
+    cfg,
+    `query($id: ID!) {
+      product(id: $id) {
+        media(first: 250) { nodes { id status alt ... on MediaImage { image { url } } } }
+      }
+    }`,
+    { id: keeper.id }
+  );
+  const nodes = data.product.media.nodes;
+
+  const broken = nodes.filter((n) => n.status === 'FAILED');
+  if (broken.length) {
+    await gql(
+      cfg,
+      `mutation($productId: ID!, $mediaIds: [ID!]!) {
+        productDeleteMedia(productId: $productId, mediaIds: $mediaIds) {
+          deletedMediaIds mediaUserErrors { field message } userErrors { field message }
+        }
+      }`,
+      { productId: keeper.id, mediaIds: broken.map((n) => n.id) },
+      'productDeleteMedia'
+    );
+  }
+
+  const basename = (url) => (url || '').split('/').pop().split('?')[0].replace(/\.[a-z0-9]+$/i, '');
+  const pool = nodes.filter((n) => n.status !== 'FAILED');
+  const present = [];
+  const todo = [];
+  for (const m of newMedia) {
+    const base = basename(m.url);
+    const index = pool.findIndex((n) => {
+      const name = basename(n.image?.url);
+      return (n.alt || '').trim() === m.alt && (name === base || name.startsWith(`${base}_`));
+    });
+    if (index === -1) {
+      todo.push(m);
+    } else {
+      present.push({ ...m, newMediaId: pool[index].id });
+      pool.splice(index, 1);
+    }
+  }
+  return { present, todo, removed: broken.length };
+}
+
+// Folds the keeper's own shape into its photo alt groups. Photos copied from a donor on an
+// earlier run are already scoped to their own shape, and a photo still processing cannot be
+// updated at all, so both are left alone — otherwise a re-run would stack one shape on another
+// ("#Jewelry material_Round Cushion Gold") or fail outright.
+async function rescopeExistingAlts(keeper, shape, donorShapes = []) {
   const files = [];
   for (const m of keeper.media.nodes) {
-    const next = scopedAlt(m.alt, shape);
-    if (next && next !== m.alt.trim()) files.push({ id: m.id, alt: next });
+    if (m.status && m.status !== 'READY') continue;
+    const text = (m.alt || '').trim();
+    const match = text.match(/^#([^_]+)_(.*)$/);
+    if (!match) continue;
+    const rest = match[2].toLowerCase();
+    if (donorShapes.some((s) => rest.startsWith(`${s.toLowerCase()} `))) continue;
+    const next = scopedAlt(text, shape);
+    if (next && next !== text) files.push({ id: m.id, alt: next });
   }
   if (!files.length) return 0;
   await gql(
@@ -613,7 +780,7 @@ async function main() {
   for (const merge of wanted) {
     const keeper = await productBySkuPrefix(merge.keep.sku);
     const donors = [];
-    for (const d of merge.donors) donors.push({ ...d, product: await productBySkuPrefix(d.sku) });
+    for (const d of merge.donors) donors.push({ ...d, product: await productBySkuPrefix(d.sku, keeper) });
     groups.push({ merge, keeper, donors, plan: planMerge(merge, keeper, donors) });
   }
 
@@ -663,14 +830,30 @@ async function main() {
       log(`  added the shape value(s) ${missing.join(', ')}`);
     }
 
-    const rescoped = await rescopeExistingAlts(keeper, merge.keep.shape);
+    const rescoped = await rescopeExistingAlts(keeper, merge.keep.shape, donors.map((d) => d.shape));
     if (rescoped) log(`  rewrote ${rescoped} of the keeper's photo alt groups to "${merge.keep.shape} ..."`);
 
     let copied = [];
     if (plan.newMedia.length) {
-      copied = await copyMedia(keeper, plan.newMedia);
-      log(`  copied ${copied.length} photo(s) across; waiting for Shopify to process them`);
-      await waitForMedia(copied.map((m) => m.newMediaId));
+      for (let attempt = 1; ; attempt++) {
+        const { present, todo, removed } = await existingCopies(keeper, plan.newMedia);
+        if (removed) log(`  removed ${removed} photo(s) Shopify could not process`);
+        if (present.length && todo.length) log(`  ${present.length} photo(s) already copied across`);
+        if (todo.length) {
+          const made = await copyMedia(keeper, todo);
+          log(`  copied ${made.length} photo(s) across; waiting for Shopify to process them`);
+          present.push(...made);
+        }
+        const failed = await waitForMedia(present.map((m) => m.newMediaId));
+        if (!failed.length) {
+          copied = present;
+          break;
+        }
+        if (attempt >= 3) {
+          throw new Error(`${failed.length} photo(s) could not be copied after ${attempt} attempts.`);
+        }
+        log(`  ${failed.length} photo(s) failed to process; copying those again`);
+      }
       log('  photos ready');
     }
 
