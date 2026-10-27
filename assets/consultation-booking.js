@@ -221,6 +221,10 @@ if (!customElements.get('consultation-booking')) {
           // Coming back from a posted contact form, the dialog reopens on the thank-you message
           // rather than leaving the visitor looking at the page wondering whether it sent.
           this.clearStash();
+          this.clearPostedFlag();
+          // Said once. The script says the same line where the dialog always speaks, and this
+          // copy sits inside a form that is about to be hidden and later shown again.
+          serverSaid?.remove();
           this.reopenOnRequest();
           // The slow path has come back: the request did go, so show the thank-you in the
           // place the form was rather than the form again under it.
@@ -246,6 +250,7 @@ if (!customElements.get('consultation-booking')) {
 
       disconnectedCallback() {
         clearTimeout(this.timer);
+        clearTimeout(this.closeTimer);
         document.removeEventListener('keydown', this.onKeydown);
         if (this.isOpen) document.body.style.overflow = this.scrollWas || '';
         // A re-render in the theme editor replaces the section but not the overlay we moved
@@ -430,12 +435,54 @@ if (!customElements.get('consultation-booking')) {
       closeDialog() {
         if (!this.isOpen) return;
         this.isOpen = false;
+        clearTimeout(this.closeTimer);
 
         this.dialog.hidden = true;
         document.body.style.overflow = this.scrollWas || '';
         document.removeEventListener('keydown', this.onKeydown);
 
         if (this.lastFocused instanceof HTMLElement) this.lastFocused.focus({ preventScroll: true });
+
+        // However it closed on a thank-you - by itself or by the visitor - what reopens is a
+        // fresh request, not the message left over from the last one.
+        if (this.sent) this.resetRequest();
+      }
+
+      /*
+        The thank-you has been read and the dialog has gone. What is left behind should be the
+        panel as it was before the request: a form, an empty calendar, and nothing said. The
+        kind of appointment is kept, because that is the dialog the visitor opened and the
+        header above the form still names it.
+      */
+      resetRequest() {
+        if (!this.form) return;
+        this.sent = false;
+        this.sending = false;
+
+        const appointment = this.typeField?.value;
+        this.form.reset();
+        if (this.typeField && appointment) this.typeField.value = appointment;
+        this.form.hidden = false;
+        this.setStatus(null);
+
+        this.chosenDate = null;
+        this.chosenSlot = null;
+        this.chosenDateLabel = '';
+        this.viewMonth = new Date(this.firstDay.getFullYear(), this.firstDay.getMonth(), 1);
+        if (this.calendarBuilt) this.renderCalendar();
+        this.updateChosen();
+      }
+
+      /*
+        The flag in the query string is spent the moment it has been read. Left in the address
+        bar, a refresh - or a visitor stepping back to this page later - would open the dialog
+        on a thank-you for a request that went some time ago.
+      */
+      clearPostedFlag() {
+        const url = new URL(window.location.href);
+        if (!url.searchParams.has('contact_posted')) return;
+        url.searchParams.delete('contact_posted');
+        window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
       }
 
       /*
@@ -890,8 +937,21 @@ if (!customElements.get('consultation-booking')) {
       requestSent() {
         if (!this.form) return;
         this.sending = false;
+        this.sent = true;
         this.form.hidden = true;
         this.setStatus(this.statusEl?.dataset.sent, 'sent');
+
+        /*
+          The request has gone, so the dialog has nothing further to ask: it holds the thank-you
+          long enough to be read and then gets out of the way, rather than leaving the visitor
+          looking for a close button on a panel that is finished with. How long is a setting,
+          and 0 means a merchant would rather it stayed open until it is closed by hand.
+        */
+        const wait = Number(this.dataset.closeDelay || 0) * 1000;
+        if (!wait) return;
+
+        clearTimeout(this.closeTimer);
+        this.closeTimer = setTimeout(() => this.closeDialog(), wait);
       }
 
       setStatus(text, state) {

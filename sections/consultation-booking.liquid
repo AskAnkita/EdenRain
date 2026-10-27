@@ -192,6 +192,7 @@
     data-brand-color="{{ section.settings.embed_brand_color | default: '#171714' }}"
     data-hide-details="{% if section.settings.hide_event_details %}true{% else %}false{% endif %}"
     data-frame-title="{{ section.settings.dialog_title | default: 'Book an appointment' | escape }}"
+    data-close-delay="{{ section.settings.success_close_delay | default: 5 }}"
     {% if section.settings.prefill_customer and customer %}
       data-name="{{ customer.name | escape }}"
       data-email="{{ customer.email | escape }}"
@@ -623,6 +624,7 @@
     { "type": "text", "id": "request_note", "label": "Line under the form", "default": "We reply to every request, usually the same working day." },
     { "type": "text", "id": "success_text", "label": "Message once it is sent", "default": "Thank you - your request is with us. We will confirm the time by email shortly." },
     { "type": "text", "id": "sending_text", "label": "Message while it sends", "default": "Sending your request" },
+    { "type": "range", "id": "success_close_delay", "label": "Close the dialog after the thank-you", "info": "How long the thank-you is held before the dialog closes itself. 0 leaves it open.", "min": 0, "max": 12, "step": 1, "unit": "s", "default": 5 },
     { "type": "text", "id": "error_text", "label": "Message if it will not send", "default": "That did not send. Please try again, or write to us and we will book it for you." },
     { "type": "text", "id": "pick_first_text", "label": "Message if no day was chosen", "default": "Choose a day and a time first and we will ask for that one." },
 
