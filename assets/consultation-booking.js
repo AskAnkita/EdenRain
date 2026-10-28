@@ -177,6 +177,7 @@ if (!customElements.get('consultation-booking')) {
         this.titleEl = this.querySelector('[data-booking-title]');
         this.eyebrowEl = this.querySelector('[data-booking-eyebrow]');
         this.typeField = this.querySelector('[data-booking-field-type]');
+        this.serviceField = this.querySelector('[data-booking-field-service]');
 
         this.openers.forEach((opener) => {
           opener.addEventListener('click', (event) => {
@@ -289,6 +290,7 @@ if (!customElements.get('consultation-booking')) {
         if (label && this.titleEl) this.titleEl.textContent = label;
         if (this.eyebrowEl) this.eyebrowEl.textContent = meta || this.eyebrowEl.dataset.default || '';
         if (this.typeField && label) this.typeField.value = meta ? `${label} (${meta})` : label;
+        this.syncService(label);
 
         this.switches.forEach((button) => {
           button.setAttribute('aria-pressed', String(button === trigger));
@@ -358,6 +360,7 @@ if (!customElements.get('consultation-booking')) {
           if (label && this.titleEl) this.titleEl.textContent = label;
           if (this.eyebrowEl) this.eyebrowEl.textContent = meta || this.eyebrowEl.dataset.default || '';
           if (this.typeField && label) this.typeField.value = meta ? `${label} (${meta})` : label;
+          this.syncService(label);
           this.switches.forEach((button) => button.setAttribute('aria-pressed', String(button === trigger)));
         }
 
@@ -390,6 +393,15 @@ if (!customElements.get('consultation-booking')) {
           // Storage switched off, or a private window: the round trip loses the choice, which is
           // what it did before any of this, not something worse.
         }
+      }
+
+      // The service select is drawn from the same "way to meet" labels, so arriving through one
+      // of them answers the question before it is asked. A label with no option to match means
+      // that way has no card of its own, and the select is left as the visitor had it.
+      syncService(label) {
+        if (!this.serviceField || !label) return;
+        const match = Array.from(this.serviceField.options).find((option) => option.value === label);
+        if (match) this.serviceField.value = label;
       }
 
       readStash() {

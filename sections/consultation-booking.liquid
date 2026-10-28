@@ -10,6 +10,14 @@
   The calendar lives in the dialog rather than on the page. Pinned beside the copy it leaves a
   tall empty column whenever it is not the thing being looked at, which is most of the time.
 
+  An appointment booking app installed in the shop can own the booking outright. Apntly is
+  wired by product id rather than by an app block, because it ships no block at all: give a way
+  to meet the numeric id of its service product and the card is rendered as the link Apntly
+  looks for, <a href="#apntly-page-book-link-ID">. Its calendar opens over the page, it takes
+  the time, and the booking lands in the app's Bookings list; our dialog steps aside entirely.
+  In the theme editor the card stays a button and still opens our dialog, because Apntly's
+  script sits out design mode and a card that did nothing there would look broken.
+
   What fills the dialog depends on what the shop has set up. With a booking link on a card, the
   provider's own calendar (Cal.com by default, Calendly or any booking URL by setting) takes
   over: it alone knows what is free, sends the confirmation, and issues the Google Meet or Zoom
@@ -33,6 +41,24 @@
 {{ 'consultation-booking.css' | asset_url | stylesheet_tag }}
 {{ 'eden-actions.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'consultation-booking.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  Apntly draws its calendar in an iframe of its own and brings its own look with it - rounded,
+  purple, nothing like the rest of the page. apntly-skin.js reaches into that iframe (it is a
+  same-origin srcdoc one) and dresses it in the theme's ink and type. It is only worth sending
+  when a block actually hands a service to Apntly.
+{%- endcomment -%}
+{%- liquid
+  assign uses_apntly = false
+  for block in section.blocks
+    if block.type == 'meeting' and block.settings.apntly_product_id != blank
+      assign uses_apntly = true
+    endif
+  endfor
+-%}
+{%- if uses_apntly -%}
+  <script src="{{ 'apntly-skin.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
 
 {%- liquid
   assign transparent = 'rgba(0,0,0,0)'
@@ -85,13 +111,25 @@
   assign hero_link = ''
   assign hero_label = ''
   assign hero_meta = ''
+  assign hero_apntly = ''
   for block in meeting_blocks
-    if block.settings.booking_link != blank and hero_link == blank
-      assign hero_link = block.settings.booking_link
+    assign block_apntly = block.settings.apntly_product_id | strip
+    if block_apntly != blank and hero_apntly == blank
+      assign hero_apntly = block_apntly
       assign hero_label = block.settings.label
       assign hero_meta = block.settings.meta
     endif
   endfor
+
+  if hero_apntly == blank
+    for block in meeting_blocks
+      if block.settings.booking_link != blank and hero_link == blank
+        assign hero_link = block.settings.booking_link
+        assign hero_label = block.settings.label
+        assign hero_meta = block.settings.meta
+      endif
+    endfor
+  endif
 
   assign has_media = false
   if section.settings.media_image != blank or section.settings.media_asset != blank or section.settings.media_image_url != blank
@@ -213,16 +251,25 @@
 
           <div class="ebk-actions">
             {%- if section.settings.button_label != blank -%}
-              <button
-                type="button"
-                class="eden-action eden-action--{{ section.settings.button_style }}"
-                data-booking-open
-                data-booking-link="{{ hero_link | escape }}"
-                data-booking-label="{{ hero_label | escape }}"
-                data-booking-meta="{{ hero_meta | escape }}"
-              >
-                {{- section.settings.button_label | escape -}}
-              </button>
+              {%- if hero_apntly != blank and request.design_mode != true -%}
+                <a
+                  class="eden-action eden-action--{{ section.settings.button_style }} apntly-booking-link"
+                  href="#apntly-page-book-link-{{ hero_apntly | escape }}"
+                >
+                  {{- section.settings.button_label | escape -}}
+                </a>
+              {%- else -%}
+                <button
+                  type="button"
+                  class="eden-action eden-action--{{ section.settings.button_style }}"
+                  data-booking-open
+                  data-booking-link="{{ hero_link | escape }}"
+                  data-booking-label="{{ hero_label | escape }}"
+                  data-booking-meta="{{ hero_meta | escape }}"
+                >
+                  {{- section.settings.button_label | escape -}}
+                </button>
+              {%- endif -%}
             {%- endif -%}
             {%- if section.settings.link_label != blank -%}
               <a class="eden-action eden-action--outline" href="{{ section.settings.link_url | default: '/pages/contact' }}">
@@ -265,16 +312,19 @@
                 if block.settings.icon_image != blank or block.settings.icon_asset != blank
                   assign has_icon_image = true
                 endif
+                comment
+                  Apntly reads the product id out of the href and opens its own calendar over the
+                  page, so a card it owns is a link rather than a button. Its script sits out
+                  design mode, so in the theme editor the card stays a button and goes on opening
+                  our dialog - a card that did nothing at all would read as broken.
+                endcomment
+                assign block_apntly = block.settings.apntly_product_id | strip
+                assign way_is_apntly = false
+                if block_apntly != blank and request.design_mode != true
+                  assign way_is_apntly = true
+                endif
               -%}
-              <button
-                type="button"
-                class="ebk-way"
-                data-booking-open
-                data-booking-link="{{ block.settings.booking_link | escape }}"
-                data-booking-label="{{ block.settings.label | escape }}"
-                data-booking-meta="{{ block.settings.meta | escape }}"
-                {{ block.shopify_attributes }}
-              >
+              {%- capture way_face -%}
                 <span class="ebk-way__top">
                   {%- if has_icon_image -%}
                     <span class="ebk-way__icon">
@@ -306,7 +356,24 @@
                   <span class="ebk-way__text">{{ block.settings.text | escape }}</span>
                 {%- endif -%}
                 <span class="ebk-way__cue">{{ section.settings.card_cue | default: 'Choose a time' | escape }}</span>
-              </button>
+              {%- endcapture -%}
+              {%- if way_is_apntly -%}
+                <a
+                  class="ebk-way apntly-booking-link"
+                  href="#apntly-page-book-link-{{ block_apntly | escape }}"
+                  {{ block.shopify_attributes }}
+                >{{ way_face }}</a>
+              {%- else -%}
+                <button
+                  type="button"
+                  class="ebk-way"
+                  data-booking-open
+                  data-booking-link="{{ block.settings.booking_link | escape }}"
+                  data-booking-label="{{ block.settings.label | escape }}"
+                  data-booking-meta="{{ block.settings.meta | escape }}"
+                  {{ block.shopify_attributes }}
+                >{{ way_face }}</button>
+              {%- endif -%}
             {%- endfor -%}
           </div>
 
@@ -466,6 +533,51 @@
                 </div>
 
                 {%- comment -%}
+                  Which appointment, and who with. The request leaves here as an email rather
+                  than as a booking in a diary, so both are simply two more lines in it.
+
+                  The services are the "Way to meet" blocks - they are named there already, and
+                  naming them twice is how the two drift apart - and the script keeps this
+                  select on whichever way the visitor arrived through. The people are a setting,
+                  one to a line; name nobody and the field is never drawn, because a dropdown
+                  with one choice in it is a question not worth asking.
+                {%- endcomment -%}
+                {%- capture service_options -%}
+                  {%- for block in section.blocks -%}
+                    {%- if block.type == 'meeting' and block.settings.label != blank -%}
+                      <option value="{{ block.settings.label | escape }}">{{ block.settings.label | escape }}</option>
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endcapture -%}
+
+                {%- assign service_options = service_options | strip -%}
+                {%- if service_options != blank -%}
+                  <div class="ebk-field">
+                    <label for="ebk-service-{{ section.id }}">{{ section.settings.service_label | default: 'Service' | escape }}</label>
+                    <select id="ebk-service-{{ section.id }}" name="contact[Service]" data-booking-field-service>
+                      {{ service_options }}
+                    </select>
+                  </div>
+                {%- endif -%}
+
+                {%- if section.settings.team_members != blank -%}
+                  {%- assign team_any = section.settings.team_any_label | default: 'Whoever is free' -%}
+                  {%- assign team_lines = section.settings.team_members | newline_to_br | split: '<br />' -%}
+                  <div class="ebk-field">
+                    <label for="ebk-team-{{ section.id }}">{{ section.settings.team_label | default: 'Team member' | escape }}</label>
+                    <select id="ebk-team-{{ section.id }}" name="contact[Team member]">
+                      <option value="{{ team_any | escape }}">{{ team_any | escape }}</option>
+                      {%- for line in team_lines -%}
+                        {%- assign person = line | strip_html | strip -%}
+                        {%- if person != blank -%}
+                          <option value="{{ person | escape }}">{{ person | escape }}</option>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </select>
+                  </div>
+                {%- endif -%}
+
+                {%- comment -%}
                   A name and an email are what a confirmation needs; a telephone number is not,
                   and a field nobody reads is a field that loses requests. Off by default, and
                   never required when it is on.
@@ -477,10 +589,18 @@
                   </div>
                 {%- endif -%}
 
-                <div class="ebk-field">
-                  <label for="ebk-body-{{ section.id }}">{{ section.settings.message_label | default: 'What would you like to talk about?' | escape }}</label>
-                  <textarea id="ebk-body-{{ section.id }}" name="contact[body]">{{ form.body }}</textarea>
-                </div>
+                {%- comment -%}
+                  The message is off by default for the same reason the telephone number is:
+                  the day, the time and the service already say what the appointment is, and an
+                  open box above the send button is one more thing to get past. On, it is never
+                  required.
+                {%- endcomment -%}
+                {%- if section.settings.ask_for_message -%}
+                  <div class="ebk-field">
+                    <label for="ebk-body-{{ section.id }}">{{ section.settings.message_label | default: 'What would you like to talk about?' | escape }}</label>
+                    <textarea id="ebk-body-{{ section.id }}" name="contact[body]">{{ form.body }}</textarea>
+                  </div>
+                {%- endif -%}
 
                 <button type="submit" class="eden-action eden-action--{{ section.settings.button_style }}">
                   {{- section.settings.request_button_label | default: 'Send the request' | escape -}}
@@ -553,6 +673,9 @@
 
     { "type": "header", "content": "The diary" },
     { "type": "paragraph", "content": "Installed a booking app? Use Add block at the foot of this panel, choose it under Apps, and its calendar fills the dialog on its own - every setting under this heading is then ignored, and so is the request form below. Leave the app block off to go on using a scheduling link instead." },
+    { "type": "paragraph", "content": "Using Apntly? It has no block to add here. Instead make each appointment a product, add that product as a service in the app, and paste the product's numeric id - the last part of its URL in Products - into \"Apntly service product ID\" on its \"Way to meet\" block below." },
+    { "type": "paragraph", "content": "Mark the service free in Apntly and the product never has to be seen: a free booking is taken on Apntly's own screens, with no cart and no order, so the product can stay a Draft nobody can reach. Only a service you charge for needs the product Active, published to the Online Store, and set to no stock tracking and no shipping." },
+    { "type": "paragraph", "content": "The card will not open the calendar in this editor - Apntly's script sits out design mode - so test it on the storefront." },
     { "type": "paragraph", "content": "The appointment itself is kept by a scheduling provider. Paste the link for each way to meet into its block below - a Cal.com event link looks like cal.com\/eden-raine\/virtual-consultation. The Google Meet or Zoom link is set on the event type in the provider's own admin, and goes out with the confirmation." },
     {
       "type": "select",
@@ -619,6 +742,11 @@
     { "type": "text", "id": "email_label", "label": "Email field", "default": "Email" },
     { "type": "checkbox", "id": "ask_for_phone", "label": "Ask for a telephone number", "default": false, "info": "Off by default. A name and an email are all a confirmation needs, and the number is never required when the field is shown." },
     { "type": "text", "id": "phone_label", "label": "Telephone field", "default": "Telephone" },
+    { "type": "text", "id": "service_label", "label": "Service field", "default": "Service", "info": "The choices are the \"Way to meet\" blocks below, by their label. The field is left out when there are none." },
+    { "type": "text", "id": "team_label", "label": "Team member field", "default": "Team member" },
+    { "type": "text", "id": "team_any_label", "label": "No preference choice", "default": "Whoever is free" },
+    { "type": "textarea", "id": "team_members", "label": "Team members", "info": "One name to a line. Leave this empty and the team member field is never shown." },
+    { "type": "checkbox", "id": "ask_for_message", "label": "Ask what they would like to talk about", "default": false, "info": "Off by default. The day, the time and the service already say what the appointment is." },
     { "type": "text", "id": "message_label", "label": "Message field", "default": "What would you like to talk about?" },
     { "type": "text", "id": "request_button_label", "label": "Submit button", "default": "Send the request" },
     { "type": "text", "id": "request_note", "label": "Line under the form", "default": "We reply to every request, usually the same working day." },
@@ -725,6 +853,7 @@
         { "type": "text", "id": "meta", "label": "Duration or place", "default": "30 minutes, by video" },
         { "type": "text", "id": "text", "label": "Description", "default": "A one to one call with a specialist, wherever you are." },
         { "type": "text", "id": "badge", "label": "Badge", "info": "A small label on the card, e.g. \"Most booked\". Leave empty for none." },
+        { "type": "text", "id": "apntly_product_id", "label": "Apntly service product ID", "info": "The numeric product id of this appointment's service product, from the end of its URL in Products. With one, the card opens Apntly's own calendar and the booking lands in the app - the booking link and the request calendar are then ignored." },
         { "type": "text", "id": "booking_link", "label": "Booking link", "info": "The event link from your provider, e.g. cal.com\/eden-raine\/virtual-consultation. Without one this card opens the request calendar instead." },
         {
           "type": "select",

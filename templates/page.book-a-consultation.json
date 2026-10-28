@@ -10,6 +10,7 @@
             "meta": "30 minutes, by video",
             "text": "A one to one call with a specialist, wherever you are. Share a sketch, a photograph or an idea and we will talk it through.",
             "badge": "Most booked",
+            "apntly_product_id": "15966409916790",
             "booking_link": "",
             "icon": "virtual"
           }
@@ -20,6 +21,7 @@
             "label": "Speak with a designer",
             "meta": "45 minutes, by video",
             "text": "For a bespoke piece or a reset: bring the idea, however rough, and we will draw it with you.",
+            "apntly_product_id": "15977665495414",
             "booking_link": "",
             "icon": "in-person"
           }
@@ -101,6 +103,11 @@
         "window_days": 63,
         "chosen_prefix": "You have asked for",
         "name_label": "Name",
+        "service_label": "Service",
+        "team_label": "Team member",
+        "team_any_label": "Whoever is free",
+        "team_members": "",
+        "ask_for_message": false,
         "email_label": "Email",
         "phone_label": "Telephone",
         "message_label": "What would you like to talk about?",

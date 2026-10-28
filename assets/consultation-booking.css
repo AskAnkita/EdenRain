@@ -204,6 +204,7 @@
   color: var(--ebk-card-color);
   font-family: inherit;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
@@ -693,6 +694,25 @@
 .ebk-field textarea:focus { outline: 0.1rem solid var(--ebk-card-border-hover); outline-offset: 0; }
 
 .ebk-field textarea { min-height: 9rem; resize: vertical; }
+
+/*
+  A select sizes itself to its own line box rather than to the padding it is given, so beside
+  an input carrying the same rule it comes out noticeably shorter - and chasing that with a
+  height picked by eye only holds until the body font changes. Instead the two are made the
+  same box: the same sizing, the same padding, the same line height, and a floor under both.
+  Identical in, identical out, whatever the font is doing.
+*/
+.ebk-field input,
+.ebk-field select {
+  box-sizing: border-box;
+  height: 5.6rem;
+  min-height: 5.6rem;
+  padding: 0 1.2rem;
+  line-height: 1.4;
+}
+
+/* The native arrow needs room of its own, or a long service name runs under it. */
+.ebk-field select { padding-right: 3.6rem; }
 
 .ebk-chosen {
   margin: 0 0 1.6rem;

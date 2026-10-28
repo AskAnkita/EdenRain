@@ -36,7 +36,7 @@
   let tickTimer = null;
   let watchdogTimer = null;
   let hideTimer = null;
-  let positionFrame = null;
+  let syncFrame = null;
 
   function mount() {
     if (root) return;
@@ -59,7 +59,6 @@
      transparent on some, and slides out of the way on scroll-up, and the announcement
      bar above it is editable, so its height is not ours to hardcode. */
   function syncPosition() {
-    positionFrame = null;
     const header = document.querySelector('#header-component');
     const bottom = header ? header.getBoundingClientRect().bottom : 0;
     /* A header that has scrolled away, or slid up out of view, leaves the bar at the
@@ -68,16 +67,32 @@
     document.documentElement.style.setProperty('--page-progress-top', `${Math.round(top)}px`);
   }
 
-  function queueSync() {
-    if (positionFrame !== null) return;
-    positionFrame = requestAnimationFrame(syncPosition);
+  /* Measured every frame the bar is on screen, not once when it appears. A document
+     that is still loading keeps resizing its own header underneath the bar -- the
+     announcement bar arrives, the webfont swaps in and rewraps the nav, the logo takes
+     its height -- and the last of those growth spurts lands on window load, the very
+     moment the bar stops creeping. Measured once, the bar is stranded in the middle of
+     the nav bar for the whole of its landing and fade. The loop costs one rect per
+     frame, for the second or two a navigation is in flight, and it also covers the
+     scrolling and sticky-header movement that used to need listeners of their own. */
+  function startTracking() {
+    if (syncFrame !== null) return;
+    const step = () => {
+      syncPosition();
+      syncFrame = requestAnimationFrame(step);
+    };
+    syncFrame = requestAnimationFrame(step);
+  }
+
+  function stopTracking() {
+    if (syncFrame !== null) cancelAnimationFrame(syncFrame);
+    syncFrame = null;
   }
 
   /* Steps shrink as the bar advances, so it never looks stalled and never looks about
      to finish -- the one thing a fake progress bar must not promise. */
   function tick() {
     progress = Math.min(CEILING, progress + Math.max((CEILING - progress) * 0.12, 0.004));
-    queueSync();
     paint();
   }
 
@@ -97,6 +112,7 @@
     bar.style.transition = 'none';
     progress = START_AT;
     syncPosition();
+    startTracking();
     paint();
     root.dataset.state = 'loading';
 
@@ -126,6 +142,7 @@
        left edge is never on screen. */
     hideTimer = setTimeout(() => {
       if (!root.dataset.state) {
+        stopTracking();
         bar.style.transition = 'none';
         paint();
       }
@@ -192,18 +209,6 @@
     },
     true
   );
-
-  /* Only while the bar is on screen: there is nothing to reposition otherwise, and a
-     scroll listener that measures on every page in the store is not worth its cost. */
-  ['scroll', 'resize'].forEach((type) => {
-    window.addEventListener(
-      type,
-      () => {
-        if (root && root.dataset.state) queueSync();
-      },
-      { passive: true }
-    );
-  });
 
   window.addEventListener('beforeunload', finish);
   window.addEventListener('pagehide', finish);

@@ -20393,7 +20393,7 @@ Specificity: (0,6,0)
 }
 /* Delivery time block — mobile-only fixes, side by side */
 @media (max-width: 767px) {
-  .group-block-content.layout-panel-flex.layout-panel-flex--row.mobile-column {
+  .group-block.delivery-time .group-block-content.layout-panel-flex.layout-panel-flex--row.mobile-column {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: flex-start !important;
@@ -20423,9 +20423,11 @@ Specificity: (0,6,0)
     text-align: left !important;
   }
 }
-/* Delivery time block — mobile & tablet fixes, side by side */
+/* Delivery time block — mobile & tablet fixes, side by side.
+   Scoped to .delivery-time: unscoped, this forced every row group that is set
+   to stack on mobile to stay in a row (it broke the contact page columns). */
 @media (max-width: 1024px) {
-  .group-block-content.layout-panel-flex.layout-panel-flex--row.mobile-column {
+  .group-block.delivery-time .group-block-content.layout-panel-flex.layout-panel-flex--row.mobile-column {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: flex-start !important;

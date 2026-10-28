@@ -572,7 +572,16 @@
                 "padding-block-start": 50,
                 "padding-block-end": 20,
                 "padding-inline-start": 20,
-                "padding-inline-end": 20
+                "padding-inline-end": 20,
+                "custom_padding_more_devices": true,
+                "padding-block-start-tl": 50,
+                "padding-block-end-tl": 20,
+                "padding-inline-start-tl": 20,
+                "padding-inline-end-tl": 20,
+                "padding-block-start-mb": 0,
+                "padding-block-end-mb": 16,
+                "padding-inline-start-mb": 0,
+                "padding-inline-end-mb": 0
               },
               "blocks": {
                 "text_zKMnQm": {
@@ -943,7 +952,16 @@
                 "padding-block-start": 50,
                 "padding-block-end": 50,
                 "padding-inline-start": 50,
-                "padding-inline-end": 50
+                "padding-inline-end": 50,
+                "custom_padding_more_devices": true,
+                "padding-block-start-tl": 50,
+                "padding-block-end-tl": 50,
+                "padding-inline-start-tl": 50,
+                "padding-inline-end-tl": 50,
+                "padding-block-start-mb": 32,
+                "padding-block-end-mb": 32,
+                "padding-inline-start-mb": 24,
+                "padding-inline-end-mb": 24
               },
               "blocks": {
                 "text_GdNXmE": {
