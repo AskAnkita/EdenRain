@@ -178,10 +178,11 @@
     line-height: 1.6;
   }
 
-  /* One outlined field with the submit tucked into its right edge. The field
-     stays on the footer's own background at all times; only the rule brightens
-     on hover. Everything inside reads from --fc-field-bg/fg, and the arrow cell
-     inverts against those two. */
+  /* One outlined field with the submit tucked into its right edge. The whole
+     unit inverts to a white card on focus, so typing happens on paper rather
+     than on the black. Everything inside reads from --fc-field-bg/fg, which is
+     the only thing the focus rule swaps, and the arrow cell always inverts
+     against whichever of the two is currently showing. */
   #{{ footer_id }} .fc-form-fields {
     --fc-field-bg: {{ stts.background }};
     --fc-field-fg: {{ stts.text_color }};
@@ -196,11 +197,14 @@
     transition: background-color 0.25s ease, border-color 0.25s ease;
   }
 
-  /* Focus gets the same treatment as hover - the rule brightens, nothing
-     else moves - so a keyboard user still sees where they are. */
-  #{{ footer_id }} .fc-form-fields:hover,
-  #{{ footer_id }} .fc-form-fields:focus-within {
+  #{{ footer_id }} .fc-form-fields:hover {
     --fc-field-rule: {{ stts.text_color }};
+  }
+
+  #{{ footer_id }} .fc-form-fields:focus-within {
+    --fc-field-bg: {{ stts.button_background }};
+    --fc-field-fg: {{ stts.button_text_color }};
+    --fc-field-rule: {{ stts.button_background }};
   }
 
   #{{ footer_id }} .fc-input {
