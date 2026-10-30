@@ -200,6 +200,45 @@
     },
     "category_tiles": {
       "type": "category-tiles",
+      "blocks": {
+        "tile_engagement_rings": {
+          "type": "tile_picture",
+          "settings": {
+            "title": "Engagement Rings"
+          }
+        },
+        "tile_wedding_bands": {
+          "type": "tile_picture",
+          "settings": {
+            "title": "Wedding Bands"
+          }
+        },
+        "tile_necklaces": {
+          "type": "tile_picture",
+          "settings": {
+            "title": "Necklaces"
+          }
+        },
+        "tile_earrings": {
+          "type": "tile_picture",
+          "settings": {
+            "title": "Earrings"
+          }
+        },
+        "tile_bracelets": {
+          "type": "tile_picture",
+          "settings": {
+            "title": "Bracelets"
+          }
+        }
+      },
+      "block_order": [
+        "tile_engagement_rings",
+        "tile_wedding_bands",
+        "tile_necklaces",
+        "tile_earrings",
+        "tile_bracelets"
+      ],
       "settings": {
         "items": "Engagement Rings, Wedding Bands, Necklaces, Earrings, Bracelets",
         "menu": "category",

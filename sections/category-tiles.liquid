@@ -9,7 +9,8 @@
   every item in the menu instead.
 
   Where a tile's picture comes from, in order:
-    1. a "Picture for a tile" block in the theme editor, matched to the tile's title;
+    1. a "Picture for a tile" block in the theme editor, matched to the tile's title, or
+       to its place in the row when the block's title is left empty;
     2. the TILE PICTURES list below, which is the place to set pictures in code;
     3. category-<tile>.png in Content > Files, e.g. category-rings.png for a tile titled Rings.
   A tile with none of the three is dropped (the script below removes the tile).
@@ -405,6 +406,7 @@
               assign tile_title = tile_parts[0]
               assign tile_url = tile_parts[1]
               assign tile_handle = tile_title | handleize
+              assign tile_index = forloop.index0
 
               # A picture set on a block wins over everything else. Titles are compared
               # loosely, so "Best Sellers" and "best sellers" both reach the same tile.
@@ -417,6 +419,15 @@
                   endif
                 endif
               endfor
+
+              # A block with no title typed takes the tile in the same place in the row, so a
+              # picture can be uploaded in the theme editor without matching any wording.
+              if tile_image == blank
+                assign placed = overrides[tile_index]
+                if placed.settings.title == blank and placed.settings.image != blank
+                  assign tile_image = placed.settings.image
+                endif
+              endif
 
               # Otherwise the TILE PICTURES list at the top of this file, and failing that
               # the category-<menu item>.png naming convention in assets/. A menu
@@ -647,7 +658,7 @@
           "type": "text",
           "id": "title",
           "label": "Menu item title",
-          "info": "As in the menu, e.g. Earrings. Capitals and spacing do not have to match."
+          "info": "As in the menu, e.g. Earrings. Capitals and spacing do not have to match. Leave it empty and the block takes the tile in the same place in the row: first block, first tile."
         },
         {
           "type": "image_picker",
