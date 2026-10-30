@@ -62,7 +62,7 @@
                     "text": "FREE Shipping + FREE 30-Day Returns",
                     "font": "body",
                     "font_size": "1.4rem",
-                    "font_weight": "400",
+                    "font_weight": "300",
                     "text_align": "center"
                   },
                   "blocks": {}
@@ -73,7 +73,7 @@
                     "text": "Choose up to 36 monthly payments, from 0% APR financing. Terms apply.",
                     "font": "body",
                     "font_size": "1.4rem",
-                    "font_weight": "default",
+                    "font_weight": "300",
                     "text_align": "center"
                   },
                   "blocks": {}
