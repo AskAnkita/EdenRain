@@ -349,13 +349,15 @@
     overflow: hidden;
   }
 
-  .ai-luxury-video-hero-video-{{ ai_gen_id }} {
+  .ai-luxury-video-hero-video-{{ ai_gen_id }},
+  .ai-luxury-video-hero-image-{{ ai_gen_id }} {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
   }
 
   .ai-luxury-video-hero-overlay-{{ ai_gen_id }} {
@@ -619,6 +621,13 @@
 <luxury-video-hero-{{ ai_gen_id }} class="ai-luxury-video-hero-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-luxury-video-hero-container-{{ ai_gen_id }}">
     {% liquid
+      # The hero shows either the film or a still, chosen in the editor. Both sets of
+      # settings stay in place, so switching back and forth loses nothing.
+      assign hero_media = block.settings.media_type
+      if hero_media == blank
+        assign hero_media = 'video'
+      endif
+
       # Use fallback clips only when no Shopify-hosted video is selected.
       assign desktop_video_src = block.settings.desktop_video.sources[1].url
       assign desktop_video_type = block.settings.desktop_video.sources[1].mime_type
@@ -633,7 +642,61 @@
         assign mobile_video_type = 'video/mp4'
       endif
     %}
-    {% if desktop_video_src != blank %}
+    {% if hero_media == 'image' %}
+      {% liquid
+        # One still is enough: without a phone-sized one the desktop image serves both.
+        assign desktop_image = block.settings.desktop_image
+        assign mobile_image = block.settings.mobile_image
+        if mobile_image == blank
+          assign mobile_image = desktop_image
+        endif
+        if desktop_image == blank
+          assign desktop_image = mobile_image
+        endif
+      %}
+      {% if desktop_image != blank %}
+        <img
+          class="ai-luxury-video-hero-image-{{ ai_gen_id }} ai-luxury-video-hero-desktop-image-{{ ai_gen_id }}"
+          src="{{ desktop_image | image_url: width: 3000 }}"
+          srcset="
+            {{ desktop_image | image_url: width: 750 }} 750w,
+            {{ desktop_image | image_url: width: 1100 }} 1100w,
+            {{ desktop_image | image_url: width: 1500 }} 1500w,
+            {{ desktop_image | image_url: width: 2000 }} 2000w,
+            {{ desktop_image | image_url: width: 3000 }} 3000w
+          "
+          sizes="100vw"
+          width="{{ desktop_image.width }}"
+          height="{{ desktop_image.height }}"
+          alt="{{ desktop_image.alt | escape }}"
+          loading="eager"
+          fetchpriority="high"
+          style="object-position: {{ desktop_image.presentation.focal_point | default: 'center center' }};"
+          data-desktop-image
+        >
+      {% endif %}
+
+      {% if mobile_image != blank %}
+        <img
+          class="ai-luxury-video-hero-image-{{ ai_gen_id }} ai-luxury-video-hero-mobile-image-{{ ai_gen_id }}"
+          src="{{ mobile_image | image_url: width: 1200 }}"
+          srcset="
+            {{ mobile_image | image_url: width: 500 }} 500w,
+            {{ mobile_image | image_url: width: 750 }} 750w,
+            {{ mobile_image | image_url: width: 1000 }} 1000w,
+            {{ mobile_image | image_url: width: 1200 }} 1200w
+          "
+          sizes="100vw"
+          width="{{ mobile_image.width }}"
+          height="{{ mobile_image.height }}"
+          alt="{{ mobile_image.alt | escape }}"
+          loading="eager"
+          fetchpriority="high"
+          style="display: none; object-position: {{ mobile_image.presentation.focal_point | default: 'center center' }};"
+          data-mobile-image
+        >
+      {% endif %}
+    {% elsif desktop_video_src != blank %}
       <video
         class="ai-luxury-video-hero-video-{{ ai_gen_id }} ai-luxury-video-hero-desktop-video-{{ ai_gen_id }}"
         {% if block.settings.enable_autoplay %}autoplay{% endif %}
@@ -646,7 +709,7 @@
       </video>
     {% endif %}
 
-    {% if mobile_video_src != blank %}
+    {% if hero_media != 'image' and mobile_video_src != blank %}
       <video
         class="ai-luxury-video-hero-video-{{ ai_gen_id }} ai-luxury-video-hero-mobile-video-{{ ai_gen_id }}"
         {% if block.settings.enable_autoplay %}autoplay{% endif %}
@@ -721,8 +784,10 @@
     class LuxuryVideoHero{{ ai_gen_id }} extends HTMLElement {
       constructor() {
         super();
-        this.desktopVideo = this.querySelector('[data-desktop-video]');
-        this.mobileVideo = this.querySelector('[data-mobile-video]');
+        // Either the films or the stills are in the markup, never both, so the swap
+        // below works the same way for each.
+        this.desktopMedia = this.querySelector('[data-desktop-video], [data-desktop-image]');
+        this.mobileMedia = this.querySelector('[data-mobile-video], [data-mobile-image]');
       }
 
       connectedCallback() {
@@ -829,19 +894,17 @@
 
       handleResponsiveVideo() {
         const isMobile = window.innerWidth <= 749;
-        
-        if (this.desktopVideo && this.mobileVideo) {
-          if (isMobile) {
-            this.desktopVideo.style.display = 'none';
-            this.mobileVideo.style.display = 'block';
-            this.desktopVideo.pause();
-            this.mobileVideo.play();
-          } else {
-            this.desktopVideo.style.display = 'block';
-            this.mobileVideo.style.display = 'none';
-            this.mobileVideo.pause();
-            this.desktopVideo.play();
-          }
+
+        if (this.desktopMedia && this.mobileMedia) {
+          const shown = isMobile ? this.mobileMedia : this.desktopMedia;
+          const hidden = isMobile ? this.desktopMedia : this.mobileMedia;
+          shown.style.display = 'block';
+          hidden.style.display = 'none';
+          if (hidden.tagName === 'VIDEO') hidden.pause();
+          if (shown.tagName === 'VIDEO') shown.play();
+        } else if (this.desktopMedia) {
+          // Only one was picked; it serves both widths.
+          this.desktopMedia.style.display = 'block';
         }
       }
     }
@@ -858,6 +921,33 @@
 {
   "name": "Luxury video hero",
   "settings": [
+    {
+      "type": "header",
+      "content": "Hero media"
+    },
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "Show",
+      "info": "Both sets of settings are kept, so you can switch back to the video at any time.",
+      "options": [
+        { "value": "video", "label": "Video" },
+        { "value": "image", "label": "Image" }
+      ],
+      "default": "video"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop image",
+      "info": "Used when Show is set to Image. Falls back to the mobile image if left empty."
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image",
+      "info": "Optional. The desktop image is used on phones when this is empty."
+    },
     {
       "type": "header",
       "content": "Desktop video"
