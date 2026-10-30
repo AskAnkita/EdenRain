@@ -250,6 +250,7 @@
         "ratio": "1 / 1",
         "tile_height": 380,
         "show_progress": true,
+        "label_color": "#ffffff",
         "color_scheme": "scheme-1",
         "padding_top": 24,
         "padding_bottom": 24

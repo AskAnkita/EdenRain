@@ -80,6 +80,15 @@
   # ------------------------------------------------------------------
   assign tile_pictures = 'Engagement Rings: category-engagement-rings-model.png, Rings: category-rings.png, Earrings: category-earrings.png, Necklaces: category-necklaces.png, Bracelets: category-bracelets.png, Best Sellers: category-best-sellers.png, Wedding Bands: category-wedding-bands-product.png'
   assign tile_picture_pairs = tile_pictures | split: ','
+
+  # The words sit straight on the photograph, so they carry a soft glow of the opposite
+  # tone to keep them readable whatever the picture does behind them.
+  assign label_brightness = section.settings.label_color | color_brightness
+  if label_brightness > 127
+    assign label_glow = 'rgb(0 0 0 / 0.55)'
+  else
+    assign label_glow = 'rgb(255 255 255 / 0.65)'
+  endif
 -%}
 
 {%- style -%}
@@ -190,7 +199,7 @@
     z-index: 1;
     display: inline-block;
     padding-bottom: 0.9rem;
-    color: #111;
+    color: {{ section.settings.label_color }};
     font-size: 1.35rem;
     font-weight: 600;
     letter-spacing: 0.16em;
@@ -198,7 +207,7 @@
     text-transform: uppercase;
     transform: translateX(-50%);
     white-space: nowrap;
-    text-shadow: 0 0 0.8rem rgb(255 255 255 / 0.65);
+    text-shadow: 0 0 0.8rem {{ label_glow }};
   }
 
   #category-tiles-{{ section.id }} .ct-label::before,
@@ -621,6 +630,13 @@
       "label": "Show the scroll progress bar",
       "info": "The bar under the row that fills as the tiles scroll. The arrows either side still work with it off.",
       "default": false
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Tile title colour",
+      "info": "The words over each picture. The glow behind them flips to suit, so a pale title stays readable on a pale photograph.",
+      "default": "#ffffff"
     },
     {
       "type": "color_scheme",
