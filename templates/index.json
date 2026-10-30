@@ -32,6 +32,7 @@
             "description": "Elegantly Crafted. Timelessly Beautiful.",
             "desktop_vertical_position": "bottom",
             "desktop_horizontal_alignment": "center",
+            "desktop_content_bottom_padding": 32,
             "mobile_content_alignment": "center",
             "mobile_content_background": "#ffffff",
             "heading_font_size": 30,

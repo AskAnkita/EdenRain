@@ -382,7 +382,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 40px 40px 88px;
+    padding: 40px 40px {{ block.settings.desktop_content_bottom_padding }}px;
     z-index: 2;
     {% if block.settings.desktop_vertical_position == 'top' %}
       justify-content: flex-start;
@@ -1113,6 +1113,17 @@
         }
       ],
       "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "desktop_content_bottom_padding",
+      "label": "Distance from bottom",
+      "info": "Space between the text and the bottom edge of the hero on desktop",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 32
     },
     {
       "type": "header",
