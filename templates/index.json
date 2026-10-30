@@ -273,128 +273,113 @@
     "favourites_carousel": {
       "type": "favourites-carousel",
       "blocks": {
-        "slide_tennis_bracelet": {
+        "tennis_33": {
           "type": "slide",
           "settings": {
-            "image_asset": "menu-tile-tennis-bracelets.png",
+            "image_asset": "",
             "image_url": "",
-            "image_alt": "Diamond tennis bracelet",
+            "image_alt": "",
             "image_scale": 100,
             "object_position": "center",
             "card_background": "rgba(0,0,0,0)",
             "badge": "#1 Best Seller",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
-            "title": "Tennis Bracelets",
+            "title": "",
             "price": "",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
-            "link": "shopify://collections/tennis-bracelets"
+            "link": "",
+            "product": "33-ctw-round-brilliant-lab-grown-diamond-tennis-necklace"
           }
         },
-        "slide_tennis_necklace": {
+        "bracelet_bezel": {
           "type": "slide",
           "settings": {
-            "image_asset": "menu-tile-tennis-necklaces.png",
+            "image_asset": "",
             "image_url": "",
-            "image_alt": "Diamond tennis necklace",
+            "image_alt": "",
             "image_scale": 100,
             "object_position": "center",
             "card_background": "rgba(0,0,0,0)",
             "badge": "",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
-            "title": "Tennis Necklaces",
+            "title": "",
             "price": "",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
-            "link": "shopify://collections/tennis-necklaces"
+            "link": "",
+            "product": "3-33-ctw-round-brilliant-lab-grown-diamond-bezel-set-tennis-bracelet"
           }
         },
-        "slide_signature_bracelet": {
+        "tennis_354": {
           "type": "slide",
           "settings": {
-            "image_asset": "menu-tile-signature-bracelets.png",
+            "image_asset": "",
             "image_url": "",
-            "image_alt": "Signature diamond bracelet",
+            "image_alt": "",
             "image_scale": 100,
             "object_position": "center",
             "card_background": "rgba(0,0,0,0)",
             "badge": "New",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
-            "title": "Signature Bracelets",
+            "title": "",
             "price": "",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
-            "link": "shopify://collections/signature-bracelets"
+            "link": "",
+            "product": "35-4-ctw-marquise-cut-lab-grown-diamond-statement-necklace"
           }
         },
-        "slide_signature_necklace": {
+        "tennis_14": {
           "type": "slide",
           "settings": {
-            "image_asset": "menu-tile-signature-necklaces.png",
+            "image_asset": "",
             "image_url": "",
-            "image_alt": "Signature diamond necklace",
+            "image_alt": "",
             "image_scale": 100,
             "object_position": "center",
             "card_background": "rgba(0,0,0,0)",
             "badge": "",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
-            "title": "Signature Necklaces",
+            "title": "",
             "price": "",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
-            "link": "shopify://collections/signature-necklaces"
+            "link": "",
+            "product": "14-ctw-marquise-pear-cut-lab-grown-diamond-cluster-necklace"
           }
         },
-        "slide_signature_earrings": {
+        "bracelet_tennis_12": {
           "type": "slide",
           "settings": {
-            "image_asset": "menu-tile-signature-earrings.png",
+            "image_asset": "",
             "image_url": "",
-            "image_alt": "Signature diamond earrings",
+            "image_alt": "",
             "image_scale": 100,
             "object_position": "center",
             "card_background": "rgba(0,0,0,0)",
             "badge": "",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
-            "title": "Signature Earrings",
-            "price": "",
+            "title": "",
+            "price": "Price on request",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
-            "link": "shopify://collections/signature-earrings"
-          }
-        },
-        "slide_best_sellers": {
-          "type": "slide",
-          "settings": {
-            "image_asset": "menu-tile-best-sellers.png",
-            "image_url": "",
-            "image_alt": "Best selling diamond jewellery",
-            "image_scale": 100,
-            "object_position": "center",
-            "card_background": "rgba(0,0,0,0)",
-            "badge": "",
-            "badge_background": "#ffffff",
-            "badge_text_color": "#1a1a1a",
-            "title": "Best Sellers",
-            "price": "",
-            "caption": "",
-            "caption_color": "rgba(0,0,0,0)",
-            "link": "shopify://collections/best-sellers"
+            "link": "",
+            "product": "12-ctw-round-brilliant-lab-grown-diamond-tennis-bracelet"
           }
         }
       },
       "block_order": [
-        "slide_tennis_bracelet",
-        "slide_tennis_necklace",
-        "slide_signature_bracelet",
-        "slide_signature_necklace",
-        "slide_signature_earrings",
-        "slide_best_sellers"
+        "tennis_33",
+        "bracelet_bezel",
+        "tennis_354",
+        "tennis_14",
+        "bracelet_tennis_12"
       ],
       "settings": {
         "heading": "Tennis Favourites",
@@ -409,7 +394,7 @@
         "panel_width": 25,
         "panel_background": "#f5f5f5",
         "link_label": "Shop the tennis collection",
-        "link_url": "shopify://collections/tennis-bracelets",
+        "link_url": "shopify://collections/tennis-necklaces",
         "link_size": 13,
         "link_tracking": 12,
         "link_transform": "uppercase",

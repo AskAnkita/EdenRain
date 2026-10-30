@@ -362,6 +362,107 @@ body.apntly-modal-container .apntly-branding-powered-by {
   opacity: 0.7;
 }
 
+/* --------------------------------------------------------- the confirmation */
+
+/*
+  Screen 4 is the whole dialog once a free booking has gone through: no heading, no button,
+  just one div holding the merchant's confirmation sentence, washed in the app's #DFF2BF
+  green and left alone in a 910px-wide white slab. Rebuilt here as a confirmation panel -
+  the card drawn in to the width of the sentence, a ruled square and a tick above it, the
+  message in the heading face - and the Done button the screen has no markup for is appended
+  by the script below. Screen 6, the failure, is given the same shape.
+
+  Neither screen carries a class of its own, so :has() names them by the one child each holds.
+*/
+body.apntly-modal-container .modal-container:has(> .free-booking-success-message-container),
+body.apntly-modal-container .modal-container:has(> .error-message-container) {
+  width: min(92vw, 520px);
+  padding: 44px 48px 48px;
+  text-align: center;
+}
+
+/* The close control floats, so the panel has to start below it rather than beside it. */
+body.apntly-modal-container .free-booking-success-message-container,
+body.apntly-modal-container .error-message-container {
+  clear: both;
+  margin: 0;
+  padding: 24px 0 0;
+  background: none;
+  color: var(--eden-ink);
+}
+
+body.apntly-modal-container .free-booking-success-message-container::before,
+body.apntly-modal-container .error-message-container::before {
+  content: '\\2713';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 28px;
+  border: 1px solid var(--eden-edge);
+  font-size: 20px;
+  line-height: 1;
+  color: var(--eden-ink);
+}
+
+body.apntly-modal-container .error-message-container::before {
+  content: '\\2715';
+}
+
+/* Both of these are sized by the app, one selector deep, so they only move for two. */
+body.apntly-modal-container .free-booking-success-message-container .success-message-text,
+body.apntly-modal-container .error-message-container .error-message-text {
+  margin: 0 auto;
+  max-width: 34ch;
+  font-family: var(--eden-heading);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  color: var(--eden-ink);
+}
+
+/* Appended by addDone() below, and the same face as the booking button two screens back. */
+body.apntly-modal-container .eden-success-done {
+  display: inline-block;
+  margin-top: 36px;
+  border: 1px solid var(--eden-ink);
+  background: var(--eden-ink);
+  color: #ffffff;
+  font-family: var(--eden-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 14px 36px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body.apntly-modal-container .eden-success-done:hover {
+  background: #ffffff;
+  color: var(--eden-ink);
+}
+
+/* The browser's own ring is a blue slab against the ink fill; a hairline outside it instead. */
+body.apntly-modal-container .eden-success-done:focus {
+  outline: none;
+}
+
+body.apntly-modal-container .eden-success-done:focus-visible {
+  outline: 1px solid var(--eden-ink);
+  outline-offset: 3px;
+}
+
+/* The app's byline floats right, which on a centred card leaves it hanging off one corner. */
+body.apntly-modal-container .modal-container:has(> .free-booking-success-message-container) .apntly-branding-powered-by,
+body.apntly-modal-container .modal-container:has(> .error-message-container) .apntly-branding-powered-by {
+  float: none;
+  justify-content: center;
+  margin: 32px 0 0;
+}
+
 /* --------------------------------------------------------------- the layout */
 
 /*
@@ -634,6 +735,31 @@ body.apntly-modal-container .apntly-branding-powered-by {
   };
 
   /*
+    The confirmation screen has no way out of its own: the app draws the message and leaves the
+    corner X as the only exit. A Done button is appended to the panel instead, wired to that X
+    so the app still closes the modal its own way.
+
+    Vue owns the panel, so this runs off a mutation observer rather than once: if a re-render
+    ever drops the button, the record that dropped it puts it back.
+  */
+  const DONE_MARK = 'data-eden-done';
+
+  const addDone = (doc) => {
+    const panel = doc.querySelector('.free-booking-success-message-container');
+    if (!panel || panel.querySelector(`[${DONE_MARK}]`)) return;
+    const close = doc.querySelector('.close-icon, .action-close');
+    if (!close) return;
+
+    const done = doc.createElement('button');
+    done.type = 'button';
+    done.className = 'eden-success-done';
+    done.setAttribute(DONE_MARK, '');
+    done.textContent = 'Done';
+    done.addEventListener('click', () => close.click());
+    panel.appendChild(done);
+  };
+
+  /*
     The stylesheet goes in once per iframe document. Vue mounts on #app and leaves <head>
     alone, so nothing re-renders it away; the guard is only against the load event and the
     observer both firing for the same frame.
@@ -645,6 +771,16 @@ body.apntly-modal-container .apntly-branding-powered-by {
     style.setAttribute(MARK, '');
     style.textContent = skin();
     doc.head.appendChild(style);
+
+    /*
+      One observer per document, set up alongside the stylesheet so the guard above keeps it
+      to one: the modal's screens come and go inside this frame for as long as it is open.
+    */
+    addDone(doc);
+    new MutationObserver(() => addDone(doc)).observe(doc.body || doc.documentElement, {
+      childList: true,
+      subtree: true,
+    });
   };
 
   const watch = (frame) => {

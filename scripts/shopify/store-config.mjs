@@ -101,6 +101,12 @@ export const collections = [
     ['chains', 'Chains', 'chain'],
     ['charms', 'Charms', 'charm'],
   ].map(([handle, title, value]) => ({ handle, title, rule: tag(`category:${value}`) })),
+  // The two tiles the homepage "Tennis Favourites" carousel links to (templates/index.json).
+  // Both rules are needed: `style:tennis` says what the piece is, but the same word describes a
+  // bracelet and a necklace, and each tile browses only its own kind. Without the category tag
+  // the two collections would hold exactly the same products.
+  { handle: 'tennis-bracelets', title: 'Tennis Bracelets', rules: [tag('style:tennis'), tag('category:bracelet')] },
+  { handle: 'tennis-necklaces', title: 'Tennis Necklaces', rules: [tag('style:tennis'), tag('category:necklace')] },
 
   // Shop by shape, across the whole catalogue: every piece whose stone or outline is that shape,
   // not just engagement rings. `shape:<x>` is the same tag the Shape group in the collection

@@ -443,6 +443,38 @@
           assign slide_url = block.settings.image_url | strip
           assign slide_alt = block.settings.image_alt | default: block.settings.caption
           assign slide_link = block.settings.link
+          assign slide_title = block.settings.title
+          assign slide_price = block.settings.price
+
+          # A panel can name a product instead of being filled in by hand. Everything the
+          # product knows - its picture, title, price and URL - is only used where the panel
+          # left that field empty, so a tile can still borrow a product's photograph while
+          # carrying its own wording. Without this the carousel showed whatever pictures were
+          # last uploaded to assets/, which no amount of adding products to the shop could change.
+          assign slide_product = block.settings.product
+          if slide_product != blank
+            if slide_image == blank and slide_asset == blank and slide_url == blank
+              assign slide_image = slide_product.featured_image
+            endif
+            if slide_alt == blank
+              assign slide_alt = slide_product.featured_image.alt | default: slide_product.title
+            endif
+            if slide_title == blank
+              assign slide_title = slide_product.title
+            endif
+            if slide_price == blank
+              assign slide_price = slide_product.price_min | money
+              if slide_product.price_varies
+                assign slide_price = 'From ' | append: slide_price
+              endif
+            endif
+            # The product's own page wins over the section's catch-all link, but not over a
+            # link set on the panel.
+            if slide_link == blank
+              assign slide_link = slide_product.url
+            endif
+          endif
+
           if slide_link == blank
             assign slide_link = section.settings.link_url
           endif
@@ -528,18 +560,18 @@
           {%- endif -%}
 
           {%- if section.settings.info_display != 'hidden' -%}
-            {%- if block.settings.title != blank or block.settings.price != blank -%}
+            {%- if slide_title != blank or slide_price != blank -%}
               <div class="fav-info">
-                {%- if block.settings.title != blank -%}
+                {%- if slide_title != blank -%}
                   {%- if slide_link != blank -%}
-                    <a class="fav-title" href="{{ slide_link }}">{{ block.settings.title | escape }}</a>
+                    <a class="fav-title" href="{{ slide_link }}">{{ slide_title | escape }}</a>
                   {%- else -%}
-                    <p class="fav-title">{{ block.settings.title | escape }}</p>
+                    <p class="fav-title">{{ slide_title | escape }}</p>
                   {%- endif -%}
                 {%- endif -%}
 
-                {%- if block.settings.price != blank -%}
-                  <p class="fav-price">{{ block.settings.price | escape }}</p>
+                {%- if slide_price != blank -%}
+                  <p class="fav-price">{{ slide_price }}</p>
                 {%- endif -%}
               </div>
             {%- endif -%}
@@ -639,8 +671,11 @@
       "type": "slide",
       "name": "Picture panel",
       "settings": [
+        { "type": "header", "content": "Product" },
+        { "type": "product", "id": "product", "label": "Product", "info": "Optional. The panel borrows this product's picture, title, price and link for every field below it leaves empty." },
+
         { "type": "header", "content": "Picture" },
-        { "type": "image_picker", "id": "image", "label": "Picture" },
+        { "type": "image_picker", "id": "image", "label": "Picture", "info": "Overrides the product's own picture." },
         { "type": "text", "id": "image_asset", "label": "Picture file name (fallback)", "info": "A file name in Content > Files (or assets/), e.g. menu-tile-tennis-bracelets.png. Only used when no picture is chosen." },
         { "type": "text", "id": "image_url", "label": "Picture URL (fallback)", "info": "Only used when neither of the two above is set." },
         { "type": "text", "id": "image_alt", "label": "Picture alt text" },

@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Eden Raine London — Ring Size Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400;500&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 14mm 13mm 12mm; }
+
+  :root {
+    --pink: #e3d4cf;
+    --pink-soft: #f4ece9;
+    --ink: #000;
+    --muted: #6a6a6a;
+    --rule: #d8d8d8;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Source Sans 3', 'Source Sans Pro', -apple-system, sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.5;
+    color: var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  h1, h2, .display { font-family: Cormorant, Georgia, serif; font-weight: 400; margin: 0; }
+
+  /* A4 is 297mm; the @page margins take 14mm off the top and 12mm off the bottom,
+     so this is exactly the printable height. Making each sheet that tall lets the
+     footer sit on the baseline of its own page without position:fixed, which Chrome
+     would otherwise repeat on every page. */
+  .sheet { height: 271mm; display: flex; flex-direction: column; page-break-after: always; }
+  .sheet:last-child { page-break-after: auto; }
+  .foot-spacer { margin-top: auto; }
+
+  /* --- masthead ------------------------------------------------------- */
+  .masthead { text-align: center; padding-bottom: 7mm; border-bottom: 1px solid var(--ink); }
+  .masthead img { width: 46mm; height: auto; }
+  h1 { font-size: 30pt; letter-spacing: .14em; text-transform: uppercase; margin-top: 6mm; }
+  .kicker {
+    font-size: 8pt; letter-spacing: .3em; text-transform: uppercase;
+    color: var(--muted); margin-top: 3mm;
+  }
+
+  /* --- page 1 --------------------------------------------------------- */
+  .intro { margin: 7mm 0 0; font-size: 10pt; line-height: 1.65; }
+  .intro .lead { font-family: Cormorant, Georgia, serif; font-size: 13pt; line-height: 1.5; }
+
+  .band {
+    background: var(--pink); padding: 5mm 6mm; margin: 7mm 0;
+    display: flex; align-items: center; gap: 6mm;
+  }
+  .band .label { font-size: 8pt; letter-spacing: .22em; text-transform: uppercase; }
+  .band .title { font-family: Cormorant, Georgia, serif; font-size: 15pt; line-height: 1.2; }
+  .band .url { font-size: 7.5pt; color: #4a4a4a; word-break: break-all; line-height: 1.35; margin-top: 1.5mm; }
+
+  h2 {
+    font-size: 15pt; letter-spacing: .04em; margin: 8mm 0 4mm;
+    padding-bottom: 2mm; border-bottom: 1px solid var(--rule);
+  }
+
+  ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: step; }
+  ol.steps li {
+    counter-increment: step; position: relative;
+    padding: 0 0 4mm 11mm; line-height: 1.55;
+  }
+  ol.steps li::before {
+    content: counter(step); position: absolute; left: 0; top: -0.3mm;
+    width: 7mm; height: 7mm; background: var(--pink);
+    font-family: Cormorant, Georgia, serif; font-size: 11pt;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .note {
+    margin-top: 4mm; padding: 4mm 5mm; background: var(--pink-soft);
+    font-size: 8.5pt; line-height: 1.5;
+  }
+
+  .foot {
+    margin-top: auto; display: flex; justify-content: space-between;
+    font-size: 7pt; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); border-top: 1px solid var(--rule); padding-top: 2mm;
+  }
+
+  /* --- page 2: the chart ---------------------------------------------- */
+  .chart-head { text-align: center; margin-bottom: 5mm; }
+  .chart-head .display { font-size: 21pt; letter-spacing: .05em; }
+  .chart-head p { margin: 2mm 0 0; font-size: 8.5pt; color: var(--muted); }
+
+  .columns { display: flex; gap: 6mm; }
+  .columns > div { flex: 1; }
+
+  table.chart { width: 100%; border-collapse: collapse; font-size: 7.2pt; font-variant-numeric: tabular-nums; line-height: 1.25; }
+  table.chart th, table.chart td {
+    padding: 0.62mm 0.6mm; text-align: center; border-bottom: 0.3pt solid var(--rule);
+  }
+  table.chart .grp {
+    background: var(--ink); color: #fff; font-weight: 400;
+    font-size: 6.6pt; letter-spacing: .16em; text-transform: uppercase; padding: 1.4mm 0;
+  }
+  table.chart .grp-alt { background: #5a5a5a; }
+  table.chart thead tr:last-child th {
+    background: var(--pink); font-weight: 600; font-size: 6.6pt;
+    letter-spacing: .04em; line-height: 1.2; padding: 1.2mm 0.4mm;
+    border-bottom: 0.6pt solid var(--ink);
+  }
+  table.chart td.uk, table.chart th.uk { font-weight: 600; }
+  table.chart tr.whole { background: var(--pink-soft); }
+  table.chart tr.whole td.uk { font-size: 8.4pt; }
+  table.chart td.none { color: #bdbdbd; }
+  table.chart td.dim { color: var(--muted); }
+
+  .key {
+    margin-top: 4mm; display: flex; gap: 7mm; justify-content: center;
+    font-size: 7.5pt; color: var(--muted); align-items: center;
+  }
+  .key span { display: inline-flex; align-items: center; gap: 2mm; }
+  .key i { width: 4mm; height: 3mm; display: inline-block; }
+  .key i.whole { background: var(--pink-soft); border: 0.3pt solid var(--rule); }
+</style>
+</head>
+<body>
+
+<section class="sheet">
+  <header class="masthead">
+    <img src="https://cdn.shopify.com/s/files/1/0423/9668/0352/files/Eden_Raine_Logo_Full.png?v=1615321151" alt="Eden Raine London">
+    <h1>Ring Size Guide</h1>
+    <p class="kicker">How to measure at home</p>
+  </header>
+
+  <div class="intro"><p class="lead">If you are planning to buy a ring for a loved one but are unsure of their ring size, we can help. Download our free ring sizer guide to find out your ring size at home. All you have to do is simply download the sizer below, and follow the instructions below. Of course, we will be happy to assist you any way we can so please feel free to get in touch with any queries you may have.</p></div>
+
+  <div class="band">
+    <div>
+      <div class="label">Step one</div>
+      <div class="title">Print the free Eden Raine ring sizer</div>
+      <div class="url">https://cdn.shopify.com/s/files/1/0423/9668/0352/files/er_Ring_sizer.pdf?v=1624288622</div>
+    </div>
+  </div>
+
+  <h2>Measuring your finger</h2>
+  <ol class="steps"><li>Download the PDF file above, print to scale on A4 paper, and using a pair of scissors cut around the dotted lines to reveal your finger sizer.</li>
+<li>You can check the document is printed to scale by measuring the 5cm line once printed.</li>
+<li>Make a slit in the sizer where shown, and wrap the band sizer around your finger, with the end of the band poking through the slit you’ve made.</li>
+<li>The sizer should fit comfortably around your finger, take care to ensure it is not too tight. Make sure you can remove the sizer over your knuckle.</li>
+<li>The letter indicated by the “Ring Size” in the slit indicates the ring size you will need. This guide is for indication purposes only, and should you have any questions please get in touch with us directly and we will be happy to assist you in any way.</li></ol>
+
+  <div class="note">
+    <strong>Need a hand?</strong> Call us on +44 (0) 203 554 887 and we will talk you through it, or see the full
+    guide at edenraine.com/pages/er-sizing.
+  </div>
+
+  <div class="foot"><span>Eden Raine London</span><span>Page 1 of 2</span></div>
+</section>
+
+<section class="sheet">
+  <header class="chart-head">
+    <div class="display">International Conversion Chart</div>
+    <p>Compare ring sizes between the UK, the United States and Europe. 80 sizes.</p>
+  </header>
+
+  <div class="columns">
+    <div><table class="chart">
+    <thead>
+      <tr><th colspan="3" class="grp">Standard sizes</th><th colspan="3" class="grp grp-alt">Inside measurement</th></tr>
+      <tr><th class="uk">UK &amp;<br>AUS</th><th>US &amp;<br>CAN</th><th>EU</th>
+          <th class="num">Dia.<br>mm</th><th class="num">Circ.<br>mm</th><th class="num">Dia.<br>in</th></tr>
+    </thead>
+    <tbody><tr class="">
+        <td class="uk">·</td><td>0000</td><td class="none">·</td>
+        <td class="num">9.9</td><td class="num">31.1</td><td class="num dim">0.390</td>
+      </tr>
+<tr class="">
+        <td class="uk">·</td><td>00</td><td class="none">·</td>
+        <td class="num">10.7</td><td class="num">33.7</td><td class="num dim">0.442</td>
+      </tr>
+<tr class="">
+        <td class="uk">·</td><td>0</td><td class="none">·</td>
+        <td class="num">11.5</td><td class="num">36.2</td><td class="num dim">0.454</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">A</td><td>1/2</td><td class="none">·</td>
+        <td class="num">12.0</td><td class="num">37.5</td><td class="num dim">0.470</td>
+      </tr>
+<tr class="">
+        <td class="uk">A 1/2</td><td>3/4</td><td class="none">·</td>
+        <td class="num">12.2</td><td class="num">38.3</td><td class="num dim">0.479</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">B</td><td>1</td><td class="none">·</td>
+        <td class="num">12.4</td><td class="num">38.9</td><td class="num dim">0.487</td>
+      </tr>
+<tr class="">
+        <td class="uk">B 1/2</td><td>1 1/4</td><td class="none">·</td>
+        <td class="num">12.6</td><td class="num">39.6</td><td class="num dim">0.506</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">C</td><td>1 1/2</td><td class="none">·</td>
+        <td class="num">12.8</td><td class="num">40.2</td><td class="num dim">0.503</td>
+      </tr>
+<tr class="">
+        <td class="uk">C 1/2</td><td>1 3/4</td><td class="none">·</td>
+        <td class="num">13.0</td><td class="num">40.8</td><td class="num dim">0.511</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">D</td><td>2</td><td>41 1/2</td>
+        <td class="num">13.2</td><td class="num">41.5</td><td class="num dim">0.520</td>
+      </tr>
+<tr class="">
+        <td class="uk">D 1/2</td><td>2 1/4</td><td class="none">·</td>
+        <td class="num">13.4</td><td class="num">42.1</td><td class="num dim">0.528</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">E</td><td>2 1/2</td><td>42 3/4</td>
+        <td class="num">13.6</td><td class="num">42.8</td><td class="num dim">0.536</td>
+      </tr>
+<tr class="">
+        <td class="uk">E 1/2</td><td>2 3/4</td><td class="none">·</td>
+        <td class="num">13.8</td><td class="num">43.5</td><td class="num dim">0.544</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">F</td><td>3</td><td>44</td>
+        <td class="num">14.0</td><td class="num">44.1</td><td class="num dim">0.553</td>
+      </tr>
+<tr class="">
+        <td class="uk">F 1/2</td><td>3 1/8</td><td class="none">·</td>
+        <td class="num">14.2</td><td class="num">44.5</td><td class="num dim">0.557</td>
+      </tr>
+<tr class="">
+        <td class="uk">F 3/4</td><td>3 1/4</td><td class="none">·</td>
+        <td class="num">14.3</td><td class="num">44.8</td><td class="num dim">0.561</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">G</td><td>3 3/8</td><td>45 1/4</td>
+        <td class="num">14.4</td><td class="num">45.1</td><td class="num dim">0.565</td>
+      </tr>
+<tr class="">
+        <td class="uk">G 1/4</td><td>3 1/2</td><td class="none">·</td>
+        <td class="num">14.5</td><td class="num">45.4</td><td class="num dim">0.568</td>
+      </tr>
+<tr class="">
+        <td class="uk">G 1/2</td><td>3 5/8</td><td class="none">·</td>
+        <td class="num">14.6</td><td class="num">45.7</td><td class="num dim">0.573</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">H</td><td>3 3/4</td><td>46 1/2</td>
+        <td class="num">14.7</td><td class="num">46.0</td><td class="num dim">0.576</td>
+      </tr>
+<tr class="">
+        <td class="uk">H 1/2</td><td>4</td><td class="none">·</td>
+        <td class="num">14.9</td><td class="num">46.7</td><td class="num dim">0.585</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">I</td><td>4 1/4</td><td>47 3/4</td>
+        <td class="num">15.0</td><td class="num">47.3</td><td class="num dim">0.592</td>
+      </tr>
+<tr class="">
+        <td class="uk">I 1/2</td><td>4 1/2</td><td class="none">·</td>
+        <td class="num">15.3</td><td class="num">48.0</td><td class="num dim">0.601</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">J</td><td>4 5/8</td><td>50</td>
+        <td class="num">15.4</td><td class="num">48.4</td><td class="num dim">0.606</td>
+      </tr>
+<tr class="">
+        <td class="uk">J 1/4</td><td>4 3/4</td><td class="none">·</td>
+        <td class="num">15.5</td><td class="num">48.8</td><td class="num dim">0.611</td>
+      </tr>
+<tr class="">
+        <td class="uk">J 1/2</td><td>5</td><td class="none">·</td>
+        <td class="num">15.7</td><td class="num">50.3</td><td class="num dim">0.618</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">K</td><td>5 1/8</td><td>50</td>
+        <td class="num">15.8</td><td class="num">50.6</td><td class="num dim">0.622</td>
+      </tr>
+<tr class="">
+        <td class="uk">K 1/4</td><td>5 1/4</td><td class="none">·</td>
+        <td class="num">15.9</td><td class="num">50.0</td><td class="num dim">0.625</td>
+      </tr>
+<tr class="">
+        <td class="uk">K 1/2</td><td>5 3/8</td><td class="none">·</td>
+        <td class="num">16.0</td><td class="num">50.3</td><td class="num dim">0.630</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">L</td><td>5 1/2</td><td>51 3/4</td>
+        <td class="num">16.1</td><td class="num">50.6</td><td class="num dim">0.634</td>
+      </tr>
+<tr class="">
+        <td class="uk">L 1/4</td><td>5 3/4</td><td class="none">·</td>
+        <td class="num">16.3</td><td class="num">51.2</td><td class="num dim">0.642</td>
+      </tr>
+<tr class="">
+        <td class="uk">L 1/2</td><td>5 7/8</td><td class="none">·</td>
+        <td class="num">16.4</td><td class="num">51.6</td><td class="num dim">0.646</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">M</td><td>6</td><td>52 3/4</td>
+        <td class="num">16.5</td><td class="num">51.9</td><td class="num dim">0.650</td>
+      </tr>
+<tr class="">
+        <td class="uk">M 1/2</td><td>6 1/4</td><td class="none">·</td>
+        <td class="num">16.7</td><td class="num">52.5</td><td class="num dim">0.658</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">N</td><td>6 1/2</td><td>54</td>
+        <td class="num">16.9</td><td class="num">53.2</td><td class="num dim">0.666</td>
+      </tr>
+<tr class="">
+        <td class="uk">N 1/2</td><td>6 3/4</td><td class="none">·</td>
+        <td class="num">17.1</td><td class="num">53.8</td><td class="num dim">0.674</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">O</td><td>7</td><td>55 1/4</td>
+        <td class="num">17.4</td><td class="num">54.5</td><td class="num dim">0.683</td>
+      </tr>
+<tr class="">
+        <td class="uk">O 1/2</td><td>7 1/4</td><td class="none">·</td>
+        <td class="num">17.5</td><td class="num">54.8</td><td class="num dim">0.687</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">P</td><td>7 1/2</td><td>56 1/2</td>
+        <td class="num">17.8</td><td class="num">55.8</td><td class="num dim">0.698</td>
+      </tr>
+<tr class="">
+        <td class="uk">P 1/2</td><td>7 3/4</td><td class="none">·</td>
+        <td class="num">18.0</td><td class="num">56.5</td><td class="num dim">0.707</td>
+      </tr></tbody>
+  </table></div>
+    <div><table class="chart">
+    <thead>
+      <tr><th colspan="3" class="grp">Standard sizes</th><th colspan="3" class="grp grp-alt">Inside measurement</th></tr>
+      <tr><th class="uk">UK &amp;<br>AUS</th><th>US &amp;<br>CAN</th><th>EU</th>
+          <th class="num">Dia.<br>mm</th><th class="num">Circ.<br>mm</th><th class="num">Dia.<br>in</th></tr>
+    </thead>
+    <tbody><tr class="whole">
+        <td class="uk">Q</td><td>8</td><td>57 3/4</td>
+        <td class="num">18.2</td><td class="num">57.1</td><td class="num dim">0.716</td>
+      </tr>
+<tr class="">
+        <td class="uk">Q 1/2</td><td>8 1/4</td><td class="none">·</td>
+        <td class="num">18.4</td><td class="num">57.7</td><td class="num dim">0.722</td>
+      </tr>
+<tr class="">
+        <td class="uk">Q 3/4</td><td>8 1/2</td><td class="none">·</td>
+        <td class="num">18.5</td><td class="num">58.2</td><td class="num dim">0.729</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">R</td><td>8 5/8</td><td>59</td>
+        <td class="num">18.6</td><td class="num">58.5</td><td class="num dim">0.733</td>
+      </tr>
+<tr class="">
+        <td class="uk">R 1/4</td><td>8 3/4</td><td class="none">·</td>
+        <td class="num">18.7</td><td class="num">58.7</td><td class="num dim">0.736</td>
+      </tr>
+<tr class="">
+        <td class="uk">R 1/2</td><td>8 7/8</td><td class="none">·</td>
+        <td class="num">18.8</td><td class="num">59.1</td><td class="num dim">0.740</td>
+      </tr>
+<tr class="">
+        <td class="uk">R 3/4</td><td>9</td><td class="none">·</td>
+        <td class="num">18.9</td><td class="num">59.3</td><td class="num dim">0.743</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">S</td><td>9 1/8</td><td>60 1/4</td>
+        <td class="num">19.1</td><td class="num">60.0</td><td class="num dim">0.752</td>
+      </tr>
+<tr class="">
+        <td class="uk">S 1/4</td><td>9 1/4</td><td class="none">·</td>
+        <td class="num">19.2</td><td class="num">60.4</td><td class="num dim">0.757</td>
+      </tr>
+<tr class="">
+        <td class="uk">S 1/2</td><td>9 3/8</td><td class="none">·</td>
+        <td class="num">19.3</td><td class="num">60.7</td><td class="num dim">0.760</td>
+      </tr>
+<tr class="">
+        <td class="uk">S 3/4</td><td>9 1/2</td><td class="none">·</td>
+        <td class="num">19.4</td><td class="num">61.0</td><td class="num dim">0.764</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">T</td><td>9 5/8</td><td>61 1/2</td>
+        <td class="num">19.5</td><td class="num">61.3</td><td class="num dim">0.768</td>
+      </tr>
+<tr class="">
+        <td class="uk">T 1/4</td><td>9 3/4</td><td class="none">·</td>
+        <td class="num">19.6</td><td class="num">61.6</td><td class="num dim">0.772</td>
+      </tr>
+<tr class="">
+        <td class="uk">T 1/2</td><td>10</td><td class="none">·</td>
+        <td class="num">19.8</td><td class="num">62.3</td><td class="num dim">0.781</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">U</td><td>10 1/4</td><td>62 3/4</td>
+        <td class="num">20.0</td><td class="num">62.9</td><td class="num dim">0.780</td>
+      </tr>
+<tr class="">
+        <td class="uk">U 1/2</td><td>10 1/2</td><td class="none">·</td>
+        <td class="num">20.2</td><td class="num">63.5</td><td class="num dim">0.795</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">V</td><td>10 5/8</td><td>63</td>
+        <td class="num">20.3</td><td class="num">63.8</td><td class="num dim">0.800</td>
+      </tr>
+<tr class="">
+        <td class="uk">V 1/4</td><td>10 3/4</td><td class="none">·</td>
+        <td class="num">20.4</td><td class="num">64.2</td><td class="num dim">0.805</td>
+      </tr>
+<tr class="">
+        <td class="uk">V 1/2</td><td>11</td><td class="none">·</td>
+        <td class="num">20.7</td><td class="num">65.0</td><td class="num dim">0.814</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">W</td><td>11 1/8</td><td>65</td>
+        <td class="num">20.8</td><td class="num">65.2</td><td class="num dim">0.817</td>
+      </tr>
+<tr class="">
+        <td class="uk">W 1/4</td><td>11 1/4</td><td class="none">·</td>
+        <td class="num">20.9</td><td class="num">65.5</td><td class="num dim">0.821</td>
+      </tr>
+<tr class="">
+        <td class="uk">W 1/2</td><td>11 3/8</td><td class="none">·</td>
+        <td class="num">20.9</td><td class="num">65.8</td><td class="num dim">0.824</td>
+      </tr>
+<tr class="">
+        <td class="uk">W 3/4</td><td>11 1/2</td><td class="none">·</td>
+        <td class="num">21.0</td><td class="num">66.2</td><td class="num dim">0.830</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">X</td><td>11 5/8</td><td>66 1/4</td>
+        <td class="num">21.2</td><td class="num">66.5</td><td class="num dim">0.834</td>
+      </tr>
+<tr class="">
+        <td class="uk">X 1/4</td><td>11 3/4</td><td class="none">·</td>
+        <td class="num">21.2</td><td class="num">66.7</td><td class="num dim">0.836</td>
+      </tr>
+<tr class="">
+        <td class="uk">X 1/2</td><td>11 7/8</td><td class="none">·</td>
+        <td class="num">21.3</td><td class="num">66.9</td><td class="num dim">0.838</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">Y</td><td>12</td><td>67 1/2</td>
+        <td class="num">21.5</td><td class="num">67.5</td><td class="num dim">0.846</td>
+      </tr>
+<tr class="">
+        <td class="uk">Y 1/2</td><td>12 1/4</td><td class="none">·</td>
+        <td class="num">21.7</td><td class="num">68.1</td><td class="num dim">0.854</td>
+      </tr>
+<tr class="whole">
+        <td class="uk">Z</td><td>12 1/2</td><td>68 3/4</td>
+        <td class="num">21.9</td><td class="num">68.8</td><td class="num dim">0.861</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z +1/2</td><td>12 3/4</td><td class="none">·</td>
+        <td class="num">22.1</td><td class="num">69.4</td><td class="num dim">0.870</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z+1</td><td>13</td><td class="none">·</td>
+        <td class="num">22.3</td><td class="num">70.2</td><td class="num dim">0.879</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z+1.5</td><td>13.5</td><td class="none">·</td>
+        <td class="num">22.6</td><td class="num">71.0</td><td class="num dim">0.890</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z+2</td><td class="none">·</td><td class="none">·</td>
+        <td class="num">22.7</td><td class="num">71.3</td><td class="num dim">0.893</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z+2.5</td><td class="none">·</td><td class="none">·</td>
+        <td class="num">22.9</td><td class="num">72.0</td><td class="num dim">0.902</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z+3</td><td class="none">·</td><td class="none">·</td>
+        <td class="num">23.0</td><td class="num">72.5</td><td class="num dim">0.908</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z+3.5</td><td class="none">·</td><td class="none">·</td>
+        <td class="num">23.3</td><td class="num">73.0</td><td class="num dim">0.915</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z+4</td><td class="none">·</td><td class="none">·</td>
+        <td class="num">23.5</td><td class="num">73.7</td><td class="num dim">0.924</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z+4.5</td><td class="none">·</td><td class="none">·</td>
+        <td class="num">23.6</td><td class="num">74.0</td><td class="num dim">0.927</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z+5</td><td class="none">·</td><td class="none">·</td>
+        <td class="num">23.9</td><td class="num">75.0</td><td class="num dim">0.940</td>
+      </tr>
+<tr class="">
+        <td class="uk">Z+6</td><td class="none">·</td><td class="none">·</td>
+        <td class="num">24.3</td><td class="num">76.2</td><td class="num dim">0.955</td>
+      </tr></tbody>
+  </table></div>
+  </div>
+
+  <div class="key">
+    <span><i class="whole"></i> Whole UK letter size</span>
+    <span>· No equivalent size</span>
+    <span>Dia. = inside diameter &nbsp;·&nbsp; Circ. = inside circumference</span>
+  </div>
+
+  <div class="foot"><span>Eden Raine London &nbsp;·&nbsp; edenraine.com/pages/er-sizing</span><span>29 October 2026 &nbsp;·&nbsp; Page 2 of 2</span></div>
+</section>
+
+</body>
+</html>

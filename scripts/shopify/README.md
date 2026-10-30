@@ -425,3 +425,35 @@ unless `--drafts` is passed; nothing links to it, so it costs nothing where it i
 
 Deleting a blog is permanent. Every blog about to go, every article inside it, and the original
 body of every page about to be edited are written to `backups/` before the first write.
+
+## Print the ring size guide as a PDF
+
+`er_Ring_sizer.pdf` in Content > Files is only the cut-out band sizer. The international conversion
+chart — 80 rows, UK to US to EU — has only ever existed as an HTML table in the `/pages/er-sizing`
+body. This builds a two-page A4 PDF of the whole guide: the measuring steps on page one, the entire
+chart on page two.
+
+```bash
+node scripts/shopify/build-ring-size-pdf.mjs                 # -> design-previews/eden-raine-ring-size-guide.pdf
+node scripts/shopify/build-ring-size-pdf.mjs --out=path.pdf  # somewhere else
+node scripts/shopify/build-ring-size-pdf.mjs --html          # keep the HTML beside it, to tweak the layout
+```
+
+Everything is read live from the page, so an edit made in the Shopify admin shows up on the next
+run. Nothing is ever written back to the store — the PDF is left in `design-previews/` for a human
+to check before it goes anywhere near Content > Files.
+
+Two sets of substitutions are applied to the copy on the way through, and both are printed on every
+run so they stay visible: `TYPOS`, for plain mistakes in the page ("it is. not too tight"), and
+`PRINT_ADAPTATIONS`, for wording that only works on a screen ("click here" becomes a reference to
+the panel that carries the address). A left-hand side that no longer matches simply stops firing,
+so fixing the page retires its entry rather than double-correcting it.
+
+The numbers are copied from the page exactly as they stand, including the handful that disagree with
+each other — the chart has a few rows where the inches column and the millimetre column are not the
+same measurement. Correct the page, not the PDF, and re-run.
+
+Rendering needs a browser. This repo has no `node_modules`, so the script borrows the Playwright left
+in `~/.npm/_npx` by `npx playwright` and drives the installed Google Chrome through it
+(`channel: 'chrome'`), because the browser build in the Playwright cache is usually older than the
+Playwright that wants it.
