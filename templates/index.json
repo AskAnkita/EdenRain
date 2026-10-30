@@ -19,7 +19,7 @@
             "desktop_image": "shopify://shop_images/hero-underwater-rings.jpg",
             "placeholder_desktop_video_url": "https://cdn.shopify.com/videos/c/o/v/d104411d81c940fb996fc439f675d3c2.mp4",
             "enable_full_height": true,
-            "desktop_height": 90,
+            "desktop_height": 100,
             "placeholder_mobile_video_url": "https://cdn.shopify.com/videos/c/o/v/a44d0c0308f5486c9329c4ca6df1d823.mp4",
             "mobile_height": 54,
             "enable_autoplay": true,
