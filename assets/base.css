@@ -21469,10 +21469,14 @@ footer.section-footer .email-signup__input {
   }
 
   /* Capitals with the same tracking as the nav; the magnifier sits at the far
-     end of the underline, which is what --header-search-button-pos-right moves. */
+     end of the underline, which is what --header-search-button-pos-right moves.
+     The field's own padding-block is what sets the utility row's height — it
+     came to 48px against a 32px logo, so the logo sat centred in the leftover
+     and picked up eight pixels of air it had no setting for. Even padding
+     brings the field down to roughly the logo's own height. */
   #header-component .header__column--left .search--inline .search__input.field__input {
     padding-left: 0;
-    padding-bottom: 0.9rem;
+    padding-block: 0.8rem;
     font-size: 1.3rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -21598,6 +21602,114 @@ footer.section-footer .email-signup__input {
   #header-component .header__row--top .header__columns {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
+}
+
+/* --- Row heights ----------------------------------------------------
+   The utility row and the nav row below it together stood taller than the
+   logo twice over and pushed the hero banner down the page. The layout is
+   unchanged — search | logo | utilities, nav on its own row — it is only set
+   tighter. The row padding comes out of the section settings, but the chip
+   and the nav links each carry their own block padding on top of it, so both
+   come down with it or the rows keep most of their height. */
+@media screen and (min-width: 1025px) {
+  #header-component .header-consultant {
+    padding-block: 0.6rem;
+  }
+
+  #header-component .header__row--bottom .list-menu--inline > li > .header__menu-item,
+  #header-component .header__row--bottom .list-menu--inline > li > details > .header__menu-item {
+    padding-block: 0.7rem;
+  }
+
+  /* The logo is 32px tall at its set width, but the account/wishlist/cart
+     boxes above were 36px, so the row was four pixels taller than the logo and
+     the logo sat centred in the leftover — reading as extra air above and
+     below it that no padding setting could reach. The boxes come down to the
+     logo's own height; the glyphs inside them stay 1.8rem, so each is still a
+     32px pointer target. */
+  #header-component .header__column--right .header__icon,
+  #header-component .header__column--right .header__icon .svg-wrapper {
+    width: 3.2rem;
+    height: 3.2rem;
+    min-width: 3.2rem;
+    min-height: 3.2rem;
+  }
+
+  /* What actually set the utility row's height: the inline search field is
+     pinned to --minimum-touch-target, 45px, against a 32px logo, so the logo
+     sat centred in the leftover with eight pixels of air above and below it
+     that no padding setting could reach. That floor is there for a finger on a
+     phone; this rule is desktop-only and 34px is still well clear of the 24px
+     WCAG target size. The search drawer on mobile is untouched. */
+  #header-component .header__column--left .search--inline .predictive-search--center .search__input {
+    height: 3.4rem;
+  }
+
+  /* The other half of it: the logo's link carries --padding-xs on all four
+     sides, so eight pixels sat above and below the wordmark inside the row's
+     own padding. The theme already drops it to horizontal-only below 1025px;
+     this does the same on desktop. */
+  #header-component .header__heading-link {
+    padding-block: 0;
+  }
+
+  /* With both of those out of the way, what is left holding each row open is
+     the 4.4rem floor on .header__columns further up. It has to stay a floor:
+     on desktop the centre column — the logo on one row, the nav on the other —
+     is positioned absolutely and contributes no height, so a row with nothing
+     but a centred child collapses without it. 3.8rem still clears the 36.4px
+     nav and leaves the 32px logo three pixels of air each side. */
+  #header-component .header__columns {
+    min-height: 3.8rem;
+  }
+}
+
+/* --- Announcement strap ----------------------------------------------
+   The strap is one line of 1.4rem text, and the theme's 1.6 body leading gave
+   it a 22px line box inside an 11px bed. Tighter leading takes the line box
+   down without touching the type size, and the row padding comes out of the
+   section's own settings. */
+.announcement-bar__announcement,
+.announcement-bar__message {
+  line-height: 1.3;
+}
+
+/* The slider's arrows are a 56px box each, drawn over a strap that is now half
+   that, so they hung past both edges and their hit area reached down over the
+   search field. Sized to the strap they stay inside it; the chevron itself is
+   set by .icon further up and does not change. */
+.announcement-bar-slider .swiper-button.swiper-button-prev,
+.announcement-bar-slider .swiper-button.swiper-button-next {
+  width: 2.6rem;
+  height: 2.6rem;
+}
+
+/* --- Nav ink ---------------------------------------------------------
+   The nav sits on white directly above the hero, and pure black held the eye
+   at the top of the page instead of on the banner. A soft graphite reads as
+   the second thing on the screen and still clears the 4.5:1 floor by a wide
+   margin (7.1:1 on white). The logo and the consultant chip stay black so the
+   row keeps an anchor, and the link for the page you are on goes back to
+   black rather than relying on its underline alone.
+   The hover rule on .link--text lightens the link further on hover, which is
+   the wrong way round once the resting colour is already grey, so hover,
+   focus and the current page all resolve to the scheme's foreground. */
+#header-component {
+  --eden-nav-ink: #5c5c5c;
+}
+
+#header-component .header__row--bottom .list-menu--inline > li > .header__menu-item,
+#header-component .header__row--bottom .list-menu--inline > li > details > .header__menu-item {
+  color: var(--eden-nav-ink);
+}
+
+#header-component .header__row--bottom .list-menu--inline > li > .header__menu-item:hover,
+#header-component .header__row--bottom .list-menu--inline > li > .header__menu-item:focus-visible,
+#header-component .header__row--bottom .list-menu--inline > li > details > .header__menu-item:hover,
+#header-component .header__row--bottom .list-menu--inline > li > details > .header__menu-item:focus-visible,
+#header-component .header__row--bottom .list-menu--inline > li > details[open] > .header__menu-item,
+#header-component .header__row--bottom .header__active-menu-item {
+  color: var(--color-foreground);
 }
 
 /* The header search panel lives in assets/search-luxe.css. */

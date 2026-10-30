@@ -97,8 +97,8 @@
       "settings": {
         "color_scheme": "scheme-7",
         "margin_bottom": 0,
-        "padding_top": 6,
-        "padding_bottom": 5
+        "padding_top": 4,
+        "padding_bottom": 4
       }
     },
     "header_rGFz4d": {
@@ -275,10 +275,10 @@
         "product_color_scheme": "default",
         "enable_transparent_header_collection": false,
         "collection_color_scheme": "default",
-        "padding-block-start-top": 18,
-        "padding-block-end-top": 18,
-        "padding-block-start-bottom": 6,
-        "padding-block-end-bottom": 6
+        "padding-block-start-top": 8,
+        "padding-block-end-top": 8,
+        "padding-block-start-bottom": 4,
+        "padding-block-end-bottom": 4
       }
     },
     "header_mobile_MqfLk9": {

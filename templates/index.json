@@ -203,8 +203,10 @@
       "blocks": {
         "tile_engagement_rings": {
           "type": "tile_picture",
+          "name": "Engagement Rings",
           "settings": {
-            "title": "Engagement Rings"
+            "title": "Engagement Rings",
+            "image": "shopify://shop_images/3_62f3770c-80bd-456c-860e-3dcdc255a6be.jpg"
           }
         },
         "tile_wedding_bands": {
@@ -225,10 +227,18 @@
             "title": "Earrings"
           }
         },
-        "tile_bracelets": {
+        "tile_picture_zgRbmK": {
           "type": "tile_picture",
           "settings": {
-            "title": "Bracelets"
+            "title": ""
+          }
+        },
+        "tile_bracelets": {
+          "type": "tile_picture",
+          "name": "Bracelet",
+          "settings": {
+            "title": "Bracelets",
+            "image": "shopify://shop_images/i_want_this_image_in_c9a745ee_2K.jpg"
           }
         }
       },
@@ -237,6 +247,7 @@
         "tile_wedding_bands",
         "tile_necklaces",
         "tile_earrings",
+        "tile_picture_zgRbmK",
         "tile_bracelets"
       ],
       "settings": {
@@ -319,6 +330,7 @@
         "tennis_33": {
           "type": "slide",
           "settings": {
+            "product": "33-ctw-round-brilliant-lab-grown-diamond-tennis-necklace",
             "image_asset": "",
             "image_url": "",
             "image_alt": "",
@@ -332,13 +344,13 @@
             "price": "",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
-            "link": "",
-            "product": "33-ctw-round-brilliant-lab-grown-diamond-tennis-necklace"
+            "link": ""
           }
         },
         "bracelet_bezel": {
           "type": "slide",
           "settings": {
+            "product": "3-33-ctw-round-brilliant-lab-grown-diamond-bezel-set-tennis-bracelet",
             "image_asset": "",
             "image_url": "",
             "image_alt": "",
@@ -352,13 +364,13 @@
             "price": "",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
-            "link": "",
-            "product": "3-33-ctw-round-brilliant-lab-grown-diamond-bezel-set-tennis-bracelet"
+            "link": ""
           }
         },
         "tennis_354": {
           "type": "slide",
           "settings": {
+            "product": "35-4-ctw-marquise-cut-lab-grown-diamond-statement-necklace",
             "image_asset": "",
             "image_url": "",
             "image_alt": "",
@@ -372,13 +384,13 @@
             "price": "",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
-            "link": "",
-            "product": "35-4-ctw-marquise-cut-lab-grown-diamond-statement-necklace"
+            "link": ""
           }
         },
         "tennis_14": {
           "type": "slide",
           "settings": {
+            "product": "14-ctw-marquise-pear-cut-lab-grown-diamond-cluster-necklace",
             "image_asset": "",
             "image_url": "",
             "image_alt": "",
@@ -392,13 +404,13 @@
             "price": "",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
-            "link": "",
-            "product": "14-ctw-marquise-pear-cut-lab-grown-diamond-cluster-necklace"
+            "link": ""
           }
         },
         "bracelet_tennis_12": {
           "type": "slide",
           "settings": {
+            "product": "12-ctw-round-brilliant-lab-grown-diamond-tennis-bracelet",
             "image_asset": "",
             "image_url": "",
             "image_alt": "",
@@ -412,8 +424,7 @@
             "price": "Price on request",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
-            "link": "",
-            "product": "12-ctw-round-brilliant-lab-grown-diamond-tennis-bracelet"
+            "link": ""
           }
         }
       },
@@ -434,8 +445,11 @@
         "heading_tracking": 0,
         "heading_color": "rgba(0,0,0,0)",
         "panel_alignment": "center",
+        "panel_alignment_mobile": "center",
         "panel_width": 25,
         "panel_background": "#f5f5f5",
+        "mobile_link_gap": 12,
+        "mobile_header_gap": 24,
         "link_label": "Shop the tennis collection",
         "link_url": "shopify://collections/tennis-necklaces",
         "link_size": 13,
@@ -447,6 +461,10 @@
         "loop_arrows": false,
         "show_progress": true,
         "arrow_size": 32,
+        "arrow_size_mobile": 36,
+        "arrow_gap_mobile": 32,
+        "mobile_arrow_gap": 24,
+        "arrows_below_mobile": true,
         "arrow_color": "rgba(0,0,0,0)",
         "per_row": 3,
         "per_row_mobile": 1,
@@ -458,10 +476,23 @@
         "gap_mobile": 4,
         "mobile_full_bleed": true,
         "badge_size": 11,
+        "badge_size_mobile": 11,
         "badge_offset": 20,
+        "badge_offset_mobile": 12,
         "caption_size": 12,
         "info_display": "mobile",
         "info_alignment": "center",
+        "info_gap": 16,
+        "title_font": "body",
+        "title_size": 16,
+        "title_size_mobile": 15,
+        "title_weight": "400",
+        "title_tracking": 0,
+        "title_color": "rgba(0,0,0,0)",
+        "price_size": 15,
+        "price_size_mobile": 14,
+        "price_tracking": 0,
+        "price_color": "rgba(0,0,0,0)",
         "width": "full",
         "page_padding": 0,
         "page_padding_mobile": 16,
@@ -1153,7 +1184,6 @@
         "show_button_arrow": false,
         "link_label": "",
         "link_url": "",
-        "media_image": "",
         "media_asset": "appointment-consultation-office-monogram.png",
         "media_image_url": "",
         "media_alt": "The Eden Raine London monogram and lettering on the back wall of a private jewellery consultation office, with ring sketches beside the balcony windows",
@@ -1184,6 +1214,7 @@
         "full_width": true,
         "content_width": 0,
         "padding_horizontal": 72,
+        "padding_horizontal_mobile": 0,
         "padding_vertical": 72,
         "custom_padding": true,
         "padding_top": 24,
