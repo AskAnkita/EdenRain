@@ -1,90 +1,99 @@
+{%- liquid
+  assign gifting_ring_image = section.settings.ring_photo
+  assign gifting_box_image = section.settings.box_photo
+
+  if gifting_ring_image != blank
+    assign gifting_ring_src = gifting_ring_image | image_url: width: 900
+  else
+    capture gifting_ring_src
+      render 'image-source', file: 'gifting-floating-ring.png', width: 900
+    endcapture
+  endif
+
+  if gifting_box_image != blank
+    assign gifting_box_src = gifting_box_image | image_url: width: 900
+  else
+    capture gifting_box_src
+      render 'image-source', file: 'gifting-gift-box-blush.png', width: 900
+    endcapture
+  endif
+-%}
+
 {%- style -%}
   #eden-quote-{{ section.id }} {
     position: relative;
     display: grid;
-    align-items: center;
     min-height: {{ section.settings.desktop_height }}px;
+    place-items: center;
     overflow: hidden;
-    isolation: isolate;
     margin-block: 0 !important;
-    background: #f5f2ea;
+    padding: 0 30px;
+    background: linear-gradient(120deg, #ffffff 0%, #fdfcfb 56%, #f8f5f1 100%);
     color: {{ section.settings.text_color }};
   }
-  #eden-quote-{{ section.id }} .eq-photo {
+  #eden-quote-{{ section.id }} .eq-art {
     position: absolute;
     inset: 0;
-    z-index: -2;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+    z-index: 1;
+    pointer-events: none;
   }
-  #eden-quote-{{ section.id }}::before {
-    content: '';
+  #eden-quote-{{ section.id }} .eq-art img {
     position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(90deg, rgba(249, 247, 240, .72), rgba(249, 247, 240, .26) 42%, transparent 60%);
+    display: block;
+    height: auto;
+    object-fit: contain;
   }
+  #eden-quote-{{ section.id }} .eq-ring { top: 3%; left: 4%; width: clamp(150px, 20vw, 330px); }
+  #eden-quote-{{ section.id }} .eq-box { right: 4%; bottom: -2%; width: clamp(180px, 23vw, 350px); }
   #eden-quote-{{ section.id }} .eq-inner {
-    width: 46%;
+    position: relative;
+    z-index: 2;
+    width: 100%;
     max-width: {{ section.settings.inner_width }}px;
-    padding: 56px 0 56px clamp(28px, 6vw, 120px);
+    margin: 0 auto;
+    padding: 26px 18px 24px;
+    border-top: 1px solid {{ section.settings.rule_color }};
+    border-bottom: 1px solid {{ section.settings.rule_color }};
+    text-align: center;
   }
   #eden-quote-{{ section.id }} .eq-quote {
     margin: 0;
-    font-family: var(--font-heading--family, Georgia, serif);
-    font-size: clamp(28px, 3.2vw, {{ section.settings.quote_size }}px);
+    font-family: {{ settings.heading_font.family }}, serif;
+    font-size: {{ section.settings.quote_size }}px;
     font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: -.02em;
+    line-height: 1.3;
+    letter-spacing: 0.3px;
     color: {{ section.settings.text_color }};
     text-wrap: balance;
   }
   #eden-quote-{{ section.id }} .eq-attribution {
-    margin: 28px 0 0;
-    font-family: var(--font-body--family, Arial, sans-serif);
+    margin: 24px 0 0;
+    font-family: {{ settings.body_font.family }}, sans-serif;
     font-size: {{ section.settings.attribution_size }}px;
-    letter-spacing: .24em;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: {{ section.settings.attribution_color }};
   }
+  #eden-quote-{{ section.id }} + .section { margin-block-start: 0 !important; }
   @media screen and (max-width: 749px) {
     #eden-quote-{{ section.id }} {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
       min-height: {{ section.settings.mobile_height }}px;
+      padding: 0 18px;
     }
-    #eden-quote-{{ section.id }}::before { display: none; }
-    #eden-quote-{{ section.id }} .eq-photo {
-      position: relative;
-      z-index: auto;
-      flex: none;
-      height: auto;
-      aspect-ratio: 1.45;
-      object-position: 88% center;
-    }
-    #eden-quote-{{ section.id }} .eq-inner {
-      width: 100%;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 32px 28px 38px;
-      text-align: center;
-    }
-    #eden-quote-{{ section.id }} .eq-quote { font-size: clamp(28px, 7.4vw, 36px); }
-    #eden-quote-{{ section.id }} .eq-attribution { margin-top: 22px; }
+    #eden-quote-{{ section.id }} .eq-inner { padding: 22px 12px; }
+    #eden-quote-{{ section.id }} .eq-quote { font-size: clamp(30px, 8vw, 40px); }
+    #eden-quote-{{ section.id }} .eq-attribution { margin-top: 17px; font-size: 9px; }
+    #eden-quote-{{ section.id }} .eq-ring { top: 0; left: -4%; width: 35vw; }
+    #eden-quote-{{ section.id }} .eq-box { right: -5%; bottom: -1%; width: 36vw; }
   }
 {%- endstyle -%}
 
 <section id="eden-quote-{{ section.id }}" class="eden-quote{% if section.settings.width == 'full' %} force-full-width{% endif %}">
-  {%- if section.settings.background_image != blank -%}
-    {{ section.settings.background_image | image_url: width: 2400 | image_tag: class: 'eq-photo', loading: 'lazy', widths: '600, 1000, 1600, 2400', sizes: '100vw', alt: '' }}
-  {%- else -%}
-    <img class="eq-photo" src="{{ 'gifting-poolside-editorial.jpg' | asset_url }}" alt="" loading="lazy" width="2172" height="724">
-  {%- endif -%}
+  <div class="eq-art" aria-hidden="true">
+    <img class="eq-ring" src="{{ gifting_ring_src | strip }}" alt="" loading="lazy" width="900" height="900">
+    <img class="eq-box" src="{{ gifting_box_src | strip }}" alt="" loading="lazy" width="900" height="900">
+  </div>
+
   <div class="eq-inner">
     <h2 class="eq-quote">{{ section.settings.quote | escape }}</h2>
     {%- if section.settings.attribution != blank -%}
@@ -99,106 +108,20 @@
   "tag": "section",
   "class": "section",
   "settings": [
-    {
-      "type": "select",
-      "id": "width",
-      "label": "Section width",
-      "default": "full",
-      "options": [
-        {
-          "value": "page",
-          "label": "Page width"
-        },
-        {
-          "value": "full",
-          "label": "Full width"
-        }
-      ]
-    },
-    {
-      "type": "image_picker",
-      "id": "background_image",
-      "label": "Campaign photograph (optional)"
-    },
-    {
-      "type": "range",
-      "id": "desktop_height",
-      "label": "Desktop height",
-      "min": 300,
-      "max": 760,
-      "step": 20,
-      "unit": "px",
-      "default": 480
-    },
-    {
-      "type": "range",
-      "id": "mobile_height",
-      "label": "Mobile height",
-      "min": 320,
-      "max": 720,
-      "step": 20,
-      "unit": "px",
-      "default": 560
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text colour",
-      "default": "#243a3b"
-    },
-    {
-      "type": "textarea",
-      "id": "quote",
-      "label": "Quote",
-      "default": "Made to be worn, and loved, for a lifetime."
-    },
-    {
-      "type": "text",
-      "id": "attribution",
-      "label": "Attribution",
-      "default": "Eden Raine"
-    },
-    {
-      "type": "range",
-      "id": "quote_size",
-      "label": "Quote size",
-      "min": 24,
-      "max": 48,
-      "step": 2,
-      "unit": "px",
-      "default": 44
-    },
-    {
-      "type": "range",
-      "id": "attribution_size",
-      "label": "Attribution size",
-      "min": 9,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "default": 11
-    },
-    {
-      "type": "range",
-      "id": "inner_width",
-      "label": "Text width",
-      "min": 480,
-      "max": 1200,
-      "step": 20,
-      "unit": "px",
-      "default": 1000
-    },
-    {
-      "type": "color",
-      "id": "attribution_color",
-      "label": "Attribution colour",
-      "default": "#536968"
-    }
+    { "type": "select", "id": "width", "label": "Section width", "default": "full", "options": [ { "value": "page", "label": "Page width" }, { "value": "full", "label": "Full width" } ] },
+    { "type": "image_picker", "id": "ring_photo", "label": "Ring photo (optional)" },
+    { "type": "image_picker", "id": "box_photo", "label": "Gift box photo (optional)" },
+    { "type": "range", "id": "desktop_height", "label": "Desktop height", "min": 300, "max": 760, "step": 20, "unit": "px", "default": 360 },
+    { "type": "range", "id": "mobile_height", "label": "Mobile height", "min": 320, "max": 720, "step": 20, "unit": "px", "default": 320 },
+    { "type": "color", "id": "text_color", "label": "Text colour", "default": "#191614" },
+    { "type": "textarea", "id": "quote", "label": "Quote", "default": "Made to be worn, and loved, for a lifetime." },
+    { "type": "text", "id": "attribution", "label": "Attribution", "default": "Eden Raine" },
+    { "type": "range", "id": "quote_size", "label": "Quote size", "min": 24, "max": 48, "step": 2, "unit": "px", "default": 32 },
+    { "type": "range", "id": "attribution_size", "label": "Attribution size", "min": 9, "max": 20, "step": 1, "unit": "px", "default": 11 },
+    { "type": "range", "id": "inner_width", "label": "Text width", "min": 480, "max": 1200, "step": 20, "unit": "px", "default": 1000 },
+    { "type": "color", "id": "rule_color", "label": "Hairline colour", "default": "#d9cfc7" },
+    { "type": "color", "id": "attribution_color", "label": "Attribution colour", "default": "#8a7d74" }
   ],
-  "presets": [
-    {
-      "name": "Gifting moment"
-    }
-  ]
+  "presets": [ { "name": "Gifting moment" } ]
 }
 {% endschema %}

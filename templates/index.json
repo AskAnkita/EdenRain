@@ -32,7 +32,7 @@
             "description": "Elegantly Crafted. Timelessly Beautiful.",
             "desktop_vertical_position": "bottom",
             "desktop_horizontal_alignment": "center",
-            "desktop_content_bottom_padding": 32,
+            "desktop_content_bottom_padding": 88,
             "mobile_content_alignment": "center",
             "mobile_content_background": "#ffffff",
             "heading_font_size": 30,
@@ -507,15 +507,16 @@
       "type": "eden-quote",
       "settings": {
         "width": "full",
-        "desktop_height": 480,
-        "mobile_height": 560,
-        "text_color": "#243a3b",
+        "desktop_height": 360,
+        "mobile_height": 320,
+        "text_color": "#191614",
         "quote": "Made to be worn, and loved, for a lifetime.",
         "attribution": "Eden Raine",
-        "quote_size": 44,
+        "quote_size": 32,
         "attribution_size": 11,
         "inner_width": 1000,
-        "attribution_color": "#536968"
+        "rule_color": "#d9cfc7",
+        "attribution_color": "#8a7d74"
       }
     },
     "featured_collection_QbxCWk": {
