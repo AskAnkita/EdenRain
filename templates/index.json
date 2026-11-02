@@ -16,7 +16,7 @@
           "type": "ai_gen_block_96df9c3",
           "settings": {
             "media_type": "image",
-            "desktop_image": "shopify://shop_images/ChatGPT_Image_2_Nov_2026_10_01_12.png",
+            "desktop_image": "shopify://shop_images/ChatGPT_Image_2_Nov_2026_11_59_28.png",
             "placeholder_desktop_video_url": "https://cdn.shopify.com/videos/c/o/v/d104411d81c940fb996fc439f675d3c2.mp4",
             "enable_full_height": true,
             "desktop_height": 100,
@@ -69,6 +69,7 @@
             "mobile_description_buttons_gap": 25,
             "heading_color": "#ffffff",
             "description_color": "#ffffff",
+            "desktop_text_scrim": 45,
             "mobile_heading_color": "#000000",
             "mobile_description_color": "#000000",
             "button_1_text": "ENGAGEMENT RINGS",
@@ -205,8 +206,7 @@
           "type": "tile_picture",
           "name": "Engagement Rings",
           "settings": {
-            "title": "Engagement Rings",
-            "image": "shopify://shop_images/3_62f3770c-80bd-456c-860e-3dcdc255a6be.jpg"
+            "title": "Engagement Rings"
           }
         },
         "tile_wedding_bands": {
@@ -218,8 +218,7 @@
         "tile_necklaces": {
           "type": "tile_picture",
           "settings": {
-            "title": "Necklaces",
-            "image": "shopify://shop_images/White_Gold_Round_Brilliant_Diamond_Tennis_Necklace.jpg"
+            "title": "Necklaces"
           }
         },
         "tile_earrings": {
@@ -238,8 +237,7 @@
           "type": "tile_picture",
           "name": "Bracelet",
           "settings": {
-            "title": "Bracelets",
-            "image": "shopify://shop_images/i_want_this_image_in_c9a745ee_2K.jpg"
+            "title": "Bracelets"
           }
         }
       },

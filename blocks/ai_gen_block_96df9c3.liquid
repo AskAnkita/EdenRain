@@ -374,6 +374,27 @@
     {% endunless %}
   }
 
+  /* A shade that fades up from the bottom edge so white type stays readable
+     over a pale image. Absolutely positioned, so it is not a flex item. */
+  .ai-luxury-video-hero-content-{{ ai_gen_id }}::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 55%;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, {{ block.settings.desktop_text_scrim | divided_by: 100.0 }}) 0%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+    z-index: -1;
+    {% if block.settings.desktop_text_scrim == 0 %}
+      display: none;
+    {% endif %}
+  }
+
   .ai-luxury-video-hero-content-{{ ai_gen_id }} {
     position: absolute;
     top: 0;
@@ -383,6 +404,7 @@
     display: flex;
     flex-direction: column;
     padding: 40px 40px {{ block.settings.desktop_content_bottom_padding }}px;
+    isolation: isolate;
     z-index: 2;
     {% if block.settings.desktop_vertical_position == 'top' %}
       justify-content: flex-start;
@@ -1530,6 +1552,17 @@
       "id": "description_color",
       "label": "Description",
       "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "desktop_text_scrim",
+      "label": "Shade behind text",
+      "info": "Darkens the bottom of the hero so light type stays readable over a pale image. 0 turns it off.",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 45
     },
     {
       "type": "header",

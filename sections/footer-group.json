@@ -3788,7 +3788,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p><a href=\"https://jewelery2-2.myshopify.com/policies/privacy-policy\">Privacy Policy</a>    |    <a href=\"https://jewelery2-2.myshopify.com/policies/terms-of-service\">Terms & Conditions</a></p>",
+                    "text": "<p><a href=\"/policies/privacy-policy\">Privacy Policy</a>    |    <a href=\"/policies/terms-of-service\">Terms & Conditions</a></p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,

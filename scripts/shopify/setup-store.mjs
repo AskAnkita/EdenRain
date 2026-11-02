@@ -12,6 +12,11 @@
 //       also adds to an existing automated collection any rule store-config.mjs gives it
 //   node scripts/shopify/setup-store.mjs --apply --update-rules --convert-manual
 //       ...and turns a manual collection with rules in store-config.mjs into an automated one
+//   node scripts/shopify/setup-store.mjs --apply --update-rules --convert-manual --handles=necklaces,bracelets
+//       limits the collections half of the run to those handles. --convert-manual on its own
+//       converts every manual collection store-config.mjs has a rule for, and most of them are
+//       hand-picked (rings holds 49 products, engagement-rings 39, new-in 16): converting those
+//       empties them. Name the handles whenever you convert.
 //
 // Existing collections are left untouched unless --update-rules is passed, and even then only
 // automated ones: turning a manual collection into an automated one throws away the products
@@ -30,6 +35,9 @@ const apply = args.includes('--apply');
 const only = (args.find((a) => a.startsWith('--only=')) || '').split('=')[1];
 const updateRules = args.includes('--update-rules');
 const convertManual = args.includes('--convert-manual');
+const onlyHandles = new Set(
+  (args.find((a) => a.startsWith('--handles=')) || '').split('=')[1]?.split(',').map((h) => h.trim()).filter(Boolean)
+);
 const doCollections = !only || only === 'collections';
 const doMenu = !only || only === 'menu';
 const menuHandle = (args.find((a) => a.startsWith('--menu-handle=')) || '').split('=')[1] || menu.handle;
@@ -102,7 +110,13 @@ async function syncCollections() {
 
   let created = 0;
   let updated = 0;
-  for (const c of collections) {
+  const wanted = onlyHandles.size ? collections.filter((c) => onlyHandles.has(c.handle)) : collections;
+  if (onlyHandles.size) {
+    const unknown = [...onlyHandles].filter((h) => !collections.some((c) => c.handle === h));
+    if (unknown.length) throw new Error(`--handles names ${unknown.join(', ')}, which store-config.mjs does not describe`);
+    log(`  (limited to ${[...onlyHandles].join(', ')})`);
+  }
+  for (const c of wanted) {
     const wantRules = rulesOf(c);
     const kind = describeRules(wantRules);
     const existing = await findCollection(c.handle);
