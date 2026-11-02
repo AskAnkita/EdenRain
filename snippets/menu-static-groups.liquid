@@ -1,0 +1,72 @@
+{% comment %}
+  Static tab groups for a top-level mega menu item: the left-hand column of the desktop panel.
+
+  Only for menus whose column should not mirror Online Store > Navigation. A top-level item
+  that isn't listed here keeps using its own sub-links.
+
+  Every menu is drawn by the text-only panel now ('menu-static-layout'), which lists its own
+  columns and reads the items straight from 'menu-static-items'. So what a menu is listed with
+  here is what makes the header count it as drawer-eligible ('header-menu'); the collection,
+  source and heading fields only come back into play for a menu taken off that layout.
+
+  Accepts:
+  - parent: {String} the top-level item's title, e.g. "Jewellery"
+
+  Outputs "Tab|collection-handle|source|Heading" entries separated by commas:
+  - Tab is the label in the left-hand column
+  - collection-handle is where the heading links; "-" leaves the heading as plain text
+  - source is "items" (tiles come from 'menu-static-items' for a group of this tab's name),
+    "products" (tiles are that collection's products), or "featured" (the four large cards
+    from 'menu-featured-cards' instead of tiles)
+  - Heading is the title above the tiles
+{% endcomment %}
+
+{%- liquid
+  assign parent_key = parent | handle
+
+  case parent_key
+    when 'engagement'
+      comment
+        No By Metal here: metal is a filter on the collection page, and as a third group it only
+        left a ragged row under the two that matter. 'header-menu-drawer-links' drops it too.
+      endcomment
+      echo 'By Style|-|items|Shop All'
+      echo ',By Shape|-|items|Shop All'
+      echo ',Featured|-|featured|Featured'
+    when 'wedding'
+      echo 'By Style|-|items|Shop All'
+      echo ',Featured|-|featured|Featured'
+    when 'diamonds'
+      echo 'Lab-Grown Diamonds|lab-grown-diamonds|items|Shop All'
+      comment
+        Learn links at pages and guides, not collections, so it has no product photography to
+        tile - it was drawing four initials. The big editorial cards carry their own artwork
+        and take video, which is what a guide is better sold with. Cards: 'menu-featured-cards'.
+      endcomment
+      echo ',Learn|-|featured|Learn'
+    when 'jewellery' or 'jewelry'
+      comment
+        Rings first, the way the panel draws them ('header-menu-drawer-links'): it is the
+        category the shop sells most of.
+      endcomment
+      echo 'Rings|rings|items|Shop All Rings'
+      echo ',Earrings|earrings|items|Shop All Earrings'
+      echo ',Necklaces|necklaces|items|Shop All Necklaces'
+      echo ',Bracelets|bracelets|items|Shop All Bracelets'
+      comment
+        Men's is the two collections the store carries under that name; 'menu-static-items' says
+        why there is no third.
+      endcomment
+      echo ",Men's|mens-rings|items|Shop All Men's"
+      comment
+        Shape and Stone browse the whole catalogue rather than one category: a shopper after a
+        round stone wants it in a stud as much as in a ring. They read the same `shape:` tags the
+        Shape group in the collection filter drawer filters on ('static-filters'), so the menu and
+        the drawer cannot drift apart. Tiles and collections: 'menu-static-items', store-config.mjs.
+      endcomment
+      echo ',Shop by Shape|-|items|Shop by Shape'
+      echo ',Shop by Stone|-|items|Shop by Stone'
+      echo ',Shop by Metal|-|items|Shop by Metal'
+      echo ',Featured|-|featured|Featured'
+  endcase
+-%}

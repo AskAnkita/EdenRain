@@ -1,39 +1,172 @@
 {% comment %}
-  Image tiles for one category of the desktop mega menu.
+  Picture tiles for one group of the desktop mega menu. A group can hold more than one section,
+  e.g. the earrings categories and then "Featured Collections" beneath them.
 
   Accepts:
   - group_id: {String}
-  - parent: {Object} menu link whose children become tiles
   - active: {Boolean} shown first
-  - collection: {Object} optional; when set, tiles are this collection's products instead of sub-links
+  - group_title / group_url: {String} names the group; used to look up its static list and to
+    drop a tile that just repeats the group's own link. Not printed -- the tab on the left
+    already names the group, so the panel leads with the Shop all link instead.
+  - parent: {Object} optional; menu link whose children become tiles, and the fallback name
+  - top_title / top_url: {String} the top-level menu item's title and URL, used to look up the
+    static list and for the Shop all link above the tiles
+  - tile_collection: {Object} optional; when set, tiles are this collection's products.
+    Named `tile_collection` rather than `collection` on purpose: an unpassed `collection`
+    would fall through to the page's own collection object, so the menu came out showing
+    the current collection's products on collection and product pages.
+  - static_sections: {String} optional; sections in the shape 'menu-static-items' returns,
+    passed in by the caller so the lookup only happens once
+
+  Liquid gives these groups no sub-links even though the menu has them, so the static sections
+  win over `parent.links`. Drop the static branch to go back to the navigation menu.
+
+  A tile's picture is `collection.featured_image`. Where a collection has none, the static
+  branch falls back to a picture shipped under assets/ ('menu-tile-placeholder'), and only
+  then to the initial or line drawing in 'menu-tile-fallback'.
 {% endcomment %}
 
+{%- liquid
+  assign heading = group_title | default: parent.title
+  assign heading_url = group_url | default: parent.url
+
+  assign sections_raw = static_sections | default: ''
+  if sections_raw == '' and tile_collection == blank
+    capture looked_up
+      render 'menu-static-items', group: heading, parent: top_title
+    endcapture
+    assign sections_raw = looked_up | strip
+  endif
+-%}
+
 <div class="menu-drawer-desktop__group" data-menu-drawer-group="{{ group_id }}"{% unless active %} hidden{% endunless %}>
-  {%- if parent.url != blank and parent.url != '#' -%}
-    <a class="menu-drawer-desktop__group-heading" href="{{ parent.url }}">{{ parent.title | escape }}</a>
-  {%- else -%}
-    <p class="menu-drawer-desktop__group-heading">{{ parent.title | escape }}</p>
+  {%- if top_url != blank -%}
+    <a
+      class="menu-drawer-desktop__view-all menu-drawer-desktop__group-all"
+      href="{{ top_url }}"
+    >Shop all {{ top_title | downcase | escape }}</a>
   {%- endif -%}
 
-  <ul class="menu-drawer-desktop__tiles" role="list">
-    {%- if collection != blank -%}
-      {%- for product in collection.products limit: 12 -%}
+  {%- if tile_collection != blank -%}
+    <ul class="menu-drawer-desktop__tiles" role="list">
+      {%- for product in tile_collection.products limit: 12 -%}
         <li>
           <a class="menu-drawer-desktop__tile" href="{{ product.url }}">
             <span class="menu-drawer-desktop__tile-media">
               {%- if product.featured_image != blank -%}
                 {{ product.featured_image | image_url: width: 400 | image_tag: loading: 'lazy', sizes: '180px', alt: product.title }}
+              {%- else -%}
+                {%- render 'menu-tile-fallback', title: product.title -%}
               {%- endif -%}
             </span>
             <span class="menu-drawer-desktop__tile-title">{{ product.title | escape }}</span>
           </a>
         </li>
       {%- endfor -%}
-    {%- endif -%}
-    {%- unless collection != blank -%}
+    </ul>
+
+  {%- elsif sections_raw != '' -%}
+    {%- assign tile_sections = sections_raw | split: ';;' -%}
+    {%- for section_raw in tile_sections -%}
+      {%- liquid
+        assign section_parts = section_raw | split: '::'
+        assign section_heading = ''
+        assign section_items = section_parts[0]
+        if section_parts.size > 1
+          assign section_heading = section_parts[0]
+          assign section_items = section_parts[1]
+        endif
+      -%}
+      {%- unless section_heading == '' -%}
+        <p class="menu-drawer-desktop__section-heading">{{ section_heading | escape }}</p>
+      {%- endunless -%}
+      {%- assign section_tiles = section_items | split: '~' -%}
+      <ul class="menu-drawer-desktop__tiles" role="list">
+        {%- for tile_item in section_tiles -%}
+          {%- liquid
+            assign parts = tile_item | split: '|'
+            assign item_title = parts[0]
+            assign item_handle = parts[1]
+            assign item_collection = blank
+            assign item_url = item_handle
+            unless item_handle contains '/'
+              assign item_collection = collections[item_handle]
+              assign item_url = item_handle | prepend: '/collections/'
+            endunless
+
+            comment
+              The metal discs are photographed on white, so beside the diamond shapes - which
+              carry the menu's own grey - they read as bright squares. Marking them here lets
+              the CSS lay that grey behind and multiply the picture over it, which turns the
+              white into the panel colour and leaves the metal untouched. Keyed off the handle,
+              so it holds whether the picture comes from the collection or from assets/.
+            endcomment
+            assign metal_tile = false
+            if item_handle contains 'gold' or item_handle contains 'platinum' or item_handle contains 'silver'
+              assign metal_tile = true
+            endif
+          -%}
+          {%- comment -%} Skip an item that just repeats the group's own link {%- endcomment -%}
+          {%- if item_url == heading_url -%}
+            {%- continue -%}
+          {%- endif -%}
+          {%- comment -%}
+            A collection with no picture of its own falls back to one we ship under assets/,
+            and only to the initial when there is no picture for it either. See
+            'menu-tile-placeholder' for the list and for how to retire it.
+          {%- endcomment -%}
+          {%- capture placeholder_asset -%}
+            {%- render 'menu-tile-placeholder', handle: item_handle -%}
+          {%- endcapture -%}
+          {%- assign placeholder_asset = placeholder_asset | strip -%}
+          {%- comment -%}
+            The shape photographs are framed tight - the stone all but fills its file - so at
+            tile size they stand noticeably larger than everything around them. Marked here so
+            the CSS can inset them; see 'menu-drawer-desktop.css'.
+          {%- endcomment -%}
+          {%- assign shape_tile = false -%}
+          {%- if placeholder_asset contains 'diamond-shape-' -%}
+            {%- assign shape_tile = true -%}
+          {%- endif -%}
+          <li>
+            <a class="menu-drawer-desktop__tile" href="{{ item_url }}">
+              <span class="menu-drawer-desktop__tile-media{% if metal_tile %} menu-drawer-desktop__tile-media--metal{% endif %}">
+                {%- if item_collection.featured_image != blank -%}
+                  {{ item_collection.featured_image | image_url: width: 400 | image_tag: loading: 'lazy', sizes: '180px', alt: item_title }}
+                {%- elsif placeholder_asset != '' -%}
+                  {%- comment -%}
+                    The shipped pictures come in two shapes - tall for the engagement styles,
+                    square for everything else. The width and height below describe the box
+                    the tile draws, not the file: the tile is a fixed square either way
+                    (menu-drawer-desktop.css) and a tall picture is fitted inside it, so the
+                    square is what the browser should reserve.
+                  {%- endcomment -%}
+                  <img
+                    class="menu-drawer-desktop__tile-placeholder{% if shape_tile %} menu-drawer-desktop__tile-placeholder--shape{% endif %}"
+                    src="{% render 'image-source', file: placeholder_asset, width: 400 %}"
+                    srcset="{% render 'image-source', file: placeholder_asset, width: 400 %} 400w, {% render 'image-source', file: placeholder_asset, width: 600 %} 600w"
+                    sizes="180px"
+                    alt="{{ item_title | escape }}"
+                    width="400"
+                    height="400"
+                    loading="lazy"
+                  >
+                {%- else -%}
+                  {%- render 'menu-tile-fallback', title: item_title -%}
+                {%- endif -%}
+              </span>
+              <span class="menu-drawer-desktop__tile-title">{{ item_title | escape }}</span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endfor -%}
+
+  {%- else -%}
+    <ul class="menu-drawer-desktop__tiles" role="list">
       {%- for item in parent.links -%}
         {%- comment -%} Skip "All …" links that duplicate the Shop All link {%- endcomment -%}
-        {%- if item.url == parent.url -%}
+        {%- if item.url == heading_url -%}
           {%- continue -%}
         {%- endif -%}
         {%- liquid
@@ -60,6 +193,6 @@
           </a>
         </li>
       {%- endfor -%}
-    {%- endunless -%}
-  </ul>
+    </ul>
+  {%- endif -%}
 </div>

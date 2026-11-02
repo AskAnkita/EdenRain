@@ -241,7 +241,7 @@
       "settings": {
         "background": "#ffffff",
         "icon": "#000000",
-        "secondary_background": "#001514",
+        "secondary_background": "#000000",
         "secondary_icon": "#ffffff"
       }
     },
@@ -426,6 +426,10 @@
               "type": "image",
               "name": "Image",
               "settings": {
+                "fallback_asset": "",
+                "fallback_asset_ratio": "",
+                "placeholder_image_url": "",
+                "placeholder_image_ratio": "",
                 "link": "",
                 "hide_on_mobile": false,
                 "image_ratio": "adapt",
@@ -1553,6 +1557,7 @@
                         "custom_width": 80,
                         "svg_height": "fit-content",
                         "custom_height": 80,
+                        "placeholder_image_url": "",
                         "link": "",
                         "open_in_new_tab": false,
                         "width": 40,

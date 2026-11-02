@@ -21,6 +21,7 @@
 {%- endif -%}
 {%- if settings.predictive_search_enabled -%}
   <link rel="stylesheet" href="{{ 'component-predictive-search.css' | asset_url }}"  media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="{{ 'search-luxe.css' | asset_url }}"  media="print" onload="this.media='all'">
 {%- endif -%}
 
 <link rel="stylesheet" href="{{ 'component-card.css' | asset_url }}"  media="print" onload="this.media='all'">
@@ -45,6 +46,7 @@
   {%- endif -%}
   {%- if settings.predictive_search_enabled -%}
       <link rel="stylesheet" href="{{ 'component-predictive-search.css' | asset_url }}">
+      <link rel="stylesheet" href="{{ 'search-luxe.css' | asset_url }}">
   {%- endif -%}
 
   <link rel="stylesheet" href="{{ 'component-card.css' | asset_url }}">

@@ -94,22 +94,12 @@
     transform: scaleX(0);
   }
 
-  /* Product shots sit on a tile instead of bleeding into the page, so the cards line
-     up as a grid of panels the way MiaDonna's do. */
+  /* Product shots fill the card edge to edge -- no tile behind them, nothing inset. */
   .product-grid--{{ section.id }} .card--block-media {
-    background: var(--card-media-tile, #f4f4f1);
+    background: none;
   }
 
   .product-grid--{{ section.id }} .card--block-media .media img {
-    padding: 8%;
-    object-fit: contain;
-    /* The product photos are shot on white; multiply drops that into the tile */
-    mix-blend-mode: multiply;
-  }
-
-  /* Only the main shot sits inset on the tile; the hover photo is a lifestyle shot
-     and fills the card edge to edge */
-  .product-grid--{{ section.id }} .card--block-media .media img + img {
     padding: 0;
     object-fit: cover;
     mix-blend-mode: normal;
@@ -634,7 +624,7 @@
       "type": "text",
       "id": "banner_text_1",
       "label": "Banner 1 text",
-      "default": "FREE SHIPPING & 60-DAY RETURNS"
+      "default": "FREE SHIPPING & 30-DAY RETURNS"
     },
     {
       "type": "select",
@@ -790,12 +780,6 @@
       "label": "Load more button label",
       "info": "Leave blank to use the theme translation.",
       "default": "View more"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_back_to_top_link",
-      "label": "Show \"Back to top\" link",
-      "default": true
     },
     {
       "type": "range",

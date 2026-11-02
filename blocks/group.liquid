@@ -959,6 +959,110 @@
         "step": 1,
         "unit": "px",
         "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "custom_padding_more_devices",
+        "label": "Custom padding more devices",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Tablet",
+        "visible_if": "{{ block.settings.custom_padding_more_devices }}"
+      },
+      {
+        "type": "range",
+        "id": "padding-block-start-tl",
+        "label": "t:settings.top",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.custom_padding_more_devices }}"
+      },
+      {
+        "type": "range",
+        "id": "padding-block-end-tl",
+        "label": "t:settings.bottom",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.custom_padding_more_devices }}"
+      },
+      {
+        "type": "range",
+        "id": "padding-inline-start-tl",
+        "label": "t:settings.left",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.custom_padding_more_devices }}"
+      },
+      {
+        "type": "range",
+        "id": "padding-inline-end-tl",
+        "label": "t:settings.right",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.custom_padding_more_devices }}"
+      },
+      {
+        "type": "header",
+        "content": "Mobile",
+        "visible_if": "{{ block.settings.custom_padding_more_devices }}"
+      },
+      {
+        "type": "range",
+        "id": "padding-block-start-mb",
+        "label": "t:settings.top",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.custom_padding_more_devices }}"
+      },
+      {
+        "type": "range",
+        "id": "padding-block-end-mb",
+        "label": "t:settings.bottom",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.custom_padding_more_devices }}"
+      },
+      {
+        "type": "range",
+        "id": "padding-inline-start-mb",
+        "label": "t:settings.left",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.custom_padding_more_devices }}"
+      },
+      {
+        "type": "range",
+        "id": "padding-inline-end-mb",
+        "label": "t:settings.right",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.custom_padding_more_devices }}"
       }
     ],
     "presets": [

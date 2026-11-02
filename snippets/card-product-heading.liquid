@@ -1,9 +1,22 @@
+{%- capture default_variant -%}
+  {%- render 'card-default-variant', card_product: card_product -%}
+{%- endcapture -%}
+
 {%- liquid
   assign is_card_title_custom_width = is_card_title_custom_width | default: false
   if collection and collection.handle
     assign href_product_url = '/collections/' | append: collection.handle | append: '/products/' | append: card_product.handle
   else
     assign href_product_url = card_product.url
+  endif
+
+  # The title has to lead to the same ring the photo is showing, so it carries the
+  # variant 'card-default-variant' picked - the one snippets/card-product-media.liquid
+  # opened the card on. Both ask the same snippet, so the two links cannot disagree.
+  assign default_variant = default_variant | strip
+  if default_variant != blank
+    assign metal_variant_id = default_variant | split: '||' | first
+    assign href_product_url = href_product_url | append: '?variant=' | append: metal_variant_id
   endif
 -%}
 

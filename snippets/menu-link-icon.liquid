@@ -1,0 +1,116 @@
+{% comment %}
+  The small drawing beside one name in a menu. The desktop mega menu's columns
+  ('header-menu-drawer-links') and the mobile drawer's lists (sections/header_mobile) both carry
+  it, so which file a name takes - and the fall back to a line icon when no picture ships for it
+  - is decided once, here, and the two menus cannot drift apart.
+
+  The pictures are files in Content > Files, named after the item's handle, one contract per set:
+
+  - ring-styles  'ring-style-<handle>.png'   the ten engagement settings
+  - band-styles  'band-style-<handle>.png'   the four wedding bands
+  - shapes       'shape-outline-<handle>.png' the ten cuts, drawn face-on
+
+  Replace a file in the admin and both menus take the new one up; the file name is the whole
+  contract. A name taken off the list below - or one that never had a picture - falls back to the
+  drawn icon in 'icon-ring-style', 'icon-band-style' or 'icon-diamond-shape' rather than leaving
+  a broken image in the list.
+
+  Accepts:
+  - icons: {String} which set the list asks for: "shapes", "ring-styles", "band-styles",
+      "types" or "stones". Anything else, including blank, draws nothing.
+  - key: {String} the item's handle, e.g. "hidden-halo" or "oval". Handleize the item's own
+      title, never its collection: "Round" is `round` under both Engagement and Diamonds, where
+      the collections are 'round-engagement-rings' and 'round-diamonds'.
+  - prefix: {String} the class the calling menu names its icon box with, e.g.
+      "menu-drawer-desktop__link-icon". "--image", "--shape" and "--band" are appended to it, so
+      each menu sizes the same markup for itself. Defaults to the desktop panel's.
+
+  Only a list whose every name is drawn in the set it asks for may ask for it, or the names it
+  misses each carry an empty box.
+{% endcomment %}
+
+{%- liquid
+  assign icon_prefix = prefix | default: 'menu-drawer-desktop__link-icon'
+
+  assign styles_with_images = 'solitaire,side-stone,halo,hidden-halo,three-stone,bridal-sets,vintage,nature-inspired,toi-et-moi,promise' | split: ','
+  assign band_styles_with_images = 'wedding,anniversary,eternity,plain-metal' | split: ','
+  assign shapes_with_images = 'round,oval,cushion,emerald,pear,princess,radiant,marquise,asscher,heart' | split: ','
+
+  comment
+    The box, not the file, is what holds a column level: the CSS fixes both sides and fits the
+    picture inside, so these stay true whatever proportions a replacement file has. The width and
+    height below are only the intrinsic hint that keeps the row from jumping before it loads.
+
+    The cuts are square and sit in the same box the drawn icons take. The settings and the bands
+    are wider than they are tall - each is drawn to 264px of ink on a canvas that follows its own
+    height, so a band fills the width and the eternity ring, drawn face-on, fits by its height.
+  endcomment
+  assign icon_asset = ''
+  assign icon_modifier = ''
+  assign icon_width = 46
+  assign icon_height = 32
+  assign icon_source_width = 92
+
+  if icons == 'shapes' and shapes_with_images contains key
+    assign icon_asset = key | prepend: 'shape-outline-' | append: '.png'
+    assign icon_modifier = ' ' | append: icon_prefix | append: '--image ' | append: icon_prefix | append: '--shape'
+    assign icon_width = 28
+    assign icon_height = 28
+    assign icon_source_width = 56
+  elsif icons == 'ring-styles' and styles_with_images contains key
+    assign icon_asset = key | prepend: 'ring-style-' | append: '.png'
+    assign icon_modifier = ' ' | append: icon_prefix | append: '--image'
+  elsif icons == 'band-styles' and band_styles_with_images contains key
+    assign icon_asset = key | prepend: 'band-style-' | append: '.png'
+    assign icon_modifier = ' ' | append: icon_prefix | append: '--image ' | append: icon_prefix | append: '--band'
+  endif
+
+  comment
+    The drawn icons are a `case` each with no `else`, so a name the set does not draw comes back
+    an empty box rather than nothing at all. These are what each one covers; a name in neither
+    its picture list nor this one carries no drawing, and the row closes up around the words.
+  endcomment
+  assign drawn = false
+  case icons
+    when 'shapes'
+      assign drawn_keys = 'round,oval,cushion,emerald,princess,radiant,asscher,heart,marquise,pear,square,triangle,baguette' | split: ','
+    when 'ring-styles'
+      assign drawn_keys = 'solitaire,side-stone,halo,hidden-halo,three-stone,bridal-sets,vintage,nature-inspired,toi-et-moi,promise' | split: ','
+    when 'band-styles'
+      assign drawn_keys = 'wedding,anniversary,eternity,plain-metal' | split: ','
+    when 'types'
+      assign drawn_keys = 'studs,hoops-huggies,dangles-drops,climbers-jackets-cuffs,pendants,chains,charms,bracelets,rings,new-in,best-sellers' | split: ','
+    when 'stones'
+      assign drawn_keys = 'cubic-zirconia,lab-grown-diamond,pearl,shell-abalone,turquoise,black-onyx,opal,birthstone' | split: ','
+    else
+      assign drawn_keys = '' | split: ','
+  endcase
+  if drawn_keys contains key
+    assign drawn = true
+  endif
+-%}
+
+{%- if icon_asset != '' -%}
+  <span class="{{ icon_prefix }}{{ icon_modifier }}" aria-hidden="true">
+    <img
+      src="{% render 'image-source', file: icon_asset, width: icon_source_width %}"
+      alt=""
+      width="{{ icon_width }}"
+      height="{{ icon_height }}"
+      loading="lazy"
+    >
+  </span>
+{%- elsif drawn -%}
+  {%- case icons -%}
+    {%- when 'shapes' -%}
+      <span class="{{ icon_prefix }}" aria-hidden="true">{%- render 'icon-diamond-shape', shape: key -%}</span>
+    {%- when 'ring-styles' -%}
+      <span class="{{ icon_prefix }}" aria-hidden="true">{%- render 'icon-ring-style', style: key -%}</span>
+    {%- when 'band-styles' -%}
+      <span class="{{ icon_prefix }}" aria-hidden="true">{%- render 'icon-band-style', style: key -%}</span>
+    {%- when 'types' -%}
+      <span class="{{ icon_prefix }}" aria-hidden="true">{%- render 'icon-jewellery-type', type: key -%}</span>
+    {%- when 'stones' -%}
+      <span class="{{ icon_prefix }}" aria-hidden="true">{%- render 'icon-stone', stone: key -%}</span>
+  {%- endcase -%}
+{%- endif -%}

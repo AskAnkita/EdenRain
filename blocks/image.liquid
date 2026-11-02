@@ -10,10 +10,18 @@
       assign ratio = block.settings.image.aspect_ratio
   endcase
 
-  # Theme-asset fallback (shown everywhere, including the live site) when no image is picked
+  # Named-file fallback (shown everywhere, including the live site) when no image is picked.
+  # Same order 'image-source' uses - Content > Files, where the photography lives, then assets/
+  # - inlined because `render` cannot be called from inside a `liquid` tag.
   assign fallback_asset_url = blank
   if block.settings.image == blank and block.settings.fallback_asset != blank
-    assign fallback_asset_url = block.settings.fallback_asset | strip | asset_url
+    assign fallback_asset_name = block.settings.fallback_asset | strip
+    assign fallback_in_files = images[fallback_asset_name]
+    if fallback_in_files != blank
+      assign fallback_asset_url = fallback_in_files | image_url: width: 1600
+    else
+      assign fallback_asset_url = fallback_asset_name | asset_url
+    endif
     if block.settings.image_ratio == 'adapt' and block.settings.fallback_asset_ratio != blank
       assign ratio = block.settings.fallback_asset_ratio
     endif
@@ -183,7 +191,7 @@
       "type": "text",
       "id": "fallback_asset",
       "label": "Fallback theme image",
-      "info": "File name in the theme's assets folder, shown when no image is picked (including on the live site)"
+      "info": "File name in Content > Files (or assets/), shown when no image is picked (including on the live site)"
     },
     {
       "type": "text",

@@ -1,0 +1,259 @@
+{% comment %}
+  Editorial split banner: a feature image on the left, with a heading and two routes on the right.
+  The image goes through 'homepage-journey-image' - picked image first, then a file in assets/,
+  then a pasted URL, then a placeholder. Each route is a block, and the section supports up to two.
+{% endcomment %}
+
+{{ 'design-split-banner.css' | asset_url | stylesheet_tag }}
+{%- if section.settings.media_video_asset != blank -%}
+  <script src="{{ 'design-split-video.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{%- liquid
+  assign transparent = 'rgba(0,0,0,0)'
+
+  # A template saved before a setting existed has no value for it, so sizes are coerced with
+  # 'plus: 0' and treated as "keep the stylesheet default" at 0. The paddings cannot use that
+  # sentinel - 0 is a real padding - and are gated by the custom_padding checkbox instead.
+  assign heading_size = section.settings.heading_size | plus: 0
+  assign heading_size_mobile = section.settings.heading_size_mobile | plus: 0
+  assign heading_tracking = section.settings.heading_tracking | plus: 0
+  assign eyebrow_size = section.settings.eyebrow_size | plus: 0
+  assign text_size = section.settings.text_size | plus: 0
+  assign footnote_size = section.settings.footnote_size | plus: 0
+  assign measure = section.settings.text_measure | plus: 0
+  assign content_width = section.settings.content_width | plus: 0
+  assign pad_inline = section.settings.padding_horizontal | plus: 0
+  assign pad_top = section.settings.padding_top | plus: 0
+  assign pad_bottom = section.settings.padding_bottom | plus: 0
+  assign media_zoom = section.settings.media_zoom | plus: 0
+
+  assign column_blocks = section.blocks | where: 'type', 'column'
+
+  # The panel heading is the h2; route headings sit below it.
+  assign column_tag = 'h2'
+  if section.settings.heading != blank
+    assign column_tag = 'h3'
+  endif
+-%}
+
+{%- capture section_styles -%}
+  {%- if section.settings.section_background != blank and section.settings.section_background != transparent -%}--dsp-section-bg: {{ section.settings.section_background }};{%- endif -%}
+  {%- if section.settings.heading_color != blank and section.settings.heading_color != transparent -%}--dsp-heading-color: {{ section.settings.heading_color }};{%- endif -%}
+  {%- if section.settings.text_color != blank and section.settings.text_color != transparent -%}--dsp-text-color: {{ section.settings.text_color }};{%- endif -%}
+  {%- if section.settings.footnote_color != blank and section.settings.footnote_color != transparent -%}--dsp-footnote-color: {{ section.settings.footnote_color }};{%- endif -%}
+
+  {%- if heading_size > 0 -%}--dsp-heading-size: {{ heading_size }}px;{%- endif -%}
+  {%- if heading_size_mobile > 0 -%}--dsp-heading-size-mobile: {{ heading_size_mobile }}px;{%- endif -%}
+  {%- if heading_tracking > 0 -%}--dsp-heading-tracking: {{ heading_tracking | divided_by: 100.0 }}em;{%- endif -%}
+  {%- if eyebrow_size > 0 -%}--dsp-eyebrow-size: {{ eyebrow_size }}px;{%- endif -%}
+  {%- if text_size > 0 -%}--dsp-text-size: {{ text_size }}px;{%- endif -%}
+  {%- if footnote_size > 0 -%}--dsp-footnote-size: {{ footnote_size }}px;{%- endif -%}
+  {%- unless section.settings.uppercase_headings -%}--dsp-heading-case: none;{%- endunless -%}
+
+  {%- if measure > 0 -%}--dsp-measure: {{ measure }}ch;{%- endif -%}
+
+  {%- if section.settings.full_width -%}
+    --dsp-shell-max: none;
+  {%- elsif content_width > 0 -%}
+    --dsp-shell-max: {{ content_width }}px;
+  {%- endif -%}
+  {%- if media_zoom > 0 -%}--dsp-media-zoom: {{ media_zoom | divided_by: 100.0 }};{%- endif -%}
+  {%- if pad_inline > 0 -%}--dsp-pad-inline: {{ pad_inline }}px;{%- endif -%}
+  {%- if section.settings.custom_padding -%}--dsp-pad-top: {{ pad_top }}px;--dsp-pad-bottom: {{ pad_bottom }}px;{%- endif -%}
+{%- endcapture -%}
+
+{%- capture media_html -%}
+  <div class="dsp-media{% if section.settings.media_video_asset != blank %} dsp-media--video{% endif %}">
+    {%- if section.settings.media_video_asset != blank -%}
+      <dsp-video>
+        <video
+          class="dsp-media__video"
+          autoplay
+          muted
+          playsinline
+          loop
+          disableremoteplayback
+          preload="metadata"
+          poster="{{ section.settings.media_video_poster_asset | default: 'design-split-ring-poster.jpg' | asset_url }}"
+          data-dsp-video
+          aria-label="{{ section.settings.media_alt | escape }}"
+        >
+          <source src="{{ section.settings.media_video_asset | asset_url }}" type="video/mp4">
+        </video>
+      </dsp-video>
+      <img
+        class="dsp-media__poster"
+        src="{{ section.settings.media_video_poster_asset | default: 'design-split-ring-poster.jpg' | asset_url }}"
+        alt=""
+        aria-hidden="true"
+        width="712"
+        height="708"
+      >
+    {%- else -%}
+      {%- render 'homepage-journey-image',
+        image: section.settings.media_image,
+        asset: section.settings.media_asset,
+        image_url: section.settings.media_image_url,
+        alt: section.settings.media_alt,
+        sizes: '(min-width: 990px) 50vw, 100vw',
+        width: 800,
+        height: 1020
+      -%}
+    {%- endif -%}
+  </div>
+{%- endcapture -%}
+
+<section
+  class="ds-split{% if section.settings.full_width %} ds-split--full-width{% endif %}"
+  style="{{ section_styles | strip_newlines | strip }}"
+  {{ section.shopify_attributes }}
+>
+  <div class="dsp-shell">
+    <div class="dsp-grid">
+      {{ media_html }}
+      <div class="dsp-content">
+        {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
+          <div class="dsp-head">
+            {%- if section.settings.eyebrow != blank -%}
+              <p class="dsp-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+            {%- endif -%}
+            {%- if section.settings.heading != blank -%}
+              <h2 class="dsp-head__heading">{{ section.settings.heading | escape }}</h2>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+        <div class="dsp-routes">
+      {%- for block in column_blocks limit: 2 -%}
+        {%- liquid
+          # The heading carries the route itself when there is one to carry, so a phone
+          # does not need the separate link beside it and the copy can have the full row.
+          assign heading_links = false
+          if block.settings.heading != blank and block.settings.button_link != blank
+            assign heading_links = true
+          endif
+        -%}
+        <div class="dsp-col{% if heading_links %} dsp-col--linked{% endif %}" {{ block.shopify_attributes }}>
+          <div class="dsp-col__copy">
+            {%- if block.settings.heading != blank -%}
+              <{{ column_tag }} class="dsp-col__heading">
+                {%- if heading_links -%}
+                  <a class="dsp-col__heading-link" href="{{ block.settings.button_link }}">{{ block.settings.heading | escape }}</a>
+                {%- else -%}
+                  {{ block.settings.heading | escape }}
+                {%- endif -%}
+              </{{ column_tag }}>
+            {%- endif -%}
+            {%- if block.settings.text != blank -%}
+              <div class="dsp-col__text">{{ block.settings.text }}</div>
+            {%- endif -%}
+          </div>
+          {%- if block.settings.button_label != blank -%}
+            <a class="dsp-route__link" href="{{ block.settings.button_link | default: '#' }}">
+              <span>{{ block.settings.button_label | escape }}</span>
+              {%- if section.settings.show_button_arrow -%}<span aria-hidden="true">→</span>{%- endif -%}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+        </div>
+      </div>
+    </div>
+
+    {%- if section.settings.footnote != blank -%}
+      <div class="dsp-footnote">{{ section.settings.footnote }}</div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Design split banner",
+  "tag": "section",
+  "class": "section-design-split",
+  "max_blocks": 2,
+  "settings": [
+    { "type": "header", "content": "Feature heading" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+
+    { "type": "header", "content": "Feature image" },
+    { "type": "paragraph", "content": "A picked image wins, then a file in assets/, then a pasted URL." },
+    { "type": "image_picker", "id": "media_image", "label": "Image or GIF" },
+    { "type": "text", "id": "media_asset", "label": "File in assets/", "default": "category-engagement-rings-model.png" },
+    { "type": "text", "id": "media_image_url", "label": "Image URL" },
+    { "type": "text", "id": "media_alt", "label": "Alt text", "default": "Model wearing an engagement ring" },
+    { "type": "text", "id": "media_video_asset", "label": "Video file in assets/" },
+    { "type": "text", "id": "media_video_poster_asset", "label": "Still image file in assets/", "default": "design-split-ring-poster.jpg" },
+    { "type": "range", "id": "media_zoom", "label": "Zoom", "min": 100, "max": 150, "step": 5, "unit": "%", "default": 110, "info": "Scales the image or video inside its frame; the frame crops what spills past it." },
+
+    { "type": "header", "content": "Footnote" },
+    { "type": "richtext", "id": "footnote", "label": "Line under the band", "default": "<p>Can't decide? Talk to one of our designers and we will help you find it.</p>" },
+
+    { "type": "header", "content": "Colours" },
+    { "type": "color", "id": "section_background", "label": "Background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "heading_color", "label": "Headings", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "text_color", "label": "Body text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "footnote_color", "label": "Footnote", "default": "rgba(0,0,0,0)" },
+
+    { "type": "header", "content": "Type" },
+    { "type": "paragraph", "content": "A size of 0 keeps the stylesheet's own value." },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 0, "max": 90, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "heading_size_mobile", "label": "Heading size on mobile", "min": 0, "max": 60, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "heading_tracking", "label": "Heading letter spacing", "min": 0, "max": 20, "step": 1, "unit": "%", "default": 0 },
+    { "type": "checkbox", "id": "uppercase_headings", "label": "Headings in capitals", "default": false },
+    { "type": "range", "id": "eyebrow_size", "label": "Eyebrow size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "text_size", "label": "Body text size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "footnote_size", "label": "Footnote size", "min": 0, "max": 26, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "text_measure", "label": "Body text line length", "min": 0, "max": 70, "step": 2, "unit": "ch", "default": 0, "info": "0 keeps the default of 38 characters." },
+
+    { "type": "header", "content": "Route links" },
+    { "type": "checkbox", "id": "show_button_arrow", "label": "Show arrow", "default": true },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "checkbox", "id": "full_width", "label": "Full width", "default": false },
+    { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "0 keeps the default of 1480px. Ignored when the box above is ticked." },
+    { "type": "range", "id": "padding_horizontal", "label": "Side padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's responsive padding." },
+    { "type": "checkbox", "id": "custom_padding", "label": "Set the top and bottom padding", "default": false },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 80 }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Route",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Design your own" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Start with a setting and we will bring the stone to it.</p>" },
+        { "type": "text", "id": "button_label", "label": "Link label", "default": "Start designing" },
+        { "type": "url", "id": "button_link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Design split banner",
+      "blocks": [
+        {
+          "type": "column",
+          "settings": {
+            "heading": "Design your own",
+            "text": "<p>Begin with the setting. Choose the shape of the shoulders and the metal, and we will bring the stone to it.</p>",
+            "button_label": "Start designing",
+            "button_link": "/pages/design-studio-builder"
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "heading": "Speak with a designer",
+            "text": "<p>Share your idea and get personal guidance from our designer.</p>",
+            "button_label": "Talk to a designer",
+            "button_link": "/pages/book-a-consultation"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

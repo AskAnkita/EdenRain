@@ -1,0 +1,69 @@
+/*
+ * Loading feedback on the product page.
+ *
+ * Two different waits, two different signals:
+ *
+ *   - A photo being fetched. product-media.liquid already renders a hidden
+ *     loading-spinner inside every .product-media; product-loading.js un-hides it
+ *     while that photo's image is still in flight.
+ *   - A variant change, which is a network round trip to re-render the section.
+ *     product-info.js sets aria-busy for its duration, which dims the gallery and
+ *     stops the picker taking clicks so a second swatch cannot race the first.
+ */
+
+/* The spinner is absolutely positioned; .product-media is the box it should centre in.
+   Nothing else inside it is absolutely positioned, so this only moves the spinner. */
+.product-media {
+  position: relative;
+}
+
+.product-media > .loading__spinner {
+  top: 50%;
+  left: 50%;
+  width: 2.4rem;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.product-media .product-media__image {
+  transition: opacity var(--duration-default, 200ms) ease;
+}
+
+/* Held faint rather than hidden: if a load event never arrives, a dim photo is a far
+   better failure than an empty frame. */
+.product-media.is-media-loading .product-media__image {
+  opacity: 0.3;
+}
+
+/* Variant change in flight.
+ *
+ * The pickers stop responding at once -- that is the point, it stops a second swatch
+ * racing the first -- while the dimming waits out a fast swap, so a cached response
+ * never reads as a flicker.
+ *
+ * The sticky add-to-cart bar carries a second picker and is rendered as a sibling of
+ * product-info rather than inside it, so it has to be named separately; it is a live
+ * route to the same race.
+ */
+product-info variant-selects,
+product-info media-gallery,
+product-info ~ * variant-selects {
+  transition: opacity 160ms ease;
+}
+
+product-info[aria-busy='true'] variant-selects,
+product-info[aria-busy='true'] ~ * variant-selects {
+  pointer-events: none;
+}
+
+product-info[aria-busy='true'] variant-selects,
+product-info[aria-busy='true'] media-gallery,
+product-info[aria-busy='true'] ~ * variant-selects {
+  opacity: 0.55;
+  transition: opacity 160ms ease 220ms;
+}
+
+product-info[aria-busy='true'] {
+  cursor: progress;
+}

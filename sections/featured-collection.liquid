@@ -52,6 +52,17 @@
 
   assign layout_type = sec_stts.layout_type
 
+  comment
+    The arrows can be lifted out of the carousel and pinned beside the heading.
+    global.js looks for a .swiper-btns-on-header wrap inside the nearest
+    .arrow-on-header ancestor and hands Swiper those buttons instead, so the pair
+    below the slides is left in place and hidden by base.css.
+  endcomment
+  assign arrows_on_header = false
+  if enable_navigation and layout_type == 'carousel' and sec_stts.arrows_position == 'top_right'
+    assign arrows_on_header = true
+  endif
+
   assign has_media_banner = false
   if sec_stts.banner_image != blank or sec_stts.video != blank or sec_stts.video_url != blank
     assign has_media_banner = true
@@ -385,13 +396,36 @@
     {%- endcapture -%}
 
     <div
-      class="collection{% if sec_stts.quick_add == 'bulk' %} collection-quick-add-bulk{% endif %}{% if sec_stts.full_width %} collection--full-width{% endif %}"
+      class="collection{% if sec_stts.quick_add == 'bulk' %} collection-quick-add-bulk{% endif %}{% if sec_stts.full_width %} collection--full-width{% endif %}{% if arrows_on_header %} arrow-on-header{% endif %}"
       id="collection-{{ sec_id }}"
       data-id="{{ sec_id }}"
       data-product-block
     >
       <div class="section-global__header">
         {%- content_for 'block', type: '_section-header', id: 'section-header' -%}
+        {%- if arrows_on_header -%}
+          {%- comment -%}
+            Bare chevrons rather than the shared swiper-button snippet: the header pair
+            carries no disc, border or hover fill, so the circular treatment the snippet
+            expects has nothing to sit on.
+          {%- endcomment -%}
+          <div class="swiper-btns-on-header swiper-btns-wrap small-hide">
+            <button
+              type="button"
+              class="swiper-button swiper-button-prev"
+              aria-label="{{ 'content.slider.previous_slide' | t }}"
+            >
+              <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+            </button>
+            <button
+              type="button"
+              class="swiper-button swiper-button-next"
+              aria-label="{{ 'content.slider.next_slide' | t }}"
+            >
+              <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+            </button>
+          </div>
+        {%- endif -%}
       </div>
 
       {% capture list_items %}
@@ -2222,6 +2256,10 @@
         {
           "value": "bottom",
           "label": "t:options.bottom_slide"
+        },
+        {
+          "value": "top_right",
+          "label": "t:options.top_right"
         }
       ],
       "default": "inside",

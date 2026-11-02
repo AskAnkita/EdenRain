@@ -11,6 +11,133 @@
   "name": "Footer group",
   "type": "footer",
   "sections": {
+    "footer_icon_bar": {
+      "type": "footer-icon-bar",
+      "blocks": {
+        "item_ethical": {
+          "type": "item",
+          "settings": {
+            "icon": "leaf",
+            "text": "Ethical choice",
+            "link": ""
+          }
+        },
+        "item_value": {
+          "type": "item",
+          "settings": {
+            "icon": "tag",
+            "text": "Great value",
+            "link": ""
+          }
+        },
+        "item_shipping": {
+          "type": "item",
+          "settings": {
+            "icon": "globe",
+            "text": "Worldwide shipping",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "item_ethical",
+        "item_value",
+        "item_shipping"
+      ],
+      "disabled": true,
+      "settings": {
+        "show_bar": true,
+        "background": "#ead9d1",
+        "text_color": "#161616",
+        "alignment": "center",
+        "text_size": 15,
+        "icon_size": 18,
+        "content_width": 1400,
+        "side_padding": 64,
+        "padding_top": 28,
+        "padding_bottom": 28
+      }
+    },
+    "footer_classic": {
+      "type": "footer-classic",
+      "blocks": {
+        "fc_logo": {
+          "type": "logo",
+          "settings": {
+            "logo": "",
+            "text": "<p>Eden Raine for Precious Metal Gemstone Jewellery with Elegance & Style.</p>",
+            "show_social": true
+          }
+        },
+        "fc_information": {
+          "type": "link_list",
+          "settings": {
+            "menu": "footer",
+            "extra_link_label": "",
+            "extra_link_url": "",
+            "show_social": false
+          }
+        },
+        "fc_eden_raine": {
+          "type": "link_list",
+          "settings": {
+            "menu": "eden-raine",
+            "extra_link_label": "",
+            "extra_link_url": "",
+            "show_social": false
+          }
+        },
+        "fc_help": {
+          "type": "link_list",
+          "settings": {
+            "menu": "help",
+            "extra_link_label": "",
+            "extra_link_url": "",
+            "show_social": false
+          }
+        },
+        "fc_newsletter": {
+          "type": "newsletter",
+          "settings": {
+            "heading": "JOIN THE EDEN RAINE CIRCLE",
+            "text": "<p>Sign up to receive private previews, bridal guides, and exclusive releases.</p>",
+            "field_label": "Enter your email",
+            "button_label": "JOIN"
+          }
+        }
+      },
+      "block_order": [
+        "fc_logo",
+        "fc_information",
+        "fc_eden_raine",
+        "fc_help",
+        "fc_newsletter"
+      ],
+      "custom_css": [
+        "p {color: white;}"
+      ],
+      "settings": {
+        "background": "#000000",
+        "text_color": "#ffffff",
+        "link_color": "#FFFFFF",
+        "link_hover_color": "#8c7d6b",
+        "border_color": "#FFFFFF",
+        "text_size": 13,
+        "heading_size": 14,
+        "logo_width": 70,
+        "button_background": "#FFFFFF",
+        "button_text_color": "#101010",
+        "show_payment_methods": true,
+        "credit_text": "Website by",
+        "credit_name": "Lionsorbet",
+        "credit_url": "https://www.lionsorbet.com/",
+        "extra_text": "",
+        "content_width": 1400,
+        "side_padding": 64,
+        "padding_top": 72,
+        "padding_bottom": 56
+      }
+    },
     "section_KHqNEp": {
       "type": "section",
       "blocks": {
@@ -18,9 +145,10 @@
           "type": "image",
           "name": "t:names.image",
           "settings": {
-            "image": "",
             "fallback_asset": "eden-raine-logo.png",
             "fallback_asset_ratio": "1188 / 158",
+            "placeholder_image_url": "",
+            "placeholder_image_ratio": "",
             "link": "",
             "hide_on_mobile": false,
             "image_ratio": "adapt",
@@ -56,6 +184,7 @@
       "block_order": [
         "image_eLwyrH"
       ],
+      "disabled": true,
       "name": "t:names.rich_text",
       "settings": {
         "content_direction": "column",
@@ -99,8 +228,70 @@
         "padding-block-end-mb": 0,
         "padding-inline-start-mb": 0,
         "padding-inline-end-mb": 0
+      }
+    },
+    "footer_luxe": {
+      "type": "footer-luxe",
+      "blocks": {
+        "menu_category": {
+          "type": "menu",
+          "settings": {
+            "heading": "Category",
+            "menu": "category"
+          }
+        },
+        "menu_about": {
+          "type": "menu",
+          "settings": {
+            "heading": "About",
+            "menu": ""
+          }
+        },
+        "menu_care": {
+          "type": "menu",
+          "settings": {
+            "heading": "Care",
+            "menu": ""
+          }
+        },
+        "text_visit": {
+          "type": "text",
+          "settings": {
+            "heading": "Visit",
+            "text": "<p>Unit 5C, Chelston Business Park<br/>Wellington TA21 9JQ<br/>United Kingdom</p>"
+          }
+        },
+        "text_write": {
+          "type": "text",
+          "settings": {
+            "heading": "Call us",
+            "text": "<p><a href=\"tel:+44203554887\" title=\"tel:+44203554887\">+44 (0) 203 554 887</a></p>"
+          }
+        }
       },
-      "disabled": true
+      "block_order": [
+        "menu_category",
+        "menu_about",
+        "menu_care",
+        "text_visit",
+        "text_write"
+      ],
+      "disabled": true,
+      "settings": {
+        "brand_line": "Diamonds grown with care, set by hand, made to last a lifetime.",
+        "show_newsletter": true,
+        "newsletter_placeholder": "Email for new arrivals",
+        "newsletter_button": "Join",
+        "newsletter_success": "Thank you. You're on the list.",
+        "wordmark_style": "dark",
+        "wordmark_width": 140,
+        "show_payment_icons": true,
+        "color_background": "#ffffff",
+        "color_text": "#1c1a19",
+        "color_muted": "#4f4541",
+        "color_accent": "#1c1a19",
+        "color_rule": "#cfbcb5"
+      }
     },
     "footer": {
       "type": "footer",
@@ -689,10 +880,10 @@
               "blocks": {
                 "menu_VeyxGm": {
                   "type": "menu",
-                  "disabled": true,
                   "name": "Menu",
+                  "disabled": true,
                   "settings": {
-                    "menu": "about",
+                    "menu": "",
                     "heading": "ABOUT",
                     "margin-block-end": 4,
                     "content_direction": "column",
@@ -740,10 +931,10 @@
                 },
                 "menu_YNbgQe": {
                   "type": "menu",
-                  "disabled": true,
                   "name": "Menu",
+                  "disabled": true,
                   "settings": {
-                    "menu": "care",
+                    "menu": "",
                     "heading": "CARE",
                     "margin-block-end": 4,
                     "content_direction": "column",
@@ -791,8 +982,8 @@
                 },
                 "menu_JKgFkA": {
                   "type": "menu",
-                  "disabled": true,
                   "name": "Menu",
+                  "disabled": true,
                   "settings": {
                     "menu": "category",
                     "heading": "CATEGORY",
@@ -1087,7 +1278,7 @@
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "",
+                            "placeholder_image_url": "",
                             "link": "",
                             "open_in_new_tab": false,
                             "width": 24,
@@ -1100,7 +1291,7 @@
                           "type": "text",
                           "name": "Text",
                           "settings": {
-                            "text": "<p>EXT: (091)-123-ELLA</p>",
+                            "text": "<p><a href=\"tel:+44203554887\" title=\"tel:+44203554887\">+44 (0) 203 554 887</a></p>",
                             "collection_description_only": false,
                             "collapse_text": false,
                             "typing_text": false,
@@ -1182,191 +1373,6 @@
                       "block_order": [
                         "icon_U6Y3HV",
                         "text_yLGza6"
-                      ]
-                    },
-                    "group_GQ3Jak": {
-                      "type": "group",
-                      "name": "Group",
-                      "settings": {
-                        "link": "",
-                        "open_in_new_tab": false,
-                        "hide_on_tablet": false,
-                        "hide_on_mobile": false,
-                        "content_direction": "row",
-                        "content_direction_mobile": "row",
-                        "horizontal_alignment": "flex-start",
-                        "vertical_alignment": "center",
-                        "align_baseline": false,
-                        "horizontal_alignment_flex_direction_column": "flex-start",
-                        "vertical_alignment_flex_direction_column": "center",
-                        "horizontal_alignment_mobile": "flex-start",
-                        "vertical_alignment_mobile": "center",
-                        "horizontal_alignment_flex_direction_column_mobile": "flex-start",
-                        "vertical_alignment_flex_direction_column_mobile": "center",
-                        "gap": 12,
-                        "width": "fill",
-                        "custom_width": 100,
-                        "width_tablet": "fill",
-                        "custom_width_tablet": 100,
-                        "width_mobile": "fill",
-                        "custom_width_mobile": 100,
-                        "height": "fit",
-                        "custom_height": 100,
-                        "inherit_color_scheme": true,
-                        "scheme_background": "#ffffff",
-                        "scheme_background_gradient": "",
-                        "scheme_foreground_heading": "#000000",
-                        "scheme_foreground": "#000000",
-                        "scheme_primary": "#000f9f",
-                        "scheme_primary_hover": "#000000",
-                        "scheme_border": "#e6e6e6",
-                        "scheme_shadow": "#000000",
-                        "background_media": "none",
-                        "video_position": "cover",
-                        "background_image_position": "cover",
-                        "content_overlay": false,
-                        "content_match_height": false,
-                        "image_ratio": "adapt",
-                        "border": "none",
-                        "border_width": 1,
-                        "border_opacity": 0,
-                        "border_radius": 0,
-                        "toggle_overlay": false,
-                        "overlay_color": "#00000026",
-                        "extend_left_overlay": false,
-                        "extend_right_overlay": false,
-                        "overlay_style": "solid",
-                        "gradient_direction": "to top",
-                        "enable_parallax": "none",
-                        "disable_parallax_mobile": false,
-                        "parallax_speed": 0.5,
-                        "horizontal_position": 0,
-                        "vertical_position": 0,
-                        "shadow_color": "rgba(0,0,0,0)",
-                        "shadow_horizontal_offset": 0,
-                        "shadow_vertical_offset": 0,
-                        "shadow_blur": 0,
-                        "spread_radius": 0,
-                        "margin-block-start": 0,
-                        "margin-block-start-mobile": 0,
-                        "margin-block-end": 0,
-                        "margin-block-end-mobile": 0,
-                        "margin-inline-start": 0,
-                        "margin-inline-start-mobile": 0,
-                        "margin-inline-end": 0,
-                        "margin-inline-end-mobile": 0,
-                        "padding-block-start": 0,
-                        "padding-block-end": 0,
-                        "padding-inline-start": 0,
-                        "padding-inline-end": 0
-                      },
-                      "blocks": {
-                        "icon_gHDWgh": {
-                          "type": "icon",
-                          "name": "t:names.icon",
-                          "settings": {
-                            "icon": "price_tag",
-                            "icon_custom": "svg",
-                            "svg_upload": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"1.5\"/><path d=\"m3.5 6.5 8.5 6.5 8.5-6.5\"/></svg>",
-                            "svg_width": "fit-content",
-                            "custom_width": 80,
-                            "svg_height": "fit-content",
-                            "custom_height": 80,
-                            "image_upload": "",
-                            "link": "",
-                            "open_in_new_tab": false,
-                            "width": 24,
-                            "width_mb": 24,
-                            "animation_type": "none"
-                          },
-                          "blocks": {}
-                        },
-                        "text_7PNpi3": {
-                          "type": "text",
-                          "name": "Text",
-                          "settings": {
-                            "text": "<p><a href=\"mailto:info@heatherneedhamsilver.com\" title=\"mailto:info@heatherneedhamsilver.com\">info@heatherneedhamsilver.com</a></p>",
-                            "collection_description_only": false,
-                            "collapse_text": false,
-                            "typing_text": false,
-                            "primary_text": "Welcome to our store!",
-                            "secondary_text": "Exclusive offers just for you.",
-                            "third_text": "Shop now and enjoy deals!",
-                            "highlight_text": false,
-                            "highlight_text_content": "",
-                            "highlight_text_type": "text",
-                            "underline_width": 100,
-                            "underline_height": 18,
-                            "underline_offset": 20,
-                            "highlight_text_color": "#000000",
-                            "highlight_underline_color": "#000000",
-                            "spacing_text": false,
-                            "spacing_text_content": "",
-                            "spacing_text_left": 0,
-                            "spacing_text_right": 0,
-                            "stroke_text": false,
-                            "stroke_text_content": "",
-                            "sticky_text": false,
-                            "sticky_text_color": "#ffffff",
-                            "mix_blend_mode": false,
-                            "text_box_trim": false,
-                            "enable_rotation": false,
-                            "rotate": 0,
-                            "width": "fit-content",
-                            "unit": "percent",
-                            "custom_width": 100,
-                            "custom_width_pixel": 500,
-                            "inherit_text_alignment": true,
-                            "justify_alignment": false,
-                            "alignment": "left",
-                            "width_tablet": "fit-content",
-                            "unit_tablet": "percent",
-                            "custom_width_tablet": 100,
-                            "custom_width_tablet_pixel": 100,
-                            "inherit_text_alignment_tablet": true,
-                            "justify_alignment_tablet": false,
-                            "alignment_tablet": "left",
-                            "width_mobile": "fit-content",
-                            "unit_mobile": "percent",
-                            "custom_width_mobile": 100,
-                            "custom_width_mobile_pixel": 100,
-                            "inherit_text_alignment_mobile": true,
-                            "justify_alignment_mobile": false,
-                            "alignment_mobile": "left",
-                            "type_preset": "custom",
-                            "font": "var(--font-body--family)",
-                            "font_size": "1.4rem",
-                            "font_weight": "default",
-                            "line_height": "normal",
-                            "letter_spacing": "normal",
-                            "case": "none",
-                            "wrap": "pretty",
-                            "color": "var(--color-foreground)",
-                            "background": false,
-                            "background_color": "#00000026",
-                            "background_gradient": "",
-                            "enable_border": false,
-                            "enable_border_bottom": false,
-                            "border": "none",
-                            "border_width": 0,
-                            "border_width_type": "100%",
-                            "border_custom_width": 100,
-                            "border_radius": 0,
-                            "text_effect": "none",
-                            "heading_only": false,
-                            "heading_effect": "none",
-                            "animation_repeat": false,
-                            "padding-block-start": 0,
-                            "padding-block-end": 0,
-                            "padding-inline-start": 0,
-                            "padding-inline-end": 0
-                          },
-                          "blocks": {}
-                        }
-                      },
-                      "block_order": [
-                        "icon_gHDWgh",
-                        "text_7PNpi3"
                       ]
                     },
                     "group_LfrgNL": {
@@ -1457,7 +1463,7 @@
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "",
+                            "placeholder_image_url": "",
                             "link": "",
                             "open_in_new_tab": false,
                             "width": 24,
@@ -1558,7 +1564,6 @@
                   "block_order": [
                     "text_EQtpkz",
                     "group_MVhyaq",
-                    "group_GQ3Jak",
                     "group_LfrgNL"
                   ]
                 }
@@ -1655,12 +1660,13 @@
           "blocks": {
             "image_TPwfCy": {
               "type": "image",
-              "disabled": true,
               "name": "t:names.image",
+              "disabled": true,
               "settings": {
-                "image": "",
                 "fallback_asset": "eden-raine-monogram.png",
                 "fallback_asset_ratio": "281 / 240",
+                "placeholder_image_url": "",
+                "placeholder_image_ratio": "",
                 "link": "",
                 "hide_on_mobile": false,
                 "image_ratio": "adapt",
@@ -2146,6 +2152,7 @@
         "footer_group_GQfP9p",
         "group_7TgywR"
       ],
+      "disabled": true,
       "name": "Footer - Home default",
       "settings": {
         "content_direction": "column",
@@ -2166,8 +2173,7 @@
         "background_image_position": "cover",
         "padding-block-start": 0,
         "padding-block-end": 24
-      },
-      "disabled": true
+      }
     },
     "footer_xynjaw": {
       "type": "footer",
@@ -2758,7 +2764,7 @@
                   "type": "menu",
                   "name": "Menu",
                   "settings": {
-                    "menu": "about",
+                    "menu": "",
                     "heading": "ABOUT",
                     "margin-block-end": 4,
                     "content_direction": "column",
@@ -2808,7 +2814,7 @@
                   "type": "menu",
                   "name": "Menu",
                   "settings": {
-                    "menu": "care",
+                    "menu": "",
                     "heading": "CARE",
                     "margin-block-end": 4,
                     "content_direction": "column",
@@ -3151,7 +3157,7 @@
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "",
+                            "placeholder_image_url": "",
                             "link": "",
                             "open_in_new_tab": false,
                             "width": 24,
@@ -3164,7 +3170,7 @@
                           "type": "text",
                           "name": "Text",
                           "settings": {
-                            "text": "<p>EXT: (091)-123-ELLA</p>",
+                            "text": "<p><a href=\"tel:+44203554887\" title=\"tel:+44203554887\">+44 (0) 203 554 887</a></p>",
                             "collection_description_only": false,
                             "collapse_text": false,
                             "typing_text": false,
@@ -3246,191 +3252,6 @@
                       "block_order": [
                         "icon_pztepJ",
                         "text_YjP93C"
-                      ]
-                    },
-                    "group_GFqgWq": {
-                      "type": "group",
-                      "name": "Group",
-                      "settings": {
-                        "link": "",
-                        "open_in_new_tab": false,
-                        "hide_on_tablet": false,
-                        "hide_on_mobile": false,
-                        "content_direction": "row",
-                        "content_direction_mobile": "row",
-                        "horizontal_alignment": "flex-start",
-                        "vertical_alignment": "center",
-                        "align_baseline": false,
-                        "horizontal_alignment_flex_direction_column": "flex-start",
-                        "vertical_alignment_flex_direction_column": "center",
-                        "horizontal_alignment_mobile": "flex-start",
-                        "vertical_alignment_mobile": "center",
-                        "horizontal_alignment_flex_direction_column_mobile": "flex-start",
-                        "vertical_alignment_flex_direction_column_mobile": "center",
-                        "gap": 12,
-                        "width": "fill",
-                        "custom_width": 100,
-                        "width_tablet": "fill",
-                        "custom_width_tablet": 100,
-                        "width_mobile": "fill",
-                        "custom_width_mobile": 100,
-                        "height": "fit",
-                        "custom_height": 100,
-                        "inherit_color_scheme": true,
-                        "scheme_background": "#ffffff",
-                        "scheme_background_gradient": "",
-                        "scheme_foreground_heading": "#000000",
-                        "scheme_foreground": "#000000",
-                        "scheme_primary": "#000f9f",
-                        "scheme_primary_hover": "#000000",
-                        "scheme_border": "#e6e6e6",
-                        "scheme_shadow": "#000000",
-                        "background_media": "none",
-                        "video_position": "cover",
-                        "background_image_position": "cover",
-                        "content_overlay": false,
-                        "content_match_height": false,
-                        "image_ratio": "adapt",
-                        "border": "none",
-                        "border_width": 1,
-                        "border_opacity": 0,
-                        "border_radius": 0,
-                        "toggle_overlay": false,
-                        "overlay_color": "#00000026",
-                        "extend_left_overlay": false,
-                        "extend_right_overlay": false,
-                        "overlay_style": "solid",
-                        "gradient_direction": "to top",
-                        "enable_parallax": "none",
-                        "disable_parallax_mobile": false,
-                        "parallax_speed": 0.5,
-                        "horizontal_position": 0,
-                        "vertical_position": 0,
-                        "shadow_color": "rgba(0,0,0,0)",
-                        "shadow_horizontal_offset": 0,
-                        "shadow_vertical_offset": 0,
-                        "shadow_blur": 0,
-                        "spread_radius": 0,
-                        "margin-block-start": 0,
-                        "margin-block-start-mobile": 0,
-                        "margin-block-end": 0,
-                        "margin-block-end-mobile": 0,
-                        "margin-inline-start": 0,
-                        "margin-inline-start-mobile": 0,
-                        "margin-inline-end": 0,
-                        "margin-inline-end-mobile": 0,
-                        "padding-block-start": 0,
-                        "padding-block-end": 0,
-                        "padding-inline-start": 0,
-                        "padding-inline-end": 0
-                      },
-                      "blocks": {
-                        "icon_BWidbw": {
-                          "type": "icon",
-                          "name": "t:names.icon",
-                          "settings": {
-                            "icon": "price_tag",
-                            "icon_custom": "svg",
-                            "svg_upload": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"1.5\"/><path d=\"m3.5 6.5 8.5 6.5 8.5-6.5\"/></svg>",
-                            "svg_width": "fit-content",
-                            "custom_width": 80,
-                            "svg_height": "fit-content",
-                            "custom_height": 80,
-                            "image_upload": "",
-                            "link": "",
-                            "open_in_new_tab": false,
-                            "width": 24,
-                            "width_mb": 24,
-                            "animation_type": "none"
-                          },
-                          "blocks": {}
-                        },
-                        "text_UBghXR": {
-                          "type": "text",
-                          "name": "Text",
-                          "settings": {
-                            "text": "<p><a href=\"mailto:info@heatherneedhamsilver.com\" title=\"mailto:info@heatherneedhamsilver.com\">info@heatherneedhamsilver.com</a></p>",
-                            "collection_description_only": false,
-                            "collapse_text": false,
-                            "typing_text": false,
-                            "primary_text": "Welcome to our store!",
-                            "secondary_text": "Exclusive offers just for you.",
-                            "third_text": "Shop now and enjoy deals!",
-                            "highlight_text": false,
-                            "highlight_text_content": "",
-                            "highlight_text_type": "text",
-                            "underline_width": 100,
-                            "underline_height": 18,
-                            "underline_offset": 20,
-                            "highlight_text_color": "#000000",
-                            "highlight_underline_color": "#000000",
-                            "spacing_text": false,
-                            "spacing_text_content": "",
-                            "spacing_text_left": 0,
-                            "spacing_text_right": 0,
-                            "stroke_text": false,
-                            "stroke_text_content": "",
-                            "sticky_text": false,
-                            "sticky_text_color": "#ffffff",
-                            "mix_blend_mode": false,
-                            "text_box_trim": false,
-                            "enable_rotation": false,
-                            "rotate": 0,
-                            "width": "fit-content",
-                            "unit": "percent",
-                            "custom_width": 100,
-                            "custom_width_pixel": 500,
-                            "inherit_text_alignment": true,
-                            "justify_alignment": false,
-                            "alignment": "left",
-                            "width_tablet": "fit-content",
-                            "unit_tablet": "percent",
-                            "custom_width_tablet": 100,
-                            "custom_width_tablet_pixel": 100,
-                            "inherit_text_alignment_tablet": true,
-                            "justify_alignment_tablet": false,
-                            "alignment_tablet": "left",
-                            "width_mobile": "fit-content",
-                            "unit_mobile": "percent",
-                            "custom_width_mobile": 100,
-                            "custom_width_mobile_pixel": 100,
-                            "inherit_text_alignment_mobile": true,
-                            "justify_alignment_mobile": false,
-                            "alignment_mobile": "left",
-                            "type_preset": "custom",
-                            "font": "var(--font-body--family)",
-                            "font_size": "1.4rem",
-                            "font_weight": "default",
-                            "line_height": "normal",
-                            "letter_spacing": "normal",
-                            "case": "none",
-                            "wrap": "pretty",
-                            "color": "var(--color-foreground)",
-                            "background": false,
-                            "background_color": "#00000026",
-                            "background_gradient": "",
-                            "enable_border": false,
-                            "enable_border_bottom": false,
-                            "border": "none",
-                            "border_width": 0,
-                            "border_width_type": "100%",
-                            "border_custom_width": 100,
-                            "border_radius": 0,
-                            "text_effect": "none",
-                            "heading_only": false,
-                            "heading_effect": "none",
-                            "animation_repeat": false,
-                            "padding-block-start": 0,
-                            "padding-block-end": 0,
-                            "padding-inline-start": 0,
-                            "padding-inline-end": 0
-                          },
-                          "blocks": {}
-                        }
-                      },
-                      "block_order": [
-                        "icon_BWidbw",
-                        "text_UBghXR"
                       ]
                     },
                     "group_btr7mq": {
@@ -3521,7 +3342,7 @@
                             "custom_width": 80,
                             "svg_height": "fit-content",
                             "custom_height": 80,
-                            "image_upload": "",
+                            "placeholder_image_url": "",
                             "link": "",
                             "open_in_new_tab": false,
                             "width": 24,
@@ -3622,7 +3443,6 @@
                   "block_order": [
                     "text_mLgHhT",
                     "group_KcHcMR",
-                    "group_GFqgWq",
                     "group_btr7mq"
                   ]
                 }
@@ -3721,9 +3541,10 @@
               "type": "image",
               "name": "t:names.image",
               "settings": {
-                "image": "",
                 "fallback_asset": "eden-raine-logo.png",
                 "fallback_asset_ratio": "1188 / 158",
+                "placeholder_image_url": "",
+                "placeholder_image_ratio": "",
                 "link": "",
                 "hide_on_mobile": false,
                 "image_ratio": "adapt",
@@ -4247,71 +4068,11 @@
         "padding_top": 30,
         "padding_bottom": 36
       }
-    },
-    "footer_luxe": {
-      "type": "footer-luxe",
-      "blocks": {
-        "menu_category": {
-          "type": "menu",
-          "settings": {
-            "heading": "Category",
-            "menu": "category"
-          }
-        },
-        "menu_about": {
-          "type": "menu",
-          "settings": {
-            "heading": "About",
-            "menu": "about"
-          }
-        },
-        "menu_care": {
-          "type": "menu",
-          "settings": {
-            "heading": "Care",
-            "menu": "care"
-          }
-        },
-        "text_visit": {
-          "type": "text",
-          "settings": {
-            "heading": "Visit",
-            "text": "<p>Unit 5C, Chelston Business Park<br/>Wellington TA21 9JQ<br/>United Kingdom</p>"
-          }
-        },
-        "text_write": {
-          "type": "text",
-          "settings": {
-            "heading": "Write to us",
-            "text": "<p><a href=\"mailto:info@heatherneedhamsilver.com\" title=\"mailto:info@heatherneedhamsilver.com\">info@heatherneedhamsilver.com</a></p><p><a href=\"https://www.instagram.com/heatherneedhamsilver/\" target=\"_blank\" title=\"Instagram\">Instagram</a></p>"
-          }
-        }
-      },
-      "block_order": [
-        "menu_category",
-        "menu_about",
-        "menu_care",
-        "text_visit",
-        "text_write"
-      ],
-      "settings": {
-        "brand_line": "Diamonds grown with care, set by hand, made to last a lifetime.",
-        "show_newsletter": true,
-        "newsletter_placeholder": "Email for new arrivals",
-        "newsletter_button": "Join",
-        "newsletter_success": "Thank you. You're on the list.",
-        "wordmark_style": "dark",
-        "wordmark_width": 140,
-        "show_payment_icons": true,
-        "color_background": "#e3d4cf",
-        "color_text": "#1c1a19",
-        "color_muted": "#4f4541",
-        "color_accent": "#1c1a19",
-        "color_rule": "#cfbcb5"
-      }
     }
   },
   "order": [
+    "footer_icon_bar",
+    "footer_classic",
     "section_KHqNEp",
     "footer_luxe",
     "footer",

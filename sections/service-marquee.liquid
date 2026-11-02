@@ -1,0 +1,693 @@
+{% comment %}
+  Static benefits strip with editorial icons and labels.
+{% endcomment %}
+
+{%- liquid
+  assign label_font = 'var(--font-body--family)'
+  if section.settings.label_font == 'heading'
+    assign label_font = 'var(--font-heading--family)'
+  endif
+
+  assign is_scroll = section.settings.enable_scroll
+-%}
+
+{%- style -%}
+  #service-marquee-{{ section.id }} {
+    /* The gutter the category tiles row uses, so the rule here lines up with the
+       tiles' outer edges rather than stopping short of them. */
+    --sm-gutter: max(2.4rem, calc(var(--er-arrow-size, 40px) / 2 + 0.8rem));
+    --sm-icon-size: {{ section.settings.icon_size }}px;
+    --sm-icon-gap: {{ section.settings.icon_gap }}px;
+    --sm-rule-color: {{ section.settings.divider_color }};
+    --sm-border-color: {{ section.settings.border_color }};
+    --sm-label-size: {{ section.settings.font_size }}px;
+    --sm-icon-color: {{ section.settings.icon_color }};
+    --sm-item-gap: {{ section.settings.scroll_item_gap }}px;
+
+    position: relative;
+    width: 100%;
+    color: {{ section.settings.text_color }};
+    background: transparent;
+    padding-block: 0;
+  }
+
+  #service-marquee-{{ section.id }} .sm-viewport {
+    width: calc(100% - var(--sm-gutter) * 2);
+    {% if section.settings.width == 'page' %}max-width: calc(var(--page-width, 160rem) - var(--sm-gutter) * 2);{% endif %}
+    margin: 0 auto;
+    border-block: 1px solid var(--sm-border-color);
+  }
+
+  #service-marquee-{{ section.id }} .sm-track {
+    align-items: center;
+    padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
+  }
+
+  #service-marquee-{{ section.id }} .sm-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sm-icon-gap);
+    min-width: 0;
+    position: relative;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #service-marquee-{{ section.id }} .sm-item::after {
+    position: absolute;
+    top: 25%;
+    right: 0;
+    width: 1px;
+    height: 50%;
+    background: var(--sm-rule-color);
+    content: '';
+  }
+
+  {%- if is_scroll -%}
+    #service-marquee-{{ section.id }} .sm-viewport {
+      overflow: hidden;
+    }
+
+    #service-marquee-{{ section.id }} .sm-track {
+      display: flex;
+      width: max-content;
+      animation: sm-scroll-{{ section.id }} {{ section.settings.scroll_speed }}s linear infinite;
+      {% if section.settings.scroll_direction == 'right' %}animation-direction: reverse;{% endif %}
+    }
+
+    #service-marquee-{{ section.id }} .sm-group {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+    }
+
+    #service-marquee-{{ section.id }} .sm-item {
+      padding-inline: var(--sm-item-gap);
+    }
+
+    #service-marquee-{{ section.id }} .sm-label {
+      max-width: none;
+      white-space: nowrap;
+    }
+
+    {%- if section.settings.pause_on_hover -%}
+      #service-marquee-{{ section.id }} .sm-viewport:hover .sm-track,
+      #service-marquee-{{ section.id }} .sm-viewport:focus-within .sm-track {
+        animation-play-state: paused;
+      }
+    {%- endif -%}
+
+    @keyframes sm-scroll-{{ section.id }} {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+      #service-marquee-{{ section.id }} .sm-track {
+        animation: none;
+      }
+
+      #service-marquee-{{ section.id }} .sm-viewport {
+        overflow-x: auto;
+      }
+    }
+  {%- else -%}
+    #service-marquee-{{ section.id }} .sm-group {
+      display: contents;
+    }
+
+    #service-marquee-{{ section.id }} .sm-track {
+      display: grid;
+      grid-template-columns: repeat({{ section.blocks.size }}, minmax(0, 1fr));
+    }
+
+    #service-marquee-{{ section.id }} .sm-item {
+      padding: 0 12px;
+    }
+
+    #service-marquee-{{ section.id }} .sm-item--last::after {
+      display: none;
+    }
+
+    @media screen and (min-width: 750px) and (max-width: 989px) {
+      #service-marquee-{{ section.id }} .sm-track {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        row-gap: 18px;
+      }
+
+      #service-marquee-{{ section.id }} .sm-item:nth-child(4n)::after {
+        display: none;
+      }
+    }
+  {%- endif -%}
+
+  #service-marquee-{{ section.id }} .sm-icon {
+    display: block;
+    flex: 0 0 auto;
+    width: var(--sm-icon-size);
+    height: var(--sm-icon-size);
+    color: var(--sm-icon-color);
+  }
+
+  #service-marquee-{{ section.id }} .sm-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: {{ section.settings.icon_stroke }};
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  #service-marquee-{{ section.id }} .sm-icon img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  #service-marquee-{{ section.id }} .sm-label {
+    font-family: {{ label_font }};
+    font-size: var(--sm-label-size);
+    font-weight: {{ section.settings.font_weight }};
+    line-height: 1.2;
+    letter-spacing: {{ section.settings.letter_spacing }}px;
+    max-width: 10em;
+    white-space: normal;
+    {% if section.settings.uppercase %}text-transform: uppercase;{% endif %}
+  }
+
+  @media screen and (max-width: 749px) {
+    #service-marquee-{{ section.id }} {
+      --sm-gutter: 1.6rem;
+      --sm-icon-size: {{ section.settings.mobile_icon_size }}px;
+      --sm-label-size: {{ section.settings.mobile_font_size }}px;
+      --sm-item-gap: {{ section.settings.mobile_scroll_item_gap }}px;
+      padding-block: 0;
+    }
+
+    #service-marquee-{{ section.id }} .sm-track {
+      padding-block: {{ section.settings.mobile_padding_top }}px {{ section.settings.mobile_padding_bottom }}px;
+    }
+
+    #service-marquee-{{ section.id }} .sm-icon {
+      width: min(var(--sm-icon-size), 24px);
+      height: min(var(--sm-icon-size), 24px);
+    }
+
+    #service-marquee-{{ section.id }} .sm-label {
+      font-size: min(var(--sm-label-size), 9px);
+      letter-spacing: 0.6px;
+    }
+
+    {%- if is_scroll -%}
+      #service-marquee-{{ section.id }} .sm-item {
+        gap: 7px;
+      }
+    {%- else -%}
+      #service-marquee-{{ section.id }} .sm-item {
+        gap: 7px;
+        padding-inline: 5px;
+      }
+
+      #service-marquee-{{ section.id }} .sm-track {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        row-gap: 16px;
+      }
+
+      #service-marquee-{{ section.id }} .sm-item:nth-child(even)::after {
+        display: none;
+      }
+    {%- endif -%}
+  }
+{%- endstyle -%}
+
+<section
+  id="service-marquee-{{ section.id }}"
+  class="service-marquee"
+>
+  <div class="sm-viewport">
+    <div class="sm-track">
+      {%- liquid
+        assign pass_count = 1
+        if is_scroll
+          assign pass_count = 2
+        endif
+      -%}
+      {%- for pass in (1..pass_count) -%}
+        <div class="sm-group"{% if pass > 1 %} aria-hidden="true"{% endif %}>
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign item_tag = 'div'
+              if block.settings.link != blank
+                assign item_tag = 'a'
+              endif
+            -%}
+
+            {%- capture item_inner -%}
+              {%- if block.settings.icon_image != blank -%}
+                <span class="sm-icon" aria-hidden="true">
+                  {{
+                    block.settings.icon_image
+                    | image_url: width: 96
+                    | image_tag: loading: 'lazy', widths: '48, 96, 144', alt: ''
+                  }}
+                </span>
+              {%- elsif block.settings.icon != 'none' -%}
+                <span class="sm-icon" aria-hidden="true">
+                  {%- case block.settings.icon -%}
+                    {%- when 'diamond' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.5 3h9l4.5 6-9 12L3 9l4.5-6Z" />
+                        <path d="M3 9h18M7.5 3 12 9l4.5-6M12 9v12" />
+                      </svg>
+                    {%- when 'shipping' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2.5 6h11v10h-11V6ZM13.5 9.5H17l4 4V16h-7.5V9.5Z" />
+                        <path d="M7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+                        <path d="M9 18h6" />
+                      </svg>
+                    {%- when 'returns' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.7 9.7 0 0 0-6.7 2.7L3 8" />
+                        <path d="M3 3.5v4.8h4.8" />
+                      </svg>
+                    {%- when 'crafted' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 20.5A7.5 7.5 0 0 1 9.8 6.3C15.4 5.2 17 4.6 19 2.2c1 2 2 4.2 2 8 0 5.7-4.5 10.3-10 10.3Z" />
+                        <path d="M2.5 21.5c0-3 1.9-5.4 5.1-6 2.4-.5 4.9-2 5.9-3" />
+                      </svg>
+                    {%- when 'leaf' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.5 3.5C12 3 5.2 4.7 3.7 10.6c-1 4 2 6.8 5.8 5.8 5.9-1.5 7.6-8.3 7.1-12.9Z" />
+                        <path d="M3.5 21c2.3-5 6.2-8.5 11.4-11.2" />
+                      </svg>
+                    {%- when 'heart' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.5 8.7c0 5-8.5 11-8.5 11s-8.5-6-8.5-11A4.5 4.5 0 0 1 12 6a4.5 4.5 0 0 1 8.5 2.7Z" />
+                      </svg>
+                    {%- when 'ring' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13Z" />
+                        <path d="M12 8 9.3 3.5h5.4L12 8Z" />
+                        <path d="M9.3 3.5h5.4" />
+                      </svg>
+                    {%- when 'certificate' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 15.5a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" />
+                        <path d="m8.4 14.8-1.4 6.7 5-2.4 5 2.4-1.4-6.7" />
+                      </svg>
+                    {%- when 'support' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15.5a2 2 0 0 1-2 2H7.5L3 21.5V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10.5Z" />
+                        <path d="M8 8.5h8M8 12h5" />
+                      </svg>
+                    {%- when 'gift' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 8.5h18V21H3V8.5Z" />
+                        <path d="M3 13h18M12 8.5V21" />
+                        <path d="M12 8.5S10.6 3.4 8.1 4.3 10 8.5 12 8.5Zm0 0s1.4-5.1 3.9-4.2S14 8.5 12 8.5Z" />
+                      </svg>
+                    {%- when 'secure' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.5 10.5h15V21h-15V10.5Z" />
+                        <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5M12 14.5v2.5" />
+                      </svg>
+                    {%- when 'ethical' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 11.6 8.6 8.2a2.45 2.45 0 1 1 3.4-3.5 2.45 2.45 0 1 1 3.4 3.5L12 11.6Z" />
+                        <path d="M3.4 20.6v-3.8c0-1.2 1-2.2 2.2-2.2h1.7L12 17.5l4.7-2.9h1.7c1.2 0 2.2 1 2.2 2.2v3.8" />
+                      </svg>
+                    {%- when 'globe' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21.5a9.5 9.5 0 1 0 0-19 9.5 9.5 0 0 0 0 19Z" />
+                        <path d="M2.5 12h19" />
+                        <path d="M12 2.5c2.6 2.6 4 5.7 4 9.5s-1.4 6.9-4 9.5c-2.6-2.6-4-5.7-4-9.5s1.4-6.9 4-9.5Z" />
+                      </svg>
+                    {%- when 'value' -%}
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4L12.6 2.6Z" />
+                        <path d="M7.5 6.3a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z" />
+                      </svg>
+                  {%- endcase -%}
+                </span>
+              {%- endif -%}
+
+              {%- if block.settings.title != blank -%}
+                <span class="sm-label">{{ block.settings.title }}</span>
+              {%- endif -%}
+            {%- endcapture -%}
+
+            {%- if item_tag == 'a' -%}
+              <a
+                class="sm-item{% if forloop.last %} sm-item--last{% endif %}"
+                href="{{ block.settings.link }}"
+                {% if pass == 1 %}{{ block.shopify_attributes }}{% endif %}
+              >
+                {{ item_inner }}
+              </a>
+            {%- else -%}
+              <div
+                class="sm-item{% if forloop.last %} sm-item--last{% endif %}"
+                {% if pass == 1 %}{{ block.shopify_attributes }}{% endif %}
+              >
+                {{ item_inner }}
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Service benefits",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "info": "Page width lines the strip up with the rows above and below it.",
+      "options": [
+        { "value": "page", "label": "Page width" },
+        { "value": "full", "label": "Full width" }
+      ],
+      "default": "page"
+    },
+    {
+      "type": "header",
+      "content": "Scrolling"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_scroll",
+      "label": "Scroll continuously",
+      "info": "Off shows the benefits as a fixed row instead.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "scroll_direction",
+      "label": "Direction",
+      "options": [
+        { "value": "left", "label": "Right to left" },
+        { "value": "right", "label": "Left to right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "Seconds per loop",
+      "info": "Higher is slower.",
+      "min": 10,
+      "max": 120,
+      "step": 5,
+      "unit": "s",
+      "default": 45
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "scroll_item_gap",
+      "label": "Space around each item on desktop",
+      "min": 12,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "mobile_scroll_item_gap",
+      "label": "Space around each item on mobile",
+      "min": 8,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text and icons",
+      "default": "#001514"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon accent",
+      "default": "#001514"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Column divider",
+      "default": "#c9c9c0"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Top and bottom line",
+      "default": "#e4e4dd"
+    },
+    {
+      "type": "header",
+      "content": "Label"
+    },
+    {
+      "type": "select",
+      "id": "label_font",
+      "label": "Font",
+      "options": [
+        { "value": "body", "label": "Body" },
+        { "value": "heading", "label": "Heading" }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Size on desktop",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "mobile_font_size",
+      "label": "Size on mobile",
+      "min": 9,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semibold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "default": 1.2
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase",
+      "label": "Uppercase",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Icons"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Size on desktop",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "mobile_icon_size",
+      "label": "Size on mobile",
+      "min": 14,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "icon_stroke",
+      "label": "Line weight",
+      "info": "Built-in icons only; an uploaded picture is used as it is.",
+      "min": 0.8,
+      "max": 2.4,
+      "step": 0.2,
+      "default": 1.6
+    },
+    {
+      "type": "range",
+      "id": "icon_gap",
+      "label": "Space between icon and label",
+      "min": 4,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top on desktop",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom on desktop",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "label": "Padding top on mobile",
+      "min": 0,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "label": "Padding bottom on mobile",
+      "min": 0,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "service",
+      "name": "Service",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Label",
+          "default": "Lifetime guarantee"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "diamond", "label": "Diamond" },
+            { "value": "shipping", "label": "Shipping" },
+            { "value": "returns", "label": "Returns" },
+            { "value": "crafted", "label": "Leaf" },
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "ring", "label": "Ring" },
+            { "value": "certificate", "label": "Award" },
+            { "value": "support", "label": "Chat" },
+            { "value": "gift", "label": "Gift" },
+            { "value": "secure", "label": "Secure" },
+            { "value": "ethical", "label": "Ethical (heart in hands)" },
+            { "value": "globe", "label": "Globe" },
+            { "value": "value", "label": "Price tag" },
+            { "value": "none", "label": "No icon" }
+          ],
+          "default": "diamond"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Icon picture",
+          "info": "Optional. Replaces the icon above. A square PNG or SVG with a transparent background works best."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional. Leave empty for plain text."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Service benefits",
+      "blocks": [
+        { "type": "service", "settings": { "icon": "diamond", "title": "Lifetime guarantee" } },
+        { "type": "service", "settings": { "icon": "shipping", "title": "Complimentary shipping" } },
+        { "type": "service", "settings": { "icon": "returns", "title": "30-day returns" } },
+        { "type": "service", "settings": { "icon": "crafted", "title": "Consciously crafted" } },
+        { "type": "service", "settings": { "icon": "ethical", "title": "Ethical choice" } },
+        { "type": "service", "settings": { "icon": "globe", "title": "Worldwide shipping" } },
+        { "type": "service", "settings": { "icon": "value", "title": "Great value" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

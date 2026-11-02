@@ -4,7 +4,7 @@
     
     "Shape Carousel"
     
-    Build a premium minimal jewelry shape selector section similar to the provided reference image.
+    Build a premium minimal jewellery shape selector section similar to the provided reference image.
     
     The main priority is:
     
@@ -323,7 +323,7 @@
     
     FINAL OUTPUT
     
-    Create a clean luxury jewelry shape carousel:
+    Create a clean luxury jewellery shape carousel:
     
     ✅ Fully editable Shopify section
     ✅ No default text
@@ -334,7 +334,7 @@
     ✅ Correct mobile 2x2 grouped carousel
     ✅ Mobile moves 4 cards together
     ✅ Natural image ratio
-    ✅ Minimal premium jewelry UI
+    ✅ Minimal premium jewellery UI
     ✅ Matches the provided reference image style
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
@@ -352,8 +352,8 @@
   .ai-shape-carousel__heading-{{ ai_gen_id }} {
     text-align: center;
     margin: 0 0 {{ block.settings.heading_margin_bottom }}px;
-    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
-    font-weight: {{ block.settings.heading_font.weight }};
+    font-family: var(--font-{{ block.settings.heading_font_family }}--family);
+    font-weight: var(--font-{{ block.settings.heading_font_family }}--weight);
     font-size: {{ block.settings.heading_font_size }}px;
     letter-spacing: {{ block.settings.heading_letter_spacing }}px;
     line-height: {{ block.settings.heading_line_height }};
@@ -362,6 +362,12 @@
 
   .ai-shape-carousel__container-{{ ai_gen_id }} {
     position: relative;
+    width: 100%;
+  }
+
+  /* The clipping lives here so the arrows, which sit half outside the
+     container, are not cut off. */
+  .ai-shape-carousel__viewport-{{ ai_gen_id }} {
     width: 100%;
     overflow: hidden;
   }
@@ -423,8 +429,10 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
+    /* --er-arrow-size is the shared scroller arrow size (assets/base.css), so this
+       carousel's buttons match every other row. */
+    width: var(--er-arrow-size, 40px);
+    height: var(--er-arrow-size, 40px);
     border-radius: 50%;
     background-color: {{ block.settings.arrow_background }};
     border: 1px solid {{ block.settings.arrow_border }};
@@ -435,6 +443,7 @@
     justify-content: center;
     z-index: 10;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
   }
 
   .ai-shape-carousel__nav-{{ ai_gen_id }}:hover {
@@ -442,12 +451,43 @@
     color: {{ block.settings.arrow_color_hover }};
   }
 
+  /* Hover draws a ring in from the middle of the disc to its edge, as on every
+     other scroller in the theme (assets/base.css). */
+  .ai-shape-carousel__nav-{{ ai_gen_id }}::after {
+    position: absolute;
+    inset: 0;
+    border: 1.5px solid {{ block.settings.arrow_color }};
+    border-radius: 50%;
+    content: "";
+    opacity: 0;
+    transform: scale(0.7);
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.22s ease;
+    pointer-events: none;
+  }
+
+  .ai-shape-carousel__nav-{{ ai_gen_id }}:hover::after,
+  .ai-shape-carousel__nav-{{ ai_gen_id }}:focus-visible::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .ai-shape-carousel__nav-{{ ai_gen_id }} svg {
+    width: var(--er-arrow-icon-size, 1.4rem);
+    height: auto;
+  }
+
+  /* One arrow icon serves both buttons; the back one is turned round. */
+  .ai-shape-carousel__nav-{{ ai_gen_id }}.prev svg {
+    transform: rotate(180deg);
+  }
+
+  /* Half the disc sits outside the viewport, as before, whatever its size */
   .ai-shape-carousel__nav-{{ ai_gen_id }}.prev {
-    left: 10px;
+    left: calc(var(--er-arrow-size, 40px) / -2);
   }
 
   .ai-shape-carousel__nav-{{ ai_gen_id }}.next {
-    right: 10px;
+    right: calc(var(--er-arrow-size, 40px) / -2);
   }
 
   .ai-shape-carousel__pagination-{{ ai_gen_id }} {
@@ -508,18 +548,15 @@
   <div class="ai-shape-carousel__container-{{ ai_gen_id }}">
     {% if block.settings.show_arrows %}
       <button class="ai-shape-carousel__nav-{{ ai_gen_id }} prev" aria-label="Previous">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
+        {%- render 'icon-arrow' -%}
       </button>
       <button class="ai-shape-carousel__nav-{{ ai_gen_id }} next" aria-label="Next">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
+        {%- render 'icon-arrow' -%}
       </button>
     {% endif %}
 
-    <div class="ai-shape-carousel__track-{{ ai_gen_id }}">
+    <div class="ai-shape-carousel__viewport-{{ ai_gen_id }}">
+      <div class="ai-shape-carousel__track-{{ ai_gen_id }}">
       {% for i in (1..12) %}
         {% assign image_key = 'card_' | append: i | append: '_image' %}
         {% assign hover_image_key = 'card_' | append: i | append: '_hover_image' %}
@@ -568,6 +605,7 @@
           </div>
         {% endif %}
       {% endfor %}
+      </div>
     </div>
   </div>
 
@@ -766,10 +804,16 @@
       "label": "Heading"
     },
     {
-      "type": "font_picker",
-      "id": "heading_font",
+      "type": "select",
+      "id": "heading_font_family",
       "label": "Font",
-      "default": "assistant_n4"
+      "info": "Uses the theme's typography so fonts stay consistent sitewide.",
+      "options": [
+        { "value": "heading", "label": "Heading" },
+        { "value": "subheading", "label": "Subheading" },
+        { "value": "body", "label": "Body" }
+      ],
+      "default": "heading"
     },
     {
       "type": "range",
@@ -902,7 +946,7 @@
       "type": "color",
       "id": "card_background",
       "label": "Background",
-      "default": "#FFFFFF"
+      "default": "#F8F8F6"
     },
     {
       "type": "color",

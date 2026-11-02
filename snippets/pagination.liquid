@@ -158,12 +158,6 @@
           {% render 'loading-spinner' %}
         </button>
 
-        {%- if sec_stts.show_back_to_top_link -%}
-          <a class="pagination-back-to-top" href="#top" data-pagination-back-to-top>
-            <span class="svg-wrapper" aria-hidden="true">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
-            <span>{{ 'content.back_to_top' | t }}</span>
-          </a>
-        {%- endif -%}
       </infinite-scrolling>
     {%- endif -%}
   </div>

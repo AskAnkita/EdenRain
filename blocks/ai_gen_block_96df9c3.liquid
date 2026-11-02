@@ -2,7 +2,7 @@
   @prompt
     Create a highly customizable, responsive Video Hero Section for a Shopify theme.
     
-    The section should replicate a premium luxury jewelry homepage hero experience similar to a diamond engagement ring brand website.
+    The section should replicate a premium luxury jewellery homepage hero experience similar to a diamond engagement ring brand website.
     
     🎬 VIDEO SETTINGS (CORE FEATURE)
     Desktop Video
@@ -63,7 +63,7 @@
     Buttons:
     
     Engagement Rings
-    Fine Jewelry
+    Fine Jewellery
     📱 MOBILE DESIGN CHANGE (IMPORTANT)
     
     On mobile devices:
@@ -88,7 +88,7 @@
     Content should NOT sit on top of video.
     Use white background.
     Center align content by default.
-    Maintain luxury jewelry brand style.
+    Maintain luxury jewellery brand style.
     Proper spacing between video and content.
     🎨 BUTTON SETTINGS
     
@@ -318,10 +318,16 @@
     ✅ Separate desktop/mobile typography controls
     ✅ Separate spacing controls for heading, description, and buttons
     ✅ Both buttons styled as primary buttons
-    ✅ Luxury jewelry brand aesthetic
+    ✅ Luxury jewellery brand aesthetic
     ✅ Clean, premium, modern design matching high-end diamond websites, Can you also add this setting need to change (Heading, Description) text color in mobile
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{%- comment -%}
+  The share of the first screen the film takes on a phone, as a fraction. The rest of that
+  screen - between the header above and the bar of icons below - goes to the words, the
+  buttons and the row of services under them.
+{%- endcomment -%}
+{% assign film_share = block.settings.mobile_height | divided_by: 100.0 %}
 
 {% style %}
   .ai-luxury-video-hero-{{ ai_gen_id }} {
@@ -343,13 +349,15 @@
     overflow: hidden;
   }
 
-  .ai-luxury-video-hero-video-{{ ai_gen_id }} {
+  .ai-luxury-video-hero-video-{{ ai_gen_id }},
+  .ai-luxury-video-hero-image-{{ ai_gen_id }} {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
   }
 
   .ai-luxury-video-hero-overlay-{{ ai_gen_id }} {
@@ -374,7 +382,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 40px 40px 88px;
+    padding: 40px 40px {{ block.settings.desktop_content_bottom_padding }}px;
     z-index: 2;
     {% if block.settings.desktop_vertical_position == 'top' %}
       justify-content: flex-start;
@@ -429,41 +437,44 @@
     flex-wrap: wrap;
   }
 
+  {%- comment -%}
+    The paint, the hover and the lift all come from assets/eden-actions.css,
+    which matches these buttons on their class prefix and gives every call to
+    action in the shop the same fill: a colour that wipes in from the left.
+    This block only says how big the button is and which two colours it
+    crosses between - it must not write a :hover of its own, or the hero falls
+    back out of step with add to cart and the rest of the homepage.
+  {%- endcomment -%}
   .ai-luxury-video-hero-button-{{ ai_gen_id }} {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.3s ease;
     width: {{ block.settings.button_width }}px;
     height: {{ block.settings.button_height }}px;
     padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
+    border-width: 2px;
+    border-style: solid;
     border-radius: {{ block.settings.button_border_radius }}px;
     font-size: {{ block.settings.button_font_size }}px;
     font-weight: {{ block.settings.button_font_weight }};
     letter-spacing: {{ block.settings.button_letter_spacing }}px;
     {% if block.settings.button_style == 'solid' %}
-      background-color: {{ block.settings.button_background_color }};
-      color: {{ block.settings.button_text_color }};
-      border: 2px solid {{ block.settings.button_background_color }};
+      --cta-fill: {{ block.settings.button_background_color }};
+      --cta-ink: {{ block.settings.button_text_color }};
+      --cta-edge: {{ block.settings.button_background_color }};
+      --cta-fill-hover: {{ block.settings.button_hover_background_color }};
+      --cta-ink-hover: {{ block.settings.button_hover_text_color }};
+      --cta-edge-hover: {{ block.settings.button_hover_background_color }};
     {% else %}
-      background-color: transparent;
-      color: {{ block.settings.button_text_color }};
-      border: 2px solid {{ block.settings.button_border_color }};
+      --cta-fill: transparent;
+      --cta-ink: {{ block.settings.button_text_color }};
+      --cta-edge: {{ block.settings.button_border_color }};
+      --cta-fill-hover: {{ block.settings.button_border_color }};
+      --cta-ink-hover: {{ block.settings.button_background_color }};
+      --cta-edge-hover: {{ block.settings.button_border_color }};
     {% endif %}
-  }
-
-  .ai-luxury-video-hero-button-{{ ai_gen_id }}:hover {
-    {% if block.settings.button_style == 'solid' %}
-      background-color: {{ block.settings.button_hover_background_color }};
-      border-color: {{ block.settings.button_hover_background_color }};
-      color: {{ block.settings.button_hover_text_color }};
-    {% else %}
-      background-color: {{ block.settings.button_border_color }};
-      color: {{ block.settings.button_background_color }};
-    {% endif %}
-    transform: translateY(-2px);
   }
 
   .ai-luxury-video-hero-mobile-content-{{ ai_gen_id }} {
@@ -471,8 +482,21 @@
   }
 
   @media screen and (max-width: 749px) {
+    /*
+      The real height is measured and set by the script at the foot of this block, because
+      the numbers it needs cannot be had from CSS: --header-group-height is not the height
+      of everything above the hero (it leaves the header itself out, and adding
+      --header-height over-counts), and the words below the film change height with the
+      wording and the width of the screen.
+
+      What is left here is the starting guess - the film's share of the screen between the
+      header and the bar of icons - so the film is about the right size before the script
+      runs and nothing jumps far when it does.
+    */
     .ai-luxury-video-hero-container-{{ ai_gen_id }} {
-      height: min(93vw, {{ block.settings.mobile_height }}svh);
+      height: calc((100vh - var(--header-group-height, 0px) - var(--toolbar-mobile-height, 0px)) * {{ film_share }});
+      height: calc((100svh - var(--header-group-height, 0px) - var(--toolbar-mobile-height, 0px)) * {{ film_share }});
+      min-height: 240px;
     }
 
     .ai-luxury-video-hero-content-{{ ai_gen_id }} {
@@ -480,13 +504,17 @@
     }
 
     .ai-luxury-video-hero-mobile-content-{{ ai_gen_id }} {
-      display: block;
+      /* A column so the script can hand the panel the height left over and the words
+         sit centred in it rather than crowding its top edge. */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       background-color: {{ block.settings.mobile_content_background }};
       box-sizing: border-box;
       width: 100%;
       max-width: 680px;
       margin: 0 auto;
-      padding: 36px 18px 48px;
+      padding: 14px 18px;
       {% if block.settings.mobile_content_alignment == 'left' %}
         text-align: left;
       {% elsif block.settings.mobile_content_alignment == 'center' %}
@@ -521,49 +549,70 @@
 
     .ai-luxury-video-hero-mobile-buttons-{{ ai_gen_id }} {
       display: flex;
-      flex-direction: column;
+      {% if block.settings.mobile_button_layout == 'row' %}
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+      {% else %}
+        flex-direction: column;
+        gap: 12px;
+      {% endif %}
       align-items: stretch;
-      gap: 12px;
       padding-top: {{ block.settings.mobile_buttons_padding_top }}px;
       padding-bottom: {{ block.settings.mobile_buttons_padding_bottom }}px;
       margin-top: {{ block.settings.mobile_description_buttons_gap }}px;
       width: 100%;
     }
 
+    {%- comment -%}
+      As above: size here, colours as the shared --cta-* pairs, hover in
+      assets/eden-actions.css.
+    {%- endcomment -%}
     .ai-luxury-video-hero-mobile-button-{{ ai_gen_id }} {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       text-decoration: none;
       cursor: pointer;
-      transition: all 0.3s ease;
       box-sizing: border-box;
-      width: 100%;
+      {% if block.settings.mobile_button_layout == 'row' %}
+        {%- comment -%}
+          Two across: split the row evenly and trim the side padding, so the
+          longest label still fits one line on a 320px screen.
+        {%- endcomment -%}
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        padding: {{ block.settings.mobile_button_padding_vertical }}px min({{ block.settings.mobile_button_padding_horizontal }}px, 8px);
+      {% else %}
+        width: 100%;
+        padding: {{ block.settings.mobile_button_padding_vertical }}px {{ block.settings.mobile_button_padding_horizontal }}px;
+      {% endif %}
       min-height: max(48px, {{ block.settings.mobile_button_height }}px);
-      padding: {{ block.settings.mobile_button_padding_vertical }}px {{ block.settings.mobile_button_padding_horizontal }}px;
+      border-width: 2px;
+      border-style: solid;
       border-radius: {{ block.settings.button_border_radius }}px;
-      font-size: {{ block.settings.mobile_button_font_size }}px;
+      {% if block.settings.mobile_button_layout == 'row' %}
+        font-size: min({{ block.settings.mobile_button_font_size }}px, 3.4vw);
+      {% else %}
+        font-size: {{ block.settings.mobile_button_font_size }}px;
+      {% endif %}
       font-weight: {{ block.settings.mobile_button_font_weight }};
       letter-spacing: {{ block.settings.mobile_button_letter_spacing }}px;
       {% if block.settings.button_style == 'solid' %}
-        background-color: {{ block.settings.button_background_color }};
-        color: {{ block.settings.button_text_color }};
-        border: 2px solid {{ block.settings.button_background_color }};
+        --cta-fill: {{ block.settings.button_background_color }};
+        --cta-ink: {{ block.settings.button_text_color }};
+        --cta-edge: {{ block.settings.button_background_color }};
+        --cta-fill-hover: {{ block.settings.button_hover_background_color }};
+        --cta-ink-hover: {{ block.settings.button_hover_text_color }};
+        --cta-edge-hover: {{ block.settings.button_hover_background_color }};
       {% else %}
-        background-color: transparent;
-        color: {{ block.settings.button_text_color }};
-        border: 2px solid {{ block.settings.button_border_color }};
-      {% endif %}
-    }
-
-    .ai-luxury-video-hero-mobile-button-{{ ai_gen_id }}:hover {
-      {% if block.settings.button_style == 'solid' %}
-        background-color: {{ block.settings.button_hover_background_color }};
-        border-color: {{ block.settings.button_hover_background_color }};
-        color: {{ block.settings.button_hover_text_color }};
-      {% else %}
-        background-color: {{ block.settings.button_border_color }};
-        color: {{ block.settings.button_background_color }};
+        --cta-fill: transparent;
+        --cta-ink: {{ block.settings.button_text_color }};
+        --cta-edge: {{ block.settings.button_border_color }};
+        --cta-fill-hover: {{ block.settings.button_border_color }};
+        --cta-ink-hover: {{ block.settings.button_background_color }};
+        --cta-edge-hover: {{ block.settings.button_border_color }};
       {% endif %}
     }
   }
@@ -572,6 +621,13 @@
 <luxury-video-hero-{{ ai_gen_id }} class="ai-luxury-video-hero-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-luxury-video-hero-container-{{ ai_gen_id }}">
     {% liquid
+      # The hero shows either the film or a still, chosen in the editor. Both sets of
+      # settings stay in place, so switching back and forth loses nothing.
+      assign hero_media = block.settings.media_type
+      if hero_media == blank
+        assign hero_media = 'video'
+      endif
+
       # Use fallback clips only when no Shopify-hosted video is selected.
       assign desktop_video_src = block.settings.desktop_video.sources[1].url
       assign desktop_video_type = block.settings.desktop_video.sources[1].mime_type
@@ -586,7 +642,61 @@
         assign mobile_video_type = 'video/mp4'
       endif
     %}
-    {% if desktop_video_src != blank %}
+    {% if hero_media == 'image' %}
+      {% liquid
+        # One still is enough: without a phone-sized one the desktop image serves both.
+        assign desktop_image = block.settings.desktop_image
+        assign mobile_image = block.settings.mobile_image
+        if mobile_image == blank
+          assign mobile_image = desktop_image
+        endif
+        if desktop_image == blank
+          assign desktop_image = mobile_image
+        endif
+      %}
+      {% if desktop_image != blank %}
+        <img
+          class="ai-luxury-video-hero-image-{{ ai_gen_id }} ai-luxury-video-hero-desktop-image-{{ ai_gen_id }}"
+          src="{{ desktop_image | image_url: width: 3000 }}"
+          srcset="
+            {{ desktop_image | image_url: width: 750 }} 750w,
+            {{ desktop_image | image_url: width: 1100 }} 1100w,
+            {{ desktop_image | image_url: width: 1500 }} 1500w,
+            {{ desktop_image | image_url: width: 2000 }} 2000w,
+            {{ desktop_image | image_url: width: 3000 }} 3000w
+          "
+          sizes="100vw"
+          width="{{ desktop_image.width }}"
+          height="{{ desktop_image.height }}"
+          alt="{{ desktop_image.alt | escape }}"
+          loading="eager"
+          fetchpriority="high"
+          style="object-position: {{ desktop_image.presentation.focal_point | default: 'center center' }};"
+          data-desktop-image
+        >
+      {% endif %}
+
+      {% if mobile_image != blank %}
+        <img
+          class="ai-luxury-video-hero-image-{{ ai_gen_id }} ai-luxury-video-hero-mobile-image-{{ ai_gen_id }}"
+          src="{{ mobile_image | image_url: width: 1200 }}"
+          srcset="
+            {{ mobile_image | image_url: width: 500 }} 500w,
+            {{ mobile_image | image_url: width: 750 }} 750w,
+            {{ mobile_image | image_url: width: 1000 }} 1000w,
+            {{ mobile_image | image_url: width: 1200 }} 1200w
+          "
+          sizes="100vw"
+          width="{{ mobile_image.width }}"
+          height="{{ mobile_image.height }}"
+          alt="{{ mobile_image.alt | escape }}"
+          loading="eager"
+          fetchpriority="high"
+          style="display: none; object-position: {{ mobile_image.presentation.focal_point | default: 'center center' }};"
+          data-mobile-image
+        >
+      {% endif %}
+    {% elsif desktop_video_src != blank %}
       <video
         class="ai-luxury-video-hero-video-{{ ai_gen_id }} ai-luxury-video-hero-desktop-video-{{ ai_gen_id }}"
         {% if block.settings.enable_autoplay %}autoplay{% endif %}
@@ -599,7 +709,7 @@
       </video>
     {% endif %}
 
-    {% if mobile_video_src != blank %}
+    {% if hero_media != 'image' and mobile_video_src != blank %}
       <video
         class="ai-luxury-video-hero-video-{{ ai_gen_id }} ai-luxury-video-hero-mobile-video-{{ ai_gen_id }}"
         {% if block.settings.enable_autoplay %}autoplay{% endif %}
@@ -674,35 +784,136 @@
     class LuxuryVideoHero{{ ai_gen_id }} extends HTMLElement {
       constructor() {
         super();
-        this.desktopVideo = this.querySelector('[data-desktop-video]');
-        this.mobileVideo = this.querySelector('[data-mobile-video]');
+        // Either the films or the stills are in the markup, never both, so the swap
+        // below works the same way for each.
+        this.desktopMedia = this.querySelector('[data-desktop-video], [data-desktop-image]');
+        this.mobileMedia = this.querySelector('[data-mobile-video], [data-mobile-image]');
       }
 
       connectedCallback() {
         this.handleResponsiveVideo();
-        window.addEventListener('resize', () => this.handleResponsiveVideo());
+        this.fitMobileHeight();
+
+        window.addEventListener('resize', () => {
+          this.handleResponsiveVideo();
+          this.fitMobileHeight();
+        });
+
+        // A webfont landing can take the heading from two lines to three.
+        window.addEventListener('load', () => this.fitMobileHeight());
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(() => this.fitMobileHeight());
+        }
+
+        // The words below the film, and the row of services after them, are what decides
+        // how much is left for it - and both settle late, as the webfont lands and the
+        // labels stop wrapping. Watched here are the heading, the words and the buttons
+        // themselves, not the panel around them: the panel is given a height by the fit
+        // below, so its own box stops answering to what is inside it.
+        const panel = this.querySelector('.ai-luxury-video-hero-mobile-content-{{ ai_gen_id }}');
+        const section = this.closest('.shopify-section') || this.parentElement;
+        const row = section ? section.nextElementSibling : null;
+        if ('ResizeObserver' in window) {
+          const observer = new ResizeObserver(() => this.fitMobileHeight());
+          if (panel) Array.from(panel.children).forEach((child) => observer.observe(child));
+          if (row) observer.observe(row);
+          // The bar of icons and the header above both arrive with a height of zero and
+          // find their real one later; both move where the film's share of the screen
+          // starts and ends.
+          document.querySelectorAll('toolbar-mobile, .shopify-section-group-header-group')
+            .forEach((el) => observer.observe(el));
+        }
+      }
+
+      /*
+        On a phone the first screen is meant to hold the film, the words and the buttons
+        under it, and the row of services after those - with the next section starting
+        behind the bar of icons fixed along the bottom.
+
+        The film takes its share of that screen (the Mobile height setting), and the words
+        and the row share what is left, the words centred in their part of it. The one
+        thing that overrides the share is the words themselves: if they need more room than
+        is left, the film gives it up, rather than the row being pushed under the bar.
+      */
+      fitMobileHeight() {
+        const box = this.querySelector('.ai-luxury-video-hero-container-{{ ai_gen_id }}');
+        if (!box) return;
+
+        const panel = this.querySelector('.ai-luxury-video-hero-mobile-content-{{ ai_gen_id }}');
+
+        if (window.innerWidth > 749) {
+          box.style.removeProperty('height');
+          if (panel) panel.style.removeProperty('height');
+          return;
+        }
+
+        const section = this.closest('.shopify-section') || this.parentElement;
+        const next = section ? section.nextElementSibling : null;
+
+        // Measured off the bar itself where it is there, since the variable it publishes
+        // is written by its own script and may not have been written yet.
+        const bar = document.querySelector('toolbar-mobile');
+        const toolbar = (bar && bar.clientHeight) || parseFloat(
+          getComputedStyle(document.body).getPropertyValue('--toolbar-mobile-height')
+        ) || 0;
+
+        const top = this.getBoundingClientRect().top + window.scrollY;
+        // Clamped: if the row below is ever swapped for something tall, the film keeps
+        // most of the screen instead of collapsing to the floor.
+        const row = next ? Math.min(next.offsetHeight, 160) : 0;
+        // The screen, less where the hero starts (which is the announcement bar and the
+        // header measured, not guessed) and less that bar of icons.
+        const screen = window.innerHeight - top - toolbar;
+
+        // What the words come to on their own. Added up from what is in the panel rather
+        // than read off the panel, which is already holding whatever height the last fit
+        // gave it.
+        const words = panel ? this.inkHeight(panel) : 0;
+
+        let film = Math.round(screen * {{ film_share }});
+        film = Math.min(film, screen - words - row);
+        film = Math.max(film, 240);
+        box.style.height = Math.round(film) + 'px';
+
+        if (panel) {
+          panel.style.height = Math.round(Math.max(screen - film - row, words)) + 'px';
+        }
+      }
+
+      // The heading, the words and the buttons stacked up, with the gaps between them and
+      // the panel's own padding.
+      inkHeight(panel) {
+        const pad = getComputedStyle(panel);
+        let ink = parseFloat(pad.paddingTop) + parseFloat(pad.paddingBottom);
+        Array.from(panel.children).forEach((child) => {
+          const box = getComputedStyle(child);
+          ink += child.offsetHeight + parseFloat(box.marginTop) + parseFloat(box.marginBottom);
+        });
+        return ink;
       }
 
       handleResponsiveVideo() {
         const isMobile = window.innerWidth <= 749;
-        
-        if (this.desktopVideo && this.mobileVideo) {
-          if (isMobile) {
-            this.desktopVideo.style.display = 'none';
-            this.mobileVideo.style.display = 'block';
-            this.desktopVideo.pause();
-            this.mobileVideo.play();
-          } else {
-            this.desktopVideo.style.display = 'block';
-            this.mobileVideo.style.display = 'none';
-            this.mobileVideo.pause();
-            this.desktopVideo.play();
-          }
+
+        if (this.desktopMedia && this.mobileMedia) {
+          const shown = isMobile ? this.mobileMedia : this.desktopMedia;
+          const hidden = isMobile ? this.desktopMedia : this.mobileMedia;
+          shown.style.display = 'block';
+          hidden.style.display = 'none';
+          if (hidden.tagName === 'VIDEO') hidden.pause();
+          if (shown.tagName === 'VIDEO') shown.play();
+        } else if (this.desktopMedia) {
+          // Only one was picked; it serves both widths.
+          this.desktopMedia.style.display = 'block';
         }
       }
     }
 
-    customElements.define('luxury-video-hero-{{ ai_gen_id }}', LuxuryVideoHero{{ ai_gen_id }});
+    // Defining a name twice throws, which on a theme dev hot reload would stop the
+    // script before the hero was ever sized.
+    if (!customElements.get('luxury-video-hero-{{ ai_gen_id }}')) {
+      customElements.define('luxury-video-hero-{{ ai_gen_id }}', LuxuryVideoHero{{ ai_gen_id }});
+    }
   })();
 </script>
 
@@ -710,6 +921,33 @@
 {
   "name": "Luxury video hero",
   "settings": [
+    {
+      "type": "header",
+      "content": "Hero media"
+    },
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "Show",
+      "info": "Both sets of settings are kept, so you can switch back to the video at any time.",
+      "options": [
+        { "value": "video", "label": "Video" },
+        { "value": "image", "label": "Image" }
+      ],
+      "default": "video"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop image",
+      "info": "Used when Show is set to Image. Falls back to the mobile image if left empty."
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image",
+      "info": "Optional. The desktop image is used on phones when this is empty."
+    },
     {
       "type": "header",
       "content": "Desktop video"
@@ -760,12 +998,13 @@
     {
       "type": "range",
       "id": "mobile_height",
-      "label": "Mobile height",
+      "label": "Mobile video height",
+      "info": "Share of the first screen the video takes on a phone. The heading, buttons and the services row below fill the rest, above the bar of icons.",
       "min": 40,
-      "max": 100,
+      "max": 80,
       "step": 2,
-      "unit": "vh",
-      "default": 66
+      "unit": "%",
+      "default": 54
     },
     {
       "type": "header",
@@ -874,6 +1113,17 @@
         }
       ],
       "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "desktop_content_bottom_padding",
+      "label": "Distance from bottom",
+      "info": "Space between the text and the bottom edge of the hero on desktop",
+      "min": 0,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 32
     },
     {
       "type": "header",
@@ -1320,7 +1570,7 @@
       "type": "text",
       "id": "button_2_text",
       "label": "Text",
-      "default": "Fine jewelry"
+      "default": "Fine jewellery"
     },
     {
       "type": "url",
@@ -1467,6 +1717,17 @@
     {
       "type": "header",
       "content": "Mobile button settings"
+    },
+    {
+      "type": "select",
+      "id": "mobile_button_layout",
+      "label": "Layout",
+      "info": "Side by side shrinks the label to keep it on one line.",
+      "options": [
+        { "value": "row", "label": "Side by side" },
+        { "value": "column", "label": "Stacked" }
+      ],
+      "default": "row"
     },
     {
       "type": "range",

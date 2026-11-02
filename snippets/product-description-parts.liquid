@@ -1,0 +1,68 @@
+{%- doc -%}
+  Splits a product description into the prose that belongs under "Description" and the
+  spec lists that belong under "Style Details".
+
+  Every description in this catalogue is written the same way: a `<p><strong>Description
+  </strong></p>` label, a few prose paragraphs, then one or more `<ul>` spec lists. A
+  ring sold in two shapes puts a lead-in of its own before each list
+  ("Cushion cut", "Pear cut", "Both shapes"), and those travel with the list they head.
+
+  Anything written differently is passed through untouched: a description with no list
+  has no details part at all, and prose under a heading that is not the "Description"
+  label keeps its heading.
+
+  @param {object} product - the product whose description is split
+  @param {string} part - 'details' for the spec lists, anything else for the prose
+  @param {boolean} [drop_label] - remove the "Description" label paragraph. Default: true
+{%- enddoc -%}
+
+{%- liquid
+  assign drop_label = drop_label | default: true, allow_false: true
+  assign source = product.description
+
+  # The delimiter is lost by `split`, so the lists are taken as the remainder of the
+  # description rather than rebuilt -- a `<ul class="...">` survives that way too.
+  assign intro = source | split: '<ul' | first
+  assign lists = ''
+  if source contains '<ul'
+    assign lists = source | remove_first: intro
+  endif
+
+  assign body = ''
+  assign lead_in = ''
+
+  assign segments = intro | split: '<p><strong>'
+  for segment in segments
+    if forloop.first
+      assign body = body | append: segment
+      continue
+    endif
+
+    assign heading = segment | split: '</strong></p>' | first
+    assign content = segment | remove_first: heading | remove_first: '</strong></p>'
+    assign content_text = content | strip_html | strip
+    assign content_start = content | strip | slice: 0, 1
+    assign label = heading | strip_html | strip | downcase
+
+    if content_text == blank
+      # A heading with nothing under it heads the list that follows it.
+      assign lead_in = lead_in | append: '<p><strong>' | append: segment
+    elsif drop_label and label == 'description' and content_start == '<'
+      assign body = body | append: content
+    else
+      assign body = body | append: '<p><strong>' | append: segment
+    endif
+  endfor
+
+  # Nothing to head: keep the paragraph in the prose rather than dropping it.
+  if lists == blank
+    assign body = body | append: lead_in
+    assign lead_in = ''
+  endif
+
+  if part == 'details'
+    echo lead_in | append: lists
+  else
+    echo body
+  endif
+-%}

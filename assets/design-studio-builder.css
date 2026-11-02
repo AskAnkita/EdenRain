@@ -1,0 +1,420 @@
+/*
+  Design studio builder - the configurator screen, the page you land on from a
+  card on the hub (sections/design-studio-hub.liquid).
+
+  This is the layout only. The viewer is a slot: an app block, a still image, or
+  a placeholder - no 3D, no WebGL, nothing to license. When a real builder
+  arrives it drops into .dsb-stage__frame and everything around it stays.
+
+  Three parts: a step bar across the top, a sticky viewer on the left and the
+  option rail on the right, which collapse to one column on a phone with the
+  price and the button pinned to the bottom of the screen.
+
+  Every value a merchant can move is a --dsb-* custom property written onto the
+  section element, with the value this file always had as its fallback. Square
+  corners throughout, as the rest of this theme has.
+*/
+
+.ds-builder {
+  --dsb-ink: #171714;
+  --dsb-muted: #69675f;
+  --dsb-line: rgba(23, 23, 20, 0.18);
+  --dsb-wash: #f4f2ef;
+  color: var(--dsb-ink);
+  background: var(--dsb-section-bg, transparent);
+  padding: var(--dsb-pad-top, clamp(20px, 2.5vw, 40px)) var(--dsb-pad-inline, clamp(16px, 3vw, 48px))
+    var(--dsb-pad-bottom, clamp(40px, 5vw, 80px));
+}
+
+.ds-builder img,
+.ds-builder svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dsb-shell {
+  max-width: var(--dsb-shell-max, 1480px);
+  margin: 0 auto;
+}
+
+.ds-builder h1,
+.ds-builder h2,
+.ds-builder h3 {
+  margin: 0;
+  color: var(--dsb-heading-color, var(--dsb-ink));
+  font-family: var(--font-heading--family);
+  font-weight: 400;
+}
+
+/* ----------------------------------------------------------------- step bar */
+
+.dsb-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: clamp(12px, 2vw, 32px);
+  border-bottom: 1px solid var(--dsb-rule, var(--dsb-line));
+  padding-bottom: 16px;
+  margin-bottom: clamp(20px, 3vw, 40px);
+}
+
+.dsb-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--dsb-step-color, var(--dsb-muted));
+  font-size: var(--dsb-step-size, 1.25rem);
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+/* The step you are on is the only one in full ink, so the bar reads as progress. */
+.dsb-step--current {
+  color: var(--dsb-step-current-color, var(--dsb-ink));
+}
+
+.dsb-step__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid currentColor;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+}
+
+.dsb-step--current .dsb-step__num {
+  background: currentColor;
+}
+
+.dsb-step--current .dsb-step__num span {
+  color: var(--dsb-section-bg, #fff);
+}
+
+/* ------------------------------------------------------------------- layout */
+
+.dsb-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(24px, 3vw, 56px);
+}
+
+@media screen and (min-width: 990px) {
+  .dsb-layout {
+    grid-template-columns: minmax(0, var(--dsb-stage-fr, 1.15fr)) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  /* The viewer stays put while the options scroll, which is the whole point of
+     a configurator: you watch the piece change as you choose. */
+  .dsb-stage {
+    position: sticky;
+    top: var(--dsb-sticky-top, 90px);
+  }
+}
+
+/* -------------------------------------------------------------------- stage */
+
+.dsb-stage__frame {
+  position: relative;
+  aspect-ratio: var(--dsb-stage-ratio, 1);
+  overflow: hidden;
+  background: var(--dsb-stage-bg, var(--dsb-wash));
+}
+
+.dsb-stage__frame > .shopify-app-block {
+  width: 100%;
+  height: 100%;
+}
+
+.dsb-stage__badge {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  border: 1px solid var(--dsb-rule, var(--dsb-line));
+  padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--dsb-ink);
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.dsb-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.dsb-thumb {
+  width: var(--dsb-thumb-size, 76px);
+  aspect-ratio: 1;
+  border: 1px solid var(--dsb-rule, var(--dsb-line));
+  padding: 0;
+  background: var(--dsb-stage-bg, var(--dsb-wash));
+  cursor: pointer;
+}
+
+.dsb-thumb[aria-current="true"] {
+  border-color: var(--dsb-ink);
+}
+
+/* --------------------------------------------------------------------- rail */
+
+.dsb-rail__eyebrow {
+  margin: 0 0 8px;
+  color: var(--dsb-eyebrow-color, var(--dsb-muted));
+  font-size: var(--dsb-eyebrow-size, 1.05rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.dsb-rail__title {
+  font-size: var(--dsb-title-size, clamp(2.2rem, 3vw, 3rem));
+  line-height: 1.2;
+}
+
+.dsb-rail__price {
+  margin-top: 10px;
+  color: var(--dsb-price-color, var(--dsb-ink));
+  font-size: var(--dsb-price-size, 1.9rem);
+}
+
+.dsb-rail__note {
+  margin-top: 6px;
+  color: var(--dsb-text-color, var(--dsb-muted));
+  font-size: var(--dsb-text-size, 1.35rem);
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------------ options */
+
+.dsb-option {
+  border-top: 1px solid var(--dsb-rule, var(--dsb-line));
+  padding: 18px 0;
+}
+
+.dsb-option__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.dsb-option__label {
+  color: var(--dsb-label-color, var(--dsb-ink));
+  font-size: var(--dsb-label-size, 1.3rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dsb-option__value {
+  color: var(--dsb-text-color, var(--dsb-muted));
+  font-size: var(--dsb-text-size, 1.35rem);
+}
+
+/*
+  Every choice is a real radio input, so a choice can be made and seen without a
+  line of JavaScript. The input itself is taken out of sight but left focusable,
+  and the label beside it carries the look.
+*/
+.dsb-choice input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dsb-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dsb-choice-gap, 8px);
+}
+
+.dsb-choices--shapes {
+  display: grid;
+  grid-template-columns: repeat(var(--dsb-shape-columns, 5), minmax(0, 1fr));
+}
+
+.dsb-choice {
+  position: relative;
+}
+
+.dsb-choice > label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid var(--dsb-rule, var(--dsb-line));
+  color: var(--dsb-ink);
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.dsb-choice input:checked + label {
+  border-color: var(--dsb-ink);
+}
+
+.dsb-choice input:focus-visible + label {
+  outline: 2px solid var(--dsb-ink);
+  outline-offset: 2px;
+}
+
+/* a shape: the icon over its name */
+.dsb-choices--shapes .dsb-choice > label {
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 4px;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dsb-choices--shapes .dsb-choice img {
+  width: var(--dsb-shape-size, 34px);
+  height: var(--dsb-shape-size, 34px);
+  object-fit: contain;
+}
+
+/* a metal: the colour itself, named underneath */
+.dsb-choices--swatches .dsb-choice > label {
+  flex-direction: column;
+  gap: 7px;
+  border-color: transparent;
+  padding: 4px;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+}
+
+.dsb-choices--swatches .dsb-swatch {
+  width: var(--dsb-swatch-size, 34px);
+  height: var(--dsb-swatch-size, 34px);
+  border: 1px solid var(--dsb-rule, var(--dsb-line));
+  border-radius: 50%;
+}
+
+.dsb-choices--swatches .dsb-choice input:checked + label .dsb-swatch {
+  box-shadow: 0 0 0 2px #fff inset, 0 0 0 1px var(--dsb-ink);
+}
+
+/* a carat, a size, a clarity: a plain pill of text */
+.dsb-choices--pills .dsb-choice > label {
+  padding: 9px 16px;
+  font-size: 1.3rem;
+}
+
+.dsb-choice input:checked + label {
+  background: var(--dsb-choice-active-bg, transparent);
+}
+
+.dsb-select {
+  width: 100%;
+  border: 1px solid var(--dsb-rule, var(--dsb-line));
+  border-radius: 0;
+  padding: 12px 14px;
+  background: transparent;
+  color: var(--dsb-ink);
+  font-family: inherit;
+  font-size: 1.4rem;
+}
+
+/* ------------------------------------------------------------------ actions */
+
+.dsb-actions {
+  border-top: 1px solid var(--dsb-rule, var(--dsb-line));
+  padding-top: 20px;
+  margin-top: 4px;
+}
+
+.dsb-actions .eden-action {
+  width: 100%;
+}
+
+.dsb-actions__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.dsb-reassure {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 16px;
+  color: var(--dsb-text-color, var(--dsb-muted));
+  font-size: var(--dsb-note-size, 1.25rem);
+}
+
+/* ------------------------------------------------------------------ details */
+
+.dsb-detail {
+  border-top: 1px solid var(--dsb-rule, var(--dsb-line));
+}
+
+.dsb-detail summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  padding: 16px 0;
+  font-family: var(--font-heading--family);
+  font-size: var(--dsb-detail-size, 1.5rem);
+  list-style: none;
+}
+
+.dsb-detail summary::-webkit-details-marker {
+  display: none;
+}
+
+.dsb-detail summary::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  clip-path: polygon(45% 0, 55% 0, 55% 45%, 100% 45%, 100% 55%, 55% 55%, 55% 100%, 45% 100%, 45% 55%, 0 55%, 0 45%, 45% 45%);
+  transition: transform 0.25s ease;
+}
+
+.dsb-detail[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.dsb-detail__body {
+  padding: 0 0 18px;
+  color: var(--dsb-text-color, var(--dsb-muted));
+  font-size: var(--dsb-text-size, 1.35rem);
+  line-height: 1.7;
+}
+
+/* ------------------------------------------------------------------- mobile */
+
+/*
+  On a phone the price and the button leave the rail and sit on the screen, so
+  the thing you came to do is never scrolled away from.
+*/
+@media screen and (max-width: 749px) {
+  .dsb-actions--sticky {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: 0 calc(-1 * var(--dsb-pad-inline, clamp(16px, 3vw, 48px)));
+    padding: 14px var(--dsb-pad-inline, clamp(16px, 3vw, 48px));
+    background: var(--dsb-section-bg, #fff);
+    box-shadow: 0 -1px 0 var(--dsb-rule, var(--dsb-line));
+  }
+
+  .dsb-actions--sticky .dsb-reassure {
+    display: none;
+  }
+}

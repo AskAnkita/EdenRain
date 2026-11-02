@@ -17,13 +17,19 @@
             {{- 'icon-search.svg' | inline_asset_content -}}
           </span>
         </button>
+        {%- liquid
+          assign search_placeholder = section.settings.search_placeholder | strip
+          if search_placeholder == blank
+            assign search_placeholder = 'content.search' | t
+          endif
+        -%}
         <input
           class="search__input field__input"
           id="{{ input_id }}"
           type="search"
           name="q"
           value="{{ search.terms | escape }}"
-          placeholder="{{ 'content.search' | t }}"
+          placeholder="{{ search_placeholder | escape }}"
           {%- if settings.predictive_search_enabled -%}
             role="combobox"
             aria-expanded="false"
@@ -39,6 +45,7 @@
         >
         {% comment %} <label class="field__label" for="{{ input_id }}">{{ 'content.search' | t }}</label> {% endcomment %}
         <input type="hidden" name="options[prefix]" value="last">
+        <input type="hidden" name="type" value="product">
         <button
           type="reset"
           class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}"

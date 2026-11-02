@@ -1,0 +1,81 @@
+{%- doc -%}
+  The variant a product card opens on.
+
+  'card-default-metal' decides which metal a card should show; this turns that decision
+  into the variant behind it, so the photo, the underlined swatch and the link out all
+  describe the same ring. Without it a card shuffled to Rose Gold still linked to the
+  bare product URL, and the product page opened on its first variant - Sterling Silver -
+  which is not the ring the shopper clicked.
+
+  The variant is chosen the same way the card's photo is: the chosen metal paired with
+  whatever shape and carat the featured image already has, and failing that any
+  photographed variant of that metal. Both the media snippet and the title link read
+  this one answer, so they cannot drift apart.
+
+  Outputs "<variant id>||<option index>||<option value>", or nothing when the product
+  has one metal, no metal option, or no photographed variant in the chosen metal.
+
+  @param {object} card_product - Product Liquid object
+
+  Usage:
+  {%- capture default_variant -%}{%- render 'card-default-variant', card_product: card_product -%}{%- endcapture -%}
+{%- enddoc -%}
+
+{%- capture default_metal -%}
+  {%- render 'card-default-metal', card_product: card_product -%}
+{%- endcapture -%}
+
+{%- liquid
+  assign default_metal = default_metal | strip
+  assign chosen_variant = null
+
+  if default_metal != blank
+    assign metal_parts = default_metal | split: '||'
+    assign metal_index = metal_parts.first | plus: 0
+    assign metal_value = metal_parts.last
+
+    assign featured_variant = null
+    for variant in card_product.variants
+      if variant.featured_media != blank and variant.featured_media.id == card_product.featured_media.id
+        assign featured_variant = variant
+        break
+      endif
+    endfor
+
+    # Only the metal changes: shape, carat and anything else stay as the featured image
+    # has them, so the card's other option rows still describe the photo.
+    for variant in card_product.variants
+      if variant.options[metal_index] != metal_value or variant.featured_media == blank
+        continue
+      endif
+      if featured_variant
+        assign others_match = true
+        for option_value in variant.options
+          unless forloop.index0 == metal_index
+            if option_value != featured_variant.options[forloop.index0]
+              assign others_match = false
+            endif
+          endunless
+        endfor
+        unless others_match
+          continue
+        endunless
+      endif
+      assign chosen_variant = variant
+      break
+    endfor
+
+    # That exact pair may not be photographed -- any photo of the chosen metal will do.
+    unless chosen_variant
+      for variant in card_product.variants
+        if variant.options[metal_index] == metal_value and variant.featured_media != blank
+          assign chosen_variant = variant
+          break
+        endif
+      endfor
+    endunless
+  endif
+-%}
+{%- if chosen_variant -%}
+  {{- chosen_variant.id }}||{{ metal_index }}||{{ metal_value -}}
+{%- endif -%}

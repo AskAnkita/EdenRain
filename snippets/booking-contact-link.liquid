@@ -1,0 +1,75 @@
+{%- doc -%}
+  One way of reaching the shop without an appointment, for the row at the foot of the
+  consultation booking page: an icon, a label, the detail itself and an optional line under it.
+
+  The link is guessed from the kind, because a telephone number, a WhatsApp number, an email
+  address and an Instagram handle each have exactly one sensible destination and asking a
+  merchant to type both the number and its tel: link twice over is how the two end up
+  disagreeing. The block's own link field overrides the guess when it is wrong.
+
+  A British number is usually written "+44 (0) 203 554 887". The trunk zero in the brackets is
+  for dialling from inside the country and must not survive into a tel: link, so it is removed
+  as a unit before the spacing and punctuation are stripped.
+
+  @param {object} block - a "contact" block of sections/consultation-booking.liquid
+{%- enddoc -%}
+
+{%- liquid
+  assign c_value = block.settings.value | strip
+  assign c_link = block.settings.link | strip
+
+  if c_link == blank and c_value != blank
+    assign digits = c_value | remove: '(0)' | remove: ' ' | remove: '(' | remove: ')' | remove: '-' | remove: '.'
+    case block.settings.icon
+      when 'phone'
+        assign c_link = 'tel:' | append: digits
+      when 'whatsapp'
+        assign bare = digits | remove: '+'
+        assign c_link = 'https://wa.me/' | append: bare
+      when 'email'
+        assign c_link = 'mailto:' | append: c_value
+      when 'instagram'
+        assign handle = c_value | remove: '@' | strip
+        assign c_link = 'https://instagram.com/' | append: handle
+    endcase
+  endif
+
+  assign is_external = false
+  if c_link contains 'http'
+    assign is_external = true
+  endif
+-%}
+
+<a
+  class="ebk-contact__link"
+  href="{{ c_link | default: '/pages/contact' }}"
+  {% if is_external %}target="_blank" rel="noopener"{% endif %}
+>
+  <span class="ebk-contact__icon" aria-hidden="true">
+    {%- case block.settings.icon -%}
+      {%- when 'whatsapp' -%}
+        {{- 'icon-whatsapp.svg' | inline_asset_content -}}
+      {%- when 'instagram' -%}
+        {{- 'icon-instagram.svg' | inline_asset_content -}}
+      {%- when 'email' -%}
+        {{- 'icon-mail.svg' | inline_asset_content -}}
+      {%- when 'phone' -%}
+        {%- render 'icon-consultation', icon: 'phone' -%}
+      {%- when 'address' -%}
+        {%- render 'icon-consultation', icon: 'showroom' -%}
+      {%- else -%}
+        {%- render 'icon-consultation', icon: 'calendar' -%}
+    {%- endcase -%}
+  </span>
+  <span class="ebk-contact__body">
+    {%- if block.settings.label != blank -%}
+      <span class="ebk-contact__label">{{ block.settings.label | escape }}</span>
+    {%- endif -%}
+    {%- if c_value != blank -%}
+      <span class="ebk-contact__value">{{ c_value | escape }}</span>
+    {%- endif -%}
+    {%- if block.settings.note != blank -%}
+      <span class="ebk-contact__note">{{ block.settings.note | escape }}</span>
+    {%- endif -%}
+  </span>
+</a>

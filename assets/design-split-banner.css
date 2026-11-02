@@ -1,0 +1,309 @@
+/* Editorial split banner: one feature image beside two clear routes. */
+.ds-split {
+  --dsp-section-bg: #ffffff;
+  --dsp-heading-color: #171714;
+  --dsp-text-color: rgba(23, 23, 20, 0.72);
+  --dsp-footnote-color: rgba(23, 23, 20, 0.6);
+
+  --dsp-eyebrow-size: 12px;
+  --dsp-heading-size: 40px;
+  --dsp-heading-size-mobile: 32px;
+  --dsp-heading-tracking: 0;
+  --dsp-heading-case: none;
+  --dsp-text-size: 15px;
+  --dsp-footnote-size: 14px;
+  --dsp-shell-max: 1480px;
+  --dsp-measure: 48ch;
+  --dsp-pad-inline: 4rem;
+  --dsp-pad-top: 56px;
+  --dsp-pad-bottom: 56px;
+
+  background: var(--dsp-section-bg);
+  padding: var(--dsp-pad-top) var(--dsp-pad-inline) var(--dsp-pad-bottom);
+}
+
+.ds-split--full-width {
+  padding: 0;
+}
+
+.dsp-shell {
+  width: 100%;
+  max-width: var(--dsp-shell-max);
+  margin: 0 auto;
+}
+
+.dsp-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: stretch;
+  min-height: 500px;
+}
+
+.dsp-media {
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  align-self: center;
+  overflow: hidden;
+  background: #e8e3dd;
+}
+
+.dsp-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+  object-position: 62% center;
+}
+
+/* The video is letterboxed inside the media box, so the zoom scales the element and
+   the box clips what spills past it. */
+.dsp-media__video,
+.dsp-media__poster {
+  background: #fff;
+  object-fit: contain;
+  object-position: center;
+  transform: scale(var(--dsp-media-zoom, 1.1));
+  transform-origin: center;
+}
+
+dsp-video { display: contents; }
+
+.dsp-media__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dsp-media__poster { display: none !important; }
+
+.dsp-media[data-video-fallback] .dsp-media__video { display: none !important; }
+.dsp-media[data-video-fallback] .dsp-media__poster { display: block !important; }
+
+.dsp-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 44px clamp(34px, 5.6vw, 84px);
+}
+
+.dsp-head {
+  margin: 0 0 22px;
+  text-align: left;
+}
+
+.dsp-eyebrow {
+  margin: 0 0 10px;
+  color: var(--dsp-text-color);
+  font-size: var(--dsp-eyebrow-size);
+  letter-spacing: 0.18em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.dsp-head__heading {
+  margin: 0;
+  color: var(--dsp-heading-color);
+  font-family: var(--font-heading--family);
+  font-size: var(--dsp-heading-size);
+  font-weight: 400;
+  letter-spacing: var(--dsp-heading-tracking);
+  line-height: 1.08;
+  text-transform: var(--dsp-heading-case);
+}
+
+.dsp-routes {
+  border-top: 1px solid rgba(23, 23, 20, 0.17);
+}
+
+.dsp-col {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 24px;
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(23, 23, 20, 0.17);
+}
+
+.dsp-col__copy { min-width: 0; }
+
+.dsp-col__heading {
+  margin: 0 0 8px;
+  color: var(--dsp-heading-color);
+  font-family: var(--font-heading--family);
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.15;
+  text-transform: none;
+}
+
+.dsp-col__text {
+  max-width: var(--dsp-measure);
+  margin: 0;
+  color: var(--dsp-text-color);
+  font-size: var(--dsp-text-size);
+  line-height: 1.55;
+}
+
+.dsp-col__text > *:first-child { margin-top: 0; }
+.dsp-col__text > *:last-child { margin-bottom: 0; }
+
+.dsp-route__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--dsp-heading-color);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  line-height: 1.3;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dsp-route__link span:last-child {
+  font-size: 22px;
+  letter-spacing: 0;
+  transition: transform 180ms ease;
+}
+
+.dsp-route__link:hover span:last-child { transform: translateX(4px); }
+.dsp-route__link:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+
+/* The heading is the route on a phone, where the link beside it is hidden. It stays a
+   plain heading to look at - the underline is the only thing that marks it as a link. */
+.dsp-col__heading-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dsp-col__heading-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.dsp-col__heading-link:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+
+.dsp-footnote {
+  margin: 22px 0 0;
+  color: var(--dsp-footnote-color);
+  font-size: var(--dsp-footnote-size);
+  line-height: 1.5;
+  text-align: right;
+}
+
+.dsp-footnote a { color: inherit; text-underline-offset: 0.3em; }
+.dsp-footnote p { margin: 0; }
+
+@media screen and (min-width: 990px) {
+  .ds-split {
+    height: 60vh;
+    min-height: 480px;
+    box-sizing: border-box;
+  }
+
+  .dsp-shell,
+  .dsp-grid {
+    height: 100%;
+  }
+
+  .dsp-grid { min-height: 0; }
+  .dsp-media { height: 100%; aspect-ratio: auto; }
+  .dsp-media img { height: 100%; min-height: 0; }
+  .dsp-content { padding-top: 24px; padding-bottom: 24px; }
+
+  .ds-split--full-width {
+    height: auto;
+    min-height: 0;
+  }
+
+  .ds-split--full-width .dsp-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .ds-split--full-width .dsp-media {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+}
+
+@media screen and (max-width: 989px) {
+  .ds-split {
+    height: auto;
+    min-height: 0;
+    --dsp-pad-inline: 2rem;
+    --dsp-pad-top: 32px;
+    --dsp-pad-bottom: 32px;
+  }
+
+  .ds-split--full-width {
+    padding: var(--dsp-pad-top) var(--dsp-pad-inline) var(--dsp-pad-bottom);
+  }
+
+  .dsp-grid { grid-template-columns: minmax(0, 1fr); }
+
+  .ds-split--full-width .dsp-grid { grid-template-columns: minmax(0, 1fr); }
+
+  .ds-split--full-width .dsp-media {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1.45 / 1;
+  }
+
+  .dsp-media,
+  .dsp-media img {
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 1.45 / 1;
+  }
+
+  .dsp-media__video,
+  .dsp-media__poster {
+    height: 100% !important;
+    min-height: 0 !important;
+    aspect-ratio: 1.45 / 1;
+    object-fit: contain;
+  }
+
+  /* The film is square. In a 1.45:1 letterbox it can only be as wide as the box is
+     tall, so it sat about two thirds of the way across the screen with white either
+     side. Giving the box the film's own shape on a phone lets it run the full width
+     of the row, matching the picture rows above and below it. */
+  .dsp-media--video,
+  .ds-split--full-width .dsp-media--video,
+  .dsp-media--video .dsp-media__video,
+  .dsp-media--video .dsp-media__poster {
+    aspect-ratio: 1 / 1;
+  }
+
+  .dsp-media img { object-position: 62% 45%; }
+  .dsp-content { padding: 32px clamp(4px, 3vw, 24px) 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsp-media__video { display: none !important; }
+  .dsp-media__poster { display: block !important; }
+}
+
+/* Phone: the route row put the copy and the link side by side, which left the text
+   wrapping in half a screen. The heading carries the link here, so the link is dropped
+   and the copy runs the full width of the row. */
+@media screen and (max-width: 749px) {
+  .dsp-col { grid-template-columns: minmax(0, 1fr); }
+  .dsp-col__text { max-width: none; }
+  .dsp-col--linked .dsp-route__link { display: none; }
+}
+
+@media screen and (max-width: 600px) {
+  .dsp-content { padding: 26px 0 0; }
+  .dsp-head__heading { font-size: var(--dsp-heading-size-mobile); }
+  .dsp-col { gap: 12px; padding: 20px 0; }
+  .dsp-col__heading { font-size: 22px; }
+  .dsp-col__text { font-size: 14px; }
+  .dsp-route__link { gap: 8px; font-size: 9px; letter-spacing: 0.08em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsp-route__link span:last-child { transition: none; }
+}

@@ -1,9 +1,9 @@
 // Shared helpers for the store scripts: reads .env and calls the Shopify Admin GraphQL API.
 // No dependencies; needs Node 18+ (built-in fetch).
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, join } from 'node:path';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -131,4 +131,166 @@ export async function gql(cfg, query, variables = {}, mutationField) {
     return body.data;
   }
   throw new Error('Shopify kept throttling the request; try again in a minute.');
+}
+
+// Walks a cursor-paginated connection to the end and hands back every node. `field` is the
+// connection's name as the query selects it; the query takes an $after variable and selects
+// `nodes` plus `pageInfo { hasNextPage endCursor }`. Every script that reads a whole resource
+// out of the store goes through this rather than spelling the cursor loop out again.
+export async function paginate(cfg, query, field, variables = {}) {
+  const out = [];
+  let after = null;
+  for (;;) {
+    const data = await gql(cfg, query, { ...variables, after });
+    out.push(...data[field].nodes);
+    if (!data[field].pageInfo.hasNextPage) return out;
+    after = data[field].pageInfo.endCursor;
+  }
+}
+
+// Writes a timestamped JSON file into scripts/shopify/backups/ (git-ignored) and hands back its
+// path. Anything that deletes or overwrites live store data saves what it found here first, so
+// the deleted thing can be rebuilt by hand. One definition of where backups live, which is what
+// restore-menu.mjs assumes.
+export function writeBackup(cfg, name, data) {
+  const dir = resolve(cfg.repoRoot, 'scripts', 'shopify', 'backups');
+  mkdirSync(dir, { recursive: true });
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const file = join(dir, `${name}-${stamp}.json`);
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  return file;
+}
+
+// Handles of one resource kind ('collections' or 'blogs') written anywhere in the theme. A handle
+// in the theme is a live link somewhere - a nav item, a section setting, a hard-coded href - and
+// deleting what it points at turns that link into a 404. Scanning the folders is cruder than
+// reading the menu, but it also catches links the menu doesn't know about, which is exactly what
+// a delete would break. locales/ is scanned too; the stock theme translations carry an example
+// "/blogs/writing-blogs" that no real store has, which simply won't match anything.
+const THEME_DIRS = ['sections', 'blocks', 'snippets', 'templates', 'config', 'layout', 'locales'];
+
+export function themeLinkedHandles(cfg, kind) {
+  const found = new Set();
+  const pattern = new RegExp(`${kind}/([a-z0-9][a-z0-9-]*)`, 'gi');
+  const walk = (dir) => {
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return; // folder not in this theme
+    }
+    for (const e of entries) {
+      const full = join(dir, e.name);
+      if (e.isDirectory()) {
+        walk(full);
+        continue;
+      }
+      if (statSync(full).size > 2_000_000) continue;
+      for (const m of readFileSync(full, 'utf8').matchAll(pattern)) found.add(m[1].toLowerCase());
+    }
+  };
+  for (const d of THEME_DIRS) walk(resolve(cfg.repoRoot, d));
+  if (kind === 'collections') found.delete('all'); // /collections/all is built in, not a collection you can delete
+  return found;
+}
+
+// The CDN URL of a picture already in Content > Files, or null. Shopify's `filename:` search
+// matches loosely, so a query for style-halo.png also comes back with style-halo-hover.jpg; the
+// basename of each result is compared against the name asked for rather than trusting the order.
+export async function findImageInFiles(cfg, filename) {
+  const res = await gql(
+    cfg,
+    `query($q: String!) {
+      files(first: 20, query: $q) {
+        nodes {
+          ... on MediaImage { image { url } }
+          ... on GenericFile { url }
+        }
+      }
+    }`,
+    { q: `filename:${filename}` }
+  );
+
+  for (const node of res.files?.nodes || []) {
+    const url = node?.image?.url || node?.url;
+    if (!url) continue;
+    const basename = decodeURIComponent(url.split('?')[0].split('/').pop() || '');
+    if (basename === filename) return url;
+  }
+  return null;
+}
+
+// Puts a local image into Shopify's Content > Files and hands back its CDN URL, so a page body
+// written by a script can point at it. A file of the same name already up there is reused rather
+// than uploaded twice - these scripts are meant to be re-run.
+//
+// Shopify takes an upload in three steps: ask for a signed target, POST the bytes to it, then
+// tell Shopify to make a file out of what landed there. The CDN URL only exists once the image
+// has been processed, which takes a few seconds, so the last step polls for it.
+export async function uploadImage(cfg, localPath, filename, mimeType = 'image/jpeg') {
+  // Files is asked first, not the disk: once a picture is up there the theme reads it from Files,
+  // so the local copy may well have been pruned, and that is not a reason to report nothing.
+  const foundUrl = await findImageInFiles(cfg, filename);
+  if (foundUrl) {
+    console.log(`  = Already in Shopify: ${filename}`);
+    return foundUrl;
+  }
+
+  if (!localPath || !existsSync(localPath)) return null;
+
+  console.log(`  + Staging upload for ${filename}...`);
+  const stagedRes = await gql(
+    cfg,
+    `mutation($input: [StagedUploadInput!]!) {
+      stagedUploadsCreate(input: $input) {
+        stagedTargets { url resourceUrl parameters { name value } }
+        userErrors { field message }
+      }
+    }`,
+    { input: [{ filename, mimeType, resource: 'IMAGE', httpMethod: 'POST' }] },
+    'stagedUploadsCreate'
+  );
+
+  const target = stagedRes.stagedUploadsCreate?.stagedTargets?.[0];
+  if (!target) throw new Error(`Could not stage an upload for ${filename}`);
+
+  const formData = new FormData();
+  for (const param of target.parameters) formData.append(param.name, param.value);
+  formData.append('file', new Blob([readFileSync(localPath)], { type: mimeType }), filename);
+
+  const uploadRes = await fetch(target.url, { method: 'POST', body: formData });
+  if (!uploadRes.ok) {
+    throw new Error(`Upload of ${filename} failed (${uploadRes.status}): ${(await uploadRes.text()).slice(0, 200)}`);
+  }
+
+  const createRes = await gql(
+    cfg,
+    `mutation($files: [FileCreateInput!]!) {
+      fileCreate(files: $files) {
+        files { id fileStatus ... on MediaImage { image { url } } }
+        userErrors { field message }
+      }
+    }`,
+    {
+      files: [
+        {
+          originalSource: target.resourceUrl,
+          contentType: 'IMAGE',
+          alt: filename.replace(/[-_.]/g, ' ').replace(/\s+(jpg|jpeg|png|webp)$/i, ''),
+        },
+      ],
+    },
+    'fileCreate'
+  );
+
+  const fileId = createRes.fileCreate?.files?.[0]?.id;
+  for (let i = 0; i < 6; i++) {
+    await sleep(2000);
+    const check = await gql(cfg, `query($id: ID!) { node(id: $id) { ... on MediaImage { image { url } } } }`, { id: fileId });
+    if (check.node?.image?.url) {
+      console.log(`  + Uploaded: ${check.node.image.url}`);
+      return check.node.image.url;
+    }
+  }
+  return target.resourceUrl;
 }

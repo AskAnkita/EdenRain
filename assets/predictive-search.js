@@ -24,6 +24,56 @@ class PredictiveSearch extends SearchForm {
     this.input.addEventListener('click', () => {
       if (this.closest('.header__search')?.querySelector(".search-modal__form")) this.open();
     });
+
+    // The results fetch is debounced and then has to round-trip, so the first
+    // few hundred milliseconds of typing used to produce no feedback at all.
+    // This runs on the keystroke itself, ahead of the debounce, so the field
+    // can spin and the panel can open on a skeleton instead of staying blank.
+    this.input.addEventListener('input', this.onInputImmediate.bind(this));
+  }
+
+  onInputImmediate() {
+    if (!this.getQuery().length) {
+      this.removeAttribute('searching');
+      this.clearSkeleton();
+      return;
+    }
+
+    this.setAttribute('searching', 'true');
+
+    // Only stand in for results we don't have yet. Once a query has rendered,
+    // its results stay on screen (dimmed by CSS) while the next ones load,
+    // which reads as faster than swapping them for placeholders every time.
+    if (!this.querySelector('#predictive-search-results-groups-wrapper')) {
+      this.showSkeleton();
+    }
+  }
+
+  showSkeleton() {
+    if (!this.predictiveSearchResults) return;
+
+    if (!this.querySelector('.predictive-search-skeleton')) {
+      const skeleton = document.createElement('div');
+      skeleton.className = 'predictive-search-skeleton';
+      skeleton.setAttribute('aria-hidden', 'true');
+      skeleton.innerHTML = Array.from({ length: 4 })
+        .map(
+          () =>
+            '<div class="predictive-search-skeleton__row">' +
+            '<span class="predictive-search-skeleton__thumb"></span>' +
+            '<span class="predictive-search-skeleton__lines"><span></span><span></span></span>' +
+            '</div>'
+        )
+        .join('');
+
+      this.predictiveSearchResults.appendChild(skeleton);
+    }
+
+    this.open();
+  }
+
+  clearSkeleton() {
+    this.querySelector('.predictive-search-skeleton')?.remove();
   }
 
   getQuery() {
@@ -47,6 +97,12 @@ class PredictiveSearch extends SearchForm {
       this.renderEmptyState();
       this.close(true);
       return;
+    }
+
+    // Backspacing drops the previous results above, which would leave the
+    // panel blank until the fetch lands; put the skeleton back instead.
+    if (!this.querySelector('#predictive-search-results-groups-wrapper')) {
+      this.showSkeleton();
     }
 
     this.getSearchResults(this.searchTerm);
@@ -94,6 +150,7 @@ class PredictiveSearch extends SearchForm {
 
         if (emptyStateContent) {
           this.predictiveSearchResults.innerHTML = emptyStateContent.innerHTML;
+          this.removeAttribute('searching');
           this.setAttribute('results', true);
           this.open();
         }
@@ -298,6 +355,7 @@ class PredictiveSearch extends SearchForm {
 
   renderSearchResults(resultsMarkup) {
     this.predictiveSearchResults.innerHTML = resultsMarkup;
+    this.removeAttribute('searching');
     this.setAttribute('results', true);
 
     this.setLiveRegionResults();
@@ -339,6 +397,8 @@ class PredictiveSearch extends SearchForm {
 
     this.input.setAttribute('aria-activedescendant', '');
     this.removeAttribute('loading');
+    this.removeAttribute('searching');
+    this.clearSkeleton();
     this.removeAttribute('open');
     this.input.setAttribute('aria-expanded', false);
     this.resultsMaxHeight = false;

@@ -18,7 +18,20 @@
   {%- assign tabs = tabs | append: 'collections,' -%}
   {%- assign tab_labels = tab_labels | append: title | append: ',' -%}
 {%- endif -%}
-{%- if predictive_search.resources.pages.size > 0 -%}
+{%- comment -%}
+  Pages hidden by Theme settings > Search behaviour (the app-generated HTML
+  sitemaps) are counted out, so a "Pages" tab is not offered for them alone.
+{%- endcomment -%}
+{%- assign visible_pages_count = 0 -%}
+{%- for page in predictive_search.resources.pages -%}
+  {%- capture hide_page -%}
+    {%- render 'search-page-hidden', page_title: page.title -%}
+  {%- endcapture -%}
+  {%- unless hide_page contains 'hidden' -%}
+    {%- assign visible_pages_count = visible_pages_count | plus: 1 -%}
+  {%- endunless -%}
+{%- endfor -%}
+{%- if visible_pages_count > 0 -%}
   {%- assign title = 'content.pages' | t -%}
   {%- assign tabs = tabs | append: 'pages,' -%}
   {%- assign tab_labels = tab_labels | append: title | append: ',' -%}
@@ -112,9 +125,15 @@
                 {% endif %}
               {%- when 'pages' -%}
                 {% assign pages = predictive_search.resources.pages %}
-                {% if pages.size > 0 %}
+                {% if visible_pages_count > 0 %}
                   <ul class="predictive-search__results-list list-unstyled">
                     {%- for page in pages -%}
+                      {%- capture hide_page -%}
+                        {%- render 'search-page-hidden', page_title: page.title -%}
+                      {%- endcapture -%}
+                      {%- if hide_page contains 'hidden' -%}
+                        {%- continue -%}
+                      {%- endif -%}
                       <li class="predictive-search__list-item">
                         <a href="{{ page.url }}" class="predictive-search__item link link--text">
                           <div class="predictive-search__item-content">

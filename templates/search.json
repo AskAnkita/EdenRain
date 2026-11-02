@@ -16,14 +16,14 @@
           "type": "filters",
           "static": true,
           "settings": {
-            "filter_style": "horizontal",
+            "filter_style": "drawer",
             "filter_position": "left",
             "filter_width": "centered",
             "heading_label_case": "normal-case",
             "heading_label_font_size": "1.2rem",
             "text_label_case": "normal-case",
             "text_label_font_size": "1.2rem",
-            "style": "frame",
+            "style": "underline",
             "enable_sticky_filters": true,
             "enable_hover_reveal": false,
             "enable_divider": true,
@@ -39,7 +39,7 @@
             "scheme_primary_hover": "#000000",
             "scheme_border": "#e6e6e6",
             "scheme_shadow": "#000000",
-            "enable_filtering": false,
+            "enable_filtering": true,
             "filter_gap_vertical": 16,
             "show_swatch_label": false,
             "show_filter_label": false,
@@ -126,13 +126,13 @@
               "settings": {
                 "width_option": "full",
                 "custom_width": 80,
-                "content_direction": "row",
+                "content_direction": "column",
                 "content_direction_mobile": "column",
                 "wrap": "wrap",
                 "wrap_tablet": "wrap",
                 "vertical_alignment": "center",
                 "horizontal_alignment": "center",
-                "horizontal_alignment_flex_direction_column": "flex-start",
+                "horizontal_alignment_flex_direction_column": "center",
                 "vertical_alignment_flex_direction_column": "center",
                 "gap_y": 10,
                 "gap_x": 10,
@@ -228,13 +228,38 @@
                     "padding-inline-end": 0
                   },
                   "blocks": {}
+                },
+                "card_product_shapes_Qa7xTb": {
+                  "type": "_card-product-shapes",
+                  "name": "Product shapes",
+                  "settings": {
+                    "product": "{{ closest.product }}",
+                    "default_shapes": "Round, Oval, Cushion, Emerald, Princess, Radiant",
+                    "alignment": "center",
+                    "padding-block-start": 4,
+                    "padding-block-end": 0
+                  },
+                  "blocks": {}
+                },
+                "card_product_metals_Lm3rKd": {
+                  "type": "_card-product-metals",
+                  "name": "Product metals",
+                  "settings": {
+                    "product": "{{ closest.product }}",
+                    "alignment": "center",
+                    "padding-block-start": 4,
+                    "padding-block-end": 0
+                  },
+                  "blocks": {}
                 }
               },
               "block_order": [
                 "card_product_vendor_flex_RFqEFm",
                 "card_product_title_flex_EpET3V",
                 "card_product_price_flex_jMMiHX",
-                "card_product_variant_flex_DW9nX3"
+                "card_product_variant_flex_DW9nX3",
+                "card_product_shapes_Qa7xTb",
+                "card_product_metals_Lm3rKd"
               ]
             }
           },

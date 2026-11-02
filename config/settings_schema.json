@@ -3409,6 +3409,13 @@
         "info": "Example: fashion,dresses,skirts,etc.."
       },
       {
+        "type": "text",
+        "id": "search_hidden_page_titles",
+        "label": "Hide pages whose title contains",
+        "info": "Separate with |. Keeps app-generated pages (the HTML sitemaps) out of the search results and the search dropdown. Leave empty to show every page. Delete the pages in Content > Pages to be rid of them properly.",
+        "default": "sitemap"
+      },
+      {
         "type": "link_list",
         "id": "quick_links",
         "label": "t:settings.quick_links"
@@ -3548,6 +3555,402 @@
         "label": "Custom logo",
         "info": "Upload a custom logo to be displayed on the preloading screen.",
         "visible_if": "{{ settings.enable_preloading_screen == true }}"
+      }
+    ]
+  },
+  {
+    "name": "Performance",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Lazy rendering lets the browser skip the sections below the fold until the visitor scrolls near them, so the top of a long page paints sooner. Turn it off if a section further down a page looks clipped."
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_lazy_sections",
+        "label": "Lazy render sections below the fold",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "lazy_sections_skip",
+        "min": 1,
+        "max": 4,
+        "step": 1,
+        "default": 2,
+        "label": "Sections rendered straight away",
+        "info": "How many sections at the top of a page are never deferred. Raise this if the section just under the hero flashes in as the page loads.",
+        "visible_if": "{{ settings.enable_lazy_sections == true }}"
+      }
+    ]
+  },
+  {
+    "name": "Education guide images",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "These are the shared images for guide cards across the education hub, guide pages and article recommendations. Change an image here once to update it everywhere."
+      },
+      { "type": "image_picker", "id": "guide_image_four_cs", "label": "The 4 C's" },
+      { "type": "image_picker", "id": "guide_image_gemstones", "label": "Lab-grown gemstones" },
+      { "type": "image_picker", "id": "guide_image_ring_size", "label": "Ring size guide" },
+      { "type": "image_picker", "id": "guide_image_wrist_size", "label": "Wrist size guide" },
+      { "type": "image_picker", "id": "guide_image_care", "label": "Jewellery care & cleaning" }
+    ]
+  },
+  {
+    "name": "Mega menu featured media",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "The large cards in each mega menu's Featured or Learn tab. Leave a field empty to keep what the theme ships with."
+      },
+      {
+        "type": "paragraph",
+        "content": "Video: upload the file under Content → Files, then paste its file name here (for example tennis-bracelets.mp4) or its full Files URL. The card's image is the still shown before the video plays, so pick a frame from it. Type none to turn a card's video off and show only the image."
+      },
+      { "type": "header", "content": "Engagement — Featured" },
+      { "type": "image_picker", "id": "mm_eng_featured_1", "label": "The Value Edit — image" },
+      { "type": "text", "id": "mm_eng_featured_video_1", "label": "The Value Edit — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_eng_featured_2", "label": "Shop Signature Engagement — image" },
+      { "type": "text", "id": "mm_eng_featured_video_2", "label": "Shop Signature Engagement — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_eng_featured_3", "label": "New Engagement Arrivals — image" },
+      { "type": "text", "id": "mm_eng_featured_video_3", "label": "New Engagement Arrivals — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_eng_featured_4", "label": "Shop Bridal Sets — image" },
+      { "type": "text", "id": "mm_eng_featured_video_4", "label": "Shop Bridal Sets — video file", "info": "File name from Content → Files, or none" },
+      { "type": "header", "content": "Wedding — Featured" },
+      { "type": "image_picker", "id": "mm_wed_featured_1", "label": "Wedding Bands — image" },
+      { "type": "text", "id": "mm_wed_featured_video_1", "label": "Wedding Bands — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_wed_featured_2", "label": "The Eternity Collection — image" },
+      { "type": "text", "id": "mm_wed_featured_video_2", "label": "The Eternity Collection — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_wed_featured_3", "label": "New Wedding Arrivals — image" },
+      { "type": "text", "id": "mm_wed_featured_video_3", "label": "New Wedding Arrivals — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_wed_featured_4", "label": "Shop Anniversary Rings — image" },
+      { "type": "text", "id": "mm_wed_featured_video_4", "label": "Shop Anniversary Rings — video file", "info": "File name from Content → Files, or none" },
+      { "type": "header", "content": "Jewellery — Featured" },
+      { "type": "image_picker", "id": "mm_jwl_featured_1", "label": "Signature Earrings — image" },
+      { "type": "text", "id": "mm_jwl_featured_video_1", "label": "Signature Earrings — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_jwl_featured_2", "label": "Must-Have Studs — image" },
+      { "type": "text", "id": "mm_jwl_featured_video_2", "label": "Must-Have Studs — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_jwl_featured_3", "label": "Tennis Bracelets — image" },
+      { "type": "text", "id": "mm_jwl_featured_video_3", "label": "Tennis Bracelets — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_jwl_featured_4", "label": "Signature Necklaces — image" },
+      { "type": "text", "id": "mm_jwl_featured_video_4", "label": "Signature Necklaces — video file", "info": "File name from Content → Files, or none" },
+      { "type": "header", "content": "Diamonds — Learn" },
+      { "type": "image_picker", "id": "mm_dia_learn_1", "label": "Education & Guides — image" },
+      { "type": "text", "id": "mm_dia_learn_video_1", "label": "Education & Guides — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_dia_learn_2", "label": "Gemstones — image" },
+      { "type": "text", "id": "mm_dia_learn_video_2", "label": "Gemstones — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_dia_learn_3", "label": "Ring Size Guide — image" },
+      { "type": "text", "id": "mm_dia_learn_video_3", "label": "Ring Size Guide — video file", "info": "File name from Content → Files, or none" },
+      { "type": "image_picker", "id": "mm_dia_learn_4", "label": "Jewellery Care — image" },
+      { "type": "text", "id": "mm_dia_learn_video_4", "label": "Jewellery Care — video file", "info": "File name from Content → Files, or none" }
+    ]
+  },
+  {
+      "name": "Mega menu panels",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "The picture half of each mega menu panel — the large image on the right with the heading, one line of copy and two buttons over it. Leave a field empty to keep what the theme ships with."
+        },
+        {
+          "type": "paragraph",
+          "content": "Use a portrait picture: the half is taller than it is wide and a landscape shot is cropped to fit. The words and buttons sit over the foot of it, so keep that area clear and reasonably dark."
+        },
+        {
+          "type": "header",
+          "content": "Engagement"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_eng_image",
+          "label": "Picture",
+          "info": "Portrait. Ships as about-craft-workshop.png"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_eng_heading",
+          "label": "Heading",
+          "info": "Ships as “Design Studio”"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_eng_url",
+          "label": "Heading link"
+        },
+        {
+          "type": "textarea",
+          "id": "mm_promo_eng_text",
+          "label": "Text over the picture"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_eng_button_1_label",
+          "label": "Button 1 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_eng_button_1_url",
+          "label": "Button 1 link"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_eng_button_2_label",
+          "label": "Button 2 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_eng_button_2_url",
+          "label": "Button 2 link"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_eng_secondary_image",
+          "label": "Second picture",
+          "info": "Narrow tile beside the first one, drawn only on screens wider than 1400px. Needs a label and a link as well as a picture."
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_eng_secondary_label",
+          "label": "Second picture label",
+          "info": "Type none to drop the second picture"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_eng_secondary_url",
+          "label": "Second picture link"
+        },
+        {
+          "type": "header",
+          "content": "Wedding"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_wed_image",
+          "label": "Picture",
+          "info": "Portrait. Ships as category-wedding-bands.png"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_wed_heading",
+          "label": "Heading",
+          "info": "Ships as “Signature Wedding Bands”"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_wed_url",
+          "label": "Heading link"
+        },
+        {
+          "type": "textarea",
+          "id": "mm_promo_wed_text",
+          "label": "Text over the picture"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_wed_button_1_label",
+          "label": "Button 1 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_wed_button_1_url",
+          "label": "Button 1 link"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_wed_button_2_label",
+          "label": "Button 2 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_wed_button_2_url",
+          "label": "Button 2 link"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_wed_secondary_image",
+          "label": "Second picture",
+          "info": "Ships as featured-wedding-eternity.jpg. Narrow tile beside the first one, drawn only on screens wider than 1400px. Needs a label and a link as well as a picture."
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_wed_secondary_label",
+          "label": "Second picture label",
+          "info": "Type none to drop the second picture"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_wed_secondary_url",
+          "label": "Second picture link"
+        },
+        {
+          "type": "header",
+          "content": "Diamonds"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_dia_image",
+          "label": "Picture",
+          "info": "Portrait. Ships as about-craft-workshop.png"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_dia_heading",
+          "label": "Heading",
+          "info": "Ships as “Design Studio”"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_dia_url",
+          "label": "Heading link"
+        },
+        {
+          "type": "textarea",
+          "id": "mm_promo_dia_text",
+          "label": "Text over the picture"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_dia_button_1_label",
+          "label": "Button 1 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_dia_button_1_url",
+          "label": "Button 1 link"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_dia_button_2_label",
+          "label": "Button 2 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_dia_button_2_url",
+          "label": "Button 2 link"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_dia_secondary_image",
+          "label": "Second picture",
+          "info": "Narrow tile beside the first one, drawn only on screens wider than 1400px. Needs a label and a link as well as a picture."
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_dia_secondary_label",
+          "label": "Second picture label",
+          "info": "Type none to drop the second picture"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_dia_secondary_url",
+          "label": "Second picture link"
+        },
+        {
+          "type": "header",
+          "content": "Jewellery"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_jwl_image",
+          "label": "Picture",
+          "info": "Portrait. Ships as category-best-sellers.png"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_jwl_heading",
+          "label": "Heading",
+          "info": "Ships as “Best Sellers”"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_jwl_url",
+          "label": "Heading link"
+        },
+        {
+          "type": "textarea",
+          "id": "mm_promo_jwl_text",
+          "label": "Text over the picture"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_jwl_button_1_label",
+          "label": "Button 1 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_jwl_button_1_url",
+          "label": "Button 1 link"
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_jwl_button_2_label",
+          "label": "Button 2 label",
+          "info": "Type none to drop this button"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_jwl_button_2_url",
+          "label": "Button 2 link"
+        },
+        {
+          "type": "image_picker",
+          "id": "mm_promo_jwl_secondary_image",
+          "label": "Second picture",
+          "info": "Narrow tile beside the first one, drawn only on screens wider than 1400px. Needs a label and a link as well as a picture."
+        },
+        {
+          "type": "text",
+          "id": "mm_promo_jwl_secondary_label",
+          "label": "Second picture label",
+          "info": "Type none to drop the second picture"
+        },
+        {
+          "type": "url",
+          "id": "mm_promo_jwl_secondary_url",
+          "label": "Second picture link"
+        }
+      ]
+    },
+  {
+    "name": "Metal swatches",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Upload a plain coloured circle for each metal. The karat text (10K, 14K, SS\u2026) is drawn on top, so leave the image blank to keep the built-in gradient. Square images around 120\u00d7120px work best."
+      },
+      {
+        "type": "image_picker",
+        "id": "metal_swatch_image_yellow",
+        "label": "Yellow gold"
+      },
+      {
+        "type": "image_picker",
+        "id": "metal_swatch_image_white",
+        "label": "White gold"
+      },
+      {
+        "type": "image_picker",
+        "id": "metal_swatch_image_rose",
+        "label": "Rose gold"
+      },
+      {
+        "type": "image_picker",
+        "id": "metal_swatch_image_platinum",
+        "label": "Platinum"
+      },
+      {
+        "type": "image_picker",
+        "id": "metal_swatch_image_silver",
+        "label": "Sterling silver"
       }
     ]
   }

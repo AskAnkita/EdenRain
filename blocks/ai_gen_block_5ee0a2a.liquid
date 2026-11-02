@@ -227,20 +227,54 @@
 
   .ai-collection-carousel-heading-{{ ai_gen_id }} {
     text-align: {{ block.settings.heading_alignment }};
-    margin: 0 0 {{ block.settings.heading_spacing }}px;
+    margin: 0 0 {% if block.settings.subheading != blank %}{{ block.settings.subheading_spacing }}{% else %}{{ block.settings.heading_spacing }}{% endif %}px;
     color: {{ block.settings.heading_color }};
-    font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
-    font-weight: {{ block.settings.heading_font.weight }};
+    font-family: var(--font-{{ block.settings.heading_font_family }}--family);
+    font-weight: var(--font-{{ block.settings.heading_font_family }}--weight);
     font-size: {{ block.settings.heading_font_size }}px;
     line-height: {{ block.settings.heading_line_height }};
     letter-spacing: {{ block.settings.heading_letter_spacing }}em;
     text-transform: {{ block.settings.heading_text_transform }};
   }
 
+  /* The supporting line under the heading. It takes the heading's own
+     alignment -- a centred heading with left aligned copy under it reads as a
+     mistake -- and owns the gap down to the cards, so the heading's "Bottom
+     spacing" keeps meaning the gap to whatever comes next. */
+  .ai-collection-carousel-subheading-{{ ai_gen_id }} {
+    max-width: {{ block.settings.subheading_max_width }}px;
+    margin: 0 0 {{ block.settings.heading_spacing }}px;
+    {% if block.settings.heading_alignment == 'center' %}margin-inline: auto;{% elsif block.settings.heading_alignment == 'right' %}margin-inline: auto 0;{% endif %}
+    text-align: {{ block.settings.heading_alignment }};
+    color: {{ block.settings.subheading_color }};
+    font-family: var(--font-{{ block.settings.subheading_font_family }}--family);
+    font-size: {{ block.settings.subheading_font_size }}px;
+    line-height: {{ block.settings.subheading_line_height }};
+    letter-spacing: {{ block.settings.subheading_letter_spacing | divided_by: 100.0 }}em;
+  }
+
+  .ai-collection-carousel-subheading-{{ ai_gen_id }} p {
+    margin: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-collection-carousel-subheading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subheading_font_size | times: 0.9 }}px;
+    }
+  }
+
   .ai-collection-carousel-wrapper-{{ ai_gen_id }} {
     position: relative;
+    width: 100%;
+    touch-action: pan-y;
+  }
+
+  /* The clipping lives here so the arrows, which sit half outside the
+     wrapper, are not cut off. */
+  .ai-collection-carousel-viewport-{{ ai_gen_id }} {
     overflow: hidden;
     width: 100%;
+    touch-action: pan-y;
   }
 
   .ai-collection-carousel-track-{{ ai_gen_id }} {
@@ -248,11 +282,23 @@
     gap: {{ block.settings.item_gap_desktop }}px;
     transition: transform 0.4s ease-in-out;
     will-change: transform;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
   }
 
+  /* The desktop column count sizes a card, but never past "Largest card width": on a wide screen
+     the count alone would blow each card up to 600px and show four of them, so the cap takes over
+     and more cards fit instead. On a laptop the count is still what decides, because the width it
+     works out to is under the cap. */
   .ai-collection-carousel-item-{{ ai_gen_id }} {
-    flex: 0 0 calc((100% - ({{ block.settings.columns_desktop | minus: 1 }} * {{ block.settings.item_gap_desktop }}px)) / {{ block.settings.columns_desktop }});
-    max-width: calc((100% - ({{ block.settings.columns_desktop | minus: 1 }} * {{ block.settings.item_gap_desktop }}px)) / {{ block.settings.columns_desktop }});
+    --ai-card-width: min(
+      calc((100% - ({{ block.settings.columns_desktop | minus: 1 }} * {{ block.settings.item_gap_desktop }}px)) / {{ block.settings.columns_desktop }}),
+      {{ block.settings.item_max_width_desktop }}px
+    );
+    flex: 0 0 var(--ai-card-width);
+    max-width: var(--ai-card-width);
     position: relative;
   }
 
@@ -269,6 +315,8 @@
     border: {{ block.settings.item_border_width }}px solid {{ block.settings.border_color }};
     box-shadow: {{ block.settings.shadow }};
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    -webkit-user-drag: none;
+    user-select: none;
   }
 
   @media (hover: hover) {
@@ -277,7 +325,7 @@
       box-shadow: {{ block.settings.hover_shadow }};
     }
 
-    .ai-collection-carousel-link-{{ ai_gen_id }}:hover .ai-collection-carousel-image-{{ ai_gen_id }} {
+    .ai-collection-carousel-link-{{ ai_gen_id }}.has-hover-image:hover .ai-collection-carousel-image-{{ ai_gen_id }} {
       opacity: 0;
     }
 
@@ -301,6 +349,9 @@
     display: block;
     object-fit: cover;
     transition: opacity 0.3s ease;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;
   }
 
   .ai-collection-carousel-hover-image-{{ ai_gen_id }} {
@@ -323,18 +374,21 @@
     border-radius: 0;
     border: 0;
     box-shadow: none;
-    background: #f8f8f6;
+    background: #f8f8f8;
   }
 
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-wrapper-{{ ai_gen_id }} {
     position: absolute;
     inset: 0;
-    background: #f8f8f6;
+    background: #f8f8f8;
   }
 
+  /* How large the ring sits inside its tile. The picture is shown whole (contain), so this
+     is the only lever for how much of the frame it fills: raise it to zoom in, lower it to
+     leave more space around the ring. Above ~0.95 the picture starts to meet the tile edges. */
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-{{ ai_gen_id }} {
     object-fit: contain;
-    transform: scale(0.74);
+    transform: scale(0.86);
   }
 
   .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-hover-image-{{ ai_gen_id }} {
@@ -365,8 +419,8 @@
       box-shadow: none;
     }
 
-    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:hover .ai-collection-carousel-image-{{ ai_gen_id }},
-    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}:focus-visible .ai-collection-carousel-image-{{ ai_gen_id }} {
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}.has-hover-image:hover .ai-collection-carousel-image-{{ ai_gen_id }},
+    .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }}.has-hover-image:focus-visible .ai-collection-carousel-image-{{ ai_gen_id }} {
       opacity: 0;
     }
 
@@ -386,8 +440,8 @@
     padding: {{ block.settings.title_padding }}px;
     text-align: center;
     color: {{ block.settings.text_color }};
-    font-family: {{ block.settings.title_font.family }}, {{ block.settings.title_font.fallback_families }};
-    font-weight: {{ block.settings.title_font.weight }};
+    font-family: var(--font-{{ block.settings.title_font_family }}--family);
+    font-weight: var(--font-{{ block.settings.title_font_family }}--weight);
     font-size: {{ block.settings.title_font_size }}px;
     line-height: {{ block.settings.title_line_height }};
     letter-spacing: {{ block.settings.title_letter_spacing }}em;
@@ -398,18 +452,21 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: var(--arrow-background, {{ block.settings.arrow_background }});
-    border: var(--arrow-border-thickness, {{ block.settings.arrow_border_width }}px) solid var(--arrow-border, {{ block.settings.arrow_border_color }});
+    background: {{ block.settings.arrow_background }};
+    border: {{ block.settings.arrow_border_width }}px solid {{ block.settings.arrow_border_color }};
     border-radius: var(--arrow-radius, {{ block.settings.arrow_border_radius }}px);
-    width: var(--arrow-width, {{ block.settings.arrow_size }}px);
-    height: var(--arrow-height, {{ block.settings.arrow_size }}px);
+    /* --er-arrow-size is the shared scroller arrow size (assets/base.css), so this
+       carousel's buttons match every other row; the setting is the fallback. */
+    width: var(--er-arrow-size, {{ block.settings.arrow_size }}px);
+    height: var(--er-arrow-size, {{ block.settings.arrow_size }}px);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     z-index: 10;
     transition: all 0.3s ease;
-    color: var(--arrow-color, {{ block.settings.arrow_color }});
+    color: {{ block.settings.arrow_color }};
+    box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }}:hover {
@@ -417,16 +474,36 @@
     color: {{ block.settings.arrow_hover_color }};
   }
 
+  /* Hover draws a ring in from the middle of the disc to its edge, as on every
+     other scroller in the theme (assets/base.css). */
+  .ai-collection-carousel-nav-{{ ai_gen_id }}::after {
+    position: absolute;
+    inset: 0;
+    border: 1.5px solid {{ block.settings.arrow_color }};
+    border-radius: inherit;
+    content: "";
+    opacity: 0;
+    transform: scale(0.7);
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.22s ease;
+    pointer-events: none;
+  }
+
+  .ai-collection-carousel-nav-{{ ai_gen_id }}:hover::after,
+  .ai-collection-carousel-nav-{{ ai_gen_id }}:focus-visible::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
   .ai-collection-carousel-nav-{{ ai_gen_id }}.prev {
-    left: {{ block.settings.arrow_offset }}px;
+    left: calc(var(--er-arrow-size, {{ block.settings.arrow_size }}px) / -2 + {{ block.settings.arrow_offset }}px);
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }}.next {
-    right: {{ block.settings.arrow_offset }}px;
+    right: calc(var(--er-arrow-size, {{ block.settings.arrow_size }}px) / -2 + {{ block.settings.arrow_offset }}px);
   }
 
   .ai-collection-carousel-nav-{{ ai_gen_id }} svg {
-    width: var(--arrow-icon-size, {{ block.settings.arrow_icon_size }}px);
+    width: var(--er-arrow-icon-size, {{ block.settings.arrow_icon_size }}px);
     height: auto;
   }
 
@@ -442,8 +519,12 @@
   .ai-collection-carousel-pagination-{{ ai_gen_id }} {
     position: relative;
     width: 100%;
-    height: 4px;
+    max-width: min({{ block.settings.pagination_max_width | default: 280 }}px, calc(100% - 40px));
+    height: 3px;
     margin-top: {{ block.settings.pagination_spacing }}px;
+    margin-left: 0;
+    margin-right: auto;
+    border-radius: 999px;
     overflow: hidden;
     background: {{ block.settings.pagination_color }};
   }
@@ -455,16 +536,7 @@
     transform: scaleX(0);
     transform-origin: left center;
     transition: transform 0.4s ease-in-out;
-  }
-
-  @media screen and (min-width: 1025px) {
-    .ai-collection-carousel-nav-{{ ai_gen_id }}:not(.is-disabled) {
-      opacity: 0;
-    }
-
-    .ai-collection-carousel-wrapper-{{ ai_gen_id }}:hover .ai-collection-carousel-nav-{{ ai_gen_id }}:not(.is-disabled) {
-      opacity: 1;
-    }
+    border-radius: 999px;
   }
 
   @media screen and (max-width: 989px) {
@@ -494,7 +566,7 @@
 
   @media screen and (max-width: 749px) {
     .ai-collection-carousel-{{ ai_gen_id }} {
-      padding: {{ block.settings.padding_top | times: 0.7 }}px {{ block.settings.padding_right | times: 0.7 }}px {{ block.settings.padding_bottom | times: 0.7 }}px {{ block.settings.padding_left | times: 0.7 }}px;
+      padding: clamp(16px, {{ block.settings.padding_top | times: 0.3 }}px, 24px) {{ block.settings.padding_right | times: 0.7 }}px {{ block.settings.padding_bottom | times: 0.7 }}px {{ block.settings.padding_left | times: 0.7 }}px;
     }
 
     .ai-collection-carousel-track-{{ ai_gen_id }} {
@@ -569,32 +641,55 @@
     }
   }
 
+  {% comment %}
+    "Find Your Style" and "Find Your Shape" sit directly above/below each other on the homepage,
+    so they share one full-bleed container: the page-width cap would make the shape row narrower
+    than the style row and the two would not line up.
+  {% endcomment %}
+  {% if block.settings.heading == 'FIND YOUR STYLE' or block.settings.heading == 'Find Your Shape' %}
+    .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-container-{{ ai_gen_id }} {
+      max-width: none;
+    }
+  {% endif %}
+
   {% if block.settings.heading == 'FIND YOUR STYLE' %}
+    /* The shared .is-diamond-shape scale (0.86) is tuned for the diamond photos in "Find Your
+       Shape", which carry almost no white margin of their own. The ring photos here do, so at
+       that scale the ring reads small inside its tile. Zoom them on desktop the way the mobile
+       rule below already does; the overflow is the photo's own white margin and the tile clips it. */
+    @media screen and (min-width: 750px) {
+      .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-{{ ai_gen_id }} {
+        transform: scale(1.15);
+      }
+    }
+
     @media screen and (max-width: 749px) {
       .ai-collection-carousel-{{ ai_gen_id }} {
-        padding-left: 18px;
-        padding-right: 18px;
+        padding-top: 16px;
+        padding-left: 16px;
+        padding-right: 16px;
       }
 
       .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-heading-{{ ai_gen_id }} {
         color: #00211c;
         font-family: var(--font-heading--family);
         font-size: 26px;
-        text-align: left;
         margin-bottom: 24px;
       }
 
       .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-track-{{ ai_gen_id }} {
-        gap: 24px;
-      }
-
-      .ai-collection-carousel-{{ ai_gen_id }} .ai-collection-carousel-item-{{ ai_gen_id }} {
-        flex: 0 0 70%;
-        max-width: 70%;
+        gap: 12px;
       }
 
       .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-link-{{ ai_gen_id }} {
         aspect-ratio: 2 / 3;
+      }
+
+      /* The tile is portrait (2/3) but the ring photo is square, so "contain" fits it to the
+         tile's width and leaves a band of empty space above and below. Scaling past 1 fills
+         that band; the overflow is only the photo's own white margin, which the tile clips. */
+      .ai-collection-carousel-{{ ai_gen_id }}.is-diamond-shape .ai-collection-carousel-image-{{ ai_gen_id }} {
+        transform: scale(1.28);
       }
     }
   {% endif %}
@@ -620,14 +715,18 @@
   }
 {% endstyle %}
 
-<collection-carousel-{{ ai_gen_id }} class="ai-collection-carousel-{{ ai_gen_id }}{% if block.settings.use_diamond_shape_placeholders %} is-diamond-shape{% endif %}{% if block.settings.heading == 'Find Your Shape' %} is-shape-grid{% endif %}"{% if block.settings.heading == 'FIND YOUR STYLE' %} id="find-your-style"{% elsif block.settings.heading == 'Find Your Shape' %} id="find-your-shape"{% endif %} {{ block.shopify_attributes }}>
+<collection-carousel-{{ ai_gen_id }} class="ai-collection-carousel-{{ ai_gen_id }}{% if block.settings.use_diamond_shape_placeholders or block.settings.use_placeholder_images %} is-diamond-shape{% endif %}{% if block.settings.heading == 'Find Your Shape' %} is-shape-grid{% endif %}"{% if block.settings.heading == 'FIND YOUR STYLE' %} id="find-your-style"{% elsif block.settings.heading == 'Find Your Shape' %} id="find-your-shape"{% endif %} {{ block.shopify_attributes }}>
   <div class="ai-collection-carousel-container-{{ ai_gen_id }}">
     {% if block.settings.heading != blank %}
       <h2 class="ai-collection-carousel-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
     {% endif %}
+    {% if block.settings.subheading != blank %}
+      <div class="ai-collection-carousel-subheading-{{ ai_gen_id }}">{{ block.settings.subheading }}</div>
+    {% endif %}
 
     <div class="ai-collection-carousel-wrapper-{{ ai_gen_id }}">
-      <div class="ai-collection-carousel-track-{{ ai_gen_id }}">
+      <div class="ai-collection-carousel-viewport-{{ ai_gen_id }}">
+        <div class="ai-collection-carousel-track-{{ ai_gen_id }}">
         {% for i in (1..12) %}
           {% liquid
             assign collection_key = 'collection_' | append: i
@@ -646,10 +745,6 @@
             assign hide_tablet = block.settings[hide_tablet_key]
             assign hide_mobile_key = 'hide_mobile_' | append: i
             assign hide_mobile = block.settings[hide_mobile_key]
-            assign placeholder_image = blank
-            assign placeholder_hover_image = blank
-            assign model_hover_image = blank
-            assign model_hover_alt = blank
             assign shape_grid_column = blank
             assign shape_grid_row = blank
             if block.settings.heading == 'Find Your Shape'
@@ -658,110 +753,55 @@
               assign shape_grid_column = shape_page | times: 2 | plus: shape_column
               assign shape_grid_row = forloop.index0 | modulo: 4 | divided_by: 2 | plus: 1
             endif
-            assign placeholder_width = 684
-            assign placeholder_height = 1014
-            assign placeholder_hover_width = 416
-            assign placeholder_hover_height = 617
+
+            comment
+              ----------------------------------------------------------------
+              BUILT-IN PICTURES - the one place to change a card's picture
+              in code. Each list below is card 1 to card 12, in order, as file
+              names under assets/. Swap a name to swap that card's picture.
+
+              These only fill a card whose picture is still empty in the theme
+              editor: a picture chosen in the editor always wins, so a card
+              never ignores the picture you pick. Leave a slot empty (two
+              commas in a row) to give a card no built-in picture at all.
+              ----------------------------------------------------------------
+            endcomment
+            assign preset_images = ''
+            assign preset_hover_images = ''
+            assign preset_hover_alts = ''
+            assign preset_width = 684
+            assign preset_height = 1014
+            assign preset_hover_width = 416
+            assign preset_hover_height = 617
 
             if block.settings.use_placeholder_images
-              case i
-                when 1
-                  assign placeholder_image = 'style-solitaire.png'
-                  assign placeholder_hover_image = 'style-solitaire-hover.jpg'
-                when 2
-                  assign placeholder_image = 'style-side-stone.png'
-                  assign placeholder_hover_image = 'style-side-stone-hover.jpg'
-                when 3
-                  assign placeholder_image = 'style-halo.png'
-                  assign placeholder_hover_image = 'style-halo-hover.jpg'
-                when 4
-                  assign placeholder_image = 'style-hidden-halo.png'
-                  assign placeholder_hover_image = 'style-hidden-halo-hover.jpg'
-                when 5
-                  assign placeholder_image = 'style-three-stone.png'
-                  assign placeholder_hover_image = 'style-three-stone-hover.jpg'
-                when 6
-                  assign placeholder_image = 'style-vintage.png'
-                  assign placeholder_hover_image = 'style-vintage-hover.jpg'
-                when 7
-                  assign placeholder_image = 'style-nature-inspired.png'
-                  assign placeholder_hover_image = 'style-nature-inspired-hover.jpg'
-                when 8
-                  assign placeholder_image = 'style-promise.png'
-                  assign placeholder_hover_image = 'style-promise-hover.jpg'
-              endcase
+              assign preset_images = 'style-solitaire.png,style-side-stone.png,style-halo.png,style-hidden-halo.png,style-three-stone.png,style-vintage.png,style-nature-inspired.png,style-promise.png'
+              assign preset_hover_images = 'style-solitaire-hover.jpg,style-side-stone-hover.jpg,style-halo-hover.jpg,style-hidden-halo-hover.jpg,style-three-stone-hover.jpg,style-vintage-hover.jpg,style-nature-inspired-hover.jpg,style-promise-hover.jpg'
             elsif block.settings.use_diamond_shape_placeholders
-              assign placeholder_width = 900
-              assign placeholder_height = 900
-              assign placeholder_hover_width = 900
-              assign placeholder_hover_height = 900
+              assign preset_width = 900
+              assign preset_height = 900
+              assign preset_hover_width = 816
+              assign preset_hover_height = 1088
+              assign preset_images = 'diamond-shape-round.png,diamond-shape-oval.png,diamond-shape-emerald.png,diamond-shape-cushion.png,diamond-shape-marquise.png,diamond-shape-radiant.png,diamond-shape-pear.png,diamond-shape-princess.png,diamond-shape-asscher.png,diamond-shape-heart.png'
+              assign preset_hover_images = 'lifestyle-round-necklace.jpg,lifestyle-necklace.jpg,lifestyle-emerald-earring.jpg,lifestyle-earring.jpg,lifestyle-marquise-bracelet.jpg,lifestyle-radiant-bracelet.jpg,lifestyle-pear-necklace.jpg,lifestyle-princess-ring.jpg,lifestyle-bracelet.jpg,lifestyle-heart-necklace.jpg'
+              assign preset_hover_alts = 'Round diamond pendant worn by a model,Oval diamond pendant worn by a model,Emerald cut diamond huggie earring worn by a model,Diamond stud earring worn by a model,Marquise diamond bracelet worn by a model,Diamond tennis bracelet worn by a model,Pear diamond pendant worn by a model,Princess cut diamond ring worn by a model,Square cut diamond bracelet worn by a model,Heart diamond pendant worn by a model'
+            endif
 
-              case i
-                when 1
-                  assign placeholder_image = 'diamond-shape-round.png'
-                when 2
-                  assign placeholder_image = 'diamond-shape-oval.png'
-                when 3
-                  assign placeholder_image = 'diamond-shape-emerald.png'
-                when 4
-                  assign placeholder_image = 'diamond-shape-cushion.png'
-                when 5
-                  assign placeholder_image = 'diamond-shape-marquise.png'
-                when 6
-                  assign placeholder_image = 'diamond-shape-radiant.png'
-                when 7
-                  assign placeholder_image = 'diamond-shape-pear.png'
-                when 8
-                  assign placeholder_image = 'diamond-shape-princess.png'
-                when 9
-                  assign placeholder_image = 'diamond-shape-asscher.png'
-                when 10
-                  assign placeholder_image = 'diamond-shape-heart.png'
-              endcase
+            assign preset_index = i | minus: 1
+            assign preset_image_list = preset_images | split: ','
+            assign preset_hover_image_list = preset_hover_images | split: ','
+            assign preset_hover_alt_list = preset_hover_alts | split: ','
+            assign preset_image = preset_image_list[preset_index]
+            assign preset_hover_image = preset_hover_image_list[preset_index]
+            assign preset_hover_alt = preset_hover_alt_list[preset_index]
 
-              comment
-                Hover photos: the store's own lifestyle shots, matched to each shape
-              endcomment
-              case i
-                when 1
-                  assign model_hover_image = 'lifestyle-round-necklace.jpg'
-                  assign model_hover_alt = 'Round diamond pendant worn by a model'
-                when 2
-                  assign model_hover_image = 'lifestyle-necklace.jpg'
-                  assign model_hover_alt = 'Oval diamond pendant worn by a model'
-                when 3
-                  assign model_hover_image = 'lifestyle-emerald-earring.jpg'
-                  assign model_hover_alt = 'Emerald cut diamond huggie earring worn by a model'
-                when 4
-                  assign model_hover_image = 'lifestyle-earring.jpg'
-                  assign model_hover_alt = 'Diamond stud earring worn by a model'
-                when 5
-                  assign model_hover_image = 'lifestyle-marquise-bracelet.jpg'
-                  assign model_hover_alt = 'Marquise diamond bracelet worn by a model'
-                when 6
-                  assign model_hover_image = 'lifestyle-radiant-bracelet.jpg'
-                  assign model_hover_alt = 'Diamond tennis bracelet worn by a model'
-                when 7
-                  assign model_hover_image = 'lifestyle-pear-necklace.jpg'
-                  assign model_hover_alt = 'Pear diamond pendant worn by a model'
-                when 8
-                  assign model_hover_image = 'lifestyle-princess-ring.jpg'
-                  assign model_hover_alt = 'Princess cut diamond ring worn by a model'
-                when 9
-                  assign model_hover_image = 'lifestyle-bracelet.jpg'
-                  assign model_hover_alt = 'Square cut diamond bracelet worn by a model'
-                when 10
-                  assign model_hover_image = 'lifestyle-heart-necklace.jpg'
-                  assign model_hover_alt = 'Heart diamond pendant worn by a model'
-              endcase
-
-              assign placeholder_hover_image = model_hover_image
-              assign placeholder_hover_width = 816
-              assign placeholder_hover_height = 1088
+            assign has_hover_image = false
+            if hover_image != blank or preset_hover_image != blank
+              assign has_hover_image = true
             endif
           %}
 
-          {% if image != blank or placeholder_image != blank %}
+          {% if image != blank or preset_image != blank %}
             <div 
               class="ai-collection-carousel-item-{{ ai_gen_id }}{% if hide_tablet %} hide-tablet{% endif %}{% if hide_mobile %} hide-mobile{% endif %}"
               data-hide-tablet="{{ hide_tablet }}"
@@ -770,10 +810,16 @@
             >
               <a 
                 href="{% if url != blank %}{{ url }}{% elsif collection != blank %}{{ collection.url }}{% else %}#{% endif %}"
-                class="ai-collection-carousel-link-{{ ai_gen_id }}"
+                class="ai-collection-carousel-link-{{ ai_gen_id }}{% if has_hover_image %} has-hover-image{% endif %}"
                 {% if open_new_tab %}target="_blank" rel="noopener noreferrer"{% endif %}
               >
                 <div class="ai-collection-carousel-image-wrapper-{{ ai_gen_id }}">
+                  {%- comment -%}
+                    One rule for every picture here: the theme editor's choice
+                    if there is one, otherwise the built-in file listed at the
+                    top of the loop. The main picture and the hover picture are
+                    decided separately, so picking one does not override the other.
+                  {%- endcomment -%}
                   {% if image != blank %}
                     <img
                       src="{{ image | image_url: width: 800 }}"
@@ -783,40 +829,33 @@
                       height="{{ image.height }}"
                       class="ai-collection-carousel-image-{{ ai_gen_id }}"
                     >
-                    {% if model_hover_image != blank %}
-                      <img
-                        src="{{ model_hover_image | asset_url }}"
-                        alt="{{ model_hover_alt | escape }}"
-                        loading="lazy"
-                        width="816"
-                        height="1088"
-                        class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
-                      >
-                    {% elsif hover_image != blank %}
-                      <img
-                        src="{{ hover_image | image_url: width: 800 }}"
-                        alt="{{ hover_image.alt | default: title | escape }}"
-                        loading="lazy"
-                        width="{{ hover_image.width }}"
-                        height="{{ hover_image.height }}"
-                        class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
-                      >
-                    {% endif %}
-                  {% elsif placeholder_image != blank %}
+                  {% elsif preset_image != blank %}
                     <img
-                      src="{{ placeholder_image | asset_url }}"
+                      src="{% render 'image-source', file: preset_image, width: 800 %}"
                       alt="{{ title | escape }}"
                       loading="lazy"
-                      width="{{ placeholder_width }}"
-                      height="{{ placeholder_height }}"
+                      width="{{ preset_width }}"
+                      height="{{ preset_height }}"
                       class="ai-collection-carousel-image-{{ ai_gen_id }}"
                     >
+                  {% endif %}
+
+                  {% if hover_image != blank %}
                     <img
-                      src="{{ placeholder_hover_image | asset_url }}"
-                      alt="{{ model_hover_alt | default: title | escape }}"
+                      src="{{ hover_image | image_url: width: 800 }}"
+                      alt="{{ hover_image.alt | default: title | escape }}"
                       loading="lazy"
-                      width="{{ placeholder_hover_width }}"
-                      height="{{ placeholder_hover_height }}"
+                      width="{{ hover_image.width }}"
+                      height="{{ hover_image.height }}"
+                      class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
+                    >
+                  {% elsif preset_hover_image != blank %}
+                    <img
+                      src="{% render 'image-source', file: preset_hover_image, width: 800 %}"
+                      alt="{{ preset_hover_alt | default: title | escape }}"
+                      loading="lazy"
+                      width="{{ preset_hover_width }}"
+                      height="{{ preset_hover_height }}"
                       class="ai-collection-carousel-hover-image-{{ ai_gen_id }}"
                     >
                   {% endif %}
@@ -830,18 +869,15 @@
             </div>
           {% endif %}
         {% endfor %}
+        </div>
       </div>
 
       {% if block.settings.show_arrows %}
         <button class="ai-collection-carousel-nav-{{ ai_gen_id }} prev" aria-label="Previous slide">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10" aria-hidden="true">
-            <path fill="currentColor" fill-rule="evenodd" d="M8.537.808a.5.5 0 0 1 .817-.162l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 1 1-.708-.708L11.793 5.5H1a.5.5 0 0 1 0-1h10.793L8.646 1.354a.5.5 0 0 1-.109-.546" clip-rule="evenodd"/>
-          </svg>
+          {%- render 'icon-arrow' -%}
         </button>
         <button class="ai-collection-carousel-nav-{{ ai_gen_id }} next" aria-label="Next slide">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10" aria-hidden="true">
-            <path fill="currentColor" fill-rule="evenodd" d="M8.537.808a.5.5 0 0 1 .817-.162l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 1 1-.708-.708L11.793 5.5H1a.5.5 0 0 1 0-1h10.793L8.646 1.354a.5.5 0 0 1-.109-.546" clip-rule="evenodd"/>
-          </svg>
+          {%- render 'icon-arrow' -%}
         </button>
       {% endif %}
     </div>
@@ -904,6 +940,15 @@
         const width = window.innerWidth;
         if (width <= 749) return this.settings.mobileColumns;
         if (width <= 989) return this.settings.tabletColumns;
+        // A card is capped at "Largest card width", so on a wide screen more of them fit than
+        // "Desktop columns" asks for. Measure what is actually on screen, or the arrows and the
+        // progress bar would count slides that aren't there. The setting is the fallback for
+        // the first pass, before the cards have been laid out.
+        const card = this.visibleItems[0] || this.items[0];
+        const trackGap = this.track ? parseInt(getComputedStyle(this.track).gap) || 0 : 0;
+        if (card && card.offsetWidth && this.wrapper && this.wrapper.clientWidth) {
+          return Math.max(1, (this.wrapper.clientWidth + trackGap) / (card.offsetWidth + trackGap));
+        }
         return this.settings.desktopColumns;
       }
 
@@ -957,14 +1002,125 @@
           this.nextBtn.addEventListener('click', () => this.next());
         }
 
+        let startX = 0;
+        let startY = 0;
+        let startOffset = 0;
+        let deltaX = 0;
+        let isDragging = false;
+        let isScrolling = undefined;
+        this.hasDragged = false;
+
+        const onDragStart = (clientX, clientY) => {
+          if (!this.visibleItems.length) return;
+          startX = clientX;
+          startY = clientY;
+          deltaX = 0;
+          isDragging = true;
+          isScrolling = undefined;
+          this.hasDragged = false;
+          startOffset = this.getOffsetForIndex(this.currentIndex);
+          this.track.style.transition = 'none';
+        };
+
+        const onDragMove = (clientX, clientY, e) => {
+          if (!isDragging) return;
+          deltaX = clientX - startX;
+          const deltaY = clientY - startY;
+
+          if (isScrolling === undefined) {
+            if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 6) {
+              isScrolling = true;
+            } else if (Math.abs(deltaX) > 6) {
+              isScrolling = false;
+            }
+          }
+
+          if (isScrolling === false) {
+            if (e && e.cancelable) e.preventDefault();
+            this.hasDragged = true;
+            const maxOffset = Math.max(0, this.track.scrollWidth - this.wrapper.clientWidth);
+            let currentOffset = startOffset - deltaX;
+            if (currentOffset < 0) {
+              currentOffset = currentOffset * 0.3;
+            } else if (currentOffset > maxOffset) {
+              currentOffset = maxOffset + (currentOffset - maxOffset) * 0.3;
+            }
+            this.track.style.transform = `translateX(-${currentOffset}px)`;
+
+            if (maxOffset > 0 && this.pagination) {
+              const ratio = Math.max(0, Math.min(1, currentOffset / maxOffset));
+              const totalSlides = this.getTotalSlides();
+              const progressValue = (1 + ratio * (totalSlides - 1)) / totalSlides;
+              const progress = this.pagination.querySelector('.ai-collection-carousel-progress-{{ ai_gen_id }}');
+              if (progress) progress.style.transform = `scaleX(${progressValue})`;
+            }
+          }
+        };
+
+        const onDragEnd = () => {
+          if (!isDragging) return;
+          isDragging = false;
+          this.track.style.transition = 'transform 0.35s ease-out';
+
+          if (isScrolling === false) {
+            const threshold = 35;
+            if (deltaX < -threshold) {
+              this.next();
+            } else if (deltaX > threshold) {
+              this.prev();
+            } else {
+              this.updateSlidePosition();
+            }
+          } else {
+            this.updateSlidePosition();
+          }
+
+          setTimeout(() => {
+            this.hasDragged = false;
+          }, 120);
+        };
+
         this.track.addEventListener('touchstart', (e) => {
-          this.touchStartX = e.changedTouches[0].screenX;
+          if (e.touches.length > 0) {
+            onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+          }
         }, { passive: true });
 
-        this.track.addEventListener('touchend', (e) => {
-          this.touchEndX = e.changedTouches[0].screenX;
-          this.handleSwipe();
+        this.track.addEventListener('touchmove', (e) => {
+          if (e.touches.length > 0) {
+            onDragMove(e.touches[0].clientX, e.touches[0].clientY, e);
+          }
+        }, { passive: false });
+
+        this.track.addEventListener('touchend', () => {
+          onDragEnd();
         }, { passive: true });
+
+        this.track.addEventListener('touchcancel', () => {
+          onDragEnd();
+        }, { passive: true });
+
+        this.track.addEventListener('mousedown', (e) => {
+          if (e.button !== 0) return;
+          onDragStart(e.clientX, e.clientY);
+          const onMouseMove = (moveEvent) => {
+            onDragMove(moveEvent.clientX, moveEvent.clientY, moveEvent);
+          };
+          const onMouseUp = () => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            onDragEnd();
+          };
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+
+        this.track.addEventListener('click', (e) => {
+          if (this.hasDragged) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }, true);
 
         if (this.settings.pauseOnHover && this.settings.autoplay) {
           this.wrapper.addEventListener('mouseenter', () => this.stopAutoplay());
@@ -982,17 +1138,18 @@
         });
       }
 
-      handleSwipe() {
-        const swipeThreshold = 50;
-        const diff = this.touchStartX - this.touchEndX;
-
-        if (Math.abs(diff) > swipeThreshold) {
-          if (diff > 0) {
-            this.next();
-          } else {
-            this.prev();
-          }
+      getOffsetForIndex(index) {
+        if (!this.visibleItems.length) return 0;
+        if (this.isShapeGrid && window.innerWidth <= 749) {
+          return index * (this.wrapper.clientWidth + 12);
         }
+        const gap = parseInt(getComputedStyle(this.track).gap) || 0;
+        let offset = 0;
+        for (let i = 0; i < index && i < this.visibleItems.length; i++) {
+          offset += this.visibleItems[i].offsetWidth + gap;
+        }
+        const maxOffset = Math.max(0, this.track.scrollWidth - this.wrapper.clientWidth);
+        return Math.min(offset, maxOffset);
       }
 
       updateSlidePosition() {
@@ -1000,27 +1157,9 @@
 
         if (this.isShapeGrid && window.innerWidth <= 749) {
           this.track.style.setProperty('--shape-page-width', `${this.wrapper.clientWidth}px`);
-          const offset = this.currentIndex * (this.wrapper.clientWidth + 12);
-          this.track.style.transform = `translateX(-${offset}px)`;
-          this.updatePaginationProgress();
-          this.updateControls();
-          return;
         }
 
-        const firstVisibleItem = this.visibleItems[0];
-        if (!firstVisibleItem) return;
-
-        const itemWidth = firstVisibleItem.offsetWidth;
-        const gap = parseInt(getComputedStyle(this.track).gap) || 0;
-        
-        let offset = 0;
-        for (let i = 0; i < this.currentIndex && i < this.visibleItems.length; i++) {
-          offset += this.visibleItems[i].offsetWidth + gap;
-        }
-
-        const maxOffset = Math.max(0, this.track.scrollWidth - this.wrapper.clientWidth);
-        offset = Math.min(offset, maxOffset);
-
+        const offset = this.getOffsetForIndex(this.currentIndex);
         this.track.style.transform = `translateX(-${offset}px)`;
         this.updatePaginationProgress();
         this.updateControls();
@@ -1038,6 +1177,7 @@
         } else if (this.settings.loop) {
           this.currentIndex = 0;
         } else {
+          this.updateSlidePosition();
           return;
         }
 
@@ -1056,6 +1196,7 @@
         } else if (this.settings.loop) {
           this.currentIndex = totalSlides - 1;
         } else {
+          this.updateSlidePosition();
           return;
         }
 
@@ -1152,13 +1293,15 @@
     {
       "type": "checkbox",
       "id": "use_placeholder_images",
-      "label": "Use development placeholder images",
+      "label": "Fill empty cards with the built-in ring style pictures",
+      "info": "Only used for a card you have not given a picture to. Edit the file names in the block's Liquid to change them.",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "use_diamond_shape_placeholders",
-      "label": "Use loose diamond placeholders",
+      "label": "Fill empty cards with the built-in diamond shape pictures",
+      "info": "Only used for a card you have not given a picture to. Edit the file names in the block's Liquid to change them.",
       "default": false
     },
     {
@@ -1182,10 +1325,16 @@
       "default": "center"
     },
     {
-      "type": "font_picker",
-      "id": "heading_font",
+      "type": "select",
+      "id": "heading_font_family",
       "label": "Font",
-      "default": "assistant_n4"
+      "info": "Uses the theme's typography so fonts stay consistent sitewide.",
+      "options": [
+        { "value": "heading", "label": "Heading" },
+        { "value": "subheading", "label": "Subheading" },
+        { "value": "body", "label": "Body" }
+      ],
+      "default": "heading"
     },
     {
       "type": "range",
@@ -1251,6 +1400,83 @@
     },
     {
       "type": "header",
+      "content": "Supporting text"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Text under the heading",
+      "info": "Leave empty to hide it."
+    },
+    {
+      "type": "select",
+      "id": "subheading_font_family",
+      "label": "Font",
+      "options": [
+        { "value": "body", "label": "Body" },
+        { "value": "heading", "label": "Heading" },
+        { "value": "subheading", "label": "Subheading" }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "range",
+      "id": "subheading_font_size",
+      "label": "Text size",
+      "min": 11,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "subheading_line_height",
+      "label": "Line height",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "default": 1.7
+    },
+    {
+      "type": "range",
+      "id": "subheading_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "unit": "%",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "subheading_max_width",
+      "label": "Maximum width",
+      "info": "Keeps the line from running the full width of a big screen.",
+      "min": 320,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 640
+    },
+    {
+      "type": "range",
+      "id": "subheading_spacing",
+      "label": "Space between heading and text",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Text colour",
+      "default": "#5f5f5f"
+    },
+    {
+      "type": "header",
       "content": "Carousel layout"
     },
     {
@@ -1261,6 +1487,17 @@
       "max": 8,
       "step": 0.5,
       "default": 4.5
+    },
+    {
+      "type": "range",
+      "id": "item_max_width_desktop",
+      "label": "Largest card width",
+      "info": "A card never grows past this, so a wide screen shows more cards rather than bigger ones.",
+      "min": 240,
+      "max": 720,
+      "step": 20,
+      "unit": "px",
+      "default": 460
     },
     {
       "type": "range",
@@ -1470,12 +1707,12 @@
     {
       "type": "range",
       "id": "arrow_offset",
-      "label": "Offset from edge",
+      "label": "Nudge arrows inward (0 = half on, half off the card)",
       "min": 0,
       "max": 50,
       "step": 2,
       "unit": "px",
-      "default": 10
+      "default": 0
     },
     {
       "type": "header",
@@ -1512,6 +1749,16 @@
       "step": 2,
       "unit": "px",
       "default": 24
+    },
+    {
+      "type": "range",
+      "id": "pagination_max_width",
+      "label": "Progress bar width",
+      "min": 120,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "default": 280
     },
     {
       "type": "header",
@@ -1554,10 +1801,16 @@
       "content": "Title style"
     },
     {
-      "type": "font_picker",
-      "id": "title_font",
+      "type": "select",
+      "id": "title_font_family",
       "label": "Font",
-      "default": "assistant_n4"
+      "info": "Uses the theme's typography so fonts stay consistent sitewide.",
+      "options": [
+        { "value": "heading", "label": "Heading" },
+        { "value": "subheading", "label": "Subheading" },
+        { "value": "body", "label": "Body" }
+      ],
+      "default": "body"
     },
     {
       "type": "range",

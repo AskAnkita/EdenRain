@@ -1,0 +1,167 @@
+{
+  "sections": {
+    "booking": {
+      "type": "consultation-booking",
+      "blocks": {
+        "virtual": {
+          "type": "meeting",
+          "settings": {
+            "label": "Virtual consultation",
+            "meta": "30 minutes, by video",
+            "text": "A one to one call with a specialist, wherever you are. Share a sketch, a photograph or an idea and we will talk it through.",
+            "badge": "Most booked",
+            "apntly_product_id": "15966409916790",
+            "booking_link": "",
+            "icon": "virtual"
+          }
+        },
+        "designer": {
+          "type": "meeting",
+          "settings": {
+            "label": "Speak with a designer",
+            "meta": "45 minutes, by video",
+            "text": "For a bespoke piece or a reset: bring the idea, however rough, and we will draw it with you.",
+            "apntly_product_id": "15977665495414",
+            "booking_link": "",
+            "icon": "in-person"
+          }
+        },
+        "contact_phone": {
+          "type": "contact",
+          "settings": {
+            "icon": "phone",
+            "label": "Call us",
+            "value": "+44 (0) 203 554 887",
+            "note": "Monday to Saturday, 9am to 6pm",
+            "link": ""
+          }
+        },
+        "contact_whatsapp": {
+          "type": "contact",
+          "settings": {
+            "icon": "whatsapp",
+            "label": "WhatsApp",
+            "value": "+44 203 554 887",
+            "note": "Send a photograph of what you have in mind",
+            "link": ""
+          }
+        },
+        "contact_instagram": {
+          "type": "contact",
+          "settings": {
+            "icon": "instagram",
+            "label": "Instagram",
+            "value": "@edenraine",
+            "note": "New pieces, and the bench they come from",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "virtual",
+        "designer",
+        "contact_phone",
+        "contact_whatsapp",
+        "contact_instagram"
+      ],
+      "settings": {
+        "eyebrow": "Private appointments",
+        "heading": "Book an appointment",
+        "text": "<p>Meet one to one with an Eden Raine jewellery specialist by video call. Pick a time that suits you and your confirmation arrives by email.<\/p>",
+        "button_label": "Book an appointment",
+        "smallprint": "Free, and never any obligation to buy.",
+        "link_label": "Prefer to write to us?",
+        "link_url": "/pages/contact",
+        "ways_heading": "Ways to meet",
+        "card_cue": "Choose a time",
+        "notes_text": "<ul><li>A confirmation email with a calendar invitation arrives within a minute.<\/li><li>For a video call we send the link; there is nothing to install.<\/li><li>Every confirmation carries a link to move or cancel the time.<\/li><\/ul>",
+        "contact_heading": "Or reach us directly",
+        "contact_text": "<p>No appointment needed. We answer Monday to Saturday, and usually within a few hours.<\/p>",
+        "provider": "cal",
+        "provider_origin": "",
+        "embed_layout": "month_view",
+        "embed_theme": "light",
+        "embed_brand_color": "#171714",
+        "hide_event_details": true,
+        "prefill_customer": true,
+        "dialog_eyebrow": "Eden Raine",
+        "dialog_title": "Book an appointment",
+        "close_label": "Close",
+        "loading_text": "Opening the diary",
+        "dialog_footnote": "Times are shown in your own timezone.",
+        "request_lead": "Choose a day and a time that suit you and we will confirm it by email.",
+        "slot_times": "10:00, 11:00, 12:00, 14:00, 15:00, 16:00",
+        "slots_empty_text": "Pick a day to see the times we keep free.",
+        "open_mon": true,
+        "open_tue": true,
+        "open_wed": true,
+        "open_thu": true,
+        "open_fri": true,
+        "open_sat": true,
+        "open_sun": false,
+        "lead_days": 1,
+        "window_days": 63,
+        "chosen_prefix": "You have asked for",
+        "name_label": "Name",
+        "service_label": "Service",
+        "team_label": "Team member",
+        "team_any_label": "Whoever is free",
+        "team_members": "",
+        "ask_for_message": false,
+        "email_label": "Email",
+        "phone_label": "Telephone",
+        "message_label": "What would you like to talk about?",
+        "request_button_label": "Send the request",
+        "request_note": "We reply to every request, usually the same working day.",
+        "success_text": "Thank you - your request is with us. We will confirm the time by email shortly.",
+        "media_asset": "about-craft-workshop.png",
+        "media_alt": "A jeweller at the bench in our London workshop",
+        "media_side": "right",
+        "media_ratio": "4 / 5",
+        "section_background": "rgba(0,0,0,0)",
+        "heading_color": "rgba(0,0,0,0)",
+        "eyebrow_color": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "accent_color": "rgba(0,0,0,0)",
+        "rule_color": "rgba(0,0,0,0)",
+        "card_background": "rgba(0,0,0,0)",
+        "card_background_hover": "rgba(0,0,0,0)",
+        "card_text_color": "rgba(0,0,0,0)",
+        "card_border_color": "rgba(0,0,0,0)",
+        "card_border_hover": "rgba(0,0,0,0)",
+        "icon_color": "rgba(0,0,0,0)",
+        "contact_background": "rgba(0,0,0,0)",
+        "dialog_background": "rgba(0,0,0,0)",
+        "dialog_backdrop": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "eyebrow_size": 0,
+        "heading_size": 0,
+        "heading_size_mobile": 0,
+        "heading_tracking": 0,
+        "uppercase_heading": false,
+        "text_size": 0,
+        "text_measure": 0,
+        "card_label_size": 0,
+        "card_meta_size": 0,
+        "card_text_size": 0,
+        "contact_value_size": 0,
+        "icon_size": 0,
+        "dialog_width": 0,
+        "stage_height": 0,
+        "stage_height_mobile": 0,
+        "centre_intro": false,
+        "button_style": "solid",
+        "button_radius": 0,
+        "full_width": false,
+        "content_width": 0,
+        "custom_padding": false,
+        "padding_top": 48,
+        "padding_bottom": 72,
+        "padding_top_mobile": 32,
+        "padding_bottom_mobile": 48
+      }
+    }
+  },
+  "order": ["booking"]
+}

@@ -1,0 +1,41 @@
+{%- doc -%}
+  Line icon for one way of meeting a consultant, drawn in the same weight as 'icon-design-route'
+  and the diamond cuts so the whole set reads as one hand.
+
+  @param {string} icon - "virtual", "in-person", "showroom", "phone" or "calendar"
+{%- enddoc -%}
+
+<svg
+  class="icon-consultation"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1"
+  stroke-linejoin="round"
+  stroke-linecap="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {%- case icon -%}
+    {%- when 'virtual' -%}
+      <path d="M3 4.8h18v13.2H3z"/>
+      <circle cx="12" cy="10" r="2.1"/>
+      <path d="M8.4 15.9a3.9 3.9 0 0 1 7.2 0"/>
+      <path d="M8.1 20.4h7.8"/>
+    {%- when 'in-person' -%}
+      <circle cx="9.3" cy="8" r="2.7"/>
+      <path d="M3.9 18.6a5.4 5.4 0 0 1 10.8 0"/>
+      <circle cx="16.8" cy="9.3" r="2"/>
+      <path d="M15.2 13.1a4.3 4.3 0 0 1 5.1 4.2"/>
+    {%- when 'showroom' -%}
+      <path d="M3.6 9.6h16.8v10.8H3.6z"/>
+      <path d="m3.6 9.6 1.7-5.1h13.4l1.7 5.1"/>
+      <path d="M9.6 20.4v-6.6h4.8v6.6"/>
+    {%- when 'phone' -%}
+      <path d="M8.2 3.9 10.5 7.4 8.6 9.3a12.3 12.3 0 0 0 6.1 6.1l1.9-1.9 3.5 2.3-.5 2.5a1.5 1.5 0 0 1-1.7 1.2C10.6 18.8 5.2 13.4 4.3 6.1a1.5 1.5 0 0 1 1.2-1.7z"/>
+    {%- when 'calendar' -%}
+      <path d="M3.6 5.7h16.8v14.7H3.6z"/>
+      <path d="M3.6 10.2h16.8M8.4 3.6v4.2M15.6 3.6v4.2"/>
+      <path d="m9.3 15 2 2 3.4-3.4"/>
+  {%- endcase -%}
+</svg>

@@ -2807,6 +2807,55 @@ input.mobile-facets__checkbox {
   display: flex;
 }
 
+/* Metal filter options use the same coloured circles as the PDP metal picker. */
+.mobile-facets__label--metal {
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.mobile-facets__metal-swatch {
+  --filter-metal: linear-gradient(140deg, #e9e9e9, #d9dadc);
+  display: inline-flex;
+  flex: 0 0 3.6rem;
+  align-items: center;
+  justify-content: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 50%;
+  background: var(--filter-metal);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07);
+  color: #2b2b2b;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  transition: box-shadow 0.2s ease;
+}
+
+.mobile-facets__metal-swatch--rose { --filter-metal: linear-gradient(140deg, #e8c3b4, #dcae9c); }
+.mobile-facets__metal-swatch--yellow { --filter-metal: linear-gradient(140deg, #f3dfa6, #e7cd87); }
+.mobile-facets__metal-swatch--white { --filter-metal: linear-gradient(140deg, #e9e9e9, #d9dadc); }
+.mobile-facets__metal-swatch--platinum { --filter-metal: linear-gradient(140deg, #ececec, #dedfe1); }
+.mobile-facets__metal-swatch--silver { --filter-metal: linear-gradient(140deg, #eceef0, #d5d9dd); }
+.mobile-facets__metal-swatch--two-tone { --filter-metal: linear-gradient(135deg, #e7cd87 0 48%, #d9dadc 52% 100%); }
+
+.mobile-facets__label--metal input:checked ~ .mobile-facets__metal-swatch {
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07), 0 0 0 2px var(--color-background),
+    0 0 0 3px var(--color-foreground);
+}
+
+.mobile-facets__label--metal:has(input:focus-visible) .mobile-facets__metal-swatch {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 4px;
+}
+
+@media (hover: hover) {
+  .mobile-facets__label--metal:hover .mobile-facets__metal-swatch {
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07), 0 0 0 2px var(--color-background),
+      0 0 0 3px rgb(var(--color-foreground-rgb) / 0.25);
+  }
+}
+
 .swatch-item > .mobile-facets__label {
   padding: 0;
 }
@@ -3159,4 +3208,182 @@ body:not(.firefox) .facets-price__range:before {
 
 .facets-price__apply {
   margin-top: var(--margin-xl);
+}
+
+/* ==========================================================================
+   Elevated Filter Tiles (Shape & Image / Metal filters)
+   ========================================================================== */
+.mobile-facets__list--shape {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 2rem 1.2rem !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+  padding: 0 !important;
+}
+
+.mobile-facets__list--metal,
+.mobile-facets__list.facets-layout-grid--image,
+.collection-filter-toolbar .facets-layout-grid--image.mobile-facets__list,
+.facets-layout-grid--image {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 2.4rem 1.6rem !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+  padding: 0 !important;
+}
+
+.mobile-facets__item--shape,
+.mobile-facets__item--metal,
+.facets-layout-grid--image .mobile-facets__item,
+.facets-layout-grid--image .facets__item {
+  min-width: 0;
+  list-style: none !important;
+}
+
+.mobile-facets__label--shape,
+.mobile-facets__label--metal,
+.mobile-facets__list.facets-layout-grid--image .facets__label,
+.collection-filter-toolbar .facets-layout-grid--image .facets__label,
+.facets-layout-grid--image .facets__label {
+  position: relative;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 1.2rem !important;
+  padding: 0 !important;
+  text-align: center !important;
+  cursor: pointer;
+  outline: none !important;
+}
+
+.mobile-facets__label--shape > .mobile-facets__checkbox,
+.mobile-facets__label--metal > .mobile-facets__checkbox,
+.facets-layout-grid--image .facets__label > input[type='checkbox'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.mobile-facets__shape-image,
+.mobile-facets__metal-tile,
+.mobile-facets__list.facets-layout-grid--image .facets__image-wrapper,
+.collection-filter-toolbar .facets-layout-grid--image .facets__image-wrapper,
+.facets-layout-grid--image .facets__image-wrapper {
+  display: grid !important;
+  aspect-ratio: 1 !important;
+  place-items: center !important;
+  padding: 0 !important;
+  background: #F6F6F4 !important;
+  border-radius: 0.6rem !important;
+  border: none !important;
+  outline: 0.15rem solid transparent !important;
+  outline-offset: -0.15rem !important;
+  transition: outline-color var(--duration-short) ease, background var(--duration-short) ease;
+  box-sizing: border-box;
+}
+
+.mobile-facets__shape-image {
+  padding: 12% !important;
+}
+
+.mobile-facets__shape-image img,
+.mobile-facets__list.facets-layout-grid--image .facets__image-wrapper img,
+.mobile-facets__list.facets-layout-grid--image .facets__image,
+.facets-layout-grid--image .facets__image {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+/* Metal circular color swatches */
+.mobile-facets__metal-circle {
+  width: 58% !important;
+  height: 58% !important;
+  border-radius: 50% !important;
+  display: block !important;
+}
+
+.mobile-facets__metal-circle--rose {
+  background: #e8bfae !important;
+}
+
+.mobile-facets__metal-circle--white {
+  background: #e0e0e0 !important;
+}
+
+.mobile-facets__metal-circle--yellow {
+  background: #f3d399 !important;
+}
+
+.mobile-facets__metal-circle--silver,
+.mobile-facets__metal-circle--platinum {
+  background: #e2e5e8 !important;
+}
+
+.mobile-facets__metal-circle--two-tone {
+  background: linear-gradient(135deg, #f3d399 0 48%, #e0e0e0 52% 100%) !important;
+}
+
+/* Checked / active / hover / focus states */
+.mobile-facets__label--shape.active .mobile-facets__shape-image,
+.mobile-facets__label--shape:has(.mobile-facets__checkbox:checked) .mobile-facets__shape-image,
+.mobile-facets__label--metal.active .mobile-facets__metal-tile,
+.mobile-facets__label--metal:has(.mobile-facets__checkbox:checked) .mobile-facets__metal-tile,
+.mobile-facets__list.facets-layout-grid--image .facets__label.active .facets__image-wrapper,
+.mobile-facets__list.facets-layout-grid--image .facets__label:has(:checked) .facets__image-wrapper,
+.facets-layout-grid--image .facets__label.active .facets__image-wrapper,
+.facets-layout-grid--image .facets__label:has(:checked) .facets__image-wrapper {
+  outline-color: var(--color-foreground) !important;
+  border-radius: 0.6rem !important;
+}
+
+.mobile-facets__label--shape:has(.mobile-facets__checkbox:focus-visible) .mobile-facets__shape-image,
+.mobile-facets__label--metal:has(.mobile-facets__checkbox:focus-visible) .mobile-facets__metal-tile,
+.mobile-facets__list.facets-layout-grid--image .facets__label:has(:focus-visible) .facets__image-wrapper,
+.facets-layout-grid--image .facets__label:has(:focus-visible) .facets__image-wrapper {
+  outline-color: var(--color-foreground) !important;
+  outline-offset: 0.2rem !important;
+  border-radius: 0.6rem !important;
+}
+
+@media (hover: hover) {
+  .mobile-facets__label--shape:hover .mobile-facets__shape-image,
+  .mobile-facets__label--metal:hover .mobile-facets__metal-tile,
+  .mobile-facets__list.facets-layout-grid--image .facets__label:hover .facets__image-wrapper,
+  .facets-layout-grid--image .facets__label:hover .facets__image-wrapper {
+    outline-color: rgb(var(--color-foreground-rgb) / 0.4) !important;
+  }
+}
+
+.mobile-facets__label--shape .facet-checkbox__text,
+.mobile-facets__label--metal .facet-checkbox__text,
+.mobile-facets__list.facets-layout-grid--image .facet-checkbox__text,
+.facets-layout-grid--image .facet-checkbox__text {
+  justify-content: center !important;
+  padding: 0 !important;
+  font-size: 1.4rem !important;
+  line-height: 1.3 !important;
+  text-align: center !important;
+}
+
+@media screen and (max-width: 749px) {
+  .mobile-facets__list--shape {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.8rem 1.2rem !important;
+  }
+  .mobile-facets__list--metal,
+  .mobile-facets__list.facets-layout-grid--image,
+  .collection-filter-toolbar .mobile-facets__list--metal,
+  .collection-filter-toolbar .facets-layout-grid--image.mobile-facets__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.8rem 1.2rem !important;
+  }
 }

@@ -1,0 +1,80 @@
+<!doctype html><html><head><title>Gifting — poolside editorial</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0}*{box-sizing:border-box}
+  #eden-quote-preview {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-height: 480px;
+    overflow: hidden;
+    isolation: isolate;
+    margin-block: 0 !important;
+    background: #f5f2ea;
+    color: #243a3b;
+  }
+  #eden-quote-preview .eq-photo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  #eden-quote-preview::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, rgba(249, 247, 240, .72), rgba(249, 247, 240, .26) 42%, transparent 60%);
+  }
+  #eden-quote-preview .eq-inner {
+    width: 46%;
+    max-width: 1000px;
+    padding: 56px 0 56px clamp(28px, 6vw, 120px);
+  }
+  #eden-quote-preview .eq-quote {
+    margin: 0;
+    font-family: var(--font-heading--family, Georgia, serif);
+    font-size: clamp(28px, 3.2vw, 44px);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -.02em;
+    color: #243a3b;
+    text-wrap: balance;
+  }
+  #eden-quote-preview .eq-attribution {
+    margin: 28px 0 0;
+    font-family: var(--font-body--family, Arial, sans-serif);
+    font-size: 11px;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: #536968;
+  }
+  @media screen and (max-width: 749px) {
+    #eden-quote-preview {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-height: 560px;
+    }
+    #eden-quote-preview::before { display: none; }
+    #eden-quote-preview .eq-photo {
+      position: relative;
+      z-index: auto;
+      flex: none;
+      height: auto;
+      aspect-ratio: 1.45;
+      object-position: 88% center;
+    }
+    #eden-quote-preview .eq-inner {
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 32px 28px 38px;
+      text-align: center;
+    }
+    #eden-quote-preview .eq-quote { font-size: clamp(28px, 7.4vw, 36px); }
+    #eden-quote-preview .eq-attribution { margin-top: 22px; }
+  }
+</style></head><body><section id="eden-quote-preview"><img class="eq-photo" src="../assets/gifting-poolside-editorial.jpg" alt=""><div class="eq-inner"><h2 class="eq-quote">Made to be worn, and loved, for a lifetime.</h2><p class="eq-attribution">Eden Raine</p></div></section></body></html>

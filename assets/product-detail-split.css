@@ -1,0 +1,6 @@
+/* An accordion row whose content block had nothing to show for this product collapses
+   instead of opening on an empty panel. The marker it keys off is rendered by
+   snippets/product-detail-row-empty.liquid and never in the theme editor. */
+.details:has(.product-detail-row-empty) {
+  display: none;
+}

@@ -7,6 +7,12 @@
   what makes the row show across a catalogue that carries no per-product shape data
   yet; clear it to show the row only for products that do. Only shapes the theme
   ships an icon for are drawn.
+
+  When shapes come from a real product option and a value maps to a variant with its
+  own image, the icon renders as a button; card-option-swatches.js reads its shape key
+  and option index, combines them with whatever metal the card's metal row has
+  selected, and swaps the card's photo for the variant matching both. Metafield and
+  default shapes have no variant behind them, so those stay decorative.
 {%- enddoc -%}
 
 {%- liquid
@@ -14,10 +20,12 @@
   assign icon_shapes = 'round,oval,cushion,emerald,princess,radiant,asscher,heart,marquise,pear' | split: ','
 
   assign shape_source = ''
+  assign shape_index = -1
   for option in card_product.options_with_values
     assign option_name = option.name | downcase
     if option_name contains 'shape'
       assign shape_source = option.values | join: '||'
+      assign shape_index = forloop.index0
       break
     endif
   endfor
@@ -29,6 +37,21 @@
     endif
   endif
 
+  # Most of the catalogue carries its shape as a tag ("Shape:Round", and some rings
+  # carry more than one) rather than as an option. Tag values have no variant behind
+  # them, so those icons stay decorative.
+  if shape_source == blank
+    assign tag_shapes = ''
+    for tag in card_product.tags
+      assign tag_compare = tag | downcase
+      if tag_compare contains 'shape:'
+        assign tag_shape = tag | split: ':' | last | strip
+        assign tag_shapes = tag_shapes | append: '||' | append: tag_shape
+      endif
+    endfor
+    assign shape_source = tag_shapes | remove_first: '||'
+  endif
+
   if shape_source == blank
     assign shape_source = block.settings.default_shapes
   endif
@@ -38,6 +61,26 @@
   else
     assign shape_values = shape_source | split: ','
   endif
+
+  # The card's photo belongs to one particular variant, so underline that shape
+  # rather than always the first -- the metals row picks its active dot the same way.
+  assign active_shape = ''
+  if shape_index >= 0 and card_product.featured_image != blank
+    for variant in card_product.variants
+      if variant.featured_image != blank and variant.featured_image.id == card_product.featured_image.id
+        assign active_text = variant.options[shape_index] | downcase
+        for shape in icon_shapes
+          if active_text contains shape
+            assign active_shape = shape
+            break
+          endif
+        endfor
+        break
+      endif
+    endfor
+  endif
+
+  assign srcset_widths = '240,352,650,832,1200' | split: ','
 -%}
 
 {%- if shape_values.size > 0 -%}
@@ -68,9 +111,61 @@
           endfor
         -%}
         {%- if matched_shape != blank -%}
-          <li class="card-shapes__item{% if drawn == 0 %} is-active{% endif %}">
+          {%- liquid
+            assign is_active_shape = false
+            if active_shape != blank
+              if matched_shape == active_shape
+                assign is_active_shape = true
+              endif
+            elsif drawn == 0
+              assign is_active_shape = true
+            endif
+
+            assign value_image = null
+            assign value_variant_id = ''
+            if shape_index >= 0
+              for variant in card_product.variants
+                if variant.options[shape_index] == value_text and variant.featured_image != blank
+                  assign value_image = variant.featured_image
+                  assign value_variant_id = variant.id
+                  break
+                endif
+              endfor
+            endif
+          -%}
+          {%- capture icon -%}
             {%- render 'icon-diamond-shape', shape: matched_shape -%}
             <span class="visually-hidden">{{ value_text | escape }}</span>
+          {%- endcapture -%}
+          <li class="card-shapes__item{% if is_active_shape %} is-active{% endif %}">
+            {%- if value_image -%}
+              {%- capture value_srcset -%}
+                {%- for width in srcset_widths -%}
+                  {%- assign width_number = width | plus: 0 -%}
+                  {%- if width_number < value_image.width -%}
+                    {{ value_image | image_url: width: width_number, format: 'webp' }} {{ width_number }}w,
+                  {%- endif -%}
+                {%- endfor -%}
+                {{ value_image | image_url: width: value_image.width, format: 'webp' }} {{ value_image.width }}w
+              {%- endcapture -%}
+              <button
+                type="button"
+                class="card-shapes__button card-swatch-button"
+                aria-pressed="{% if is_active_shape %}true{% else %}false{% endif %}"
+                data-card-swatch
+                data-swatch-role="shape"
+                data-swatch-key="{{ matched_shape }}"
+                data-swatch-option-index="{{ shape_index }}"
+                data-swatch-src="{{ value_image | image_url: width: 832, format: 'webp' | escape }}"
+                data-swatch-srcset="{{ value_srcset | strip | strip_newlines | escape }}"
+                data-swatch-alt="{{ card_product.title | append: ' - ' | append: value_text | escape }}"
+                data-swatch-variant="{{ value_variant_id }}"
+              >
+                {{ icon }}
+              </button>
+            {%- else -%}
+              {{ icon }}
+            {%- endif -%}
           </li>
           {%- assign drawn = drawn | plus: 1 -%}
         {%- endif -%}

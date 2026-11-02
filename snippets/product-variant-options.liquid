@@ -53,7 +53,18 @@
         {%- endif -%}
       {%- endcapture -%}
 
+      {%- comment -%}
+        The name is prefixed with the block id because a radio group is scoped by name
+        AND form owner -- and these radios have no form owner: the form they point at
+        ("product-form-<block id>") is never rendered, only "product-form-<section id>"
+        is. Without the prefix the main picker and the sticky add-to-cart bar, which
+        render the same options twice, shared one group, so the browser unchecked the
+        visible swatch in favour of the sticky one further down the page and the chosen
+        metal lost its ring. The two stay in step through product-info.js, which syncs
+        them on data-option-value-id, not on a shared name.
+      {%- endcomment -%}
       {%- capture input_name -%}
+        {%- if block.id -%}{{ block.id }}-{%- else -%}StickyCart-{%- endif -%}
         {{ option.name | escape | append: section_name }}-{{ product.id }}-{{ option.position }}
       {%- endcapture -%}
 
@@ -295,7 +306,18 @@
         {%- endif -%}
       {%- endcapture -%}
 
+      {%- comment -%}
+        The name is prefixed with the block id because a radio group is scoped by name
+        AND form owner -- and these radios have no form owner: the form they point at
+        ("product-form-<block id>") is never rendered, only "product-form-<section id>"
+        is. Without the prefix the main picker and the sticky add-to-cart bar, which
+        render the same options twice, shared one group, so the browser unchecked the
+        visible swatch in favour of the sticky one further down the page and the chosen
+        metal lost its ring. The two stay in step through product-info.js, which syncs
+        them on data-option-value-id, not on a shared name.
+      {%- endcomment -%}
       {%- capture input_name -%}
+        {%- if block.id -%}{{ block.id }}-{%- else -%}StickyCart-{%- endif -%}
         {{ option.name | escape | append: section_name }}-{{ product.id }}-{{ option.position }}
       {%- endcapture -%}
 
@@ -326,10 +348,24 @@
           {{ input_dataset }}
         >
         {%- liquid
-          # Metal options (Color / Metal / Finish) show as metal-coloured circles with the karat
+          # Shape options show as the same diamond-cut icons the product cards use.
+          assign shape = blank
+          assign shape_option_name = option.name | downcase
+          if shape_option_name contains 'shape' or shape_option_name contains 'cut'
+            assign icon_shapes = 'round,oval,cushion,emerald,princess,radiant,asscher,heart,marquise,pear' | split: ','
+            assign shape_value = value | downcase
+            for icon_shape in icon_shapes
+              if shape_value contains icon_shape
+                assign shape = icon_shape
+                break
+              endif
+            endfor
+          endif
+
+          # Metal options (Color / Metal / Material / Finish) show as metal-coloured circles with the karat
           assign metal = blank
           assign metal_option_name = option.name | downcase
-          if metal_option_name contains 'color' or metal_option_name contains 'colour' or metal_option_name contains 'metal' or metal_option_name contains 'finish'
+          if metal_option_name contains 'color' or metal_option_name contains 'colour' or metal_option_name contains 'metal' or metal_option_name contains 'material' or metal_option_name contains 'finish'
             assign metal_value = value | downcase
             if metal_value contains 'rose'
               assign metal = 'rose'
@@ -344,23 +380,44 @@
             endif
           endif
           if metal != blank
-            assign metal_short = value | split: ' ' | first | upcase
-            unless metal_short contains 'K'
+            # A shop can upload a plain coloured circle per metal in Theme settings
+            # > Metal swatches; the karat text still sits on top of it.
+            assign metal_image_key = 'metal_swatch_image_' | append: metal
+            assign metal_image = settings[metal_image_key]
+            assign metal_first_word = value | split: ' ' | first
+            assign metal_short = metal_first_word | upcase
+            assign metal_first_word_size = metal_first_word | size
+            unless metal_short contains 'K' and metal_first_word_size < 4
+              # No karat in the value ("White Gold", "Silver") -- fall back to the
+              # two-letter code the product cards already use.
               case metal
+                when 'rose'
+                  assign metal_short = 'RG'
+                when 'yellow'
+                  assign metal_short = 'YG'
+                when 'white'
+                  assign metal_short = 'WG'
+                when 'silver'
+                  assign metal_short = 'SS'
                 when 'platinum'
                   assign metal_short = 'PL'
-                when 'silver'
-                  assign metal_short = '925'
-                else
-                  assign metal_short = metal | slice: 0, 1 | upcase
               endcase
             endunless
           endif
         -%}
-        <label for="{{ input_id }}"{% if metal != blank %} class="metal-swatch metal-swatch--{{ metal }}" title="{{ value | escape }}"{% endif %}>
+        <label
+          for="{{ input_id }}"
+          {%- if metal != blank %} class="metal-swatch metal-swatch--{{ metal }}" title="{{ value | escape }}"
+            {%- if metal_image != blank %} style="--metal-image: url('{{ metal_image | image_url: width: 160 | escape }}');"{% endif %}
+          {%- elsif shape != blank %} class="shape-swatch shape-swatch--{{ shape }}" title="{{ value | escape }}"
+          {%- endif -%}
+        >
           {%- if metal != blank -%}
-            <span aria-hidden="true">{{ metal_short }}</span>
+            <span class="metal-swatch__dot" aria-hidden="true">{{ metal_short }}</span>
             <span class="visually-hidden">{{ value | escape }}</span>
+          {%- elsif shape != blank -%}
+            {%- render 'icon-diamond-shape', shape: shape -%}
+            <span class="shape-swatch__name">{{ value | escape }}</span>
           {%- else -%}
             {{ value | escape -}}
           {%- endif -%}
@@ -372,7 +429,7 @@
         <option
           id="{{ input_id }}"
           value="{{ value | escape }}"
-          {% if value.selected %}
+          {% if value.selected and is_size != true or value.selected and product.selected_variant != blank %}
             selected="selected"
           {% endif %}
           {{ input_dataset }}
@@ -395,7 +452,17 @@
       class="select__select variant-option__select"
       name="options[{{ option.name | escape }}]"
       form="{{ product_form_id }}"
+      {% if is_size %}required{% endif %}
     >
+      {%- if is_size -%}
+        {%- assign placeholder_label = 'Select Ring Size' -%}
+        {%- unless option.name contains 'ring' or option.name contains 'Ring' or option.name == 'size' or option.name == 'Size' -%}
+          {%- assign placeholder_label = 'Select ' | append: option.name -%}
+        {%- endunless -%}
+        <option value="" disabled hidden{% if product.selected_variant == blank %} selected="selected"{% endif %}>
+          {{ placeholder_label }}
+        </option>
+      {%- endif -%}
       {{ product_variants }}
     </select>
     <span class="svg-wrapper">

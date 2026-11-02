@@ -1,0 +1,149 @@
+/*
+  Ethical choice - the quiet grey band that answers "where do these stones come from",
+  sitting at the foot of the product page. The section is sections/ethical-choice.liquid.
+
+  One flat panel inset inside the page width: a centred heading in capitals, a short
+  paragraph or two of copy under it, and one outlined button centred below. Nothing
+  about it is a column or a card, so it stays the same shape on a phone and only its
+  padding and type come down.
+
+  Every look here is a custom property with its default written in this file, so a
+  setting left at "use the default" (a cleared colour, a size of 0) writes nothing onto
+  the section element and this value stands.
+*/
+
+.eden-ethical {
+  --eec-section-bg: rgba(0, 0, 0, 0);
+  --eec-panel-bg: #f4f3f2;
+  --eec-panel-border: rgba(0, 0, 0, 0);
+  --eec-heading-color: #171714;
+  --eec-text-color: rgba(23, 23, 20, 0.82);
+
+  --eec-heading-size: 26px;
+  --eec-heading-size-mobile: 19px;
+  --eec-heading-tracking: 0.2em;
+  --eec-heading-case: uppercase;
+  --eec-text-size: 18px;
+  --eec-text-size-mobile: 15px;
+  --eec-text-leading: 1.65;
+  --eec-measure: none;
+
+  --eec-shell-max: 1570px;
+  --eec-shell-pad: 1.5rem;
+  --eec-pad-inline: 6rem;
+  --eec-pad-block: 5rem;
+  --eec-pad-top: 2.4rem;
+  --eec-pad-bottom: 2.4rem;
+  --eec-pad-top-mobile: 2.4rem;
+  --eec-pad-bottom-mobile: 2.4rem;
+  --eec-gap: 3.2rem;
+  --eec-text-align: left;
+
+  --eec-overlay: rgba(0, 0, 0, 0);
+
+  display: block;
+  background: var(--eec-section-bg);
+  padding-block: var(--eec-pad-top-mobile) var(--eec-pad-bottom-mobile);
+}
+
+.eec-shell {
+  width: 100%;
+  max-width: var(--eec-shell-max);
+  margin: 0 auto;
+  padding-inline: var(--eec-shell-pad);
+}
+
+.eec-panel {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--eec-panel-bg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: var(--style-border-width, 1px) solid var(--eec-panel-border);
+  padding: 3.2rem 2rem;
+  text-align: center;
+}
+
+/* The tint only exists when a background picture has been set, so an unlit panel
+   keeps its flat colour and no extra layer is painted over it. */
+.eec-panel--image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--eec-overlay);
+}
+
+.eec-heading {
+  margin: 0;
+  color: var(--eec-heading-color);
+  font-family: var(--font-heading--family, inherit);
+  font-size: var(--eec-heading-size-mobile);
+  font-weight: var(--font-heading--weight, 400);
+  letter-spacing: var(--eec-heading-tracking);
+  line-height: 1.3;
+  text-transform: var(--eec-heading-case);
+}
+
+.eec-text {
+  margin: 2.4rem auto 0;
+  max-width: var(--eec-measure);
+  color: var(--eec-text-color);
+  font-size: var(--eec-text-size-mobile);
+  line-height: var(--eec-text-leading);
+  text-align: var(--eec-text-align);
+}
+
+.eec-text > :first-child {
+  margin-top: 0;
+}
+
+.eec-text > :last-child {
+  margin-bottom: 0;
+}
+
+.eec-text p {
+  margin: 0 0 1.4em;
+}
+
+.eec-text a {
+  color: inherit;
+}
+
+.eec-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6rem 2.4rem;
+  margin-top: var(--eec-gap);
+}
+
+.eec-actions .eden-action {
+  min-width: 19rem;
+}
+
+/* The heading alone, or the button alone, should not leave the gap of a row that
+   was never printed. */
+.eec-heading + .eec-actions {
+  margin-top: 2.4rem;
+}
+
+@media screen and (min-width: 750px) {
+  .eden-ethical {
+    padding-block: var(--eec-pad-top) var(--eec-pad-bottom);
+  }
+
+  .eec-panel {
+    padding: var(--eec-pad-block) var(--eec-pad-inline);
+  }
+
+  .eec-heading {
+    font-size: var(--eec-heading-size);
+  }
+
+  .eec-text {
+    font-size: var(--eec-text-size);
+  }
+}

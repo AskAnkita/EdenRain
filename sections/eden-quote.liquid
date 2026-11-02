@@ -1,0 +1,204 @@
+{%- style -%}
+  #eden-quote-{{ section.id }} {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-height: {{ section.settings.desktop_height }}px;
+    overflow: hidden;
+    isolation: isolate;
+    margin-block: 0 !important;
+    background: #f5f2ea;
+    color: {{ section.settings.text_color }};
+  }
+  #eden-quote-{{ section.id }} .eq-photo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  #eden-quote-{{ section.id }}::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, rgba(249, 247, 240, .72), rgba(249, 247, 240, .26) 42%, transparent 60%);
+  }
+  #eden-quote-{{ section.id }} .eq-inner {
+    width: 46%;
+    max-width: {{ section.settings.inner_width }}px;
+    padding: 56px 0 56px clamp(28px, 6vw, 120px);
+  }
+  #eden-quote-{{ section.id }} .eq-quote {
+    margin: 0;
+    font-family: var(--font-heading--family, Georgia, serif);
+    font-size: clamp(28px, 3.2vw, {{ section.settings.quote_size }}px);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -.02em;
+    color: {{ section.settings.text_color }};
+    text-wrap: balance;
+  }
+  #eden-quote-{{ section.id }} .eq-attribution {
+    margin: 28px 0 0;
+    font-family: var(--font-body--family, Arial, sans-serif);
+    font-size: {{ section.settings.attribution_size }}px;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: {{ section.settings.attribution_color }};
+  }
+  @media screen and (max-width: 749px) {
+    #eden-quote-{{ section.id }} {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-height: {{ section.settings.mobile_height }}px;
+    }
+    #eden-quote-{{ section.id }}::before { display: none; }
+    #eden-quote-{{ section.id }} .eq-photo {
+      position: relative;
+      z-index: auto;
+      flex: none;
+      height: auto;
+      aspect-ratio: 1.45;
+      object-position: 88% center;
+    }
+    #eden-quote-{{ section.id }} .eq-inner {
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 32px 28px 38px;
+      text-align: center;
+    }
+    #eden-quote-{{ section.id }} .eq-quote { font-size: clamp(28px, 7.4vw, 36px); }
+    #eden-quote-{{ section.id }} .eq-attribution { margin-top: 22px; }
+  }
+{%- endstyle -%}
+
+<section id="eden-quote-{{ section.id }}" class="eden-quote{% if section.settings.width == 'full' %} force-full-width{% endif %}">
+  {%- if section.settings.background_image != blank -%}
+    {{ section.settings.background_image | image_url: width: 2400 | image_tag: class: 'eq-photo', loading: 'lazy', widths: '600, 1000, 1600, 2400', sizes: '100vw', alt: '' }}
+  {%- else -%}
+    <img class="eq-photo" src="{{ 'gifting-poolside-editorial.jpg' | asset_url }}" alt="" loading="lazy" width="2172" height="724">
+  {%- endif -%}
+  <div class="eq-inner">
+    <h2 class="eq-quote">{{ section.settings.quote | escape }}</h2>
+    {%- if section.settings.attribution != blank -%}
+      <p class="eq-attribution">{{ section.settings.attribution | escape }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Gifting moment",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Section width",
+      "default": "full",
+      "options": [
+        {
+          "value": "page",
+          "label": "Page width"
+        },
+        {
+          "value": "full",
+          "label": "Full width"
+        }
+      ]
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Campaign photograph (optional)"
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "Desktop height",
+      "min": 300,
+      "max": 760,
+      "step": 20,
+      "unit": "px",
+      "default": 480
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "Mobile height",
+      "min": 320,
+      "max": 720,
+      "step": 20,
+      "unit": "px",
+      "default": 560
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text colour",
+      "default": "#243a3b"
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "Quote",
+      "default": "Made to be worn, and loved, for a lifetime."
+    },
+    {
+      "type": "text",
+      "id": "attribution",
+      "label": "Attribution",
+      "default": "Eden Raine"
+    },
+    {
+      "type": "range",
+      "id": "quote_size",
+      "label": "Quote size",
+      "min": 24,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "attribution_size",
+      "label": "Attribution size",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "inner_width",
+      "label": "Text width",
+      "min": 480,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 1000
+    },
+    {
+      "type": "color",
+      "id": "attribution_color",
+      "label": "Attribution colour",
+      "default": "#536968"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gifting moment"
+    }
+  ]
+}
+{% endschema %}

@@ -54,12 +54,22 @@
       const menuLinks = requestedHandles
         .map((handle) => allMenuLinks.find((link) => link.handle === handle))
         .filter(Boolean);
+      {%- comment -%}
+        The tile photography lives in Content > Files, so each URL is resolved through
+        'image-source' and captured before it can be handed to `json`, which takes a string
+        and not a tag.
+      {%- endcomment -%}
+      {%- capture category_image_best_sellers %}{% render 'image-source', file: 'category-best-sellers.png', width: 900 %}{% endcapture -%}
+      {%- capture category_image_necklaces %}{% render 'image-source', file: 'category-necklaces.png', width: 900 %}{% endcapture -%}
+      {%- capture category_image_rings %}{% render 'image-source', file: 'category-rings.png', width: 900 %}{% endcapture -%}
+      {%- capture category_image_bracelets %}{% render 'image-source', file: 'category-bracelets.png', width: 900 %}{% endcapture -%}
+      {%- capture category_image_earrings %}{% render 'image-source', file: 'category-earrings.png', width: 900 %}{% endcapture -%}
       const categoryImages = {
-        'best-sellers': {{ 'category-best-sellers.png' | asset_url | json }},
-        necklaces: {{ 'category-necklaces.png' | asset_url | json }},
-        rings: {{ 'category-rings.png' | asset_url | json }},
-        bracelets: {{ 'category-bracelets.png' | asset_url | json }},
-        earrings: {{ 'category-earrings.png' | asset_url | json }}
+        'best-sellers': {{ category_image_best_sellers | strip | json }},
+        necklaces: {{ category_image_necklaces | strip | json }},
+        rings: {{ category_image_rings | strip | json }},
+        bracelets: {{ category_image_bracelets | strip | json }},
+        earrings: {{ category_image_earrings | strip | json }}
       };
 
       const categoryCards = sectionRoot.querySelectorAll('.media-withtext__content .swiper-slide');

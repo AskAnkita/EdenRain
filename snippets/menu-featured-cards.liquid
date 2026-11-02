@@ -1,0 +1,76 @@
+{% comment %}
+  The four large cards of a mega menu's "Featured" tab: two pictures and two videos, in a
+  single row. Unlike the other tabs, which list collections as small tiles, this one is
+  editorial - each card is a piece of art with one line of copy over it.
+
+  Accepts:
+  - parent: {String} the top-level item's title, e.g. "Engagement"
+  - group: {String} optional; the tab's own name, for a menu where more than one tab wants
+    cards. Diamonds names its tab "Learn"; the rest call theirs "Featured" and are looked up
+    under the parent alone, so an unnamed group keeps the old behaviour.
+
+  Outputs one card per entry, separated by "~", each in this shape:
+
+      Caption|url|picture|video
+
+  - picture is a file under assets/. It is the card's image, and for a card that has a video
+    it is also the still shown before the video starts, so it should be a frame from it.
+  - video is optional, and names a file uploaded in Shopify admin under Content > Files.
+    A card with no video is just the picture. Anything ending .mp4 or .webm plays muted and
+    looping, with a pause button, and never plays for a visitor who has asked for reduced
+    motion.
+
+  The videos are NOT in this theme: a theme is capped at 50MB and these run 10-16MB each.
+  Upload them under Content > Files with exactly the names below and they appear here. Until
+  then each card falls back to its picture, so the menu looks finished either way.
+
+  The names here are only the defaults. Theme settings > Mega menu featured media overrides
+  both the picture and the video of any card, and "none" there drops a card's video, so a
+  merchant never has to edit this file.
+
+  ---------------------------------------------------------------------------
+  PLACEHOLDERS - the pictures are MiaDonna's, kept only until the shop has its
+  own. Swap the file under assets/ to change a card; the name stays the same.
+  ---------------------------------------------------------------------------
+{% endcomment %}
+
+{%- liquid
+  assign parent_key = parent | handle
+  assign group_key = group | handle
+  assign key = parent_key | append: '/' | append: group_key
+
+  comment
+    A tab that names itself is matched first; every other menu has a single "Featured" tab and
+    is matched on the parent alone, in the inner case.
+  endcomment
+  case key
+    when 'diamonds/learn'
+      comment
+        Diamonds > Learn points at guides and pages. Its first two cards carry video once the
+        files are uploaded under Content > Files; the last two stay stills. To give one of
+        those a video, put its file name after the picture, as the first two have.
+      endcomment
+      echo 'Education & Guides|/pages/education-guides|featured-diamonds-education.jpg|featured-diamonds-education.mp4'
+      echo '~Gemstones|/pages/gemstones|featured-diamonds-gemstones.jpg|featured-diamonds-gemstones.mp4'
+      echo '~Ring Size Guide|/pages/er-sizing|featured-diamonds-sizing.jpg|'
+      echo '~Jewellery Care|/pages/jewellery-care|featured-diamonds-care.jpg|'
+    else
+      case parent_key
+        when 'engagement'
+          echo 'The Value Edit|/collections/ready-to-ship|featured-engagement-value.jpg|'
+          echo '~Shop Signature Engagement|/collections/engagement-rings|featured-engagement-signature.jpg|featured-engagement-signature.mp4'
+          echo '~New Engagement Arrivals|/collections/new-in|featured-engagement-new.jpg|featured-engagement-new.mp4'
+          echo '~Shop Bridal Sets|/collections/bridal-sets|featured-engagement-bridal.jpg|'
+        when 'wedding'
+          echo 'Shop Wedding Bands|/collections/wedding-bands|featured-wedding-anniversary.jpg|'
+          echo '~The Eternity Collection|/collections/eternity-rings|featured-wedding-eternity.jpg|featured-wedding-eternity.mp4'
+          echo '~New Wedding Arrivals|/collections/new-in|featured-wedding-new.jpg|featured-wedding-new.mp4'
+          echo '~Shop Anniversary Rings|/collections/anniversary-rings|featured-wedding-anniversary.jpg|'
+        when 'jewellery'
+          echo 'Shop Signature Earrings|/collections/signature-earrings|featured-jewellery-earrings.jpg|'
+          echo '~Shop Must-Have Studs|/collections/studs|featured-jewellery-studs.jpg|featured-jewellery-studs.mp4'
+          echo '~Shop Tennis Bracelets|/collections/tennis-bracelets|featured-jewellery-bracelets.jpg|featured-jewellery-bracelets.mp4'
+          echo '~Shop Signature Necklaces|/collections/signature-necklaces|featured-jewellery-necklaces.jpg|'
+      endcase
+  endcase
+-%}

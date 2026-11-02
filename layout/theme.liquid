@@ -65,10 +65,32 @@
     {% render 'global-style' %}
 
     {% render 'global-css', direction: direction %}
+
+    {%- comment -%} One shared look for every button and link outside the theme's .button system. {%- endcomment -%}
+    {{ 'eden-actions.css' | asset_url | stylesheet_tag }}
     {%- if template.name == 'collection' -%}
       {{ 'collection-style-row.css' | asset_url | stylesheet_tag }}
     {%- endif -%}
+    {%- comment -%}
+      A policy renders as Shopify's own markup rather than through a section, so the page
+      template's measure and masthead never reach it. This puts them back.
+    {%- endcomment -%}
+    {%- if request.page_type == 'policy' -%}
+      {{ 'policy-page.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
+    {%- comment -%}
+      Feedback for the wait between clicking a link and the next page painting.
+    {%- endcomment -%}
+    {{ 'page-progress.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'page-progress.js' | asset_url }}" defer="defer"></script>
+
     {%- render 'global-script' -%}
+
+    {%- comment -%}
+      Lets the browser skip laying out and painting the sections below the fold
+      until they are scrolled near. Must sit in the head to catch the first frame.
+    {%- endcomment -%}
+    {%- render 'lazy-sections' -%}
 
     {{ content_for_header }}
 

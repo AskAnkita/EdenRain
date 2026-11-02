@@ -44,6 +44,21 @@
   if block.settings.navigation == 'pagination' or block.settings.navigation == 'arrows-pagination'
     assign enable_pagination = true
   endif
+  assign arrows_top_right = false
+  if enable_navigation and block.settings.arrows_position == 'top_right'
+    assign arrows_top_right = true
+  endif
+
+  comment
+    "Compact" is the mobile treatment for a row of category links: the pill
+    keeps the shape it has on desktop, thumbnail beside a centred label, but
+    tightened so it is not most of the screen wide. Everything it changes is
+    in base.css, under .multicolumn--compact-mobile, and only below 750px.
+  endcomment
+  assign compact_mobile_items = false
+  if block.settings.mobile_item_layout == 'compact'
+    assign compact_mobile_items = true
+  endif
 -%}
 
 {% capture list_items %}
@@ -63,7 +78,7 @@
 {% capture children %}
   {% case block.settings.layout_type %}
     {% when 'grid' %}
-      <div class="collection--grid-layout w-full block">
+      <div class="collection--grid-layout w-full block{% if compact_mobile_items %} multicolumn--compact-mobile{% endif %}">
         {%- if show_mobile_slider -%}
           <swiper-component
             class="swiper-component-mobile"
@@ -119,7 +134,17 @@
         {%- endif -%}
       </div>
     {% when 'carousel' %}
-      {%- assign slides_per_view = mobile_columns -%}
+      {%- liquid
+        assign slides_per_view = mobile_columns
+        # Compact pills are only as wide as the style they name, so below the
+        # first breakpoint Swiper measures them instead of cutting the row into
+        # equal columns. It clears the widths it set at the wider breakpoints
+        # whenever slidesPerView is 'auto' and a breakpoint sets a number, so
+        # the desktop row is untouched.
+        if compact_mobile_items
+          assign slides_per_view = 'auto'
+        endif
+      -%}
       {%- capture breakpoints -%}
         {
           "768": { "slidesPerView": {{ columns_tablet }} },
@@ -127,8 +152,34 @@
           "1400": { "slidesPerView": {{ columns_desktop }} }
         }
       {%- endcapture -%}
+      {%- if arrows_top_right -%}
+        {%- comment -%}
+          The same pair the homepage product rows use: bare chevrons on a row of
+          their own above the slides, both of them at the right. global.js hands
+          Swiper the buttons inside .swiper-btns-on-header whenever the component
+          sits under an .arrow-on-header ancestor, and base.css hides the pair that
+          is still rendered inside the carousel.
+        {%- endcomment -%}
+        <div class="multicolumn-arrows-top arrow-on-header w-full block">
+          <div class="swiper-btns-on-header swiper-btns-wrap">
+            <button
+              type="button"
+              class="swiper-button swiper-button-prev"
+              aria-label="{{ 'content.slider.previous_slide' | t }}"
+            >
+              <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+            </button>
+            <button
+              type="button"
+              class="swiper-button swiper-button-next"
+              aria-label="{{ 'content.slider.next_slide' | t }}"
+            >
+              <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+            </button>
+          </div>
+      {%- endif -%}
       <swiper-component
-        class="collection-carousel-swiper-component w-full block"
+        class="collection-carousel-swiper-component w-full block{% if compact_mobile_items %} multicolumn--compact-mobile{% endif %}"
         {%- render 'swiper-data',
           settings: block.settings,
           slides_per_view: slides_per_view,
@@ -177,6 +228,9 @@
           {%- endif -%}
         </div>
       </swiper-component>
+      {%- if arrows_top_right -%}
+        </div>
+      {%- endif -%}
   {% endcase %}
 {% endcapture %}
 
@@ -290,9 +344,34 @@
         {
           "value": "2",
           "label": "2"
+        },
+        {
+          "value": "2.5",
+          "label": "2,5"
+        },
+        {
+          "value": "3",
+          "label": "3"
         }
       ],
       "default": "2",
+      "visible_if": "{{ block.settings.layout_type == 'carousel' or block.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_item_layout",
+      "label": "t:content.mobile_layout",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "compact",
+          "label": "t:options.compact"
+        }
+      ],
+      "default": "default",
       "visible_if": "{{ block.settings.layout_type == 'carousel' or block.settings.carousel_on_mobile == true }}"
     },
     {
@@ -408,6 +487,23 @@
         }
       ],
       "default": "arrows"
+    },
+    {
+      "type": "select",
+      "id": "arrows_position",
+      "label": "t:settings.arrows_position",
+      "options": [
+        {
+          "value": "inside",
+          "label": "t:options.inside_slide"
+        },
+        {
+          "value": "top_right",
+          "label": "t:options.top_right"
+        }
+      ],
+      "default": "inside",
+      "visible_if": "{{ block.settings.layout_type == 'carousel' and block.settings.navigation == 'arrows' or block.settings.navigation == 'arrows-pagination' }}"
     },
     {
       "type": "select",

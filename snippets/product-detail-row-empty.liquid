@@ -1,0 +1,12 @@
+{%- doc -%}
+  Marker for a product detail block that found nothing to render -- a description with
+  no spec list, say. The stylesheet collapses the accordion row around it, so the row
+  never opens on an empty panel.
+
+  Left out in the theme editor, so an empty row stays visible and selectable there.
+{%- enddoc -%}
+
+{%- unless request.design_mode -%}
+  {{ 'product-detail-split.css' | asset_url | stylesheet_tag }}
+  <div class="product-detail-row-empty" hidden></div>
+{%- endunless -%}

@@ -70,8 +70,18 @@
     render 'header-menu-snippet', header_settings: sec_stts, blocks: section.blocks, variant: 'mobile'
   endcapture
 
+  comment
+    The sticky toolbar at the foot of the page (sections/toolbar-mobile.liquid) already
+    carries Account, Cart and Wishlist on a phone, so the header's copies of them are
+    hidden there and the consultant link takes the space they leave.
+  endcomment
+  assign utility_mobile_class = ''
+  if sec_stts.hide_utilities_mobile != false
+    assign utility_mobile_class = 'max-md:hidden'
+  endif
+
   capture account
-    render 'header-account', sec_stts: sec_stts, custom_header_utility: sec_stts.custom_header_utility, header_utility_size: sec_stts.header_utility_size, header_utility_font: sec_stts.header_utility_font, header_utility_weight: sec_stts.header_utility_weight, header_utility_line_height: sec_stts.header_utility_line_height, header_utility_letter_spacing: sec_stts.header_utility_letter_spacing, header_utility_case: sec_stts.header_utility_case, header_utility_wrap: sec_stts.header_utility_wrap
+    render 'header-account', sec_stts: sec_stts, extra_class: utility_mobile_class, custom_header_utility: sec_stts.custom_header_utility, header_utility_size: sec_stts.header_utility_size, header_utility_font: sec_stts.header_utility_font, header_utility_weight: sec_stts.header_utility_weight, header_utility_line_height: sec_stts.header_utility_line_height, header_utility_letter_spacing: sec_stts.header_utility_letter_spacing, header_utility_case: sec_stts.header_utility_case, header_utility_wrap: sec_stts.header_utility_wrap
   endcapture
 
   capture account_mobile
@@ -79,12 +89,22 @@
   endcapture
 
   capture actions
-    render 'header-functions', sec_stts: sec_stts, blocks: section.blocks, enable_cart: true, enable_wishlist: settings.show_wishlist, custom_header_utility: sec_stts.custom_header_utility, header_utility_size: sec_stts.header_utility_size, header_utility_font: sec_stts.header_utility_font, header_utility_weight: sec_stts.header_utility_weight, header_utility_line_height: sec_stts.header_utility_line_height, header_utility_letter_spacing: sec_stts.header_utility_letter_spacing, header_utility_case: sec_stts.header_utility_case, header_utility_wrap: sec_stts.header_utility_wrap
+    render 'header-functions', sec_stts: sec_stts, blocks: section.blocks, extra_class: utility_mobile_class, enable_cart: true, enable_wishlist: settings.show_wishlist, custom_header_utility: sec_stts.custom_header_utility, header_utility_size: sec_stts.header_utility_size, header_utility_font: sec_stts.header_utility_font, header_utility_weight: sec_stts.header_utility_weight, header_utility_line_height: sec_stts.header_utility_line_height, header_utility_letter_spacing: sec_stts.header_utility_letter_spacing, header_utility_case: sec_stts.header_utility_case, header_utility_wrap: sec_stts.header_utility_wrap
   endcapture
 
   capture actions_mobile
     render 'header-functions', sec_stts: sec_stts, blocks: section.blocks, enable_cart: true, enable_wishlist: settings.show_wishlist, custom_header_utility: sec_stts.custom_header_utility, header_utility_size: sec_stts.header_utility_size, header_utility_font: sec_stts.header_utility_font, header_utility_weight: sec_stts.header_utility_weight, header_utility_line_height: sec_stts.header_utility_line_height, header_utility_letter_spacing: sec_stts.header_utility_letter_spacing, header_utility_case: sec_stts.header_utility_case, header_utility_wrap: sec_stts.header_utility_wrap, extra_class: 'lg:none'
   endcapture
+
+  comment
+    header-row pulls these two up into the top row on a phone when their own row is set to
+    "bottom". With the icons hidden on a phone there is nothing to pull up, so they are
+    emptied and the row stays as it is.
+  endcomment
+  if sec_stts.hide_utilities_mobile != false
+    assign account_mobile = ''
+    assign actions_mobile = ''
+  endif
 
   if shop.customer_accounts_enabled
     assign search_class = 'max-md:hidden'
@@ -102,8 +122,12 @@
     render 'header-message', settings: sec_stts, blocks: section.blocks
   endcapture
 
+  capture consultant
+    render 'header-consultant', sec_stts: sec_stts
+  endcapture
+
   if shop.customer_accounts_enabled
-    render 'account-drawer'
+    render 'account-drawer', sec_stts: sec_stts
   endif
 
   # Handle localization positioning
@@ -133,6 +157,9 @@
 
   assign header_actions_order = sec_stts.header_actions_order | default: 'account,search,localization,actions'
   assign order = order | replace: 'account,search,localization,actions', header_actions_order
+
+  # The consultant chip always sits with the utilities, just before them
+  assign order = order | replace_first: 'message', 'message,consultant'
 
   # Handle logo row
   if sec_stts.logo_row == 'bottom'
@@ -316,6 +343,7 @@
           mobile_search: mobile_search,
           multi_tab_menu: multi_tab_menu,
           message: message,
+          consultant: consultant,
           color: scheme
         %}
       {% endcapture %}
@@ -1912,6 +1940,252 @@
       },
       {
         "type": "header",
+        "content": "Consultant"
+      },
+      {
+        "type": "paragraph",
+        "content": "A single call-to-action that sits with the header icons, e.g. \"Meet a Consultant\"."
+      },
+      {
+        "type": "checkbox",
+        "id": "show_consultant",
+        "label": "Show consultant link",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "consultant_text",
+        "label": "Text",
+        "default": "Meet a Consultant",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "url",
+        "id": "consultant_link",
+        "label": "Link",
+        "info": "Defaults to the booking page (\/pages\/book-a-consultation) when left empty.",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "checkbox",
+        "id": "consultant_show_icon",
+        "label": "Show icon",
+        "default": true,
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "checkbox",
+        "id": "hide_utilities_mobile",
+        "label": "Hide account and cart on mobile",
+        "info": "The sticky toolbar at the foot of the page already carries Account, Cart and Wishlist.",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "consultant_show_mobile",
+        "label": "Show on mobile",
+        "default": true,
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_mobile_display",
+        "label": "On mobile show",
+        "options": [
+          {
+            "value": "icon_text",
+            "label": "Icon and text"
+          },
+          {
+            "value": "icon",
+            "label": "Icon only"
+          },
+          {
+            "value": "text",
+            "label": "Text only"
+          }
+        ],
+        "default": "text",
+        "visible_if": "{{ section.settings.show_consultant and section.settings.consultant_show_mobile }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_mobile_font_size",
+        "label": "Size on mobile",
+        "options": [
+          {
+            "value": "1rem",
+            "label": "10px"
+          },
+          {
+            "value": "1.1rem",
+            "label": "11px"
+          },
+          {
+            "value": "1.2rem",
+            "label": "12px"
+          },
+          {
+            "value": "1.4rem",
+            "label": "14px"
+          }
+        ],
+        "default": "1rem",
+        "visible_if": "{{ section.settings.show_consultant and section.settings.consultant_show_mobile }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_font",
+        "label": "t:settings.font",
+        "options": [
+          {
+            "value": "body",
+            "label": "t:options.body"
+          },
+          {
+            "value": "subheading",
+            "label": "t:options.subheading"
+          },
+          {
+            "value": "heading",
+            "label": "t:options.heading"
+          }
+        ],
+        "default": "body",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_font_size",
+        "label": "t:settings.size",
+        "options": [
+          {
+            "value": "1.2rem",
+            "label": "12px"
+          },
+          {
+            "value": "1.3rem",
+            "label": "13px"
+          },
+          {
+            "value": "1.4rem",
+            "label": "14px"
+          },
+          {
+            "value": "1.6rem",
+            "label": "16px"
+          }
+        ],
+        "default": "1.4rem",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_case",
+        "label": "t:settings.case",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:options.default"
+          },
+          {
+            "value": "uppercase",
+            "label": "t:options.uppercase"
+          },
+          {
+            "value": "capitalize",
+            "label": "t:options.capitalize"
+          }
+        ],
+        "default": "none",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "color",
+        "id": "consultant_background",
+        "label": "Background",
+        "default": "#f4f2ef",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "color",
+        "id": "consultant_text_color",
+        "label": "Text",
+        "default": "#000000",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "color",
+        "id": "consultant_hover_background",
+        "label": "Background on hover",
+        "default": "#e8e4de",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "color",
+        "id": "consultant_hover_text_color",
+        "label": "Text on hover",
+        "default": "#000000",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "color",
+        "id": "consultant_border_color",
+        "label": "Border",
+        "default": "#e2ddd6",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "range",
+        "id": "consultant_border_width",
+        "label": "Border thickness",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_position",
+        "label": "t:settings.position",
+        "options": [
+          {
+            "value": "left",
+            "label": "t:options.left"
+          },
+          {
+            "value": "center",
+            "label": "t:options.center"
+          },
+          {
+            "value": "right",
+            "label": "t:options.right"
+          }
+        ],
+        "default": "right",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "select",
+        "id": "consultant_row",
+        "label": "t:settings.row",
+        "options": [
+          {
+            "value": "top",
+            "label": "t:options.top"
+          },
+          {
+            "value": "bottom",
+            "label": "t:options.bottom"
+          }
+        ],
+        "default": "top",
+        "visible_if": "{{ section.settings.show_consultant }}"
+      },
+      {
+        "type": "header",
         "content": "t:content.customer_account"
       },
       {
@@ -1928,7 +2202,33 @@
         "type": "checkbox",
         "id": "enable_account_drawer",
         "label": "Enable account drawer",
-        "default": false
+        "default": true,
+        "info": "Opens a themed panel instead of sending the customer straight to Shopify's sign-in page."
+      },
+      {
+        "type": "textarea",
+        "id": "account_drawer_text",
+        "label": "Account drawer text",
+        "default": "Sign in to track your order, revisit the pieces you have saved and check out faster next time."
+      },
+      {
+        "type": "textarea",
+        "id": "account_drawer_benefits",
+        "label": "Account drawer list",
+        "info": "One per line. Leave empty to hide the list.",
+        "default": "Follow your order from workshop to door\nKeep your saved pieces in one place\nCheck out without retyping your details"
+      },
+      {
+        "type": "text",
+        "id": "account_drawer_button_label",
+        "label": "Account drawer button",
+        "default": "Continue to sign in"
+      },
+      {
+        "type": "textarea",
+        "id": "account_drawer_note",
+        "label": "Account drawer note",
+        "default": "You will be asked for your email and sent a one-time code. There is no password to remember."
       },
       {
         "type": "select",
@@ -2058,6 +2358,14 @@
         "step": 0.1,
         "default": 0,
         "visible_if": "{{ section.settings.show_search and settings.search_type == 'inline' and section.settings.search_type == 'underline' }}"
+      },
+      {
+        "type": "text",
+        "id": "search_placeholder",
+        "label": "Placeholder text",
+        "default": "Search...",
+        "info": "Shown inside the inline search field. Leave empty to use the default \"Search\".",
+        "visible_if": "{{ section.settings.show_search and settings.search_type == 'inline' }}"
       },
       {
         "type": "select",
@@ -3114,7 +3422,7 @@
     ],
     "presets": [
       {
-        "name": "Header - Jewelry",
+        "name": "Header - Jewellery",
         "blocks": {
           "mega_menu_1_mDeNwB": {
             "type": "mega_menu_1",

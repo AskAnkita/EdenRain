@@ -1,0 +1,175 @@
+{%- doc -%}
+  The metal a product card should open on.
+
+  Every product's featured image is yellow gold, so a grid of cards used to read as one
+  long row of yellow rings. This spreads the opening metal across the metals a product
+  actually sells: the dots are collapsed by tone the same way blocks/_card-product-metals.liquid
+  collapses them, then one is chosen by a seed built from the product, so a card always
+  opens on the same metal (nothing shifts between page loads, filters or pagination)
+  while neighbouring cards land on different ones.
+
+  Silver is left out of that rotation. It is the entry variant across this catalogue, so
+  it sits first in nearly every option list and the card was opening a 2.3 CTW diamond
+  eternity band on sterling silver. It stays a clickable swatch and it still wins when
+  the shopper filters to it; it is just not a metal a card opens on by itself.
+
+  A metal filter beats the rotation. When the shopper has narrowed the grid to one metal
+  — from the menu's Shop by Metal, which links at a filtered collection
+  ('menu-static-items'), or from the Metal group in the filter drawer — every card opens
+  on that metal instead, so the grid shows the metal the shopper asked for rather than
+  shuffling a rose gold card into a Yellow Gold result.
+
+  Outputs "<option index>||<option value>" for the chosen metal, or nothing when the
+  product has no metal option, sells only one metal, or sells nothing but silver —
+  callers then keep the product's own featured image.
+
+  @param {object} card_product - Product Liquid object
+
+  Usage:
+  {%- capture default_metal -%}{%- render 'card-default-metal', card_product: card_product -%}{%- endcapture -%}
+{%- enddoc -%}
+
+{%- liquid
+  assign option_keys = 'metal,material,color,colour,finish,gold' | split: ','
+
+  assign metal_source = ''
+  assign metal_index = -1
+  for option in card_product.options_with_values
+    assign option_name = option.name | downcase
+    assign is_metal_option = false
+    for key in option_keys
+      if option_name contains key
+        assign is_metal_option = true
+        break
+      endif
+    endfor
+    if is_metal_option
+      assign metal_source = option.values | join: '||'
+      assign metal_index = forloop.index0
+      break
+    endif
+  endfor
+
+  assign metal_values_raw = metal_source | split: '||'
+
+  # The metal the grid is filtered to, if any. Liquid cannot read the query string, so
+  # this comes from the filters Shopify reports as applied: a tag filter carries the
+  # "metal:<colour>" tags tag-products.mjs writes, an option filter carries the option
+  # value ("14K Yellow Gold"). Other groups are skipped by name, or a Rose Quartz stone
+  # filter would turn the whole grid rose gold. With two metals filtered at once the
+  # first of them wins for every card, which is as close as one photo can get.
+  assign applied_filters = collection.filters
+  if applied_filters == blank
+    assign applied_filters = search.filters
+  endif
+
+  assign filtered_tone = ''
+  for applied_filter in applied_filters
+    assign filter_label = applied_filter.label | downcase
+    assign filter_names_metal = false
+    if filter_label contains 'metal' or filter_label contains 'finish' or filter_label contains 'material'
+      assign filter_names_metal = true
+    endif
+
+    for applied_value in applied_filter.active_values
+      assign filter_text = applied_value.value | downcase
+      unless filter_names_metal or filter_text contains 'metal:'
+        continue
+      endunless
+      if filter_text contains 'rose' or filter_text contains 'pink'
+        assign filtered_tone = 'rg'
+      elsif filter_text contains 'white'
+        assign filtered_tone = 'wg'
+      elsif filter_text contains 'yellow'
+        assign filtered_tone = 'yg'
+      elsif filter_text contains 'platinum'
+        assign filtered_tone = 'pl'
+      elsif filter_text contains 'silver'
+        assign filtered_tone = 'ss'
+      elsif filter_text contains 'gold'
+        assign filtered_tone = 'yg'
+      endif
+      if filtered_tone != ''
+        break
+      endif
+    endfor
+
+    if filtered_tone != ''
+      break
+    endif
+  endfor
+
+  # Same collapsing as the metals row: every karat of white gold is one dot, and the
+  # first value of each tone is kept because that is the one with a variant behind it.
+  assign seen_tones = '|'
+  assign metal_unique = ''
+  assign metal_rotation_source = ''
+  assign filtered_pick = ''
+  for value in metal_values_raw
+    assign dedupe_text = value | strip | downcase
+    if dedupe_text contains 'rose' or dedupe_text contains 'pink'
+      assign dedupe_tone = 'rg'
+    elsif dedupe_text contains 'white'
+      assign dedupe_tone = 'wg'
+    elsif dedupe_text contains 'yellow'
+      assign dedupe_tone = 'yg'
+    elsif dedupe_text contains 'platinum'
+      assign dedupe_tone = 'pl'
+    elsif dedupe_text contains 'silver'
+      assign dedupe_tone = 'ss'
+    elsif dedupe_text contains 'gold'
+      assign dedupe_tone = 'yg'
+    else
+      assign dedupe_tone = dedupe_text | handle
+    endif
+    assign tone_key = '|' | append: dedupe_tone | append: '|'
+    unless seen_tones contains tone_key
+      assign seen_tones = seen_tones | append: dedupe_tone | append: '|'
+      assign metal_unique = metal_unique | append: '||' | append: value
+      # Silver is the entry variant on most of this catalogue -- it is what "From £360"
+      # is quoting -- so it sits first in the option list and the rotation kept opening
+      # diamond pieces on it. It stays a swatch the shopper can click, but it is not a
+      # metal a card opens on; the rotation runs over the golds and platinum instead.
+      unless dedupe_tone == 'ss'
+        assign metal_rotation_source = metal_rotation_source | append: '||' | append: value
+      endunless
+      # The filtered metal is read off the same pass rather than tested again below:
+      # this is the first value of its tone, so it is the one with a variant behind it.
+      if dedupe_tone == filtered_tone and filtered_pick == ''
+        assign filtered_pick = value | strip
+      endif
+    endunless
+  endfor
+
+  assign metal_values = metal_unique | remove_first: '||' | split: '||'
+  assign metal_rotation = metal_rotation_source | remove_first: '||' | split: '||'
+-%}
+{%- if metal_index >= 0 and filtered_pick != '' -%}
+  {%- comment -%}
+    No seed and no size test: the shopper asked for this metal, so a product that sells
+    it opens on it even when it sells nothing else — the one metal it has is still worth
+    pointing the photo and the link at, rather than falling back to the featured image.
+  {%- endcomment -%}
+  {{- metal_index }}||{{ filtered_pick -}}
+{%- elsif metal_index >= 0 and metal_values.size > 1 and metal_rotation.size > 0 -%}
+  {%- liquid
+    # The product id alone is no good as a seed: this catalogue was imported in bulk, so
+    # Shopify handed out ids in a regular stride. Measured against the live catalogue the
+    # gap between any two ids is a multiple of 32768 -- every id ends in the same low 15
+    # bits -- so `id | modulo: 4` picked White Gold for the whole grid, and dividing by a
+    # number that does not clear that stride (`divided_by: 7`) only hides it. Dividing by
+    # the stride itself leaves the part of the id that actually counts products, which is
+    # what the pick runs on.
+    #
+    # The title's length used to be added on top to separate ids sitting close together.
+    # It does the opposite: a product family shares a title shape, so its lengths land on
+    # the same remainder and cancel the id term for the whole family -- Trending Styles
+    # came out rose, rose, rose, yellow, yellow, rose with no white gold in seven cards.
+    # Checked against the live catalogue without it: every metal in the pool comes up,
+    # the three tones split 10/8/7, and the carousel opens on three different metals.
+    assign seed = card_product.id | divided_by: 32768
+    assign pick_position = seed | modulo: metal_rotation.size
+    assign picked = metal_rotation[pick_position] | strip
+  -%}
+  {{- metal_index }}||{{ picked -}}
+{%- endif -%}

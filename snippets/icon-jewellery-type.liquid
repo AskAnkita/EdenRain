@@ -1,0 +1,105 @@
+{%- doc -%}
+  Outline icon for a kind of jewellery - the piece itself, drawn face-on - to read at ~28px
+  beside a menu link in the Jewellery panel. Companion to 'icon-diamond-shape' (the cut of a
+  stone) and 'icon-ring-style' (how the stones of a setting are arranged).
+
+  Drawn as the piece and nothing around it: no ear, no neck, no hand. Every stone in the set is
+  the same brilliant - girdle, table and the facets between - so a column of them reads as one
+  set, and the two listings at the end of the column are sparkles rather than pieces.
+
+  @param {string} type - one of studs, hoops-huggies, dangles-drops, climbers-jackets-cuffs,
+    pendants, chains, charms, bracelets, rings, new-in, best-sellers
+
+  A type with no drawing here renders an empty box, so every name a menu column puts an icon
+  beside has to be listed above.
+{%- enddoc -%}
+
+<svg
+  class="icon-jewellery-type"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="0.9"
+  stroke-linejoin="round"
+  stroke-linecap="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {%- case type -%}
+    {%- comment -%} A brilliant on a post, seen from the front, with the butterfly back behind it {%- endcomment -%}
+    {%- when 'studs' -%}
+      <circle cx="12" cy="10" r="6.2"/>
+      <circle cx="12" cy="10" r="3"/>
+      <path d="M12 3.8v3.2M18.2 10h-3.2M12 16.2v-3.2M5.8 10h3.2"/>
+      <path d="M12 16.2v4.4"/>
+      <path d="M9.4 19h5.2"/>
+
+    {%- comment -%}
+      A hoop drawn as the tube itself - outer wall, inner wall, and the two ends of the hinge
+      gap closed across the top, which is what tells a hoop from a plain circle.
+    {%- endcomment -%}
+    {%- when 'hoops-huggies' -%}
+      <path d="M9.4 5.5A7.6 7.6 0 1 0 14.6 5.5"/>
+      <path d="M10.3 7.8A5.2 5.2 0 1 0 13.7 7.8"/>
+      <path d="M9.4 5.5 10.3 7.8M14.6 5.5 13.7 7.8"/>
+
+    {%- comment -%} The stud at the ear, and a drop hanging from it {%- endcomment -%}
+    {%- when 'dangles-drops' -%}
+      <circle cx="12" cy="4" r="1.7"/>
+      <path d="M12 5.7v2.3"/>
+      <path d="M12 8c2.3 2.6 3.9 4.7 3.9 6.4a3.9 3.9 0 0 1-7.8 0C8.1 12.7 9.7 10.6 12 8z"/>
+      <path d="M12 11.3c1.2 1.4 2 2.5 2 3.4a2 2 0 0 1-4 0c0-.9.8-2 2-3.4z"/>
+
+    {%- comment -%} Three stones graduating up the ear, joined as they are set {%- endcomment -%}
+    {%- when 'climbers-jackets-cuffs' -%}
+      <circle cx="8.6" cy="17.8" r="1.3"/>
+      <circle cx="11.4" cy="12.6" r="1.9"/>
+      <circle cx="15" cy="6.6" r="2.5"/>
+      <path d="M9.2 16.7 10.5 14.3M12.4 11 13.7 8.7"/>
+
+    {%- comment -%} The chain over the collarbone, with the pendant hanging at its lowest point {%- endcomment -%}
+    {%- when 'pendants' -%}
+      <path d="M3.4 4.4c0 6.9 3.9 11.4 8.6 11.4s8.6-4.5 8.6-11.4"/>
+      <circle cx="12" cy="18.6" r="2.9"/>
+      <circle cx="12" cy="18.6" r="1.3"/>
+
+    {%- comment -%}
+      Two links of the chain itself, one through the next. Set on the diagonal and drawn tall
+      enough to read as links: three flat ones across closed up to a bar at this size.
+    {%- endcomment -%}
+    {%- when 'chains' -%}
+      <rect x="3.6" y="8.8" width="9.2" height="6.4" rx="3.2" transform="rotate(-35 12 12)"/>
+      <rect x="11.2" y="8.8" width="9.2" height="6.4" rx="3.2" transform="rotate(-35 12 12)"/>
+
+    {%- comment -%} The chain with three charms hung off it {%- endcomment -%}
+    {%- when 'charms' -%}
+      <path d="M3.2 7c2.6 3.8 5.6 5.6 8.8 5.6S17.6 10.8 20.2 7"/>
+      <path d="M7.3 11.2v2.6M12 12.6v1.5M16.7 11.2v2.6"/>
+      <circle cx="7.3" cy="15.8" r="2"/>
+      <path d="M12 14.1l2.1 2.3-2.1 2.4-2.1-2.4z"/>
+      <circle cx="16.7" cy="15.8" r="2"/>
+
+    {%- comment -%} A bangle seen at an angle: the band, its inside, and the clasp on the top {%- endcomment -%}
+    {%- when 'bracelets' -%}
+      <ellipse cx="12" cy="12.6" rx="9" ry="6.4"/>
+      <ellipse cx="12" cy="12.6" rx="6.2" ry="3.8"/>
+      <path d="M10.4 6.3v2.6M13.6 6.3v2.6"/>
+
+    {%- comment -%} A band seen from the front with a stone set over it {%- endcomment -%}
+    {%- when 'rings' -%}
+      <circle cx="12" cy="14.8" r="6.4"/>
+      <circle cx="12" cy="14.8" r="4.6"/>
+      <path d="M12 2.6l2.7 2.9-2.7 2.9-2.7-2.9z"/>
+
+    {%- comment -%}
+      New In and Best Sellers are listings rather than pieces: a pair of sparkles for what has
+      just landed, a single star for what sells.
+    {%- endcomment -%}
+    {%- when 'new-in' -%}
+      <path d="M10.6 3.8Q11.6 9.2 16.6 10.2 11.6 11.2 10.6 16.6 9.6 11.2 4.6 10.2 9.6 9.2 10.6 3.8z"/>
+      <path d="M18.2 14.2Q18.6 17 21 17.4 18.6 17.8 18.2 20.6 17.8 17.8 15.4 17.4 17.8 17 18.2 14.2z"/>
+
+    {%- when 'best-sellers' -%}
+      <path d="M12 3.4l2.74 5.56 6.14.9-4.44 4.33 1.05 6.11L12 17.42l-5.49 2.88 1.05-6.11-4.44-4.33 6.14-.9z"/>
+  {%- endcase -%}
+</svg>

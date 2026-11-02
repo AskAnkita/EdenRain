@@ -2752,7 +2752,11 @@ button.shopify-payment-button__button--unbranded {
 
 @media (hover: hover) {
 
-  .button:hover:not([disabled]):not(.button-unstyled),
+  /* Header icons wear .button for layout only. Repainting them in the primary
+     button's hover text colour turns the heart and the bag white on this white
+     header, so they vanish under the cursor and only the count bubble is left;
+     the 1.15 scale on .header__icon is the hover feedback they need. */
+  .button:hover:not([disabled]):not(.button-unstyled):not(.header__icon),
   .shopify-challenge__button:hover:not([disabled]):not(.button-unstyled),
   button.shopify-payment-button__button--unbranded:hover:not([disabled]) {
     --shadow-horizontal-offset: 0;
@@ -5859,9 +5863,24 @@ summary {
   width: var(--swiper-pagination-bullet-size);
 }
 
-.swiper .swiper-pagination-progressbar {
+.swiper:not(.swiper-vertical) .swiper-pagination-progressbar,
+.swiper-horizontal > .swiper-pagination.swiper-pagination-progressbar,
+.swiper-pagination-progressbar.swiper-pagination-horizontal {
   position: relative;
-  margin-top: 4rem;
+  width: 100% !important;
+  max-width: min(280px, calc(100% - 40px)) !important;
+  height: 3px;
+  margin-top: calc(var(--progress-top-offset, 4rem) - 4px);
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  left: 0 !important;
+  right: auto !important;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.swiper-pagination-progressbar .swiper-pagination-progressbar-fill {
+  border-radius: 999px;
 }
 
 .swiper.has-swiper-pagination-progressbar {
@@ -6400,7 +6419,26 @@ a {
     color var(--animation-speed) var(--animation-easing);
 
   @media screen and (min-width: 1025px) {
-    &:not(.button, .button-secondary):hover {
+    /* The call-to-action families in eden-actions.css are excluded by name. That file paints
+       their hover label from --cta-ink-hover at (0,2,0); this rule scores (0,2,1), so without
+       the exclusion it quietly wins and every <a> CTA in the shop hovers to the scheme's
+       primary_hover instead of the colour its own tokens name - grey text on the hero's black
+       fill, where #fff was asked for. Keep this list in step with the selector families there. */
+    &:not(
+        .button,
+        .button-secondary,
+        .eden-action,
+        .eden-link,
+        .pc-button,
+        .gifting-banner__button,
+        .editorial-image-cta__button,
+        .product-delivery__button,
+        .signature-editorial__button-label,
+        .signature-editorial__button-icon,
+        .menu-drawer-desktop__button,
+        [class*='ai-luxury-video-hero-button-'],
+        [class*='ai-luxury-video-hero-mobile-button-']
+      ):hover {
       color: var(--color-primary-hover);
     }
   }
@@ -12546,11 +12584,40 @@ product-recommendations:has([data-has-recommendations='false']) {
   height: auto;
 }
 
+/*
+  Outlined style. Two things were wrong with taking the label straight from
+  --button-color: on a scheme whose button is a fill, that variable holds the
+  colour meant to sit ON the fill (white), so the label went white on nothing;
+  and a flat background-color:transparent here out-weighed the base .button
+  background, so the hover fill could never arrive. The rule and the label now
+  come from the scheme's button border - black on every light scheme, white on
+  the dark and over-photo ones - and the fill is held in the variable the hover
+  rules already rebind, so an outlined button fills in on hover like the rest.
+*/
 .button.button--outline,
 .button-secondary.button--outline {
+  --button-background-color: transparent;
   --border-outline-color: var(--button-color);
-  background-color: transparent;
+  background-color: var(--button-background-color);
   border: 1px solid var(--border-outline-color);
+}
+
+.button.button--outline {
+  --button-color: var(--color-primary-button-border);
+}
+
+.button-secondary.button--outline {
+  --button-color: var(--color-secondary-button-border);
+}
+
+@media (hover: hover) {
+  .button.button--outline:hover:not([disabled]) {
+    --border-outline-color: var(--color-primary-button-hover-border);
+  }
+
+  .button-secondary.button--outline:hover:not([disabled]) {
+    --border-outline-color: var(--color-secondary-button-hover-border);
+  }
 }
 
 .button:not(.button-unstyled) {
@@ -18569,7 +18636,7 @@ summary.header__icon .svg-wrapper {
 
   #header-component .list-menu--inline > li > .header__menu-item,
   #header-component .list-menu--inline > li > details > .header__menu-item {
-    padding-inline: 0.8rem;
+    padding-inline: calc(var(--gap-x, 2.2rem) / 2);
     white-space: nowrap;
   }
 
@@ -20167,8 +20234,9 @@ ul.items-same-height > li {
 .ai-video-hero-content-awm5mywfkk1mvedrruaigenblockf88815bygc4pc
 .ai-video-hero-buttons-awm5mywfkk1mvedrruaigenblockf88815bygc4pc
 .ai-video-hero-button-primary-awm5mywfkk1mvedrruaigenblockf88815bygc4pc:hover {
+  background:#000000 !important;
   color: #ffffff !important;
-  border:#000000 !important;
+  border-color:#000000 !important;
 }
 
 /* Secondary button */
@@ -20176,7 +20244,7 @@ ul.items-same-height > li {
 .ai-video-hero-buttons-awm5mywfkk1mvedrruaigenblockf88815bygc4pc
 .ai-video-hero-button-secondary-awm5mywfkk1mvedrruaigenblockf88815bygc4pc:hover {
   color: #ffffff !important;
-  border:#000000 !important;
+  border-color:#000000 !important;
   background:#000000 !important;
 }
 .ai-video-hero-button-secondary-awm5mywfkk1mvedrruaigenblockf88815bygc4pc {
@@ -20316,7 +20384,6 @@ Specificity: (0,6,0)
 
 .add-to-cart-button-container .add-to-cart-button-inner .add-to-cart-button {
   width: 600px !important;
-  border-radius:35px !important;
 }
 
 @media (max-width: 787px) {
@@ -20326,7 +20393,7 @@ Specificity: (0,6,0)
 }
 /* Delivery time block — mobile-only fixes, side by side */
 @media (max-width: 767px) {
-  .group-block-content.layout-panel-flex.layout-panel-flex--row.mobile-column {
+  .group-block.delivery-time .group-block-content.layout-panel-flex.layout-panel-flex--row.mobile-column {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: flex-start !important;
@@ -20356,9 +20423,11 @@ Specificity: (0,6,0)
     text-align: left !important;
   }
 }
-/* Delivery time block — mobile & tablet fixes, side by side */
+/* Delivery time block — mobile & tablet fixes, side by side.
+   Scoped to .delivery-time: unscoped, this forced every row group that is set
+   to stack on mobile to stay in a row (it broke the contact page columns). */
 @media (max-width: 1024px) {
-  .group-block-content.layout-panel-flex.layout-panel-flex--row.mobile-column {
+  .group-block.delivery-time .group-block-content.layout-panel-flex.layout-panel-flex--row.mobile-column {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: flex-start !important;
@@ -20426,9 +20495,13 @@ Specificity: (0,6,0)
 }
 
 /* 3. HOVER STATE (For Unselected Items) */
+/* No grey wash: an unselected pill firms up its outline, and the ink fill below
+   stays the one signal that a pill is selected. */
 .product-form__input--pill input[type="radio"]:not(:checked) + label:hover {
-  background-color: #f5f5f5 !important;
-  opacity: 0.9;
+  background-color: #ffffff !important;
+  color: #001514 !important;
+  border-color: #001514 !important;
+  box-shadow: inset 0 0 0 1px #001514 !important;
 }
 
 /* 4. OPTIONAL: Clean & Consistent Red Cross-out for Sold Out Items */
@@ -20679,7 +20752,7 @@ fieldset.variant-option .form__label {
 /* change font size  and family of description and price  */
 @media (max-width: 768px) {
 .text-block.text-block--full-width.custom-typography h1 {
-  font-family: "Cormorant Garamond", sans-serif !important;
+  font-family: var(--font-heading--family) !important;
   font-weight: 600 !important;
   font-size:18px;
   
@@ -20759,28 +20832,28 @@ product-price.text-block.custom-typography.custom-font-size.custom-color {
 
 /* Heading: Shop. Earn. Sparkle. */
 .section-content-wrapper .group-block-content h2 {
-  font-family: "Cormorant Garamond", sans-serif;
+  font-family: var(--font-heading--family);
   font-weight: 400;
   font-size: 30px;
 }
 
 /* Paragraph text */
 .section-content-wrapper .group-block-content .rte p {
-  font-family: "Cormorant Garamond", serif;
+  font-family: var(--font-body--family);
   font-weight: 400;
   font-size: 14px;
 }
 
 /* Heading: "Stella McCartney in Diamonds" */
 .section-content-wrapper .group-block-content h2 {
-  font-family: "Cormorant Garamond", serif;
+  font-family: var(--font-heading--family);
   font-weight: 400;
   font-size: 30px;
 }
 
 /* Paragraph under heading */
 .section-content-wrapper .group-block-content .rte p {
-  font-family: "Cormorant Garamond", serif;
+  font-family: var(--font-body--family);
   font-weight: 400;
   font-size: 14px;
 }
@@ -20865,123 +20938,6 @@ footer.section-footer .email-signup__input {
 
 
 
-
-/* hero video section height manbage */
-@media screen and (max-width:749px){
-[class*="ai-luxury-video-hero-container"]{
-  height:250px!important;
-}
-
-[class*="ai-luxury-video-hero-video"]{
-  height:250px!important;
-  object-fit:cover!important;
-}
-}
-
-/* Homepage editorial feature: image left, centered story content right. */
-#shopify-section-section_87hr6F .section-content-wrapper {
-  align-items: stretch !important;
-  gap: 40px !important;
-  max-width: 1800px;
-  margin-inline: auto;
-}
-
-#shopify-section-section_87hr6F .section-content-wrapper > .image-block,
-#shopify-section-section_87hr6F .section-content-wrapper > .group-block {
-  flex: 1 1 calc(50% - 20px) !important;
-  width: calc(50% - 20px) !important;
-  max-width: calc(50% - 20px) !important;
-}
-
-#shopify-section-section_87hr6F .section-content-wrapper > .image-block {
-  aspect-ratio: 1.2 / 1;
-  overflow: hidden;
-  border-radius: 4px;
-  background: url('./editorial-stella-placeholder-desktop.png') center / cover no-repeat;
-}
-
-#shopify-section-section_87hr6F .image-block__image {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  opacity: 0;
-}
-
-#shopify-section-section_87hr6F .group-block-content {
-  width: 100%;
-  height: 100%;
-  padding: 48px 64px;
-  align-items: center !important;
-  justify-content: center !important;
-  text-align: center;
-}
-
-#shopify-section-section_87hr6F .group-block-content h2 {
-  max-width: 620px;
-  margin-inline: auto;
-  font-family: var(--font-heading--family);
-  font-size: 46px;
-  font-weight: 400;
-  line-height: 1.15;
-  letter-spacing: 2px;
-}
-
-#shopify-section-section_87hr6F .group-block-content .rte p {
-  max-width: 620px;
-  margin-inline: auto;
-  font-family: var(--font-body--family);
-  font-size: 17px;
-  line-height: 1.6;
-  letter-spacing: 0;
-}
-
-#shopify-section-section_87hr6F .group-block-content .button {
-  width: auto !important;
-  min-width: 248px !important;
-  min-height: 58px;
-  padding: 14px 28px !important;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  font-size: 15px;
-  letter-spacing: 1px;
-}
-
-@media screen and (max-width: 989px) {
-  #shopify-section-section_87hr6F .section-content-wrapper {
-    flex-direction: column !important;
-    gap: 28px !important;
-  }
-
-  #shopify-section-section_87hr6F .section-content-wrapper > .image-block,
-  #shopify-section-section_87hr6F .section-content-wrapper > .group-block {
-    flex-basis: auto !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  #shopify-section-section_87hr6F .section-content-wrapper > .image-block {
-    aspect-ratio: 1 / 1;
-    background-image: url('./editorial-stella-placeholder-mobile.png');
-  }
-
-  #shopify-section-section_87hr6F .group-block-content {
-    padding: 24px 16px 12px;
-  }
-
-  #shopify-section-section_87hr6F .group-block-content h2 {
-    font-size: 32px;
-    line-height: 1.2;
-  }
-
-  #shopify-section-section_87hr6F .group-block-content .rte p {
-    font-size: 15px;
-  }
-
-  #shopify-section-section_87hr6F .group-block-content .button {
-    min-width: 220px !important;
-    min-height: 52px;
-  }
-}
 
 /* A linked group (e.g. a sub-collection tile) pointing at the page being viewed */
 .group-block:has(> .group-block__link[aria-current='page']) {
@@ -21099,5 +21055,860 @@ footer.section-footer .email-signup__input {
     width: 1.8rem;
     height: 1.5px;
     margin: 0.45rem auto;
+  }
+}
+
+/* ==================================================================
+   Eden Raine: main-nav type
+   Appended at the end of the file so it wins over the rules above
+   without editing them in place.
+   ================================================================== */
+
+/* Main nav: light, widely tracked capitals with a warm hover colour drawn
+   from the brand blush rather than plain black. */
+@media screen and (min-width: 1025px) {
+  #header-component .list-menu--inline > li > .header__menu-item > .text,
+  #header-component .list-menu--inline > li > details > .header__menu-item .text,
+  #header-component .header-message--menu .header__menu-item .text {
+    letter-spacing: 0.2em;
+  }
+
+  /* The right-hand links (Learn, About, Contact Us) were title case with no
+     tracking; match them to the rest of the row. */
+  #header-component .header-message--menu .header__menu-item,
+  #header-component .header-message--menu .header__menu-item .text {
+    text-transform: uppercase;
+  }
+
+  /* The caret sits beside the label rather than crowding it */
+  #header-component .list-menu--inline > li > .header__menu-item .icon-caret {
+    margin-inline-start: 0.4rem;
+  }
+
+  #header-component .list-menu--inline > li > .header__menu-item,
+  #header-component .list-menu--inline > li > details > .header__menu-item,
+  #header-component .header-message--menu .header__menu-item {
+    transition: color 0.25s ease;
+  }
+
+  #header-component .list-menu--inline > li > .header__menu-item:hover,
+  #header-component .list-menu--inline > li > .header__menu-item:hover > .text,
+  #header-component .list-menu--inline > li > details > .header__menu-item:hover .text,
+  #header-component .header-message--menu .header__menu-item:hover,
+  #header-component .header-message--menu .header__menu-item:hover .text {
+    color: #8c6a57;
+  }
+}
+
+/* Header phone number (the "message" slot, top row, left column).
+   Matches the main nav's tracking and warm hover colour; the number itself is
+   editable in Theme editor > Header > Message. */
+@media screen and (min-width: 1025px) {
+  #header-component .header-message:not(.header-message--menu) {
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+  }
+
+  #header-component .header-message:not(.header-message--menu) p {
+    margin: 0;
+  }
+
+  #header-component .header-message:not(.header-message--menu) a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.25s ease;
+  }
+
+  #header-component .header-message:not(.header-message--menu) a:hover {
+    color: #8c6a57;
+  }
+}
+
+
+/* The one size for every scroller arrow in the theme: the swiper sliders below,
+   the category tile row (sections/category-tiles.liquid) and the carousel blocks
+   (blocks/ai_gen_block_5ee0a2a.liquid, blocks/ai_gen_block_c1757b9.liquid). */
+:root {
+  --er-arrow-size: 40px;
+  --er-arrow-icon-size: 1.4rem;
+}
+
+@media screen and (min-width: 1400px) {
+  :root {
+    --er-arrow-size: 56px;
+    --er-arrow-icon-size: 1.6rem;
+  }
+}
+
+/* ==================================================================
+   Eden Raine: slider arrows
+   Every scroller gets the same button: a white disc, dark icon, on
+   screen at all times so it reads over a pale product shot. Hover draws
+   a ring in around it. Without this each section took its arrow colours
+   from its colour scheme, which is why the rows did not match.
+   ================================================================== */
+
+.swiper-button.swiper-button-prev,
+.swiper-button.swiper-button-next {
+  --arrow-background: #fff;
+  --arrow-background-hover: #fff;
+  --arrow-color: #1a1a1a;
+  --arrow-color-hover: #1a1a1a;
+  /* The disc is white and the page behind it is white too wherever a button overhangs the
+     product band, which left the outer third of the circle with nothing to draw it -- the
+     shadow alone is too faint over white, so the circle read as unfinished on that side.
+     The 1px border box is already reserved by the theme, so colouring it shifts nothing. */
+  --arrow-border: rgb(0 0 0 / 0.1);
+  --er-arrow-ring: #1a1a1a;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease,
+    opacity var(--animation-speed-slow) var(--cubic-fast),
+    transform var(--animation-speed-slow) var(--cubic-fast);
+}
+
+/* The theme's own hover is a panel of --arrow-color sliding in from the side. These
+   buttons keep their white face and draw a ring instead. */
+.swiper-button .fill-bg {
+  display: none;
+}
+
+/* One disc for every scroller: a fixed-size circle with a soft shadow, always on screen
+   instead of fading in when the row is hovered, and gone once the row reaches that end.
+   The announcement bar is put back below — its arrows are bare icons beside the
+   message, not discs. */
+.swiper-button.swiper-button-prev,
+.swiper-button.swiper-button-next {
+  --button-width: var(--er-arrow-size);
+  --button-height: var(--er-arrow-size);
+  --button-icon-size: var(--er-arrow-icon-size);
+  --arrow-radius: 50%;
+  border-radius: 50%;
+  box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
+  opacity: 1;
+  transform: none;
+}
+
+/* The ring. It grows out from the middle of the disc to its edge, so it is never
+   clipped by the overflow the theme sets on these buttons. Swiper's own ::after
+   holds its arrow glyph, which the theme hides; this takes it over. */
+.swiper-button.swiper-button-prev::after,
+.swiper-button.swiper-button-next::after {
+  display: block;
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--er-arrow-ring);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.22s ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .swiper-button.swiper-button-prev:hover::after,
+  .swiper-button.swiper-button-next:hover::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.swiper-button.swiper-button-prev:focus-visible::after,
+.swiper-button.swiper-button-next:focus-visible::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+
+
+/* Keep the theme's press effect, which the transform above would otherwise cancel */
+.swiper-button.swiper-button-prev:active,
+.swiper-button.swiper-button-next:active {
+  transform: scale(0.9);
+}
+
+/* At either end the button goes rather than sitting there greyed out. The second pair is for
+   arrows placed under a carousel, which the theme otherwise leaves half-faded; they hold their
+   space either way, so nothing shifts when they go. */
+.swiper-button.swiper-button-prev.swiper-button-disabled,
+.swiper-button.swiper-button-next.swiper-button-disabled,
+.swiper-btns-wrap--bottom .swiper-button.swiper-button-prev.swiper-button-disabled,
+.swiper-btns-wrap--bottom .swiper-button.swiper-button-next.swiper-button-disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The announcement bar's arrows are transparent, so a disc and a shadow would sit oddly
+   beside the message */
+.announcement-bar-slider .swiper-button.swiper-button-prev,
+.announcement-bar-slider .swiper-button.swiper-button-next {
+  --arrow-background: transparent;
+  --arrow-background-hover: transparent;
+  box-shadow: none;
+}
+
+.announcement-bar-slider .swiper-button.swiper-button-prev::after,
+.announcement-bar-slider .swiper-button.swiper-button-next::after {
+  display: none;
+}
+
+/* Best Sellers carousel on the homepage. Kept in the stylesheet because
+   Shopify limits a section's Custom CSS setting to 500 characters. */
+[id$="__featured_collection_QbxCWk"] .card--block-media.overflow-hidden.card-badge-is-custom.relative.group-block.w-full {
+  background: #f9f9f9;
+}
+
+[id$="__featured_collection_QbxCWk"] .swiper:has(.swiper-button) {
+  --arrow-gutter: 2rem;
+  width: calc(100% + var(--arrow-gutter) * 2);
+  padding-inline: var(--arrow-gutter);
+  margin-inline: calc(var(--arrow-gutter) * -1);
+}
+
+/* The arrows sit halfway down the product image, not halfway down the card.
+   The card's text grows with the title -- one line here, two there -- so any
+   fixed share of the carousel's height drifts below the image. Instead the
+   button wrap is made exactly as tall as one image, and Swiper's own centring
+   (top: 50% plus a margin-top of minus half a button, from vendor.css) then
+   lands the buttons on the middle of the image.
+
+   The wrap's height comes from the slides themselves: percentage padding
+   resolves against the containing block's width, so taking the arrow gutter and
+   the gaps between slides off the swiper's width leaves one slide width -- and
+   the cards are square, so that is one image tall. Slides per view follow the
+   breakpoints featured-collection.liquid hands Swiper: the tablet count from
+   768px, the desktop count from 1400px. Below 750px the wrap is hidden.
+
+   The wrap class is named twice on purpose: component-slider.css loads after
+   this file and pushes every wrap in a paginated slider to
+   top: calc(50% - 2rem) at the same specificity, so a single class here would
+   lose the tie and the arrows would drop back down the card. */
+[id$="__featured_collection_QbxCWk"] .swiper .swiper-btns-wrap.swiper-btns-wrap--inside {
+  --er-slides-per-view: var(--card-grid-per-row-mobile, 1);
+  position: absolute;
+  top: 0;
+  bottom: auto;
+  left: var(--arrow-gutter, 0px);
+  right: var(--arrow-gutter, 0px);
+  width: auto;
+  height: 0;
+  padding-bottom: calc(
+    (100% - var(--arrow-gutter, 0px) * 2 - var(--card-grid-per-row-gap, 0px) * (var(--er-slides-per-view) - 1)) /
+      var(--er-slides-per-view)
+  );
+  pointer-events: none;
+}
+
+@media screen and (min-width: 768px) {
+  [id$="__featured_collection_QbxCWk"] .swiper .swiper-btns-wrap.swiper-btns-wrap--inside {
+    --er-slides-per-view: var(--card-grid-per-row-tablet, 3);
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  [id$="__featured_collection_QbxCWk"] .swiper .swiper-btns-wrap.swiper-btns-wrap--inside {
+    --er-slides-per-view: var(--card-grid-per-row-desktop, 4);
+  }
+}
+
+[id$="__featured_collection_QbxCWk"] .swiper .swiper-btns-wrap.swiper-btns-wrap--inside .swiper-button {
+  pointer-events: auto;
+  top: 50%;
+}
+
+/* The wrap now stops short of the gutter, so the buttons reach back out over it
+   and keep straddling the edge of the first and last card. */
+[id$="__featured_collection_QbxCWk"] .swiper .swiper-button.swiper-button-prev {
+  --swiper-navigation-sides-offset: 0;
+  left: calc(var(--arrow-gutter, 0px) * -1);
+}
+
+[id$="__featured_collection_QbxCWk"] .swiper .swiper-button.swiper-button-next {
+  --swiper-navigation-sides-offset: 0;
+  right: calc(var(--arrow-gutter, 0px) * -1);
+}
+
+[id$="__featured_collection_QbxCWk"] .swiper .swiper-pagination-progressbar {
+  left: 0;
+  right: auto;
+  margin-left: 0;
+  margin-right: auto;
+  width: 100%;
+  max-width: min(280px, calc(100% - 40px));
+}
+
+/* Carousel arrows pinned to the top right of the section, level with the
+   heading, instead of sitting under the slides. featured-collection.liquid
+   renders a second pair inside .section-global__header and marks the section
+   .arrow-on-header; global.js hands Swiper those buttons, and the rule further
+   up this file hides the pair that still sits inside the carousel.
+
+   The wrap is taken out of flow so a centred heading stays centred under it. */
+.collection.arrow-on-header .section-global__header {
+  position: relative;
+}
+
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2.4rem;
+  width: auto;
+  height: auto;
+  margin: 0;
+  z-index: 2;
+}
+
+/* The buttons are laid out by the flex row above, so the left/right insets
+   Swiper gives .swiper-button-prev and .swiper-button-next are cleared --
+   .swiper-btns-on-header leaves them position: relative, where those insets
+   still shift each button inwards and the two end up on top of each other.
+
+   Everything the theme draws around the glyph goes with them: the disc, the
+   border, the hover fill and the rounded corner. What is left is a black
+   chevron that fades when the carousel runs out of slides that way. */
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button {
+  inset: auto;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+  color: var(--color-foreground);
+  cursor: pointer;
+}
+
+/* The disc is painted on a pseudo-element, not the button's own background, and
+   that pseudo-element is the only thing the theme's hover rule repaints. Taking
+   it out removes the disc and the hover with it. */
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button::before,
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button::after {
+  display: none;
+}
+
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button:hover,
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button:focus-visible {
+  background: none;
+  box-shadow: none;
+  color: var(--color-foreground);
+}
+
+/* The caret ships pointing down and component-slider.css turns it a quarter
+   turn each way, so the box stays upright while the glyph reads < and >. */
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button .icon {
+  width: 1.4rem;
+  height: auto;
+}
+
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button .fill-bg {
+  display: none;
+}
+
+/* !important only to outrank the theme's own .swiper-btns-on-header rules
+   further up, which force every header arrow to opacity 1, then 0.5 when
+   disabled. */
+.collection.arrow-on-header .section-global__header .swiper-btns-on-header .swiper-button.swiper-button-disabled {
+  opacity: 0.25 !important;
+  pointer-events: none;
+}
+
+/* ==================================================================
+   Eden Raine: header utility row
+   Search on the left, logo centred, consultant chip + icons on the right,
+   nav on its own row underneath (sections/header.liquid,
+   snippets/header-consultant.liquid, snippets/predictive-search-inline.liquid).
+   ================================================================== */
+
+/* Both hairlines — under the utility row and under the nav row — take their
+   colour from the scheme's border, which is pure black here. Soften them to the
+   light rule the layout wants without changing the colour scheme itself. */
+#header-component .header__row--top,
+#header-component .header__row--top.divider--page-width .header__columns,
+#header-component .header__row--bottom {
+  border-bottom-color: #e5e2dd;
+}
+
+/* --- Inline search, left column ------------------------------------ */
+@media screen and (min-width: 1025px) {
+  #header-component .header__column--left .search-action {
+    width: 100%;
+    max-width: 25rem;
+  }
+
+  /* The theme draws the field's underline on .field::after, which carries both
+     a 1px border-bottom and the input frame's box-shadow ring. Where the
+     magnifier button overlaps it the two no longer line up and the rule steps
+     down and thickens. One border on the field itself instead. */
+  #header-component .header__column--left .search--inline .field--has-underline {
+    border-bottom: 1px solid var(--color-input-text, currentColor);
+  }
+
+  #header-component .header__column--left .search--inline .field--has-underline::after {
+    display: none;
+  }
+
+  #header-component .header__column--left .search--inline .search__button,
+  #header-component .header__column--left .search--inline .search__input.field__input {
+    border: 0;
+    box-shadow: none;
+    background-color: transparent;
+  }
+
+  #header-component .header__column--left .header__search--inline {
+    width: 100%;
+  }
+
+  /* Capitals with the same tracking as the nav; the magnifier sits at the far
+     end of the underline, which is what --header-search-button-pos-right moves.
+     The field's own padding-block is what sets the utility row's height — it
+     came to 48px against a 32px logo, so the logo sat centred in the leftover
+     and picked up eight pixels of air it had no setting for. Even padding
+     brings the field down to roughly the logo's own height. */
+  #header-component .header__column--left .search--inline .search__input.field__input {
+    padding-left: 0;
+    padding-block: 0.8rem;
+    font-size: 1.3rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  #header-component .header__column--left .search--inline .search__input.field__input::placeholder {
+    color: inherit;
+    opacity: 0.85;
+  }
+
+  #header-component .header__column--left .search--inline .search__button .icon {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+}
+
+/* --- "Meet a Consultant" chip --------------------------------------- */
+#header-component .header-consultant {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem 1.6rem;
+  background-color: var(--consultant-background, transparent);
+  color: var(--consultant-color, currentColor);
+  border: var(--consultant-border-width, 0) solid var(--consultant-border-color, transparent);
+  font-family: var(--consultant-font, var(--font-body--family));
+  font-size: var(--consultant-font-size, 1.4rem);
+  text-transform: var(--consultant-case, none);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+#header-component .header-consultant:hover {
+  background-color: var(--consultant-background-hover, var(--consultant-background, transparent));
+  color: var(--consultant-color-hover, var(--consultant-color, currentColor));
+}
+
+#header-component .header-consultant[aria-disabled='true'] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+#header-component .header-consultant__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+}
+
+#header-component .header-consultant__icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* On a phone the account and cart icons leave the header - the sticky toolbar at
+   the foot of the page carries them - and the chip takes that space. It is not a
+   button there: no fill, no border, just the words in the header's own small caps,
+   set to the right of the logo. The icon and the words can each be switched off
+   from the section's settings. */
+@media screen and (max-width: 1024px) {
+  #header-component .header-consultant,
+  #header-component .header-consultant:hover {
+    gap: 0.6rem;
+    min-height: 44px;
+    margin-inline-end: 0;
+    padding: 0.4rem 0;
+    background-color: transparent;
+    border-width: 0;
+    font-size: var(--consultant-font-size-mobile, 1rem);
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    /* Only wraps where the logo leaves it no room, and then onto two even lines. */
+    white-space: normal;
+    text-wrap: balance;
+    text-align: end;
+  }
+
+  /* The mobile header is a fixed five-track grid (two slots each side of the logo).
+     Account and cart held the two on the right, so the chip takes both of them
+     rather than auto-placing into one 44px slot and spilling past the edge. */
+  #header-component .header__columns .header-consultant {
+    grid-row: 1;
+    grid-column: rightA-start / rightB-end;
+    justify-self: end;
+    padding-inline-end: 1.2rem;
+  }
+
+  #header-component .header-consultant--m-icon .header-consultant__text,
+  #header-component .header-consultant--m-text .header-consultant__icon {
+    display: none;
+  }
+
+  #header-component .header-consultant__icon {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+}
+
+/* From tablet width there is room for the words on one line; the chip reaches
+   left into the empty space beside the logo rather than wrapping. */
+@media screen and (min-width: 600px) and (max-width: 1024px) {
+  #header-component .header-consultant {
+    white-space: nowrap;
+  }
+}
+
+/* The chip is wider than an icon, so the right column needs a little more air
+   between it and the account icon that follows. */
+#header-component .header__column--right .header-consultant {
+  margin-inline-end: 0.4rem;
+}
+
+/* The utility row is now search | logo | utilities. The 1.35fr/0.65fr split
+   further up was sized for the old left-hand nav; with a search field on one
+   side and the chip plus icons on the other the two outer columns need equal
+   weight, or the right-hand group runs into the centred logo. */
+@media screen and (min-width: 1025px) {
+  #header-component .header__row--top .header__columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+/* --- Row heights ----------------------------------------------------
+   The utility row and the nav row below it together stood taller than the
+   logo twice over and pushed the hero banner down the page. The layout is
+   unchanged — search | logo | utilities, nav on its own row — it is only set
+   tighter. The row padding comes out of the section settings, but the chip
+   and the nav links each carry their own block padding on top of it, so both
+   come down with it or the rows keep most of their height. */
+@media screen and (min-width: 1025px) {
+  #header-component .header-consultant {
+    padding-block: 0.6rem;
+  }
+
+  #header-component .header__row--bottom .list-menu--inline > li > .header__menu-item,
+  #header-component .header__row--bottom .list-menu--inline > li > details > .header__menu-item {
+    padding-block: 0.7rem;
+  }
+
+  /* The logo is 32px tall at its set width, but the account/wishlist/cart
+     boxes above were 36px, so the row was four pixels taller than the logo and
+     the logo sat centred in the leftover — reading as extra air above and
+     below it that no padding setting could reach. The boxes come down to the
+     logo's own height; the glyphs inside them stay 1.8rem, so each is still a
+     32px pointer target. */
+  #header-component .header__column--right .header__icon,
+  #header-component .header__column--right .header__icon .svg-wrapper {
+    width: 3.2rem;
+    height: 3.2rem;
+    min-width: 3.2rem;
+    min-height: 3.2rem;
+  }
+
+  /* What actually set the utility row's height: the inline search field is
+     pinned to --minimum-touch-target, 45px, against a 32px logo, so the logo
+     sat centred in the leftover with eight pixels of air above and below it
+     that no padding setting could reach. That floor is there for a finger on a
+     phone; this rule is desktop-only and 34px is still well clear of the 24px
+     WCAG target size. The search drawer on mobile is untouched. */
+  #header-component .header__column--left .search--inline .predictive-search--center .search__input {
+    height: 3.4rem;
+  }
+
+  /* The other half of it: the logo's link carries --padding-xs on all four
+     sides, so eight pixels sat above and below the wordmark inside the row's
+     own padding. The theme already drops it to horizontal-only below 1025px;
+     this does the same on desktop. */
+  #header-component .header__heading-link {
+    padding-block: 0;
+  }
+
+  /* With both of those out of the way, what is left holding each row open is
+     the 4.4rem floor on .header__columns further up. It has to stay a floor:
+     on desktop the centre column — the logo on one row, the nav on the other —
+     is positioned absolutely and contributes no height, so a row with nothing
+     but a centred child collapses without it. 3.8rem still clears the 36.4px
+     nav and leaves the 32px logo three pixels of air each side. */
+  #header-component .header__columns {
+    min-height: 3.8rem;
+  }
+}
+
+/* --- Announcement strap ----------------------------------------------
+   The strap is one line of 1.4rem text, and the theme's 1.6 body leading gave
+   it a 22px line box inside an 11px bed. Tighter leading takes the line box
+   down without touching the type size, and the row padding comes out of the
+   section's own settings. */
+.announcement-bar__announcement,
+.announcement-bar__message {
+  line-height: 1.3;
+}
+
+/* The slider's arrows are a 56px box each, drawn over a strap that is now half
+   that, so they hung past both edges and their hit area reached down over the
+   search field. Sized to the strap they stay inside it; the chevron itself is
+   set by .icon further up and does not change. */
+.announcement-bar-slider .swiper-button.swiper-button-prev,
+.announcement-bar-slider .swiper-button.swiper-button-next {
+  width: 2.6rem;
+  height: 2.6rem;
+}
+
+/* --- Nav ink ---------------------------------------------------------
+   The nav sits on white directly above the hero, and pure black held the eye
+   at the top of the page instead of on the banner. A soft graphite reads as
+   the second thing on the screen and still clears the 4.5:1 floor by a wide
+   margin (7.1:1 on white). The logo and the consultant chip stay black so the
+   row keeps an anchor, and the link for the page you are on goes back to
+   black rather than relying on its underline alone.
+   The hover rule on .link--text lightens the link further on hover, which is
+   the wrong way round once the resting colour is already grey, so hover,
+   focus and the current page all resolve to the scheme's foreground. */
+#header-component {
+  --eden-nav-ink: #5c5c5c;
+}
+
+#header-component .header__row--bottom .list-menu--inline > li > .header__menu-item,
+#header-component .header__row--bottom .list-menu--inline > li > details > .header__menu-item {
+  color: var(--eden-nav-ink);
+}
+
+#header-component .header__row--bottom .list-menu--inline > li > .header__menu-item:hover,
+#header-component .header__row--bottom .list-menu--inline > li > .header__menu-item:focus-visible,
+#header-component .header__row--bottom .list-menu--inline > li > details > .header__menu-item:hover,
+#header-component .header__row--bottom .list-menu--inline > li > details > .header__menu-item:focus-visible,
+#header-component .header__row--bottom .list-menu--inline > li > details[open] > .header__menu-item,
+#header-component .header__row--bottom .header__active-menu-item {
+  color: var(--color-foreground);
+}
+
+/* The header search panel lives in assets/search-luxe.css. */
+
+/* ==================================================================
+   Eden Raine: style-row carousel arrows, pinned top right
+   blocks/multicolumn.liquid renders a second pair of bare chevrons above the
+   slides when the block's arrow position is "Top right", and marks the wrapper
+   around the carousel .arrow-on-header so global.js hands Swiper that pair
+   instead. The rule further up hides the pair still sitting inside the
+   carousel, so the row keeps one set of arrows, both of them on the right —
+   the same treatment as the homepage product rows.
+   ================================================================== */
+.multicolumn-arrows-top > .swiper-btns-on-header {
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2.4rem;
+  width: auto;
+  height: auto;
+  margin: 0 0 1.6rem auto;
+  opacity: 1;
+}
+
+/* Swiper leaves .swiper-button-prev/.swiper-button-next with left/right insets
+   and a translate; .swiper-btns-on-header keeps them position: relative, where
+   those insets would still drag the two buttons on top of each other. Clearing
+   them, along with the disc, border, hover fill and rounded corner the theme
+   draws around the glyph, leaves a bare chevron. */
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button {
+  inset: auto;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+  color: var(--color-foreground);
+  cursor: pointer;
+}
+
+/* The disc is painted on a pseudo-element rather than the button's own
+   background, and that pseudo-element is the only thing the theme's hover rule
+   repaints, so taking it out removes the disc and its hover together. */
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button::before,
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button::after {
+  display: none;
+}
+
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button:hover,
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button:focus-visible {
+  background: none;
+  box-shadow: none;
+  color: var(--color-foreground);
+}
+
+/* The caret ships pointing down and component-slider.css turns it a quarter
+   turn each way, so the box stays upright while the glyph reads < and >. */
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button .icon {
+  width: 1.4rem;
+  height: auto;
+}
+
+/* !important only to outrank .swiper-btns-on-header .swiper-button further up,
+   which forces every header arrow to opacity 1, then 0.5 when disabled. */
+.multicolumn-arrows-top > .swiper-btns-on-header .swiper-button.swiper-button-disabled {
+  opacity: 0.25 !important;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 749px) {
+  .multicolumn-arrows-top > .swiper-btns-on-header {
+    gap: 1.8rem;
+    margin-bottom: 1.2rem;
+  }
+}
+
+/* ==================================================================
+   Eden Raine: the style row as compact pills on mobile
+   blocks/multicolumn.liquid adds .multicolumn--compact-mobile when the block's
+   "Item layout on mobile" is Compact, and hands Swiper slidesPerView: auto
+   below its first breakpoint. The pill keeps the shape it has on desktop —
+   thumbnail in a cell on the left, label beside it — but is only as wide as
+   the style it names instead of a fixed share of the screen, so "All" is a
+   short pill and three or four of them read as a row of chips. The block's
+   mobile columns setting does nothing while Compact is on, by design.
+   ================================================================== */
+@media screen and (max-width: 749px) {
+  .multicolumn--compact-mobile .grid__item {
+    width: auto;
+  }
+
+  .multicolumn--compact-mobile .grid__item > .group-block {
+    /* The pills carry a 1px border at zero opacity, so the box is invisible
+       and only its width is doing any work. The pill needs the hairline. */
+    --border-width: 1px;
+    --border-style: solid;
+    --border-color: rgb(var(--color-border-rgb) / 1);
+    width: auto;
+    padding-block: 0;
+    padding-inline: 0;
+  }
+
+  .multicolumn--compact-mobile .grid__item .group-block-content.layout-panel-flex {
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    height: 100%;
+    /* The pill used to take its height from the thumbnail's own padding. The
+       thumbnail now fills its cell instead, so the height is set here and the
+       cell stretches to it. This rule also catches the label's own content
+       row, which is why the cell stretches with align-self rather than this
+       being align-items: stretch — that would un-centre the label. */
+    min-height: 4.8rem;
+  }
+
+  /* The thumbnail keeps its own cell, divided off from the label the way the
+     desktop pill divides them. The image fills that cell edge to edge: no
+     padding around it, and no gap between it and the pill's own border.
+     The divider is the same hairline the pill is drawn with in
+     collection-style-row.css, not --color-border-rgb: that token is #999 here
+     and reads as a dark bar between the two halves of a pill whose own border
+     is #eee. */
+  .multicolumn--compact-mobile .grid__item .icon-block {
+    flex: 0 0 auto;
+    align-self: stretch;
+    width: 4.8rem;
+    padding: 0;
+    overflow: hidden;
+    border-inline-end: 1px solid #eee;
+  }
+
+  /* The media sits in an inline span sized from --size-style-width; here the
+     cell sets the size instead. A blanket mobile rule further up pins every
+     group-block icon image to 42 x 42 with !important, so the thumbnail has
+     to outrank it. */
+  .multicolumn--compact-mobile .grid__item .icon-block--size-style {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .multicolumn--compact-mobile .grid__item .icon-block--size-style img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+
+  .multicolumn--compact-mobile .grid__item .icon-block + .group-block {
+    flex: 0 1 auto;
+    width: auto;
+    padding-inline: 1.2rem;
+  }
+
+  /* One line per pill, since the pill grows to fit rather than the label
+     wrapping inside a fixed box. The label is a <p> in a group block, and two
+     blanket mobile rules further up — the "Made for your story" icon sizing
+     and the delivery-time row — force every one of those to 15px and to the
+     left with !important, hence the same here. */
+  .multicolumn--compact-mobile .grid__item .text-block,
+  .multicolumn--compact-mobile .grid__item .text-block > * {
+    width: auto;
+    max-width: none;
+    margin-block: 0;
+    font-size: 1.2rem !important;
+    line-height: 1.3;
+    letter-spacing: 0.06em;
+    text-align: center !important;
+    text-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  /* The arrows live above the row, on the right, whenever the block is set to
+     that position — base.css hides the pair inside the carousel further up,
+     but only without !important, so this keeps a round arrow off the pills. */
+  .arrow-on-header .multicolumn--compact-mobile .swiper-btns-wrap:not(.swiper-btns-on-header) {
+    display: none !important;
+  }
+}
+
+/* ==================================================================
+   Eden Raine: product card names on mobile
+   The card title block is set to the h5 preset, 2.1rem of heading serif. That
+   reads on a four-up desktop grid; on the two-up mobile grid it fills both
+   clamped lines with half a name. Only the oversized presets are touched, so a
+   card whose title is already set to h6 or body size keeps its size.
+   ================================================================== */
+@media screen and (max-width: 749px) {
+  .card--block-title .text-block:is(.h1, .h2, .h3, .h4, .h5),
+  .card--block-title .text-block:is(.h1, .h2, .h3, .h4, .h5) > * {
+    font-size: 1.6rem;
+    line-height: 1.35;
   }
 }

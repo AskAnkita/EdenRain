@@ -4,7 +4,7 @@
     
     Create a highly customizable, responsive Video Hero Section for a Shopify theme.
     
-    The section should replicate a modern luxury landing hero similar to a diamond jewelry brand homepage.
+    The section should replicate a modern luxury landing hero similar to a diamond jewellery brand homepage.
     
     🎬 CORE FEATURE
     Background video support (desktop)
@@ -67,7 +67,7 @@
     🎨 DESIGN REQUIREMENTS
     Full screen hero section (100vh default, adjustable)
     Smooth fade overlay option (black/white gradient)
-    Modern luxury aesthetic (like premium jewelry brand)
+    Modern luxury aesthetic (like premium jewellery brand)
     Buttons should have hover animation
     Text should be readable on all video backgrounds
     ⚙️ OPTIONAL SETTINGS (BONUS)
@@ -241,7 +241,7 @@
       line-height: 1.2;
       {% comment %} change font size , family and color {% endcomment %}
       font-weight: 600;
-      font-family:'Cormorant garamond' , 'sans-serif';
+      font-family: var(--font-heading--family);
       {% comment %}  {% endcomment %}
       {% if block.settings.layout_direction == 'horizontal' %}
         width: 100%;
@@ -254,7 +254,7 @@
       font-size: {{ block.settings.description_size }}px;
       line-height: 1.5;
       {% comment %} font changes {% endcomment %}
-      font-family: "Source Sans 3", sans-serif;
+      font-family: var(--font-body--family);
       {% comment %}  {% endcomment %}
       {% if block.settings.layout_direction == 'horizontal' %}
         width: 100%;
@@ -678,7 +678,7 @@
       "type": "richtext",
       "id": "description",
       "label": "Description",
-      "default": "<p>Discover our exquisite collection of handcrafted diamond jewelry</p>"
+      "default": "<p>Discover our exquisite collection of handcrafted diamond jewellery</p>"
     },
     {
       "type": "color",

@@ -1,0 +1,574 @@
+{% comment %}
+  Text-only desktop mega menu panel: every option is a named link, no picture tiles.
+
+  Used by the menus 'menu-static-layout' returns "links" for, which is now all of them. Three
+  regions on every menu; what each menu puts in them is set in the case block below:
+  - Browse (left): the menu's own groups side by side as columns of links, and then any
+    row-style group full width underneath. The style column carries a picture from the theme's
+    assets beside each name, and the other icon columns a line drawing ('menu-link-icon' holds
+    which file each name takes and what it falls back to). Only Engagement ends
+    its columns with the shared guide pages; the other menus give that room to their own
+    options, and Diamonds has its own "Learn" column of guides.
+  - Promo (right): a heading over a picture, which is inset from the right edge of the panel
+    and carries a line of copy and two entry points over its foot. Engagement and Diamonds
+    show the Design Studio there, Wedding and Jewellery a collection. The heading takes the
+    same rule as the browse columns, so they all line up across the panel.
+  - Footer: a hairline strip across both carrying the menu's "View all".
+
+  Accepts:
+  - link: {Object} the top-level menu link
+  - drawer_id: {String}
+
+  The lists themselves all come from 'menu-static-items', so the names here cannot drift apart
+  from the menu; this snippet only decides which groups a menu draws, in what order and how wide
+  each one runs. Columns are declared per menu in `browse_columns` below as
+
+      group|Heading|styles|heading-url
+
+  - group is the name 'menu-static-items' lists the items under; "Guides" is the shared list of
+    guide pages, which any menu can ask for.
+  - Heading defaults to the group's own name.
+  - styles is a space-separated list, any of: "split" for a long list in two sub-columns,
+    "compact" for a narrower column, which is what lets a menu run five of them in one row,
+    "inline" for a row of links that runs full width under the columns, and one of the four
+    icon sets - "shapes" for the cut drawings from 'icon-diamond-shape', "ring-styles" for the
+    setting pictures in assets, "types" for the piece drawings from
+    'icon-jewellery-type', "stones" for the material drawings from 'icon-stone'. Blank is a
+    plain single column with no drawings. Only a list whose every name is drawn in that set may
+    ask for it, or the names it misses would each carry an empty box.
+  - heading-url is optional and gives the column a "View all" link under its names, for a
+    group that is also a collection. The heading itself is never a link: one destination per
+    column, in one place.
+
+  Order matters: a column is drawn where it is listed, so the "inline" rows go last.
+{% endcomment %}
+
+{%- liquid
+  assign parent_key = link.title | handle
+
+  comment
+    Defaults, for a menu that asks for this panel without being named below: its own groups are
+    not known here, so it gets the guide pages and the studio alone rather than an empty half.
+  endcomment
+  assign browse_columns = 'Guides|Guides|' | split: ','
+  assign parent_lower = link.title | downcase
+  assign view_all_label = 'View all ' | append: parent_lower
+
+  comment
+    The promo picture that fills the right-hand half. Every one of them is a portrait asset
+    under assets/, framed by the half rather than by its own proportions, and it sits behind
+    the words carrying nothing they do not - so it goes in decorative, alt="", rather than a
+    description a screen reader would read out over the heading.
+
+    'promo_style' is the modifier the picture takes: "studio" holds the workshop bench just
+    below centre, where the collection pictures are framed on the piece and want none.
+  endcomment
+  assign promo_heading = 'Design Studio'
+  assign promo_url = '/pages/design-studio'
+  assign promo_image = 'about-craft-workshop.png'
+  assign promo_width = 1086
+  assign promo_height = 1448
+  assign promo_style = 'studio'
+  assign promo_text = 'Have a piece made to your own design, or ask us to remake something you love.'
+  assign promo_actions = 'Explore the studio|/pages/design-studio,Talk to a designer|/pages/book-a-consultation' | split: ','
+
+  comment
+    An optional second picture, standing beside the promo in the same half as
+    'Name|url|asset|width|height'. Only a menu whose browse columns stop well short of the
+    picture asks for one - Wedding, whose four capped columns leave about a fifth of the panel
+    empty between the names and the promo - and the CSS draws it only on the wide screens where
+    that room exists. Blank is one picture, which is every other menu.
+  endcomment
+  assign promo_secondary = ''
+
+  comment
+    Metal is deliberately absent from Engagement: it is a filter on the collection page, and as a
+    third column beside the two long ones it left a ragged row. Wedding, whose lists are short,
+    gives it a column of its own.
+
+    Every studio action has to land somewhere that exists: the builder page is the setting-first
+    route ('design-studio-builder'), and the designer route is the booking page. 'Label|url'
+    each, and the two of them are what sits over the foot of the picture.
+  endcomment
+  case parent_key
+    when 'engagement'
+      assign browse_columns = 'By Style|Shop by Style|ring-styles split,By Shape|Shop by Shape|shapes split,Guides|Guides|' | split: ','
+      assign view_all_label = 'View all engagement rings'
+      assign promo_text = 'Build a ring from the setting up, or start from the stone and let us set it.'
+      assign promo_actions = 'Create your own design|/pages/design-studio-builder,Talk to our designer|/pages/book-a-consultation' | split: ','
+    when 'wedding'
+      comment
+        Four columns, where there were three. Three lists of four short names left the browse half
+        about 22rem tall against a promo picture that floors at 30rem, so the panel carried a band
+        of empty white under the names; the shared Guides list is the longest column the menu can
+        ask for and it anchors the row at the height the picture sets.
+
+        By Style carries a line drawing of the band itself beside each name, one per style
+        ('band-style-<handle>.png', see 'menu-link-icon'), which gives these names
+        the same visual weight as Engagement's picture-led styles. Drawings rather than the tile
+        photographs the mobile menu shows: at icon size a photograph of a plain band and a
+        photograph of a pavé one are the same grey ellipse, where the drawings say in one look
+        how much of each band is set. The set is 'band-styles', not 'ring-styles': none of these
+        four is a setting, and 'icon-ring-style' draws nothing for them.
+
+        No Shape column here. The cuts are Engagement's browse axis and the wedding range carries
+        no shape tag at all - every cut under this menu would open an empty filter.
+
+        The headings are the short forms - "By Style", not "Shop by Style" - and the columns are
+        compact, both for the same reason Jewellery's five are: at the narrow end of the desktop
+        range a quarter of the browse half is about 13rem, which "Shop by Style" overruns, and a
+        heading that wraps takes its rule out of line with the three beside it.
+      endcomment
+      assign browse_columns = 'By Style|By Style|band-styles compact,Featured|Featured|compact,By Metal|By Metal|compact,Guides|Guides|compact' | split: ','
+      assign view_all_label = 'View all wedding bands'
+      assign promo_heading = 'Signature Wedding Bands'
+      assign promo_url = '/collections/wedding-bands'
+      assign promo_image = 'category-wedding-bands.png'
+      assign promo_style = ''
+      assign promo_text = 'Plain metal, pavé and eternity bands, made to sit with the ring they are worn beside.'
+      assign promo_actions = 'Shop wedding bands|/collections/wedding-bands,Shop eternity rings|/collections/eternity-rings' | split: ','
+      assign promo_secondary = 'Eternity Rings|/collections/eternity-rings|featured-wedding-eternity.jpg|800|1020'
+    when 'diamonds'
+      comment
+        Learn is the menu's own column of guide pages, so the shared Guides list is not asked for
+        on top of it. The studio stays: the diamond-first route into it starts here.
+      endcomment
+      assign browse_columns = 'Lab-Grown Diamonds|Shop by Shape|shapes split|/collections/lab-grown-diamonds,Learn|Learn|' | split: ','
+      assign promo_text = 'Choose a lab-grown stone and we will set it in the design you pick.'
+      assign promo_actions = 'Start with a diamond|/collections/lab-grown-diamonds,Start with a setting|/pages/design-studio-builder' | split: ','
+    when 'jewellery' or 'jewelry'
+      comment
+        A column per category, in the order a jewellery shopper reads them: Rings, Earrings,
+        Necklaces, Bracelets, Men's. Each heading is the category's own collection and the names
+        under it are its sub-ranges, which is the nesting the menu had on mobile but not here -
+        the panel used to merge them all into one "Shop Jewellery" list, which read as a wall of
+        names with no sign of where one category ended and the next began.
+
+        Five columns, so they take "compact": the floor each one wraps at comes down far enough
+        for all five to stay on one row beside the promo picture. Their names and order come
+        from 'menu-static-items', so the panel and the mobile menu cannot drift apart.
+
+        Neither Shape nor Stone is on the panel. Both are still groups in the navigation and
+        still listed in 'menu-static-items' - Shape as the nine cuts, each with its drawing in
+        assets - so the mobile menu and anything else that asks for them is unchanged; it is
+        this panel that gives them no column. Putting "Shop by Shape|By Shape|shapes compact"
+        or "Shop by Stone|Shop by Stone|inline" back into the list above is all it takes to
+        return either. Keep a cut column's heading short: at the width a fifth of the row leaves
+        it, "Shop by Shape" wraps onto a second line and takes its rule out of line with the
+        four beside it, which is why the form above reads "By Shape".
+      endcomment
+      assign browse_columns = "Rings|Rings|compact|/collections/rings,Earrings|Earrings|compact|/collections/earrings,Necklaces|Necklaces|compact|/collections/necklaces,Bracelets|Bracelets|compact|/collections/bracelets,Men's|Men's|compact|/collections/mens-rings" | split: ','
+      assign promo_heading = 'Best Sellers'
+      assign promo_url = '/collections/best-sellers'
+      assign promo_image = 'category-best-sellers.png'
+      assign promo_width = 1122
+      assign promo_height = 1402
+      assign promo_style = ''
+      assign promo_text = 'The pieces that leave the workshop most often, in earrings, necklaces and rings.'
+      assign promo_actions = 'Shop best sellers|/collections/best-sellers,Shop new in|/collections/new-in' | split: ','
+  endcase
+
+  comment
+    ---------------------------------------------------------------------------
+    Theme settings > Mega menu panels overrides everything above for the picture half, so the
+    picture, the words and both buttons are changed in the editor rather than in this file.
+    The four menus that have a panel are hard-wired to a prefix below; a menu not listed keeps
+    the defaults above and has no settings of its own.
+
+    Every field falls back to its default when it is left empty, so a half-filled group is
+    still a finished panel. A button is removed by typing "none" as its label, which is the
+    same switch 'Mega menu featured media' uses to drop a card's video - there is no empty
+    field that means "no button", because an empty field already means "keep the default".
+    ---------------------------------------------------------------------------
+  endcomment
+  assign promo_prefix = ''
+  case parent_key
+    when 'engagement'
+      assign promo_prefix = 'mm_promo_eng'
+    when 'wedding'
+      assign promo_prefix = 'mm_promo_wed'
+    when 'diamonds'
+      assign promo_prefix = 'mm_promo_dia'
+    when 'jewellery' or 'jewelry'
+      assign promo_prefix = 'mm_promo_jwl'
+  endcase
+
+  comment
+    The two buttons are taken apart here so a merchant can change one without retyping the
+    other, and put back together into the 'Label|url' pairs the markup walks at the end.
+  endcomment
+  assign promo_action_1 = promo_actions[0] | split: '|'
+  assign promo_action_1_label = promo_action_1[0]
+  assign promo_action_1_url = promo_action_1[1]
+  assign promo_action_2 = promo_actions[1] | split: '|'
+  assign promo_action_2_label = promo_action_2[0]
+  assign promo_action_2_url = promo_action_2[1]
+
+  assign promo_secondary_parts = promo_secondary | split: '|'
+  assign promo_secondary_label = promo_secondary_parts[0]
+  assign promo_secondary_url = promo_secondary_parts[1]
+  assign promo_secondary_image = promo_secondary_parts[2]
+  assign promo_secondary_width = promo_secondary_parts[3]
+  assign promo_secondary_height = promo_secondary_parts[4]
+
+  comment
+    An image_picker hands back an image object; the defaults above are file names resolved in
+    Content > Files by 'image-source'. Both are kept as they are here and turned into a src
+    and a srcset further down, so the markup never has to know which of the two it got.
+  endcomment
+  assign promo_picked = ''
+  assign promo_secondary_picked = ''
+
+  if promo_prefix != ''
+    assign promo_setting_key = promo_prefix | append: '_image'
+    assign promo_picked = settings[promo_setting_key]
+
+    assign promo_setting_key = promo_prefix | append: '_heading'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_heading = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_url'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_url = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_text'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_text = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_button_1_label'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_action_1_label = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_button_1_url'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_action_1_url = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_button_2_label'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_action_2_label = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_button_2_url'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_action_2_url = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_secondary_image'
+    assign promo_secondary_picked = settings[promo_setting_key]
+
+    assign promo_setting_key = promo_prefix | append: '_secondary_label'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_secondary_label = promo_setting_value
+    endif
+
+    assign promo_setting_key = promo_prefix | append: '_secondary_url'
+    assign promo_setting_value = settings[promo_setting_key] | default: '' | strip
+    if promo_setting_value != ''
+      assign promo_secondary_url = promo_setting_value
+    endif
+  endif
+
+  comment
+    Back into the pairs the markup walks. A label of "none" drops its button, and a button with
+    nowhere to go is dropped too rather than rendered as a dead link.
+  endcomment
+  assign promo_actions = ''
+  assign promo_action_1_switch = promo_action_1_label | downcase | strip
+  if promo_action_1_label != blank and promo_action_1_url != blank and promo_action_1_switch != 'none'
+    assign promo_actions = promo_action_1_label | append: '|' | append: promo_action_1_url
+  endif
+  assign promo_action_2_switch = promo_action_2_label | downcase | strip
+  if promo_action_2_label != blank and promo_action_2_url != blank and promo_action_2_switch != 'none'
+    assign promo_action_2_pair = promo_action_2_label | append: '|' | append: promo_action_2_url
+    if promo_actions == ''
+      assign promo_actions = promo_action_2_pair
+    else
+      assign promo_actions = promo_actions | append: ',' | append: promo_action_2_pair
+    endif
+  endif
+  assign promo_actions = promo_actions | split: ','
+
+  comment
+    The picture itself. A picked image carries its own proportions, so the width and height
+    attributes come off the object rather than off the numbers set per menu above - those are
+    the proportions of the file the theme ships, and holding a picked picture to them would
+    reserve the wrong amount of room and shift the panel as it loads.
+  endcomment
+  if promo_picked != blank
+    assign promo_src = promo_picked | image_url: width: 900
+    assign promo_srcset = promo_picked | image_url: width: 600 | append: ' 600w, '
+    assign promo_srcset = promo_srcset | append: promo_src | append: ' 900w'
+    assign promo_width = promo_picked.width
+    assign promo_height = promo_picked.height
+  else
+    capture promo_src_900
+      render 'image-source', file: promo_image, width: 900
+    endcapture
+    capture promo_src_600
+      render 'image-source', file: promo_image, width: 600
+    endcapture
+    assign promo_src = promo_src_900 | strip
+    assign promo_srcset = promo_src_600 | strip | append: ' 600w, '
+    assign promo_srcset = promo_srcset | append: promo_src | append: ' 900w'
+  endif
+
+  comment
+    The second picture, resolved the same way. It is drawn only when there is something to draw
+    and somewhere for it to go, and "none" as its label takes it off a menu that ships one.
+  endcomment
+  assign promo_secondary_switch = promo_secondary_label | downcase | strip
+  assign promo_secondary_show = false
+  if promo_secondary_url != blank and promo_secondary_switch != 'none'
+    if promo_secondary_picked != blank
+      assign promo_secondary_show = true
+      assign promo_secondary_src = promo_secondary_picked | image_url: width: 700
+      assign promo_secondary_srcset = promo_secondary_picked | image_url: width: 450 | append: ' 450w, '
+      assign promo_secondary_srcset = promo_secondary_srcset | append: promo_secondary_src | append: ' 700w'
+      assign promo_secondary_width = promo_secondary_picked.width
+      assign promo_secondary_height = promo_secondary_picked.height
+    elsif promo_secondary_image != blank
+      assign promo_secondary_show = true
+      capture promo_secondary_src_700
+        render 'image-source', file: promo_secondary_image, width: 700
+      endcapture
+      capture promo_secondary_src_450
+        render 'image-source', file: promo_secondary_image, width: 450
+      endcapture
+      assign promo_secondary_src = promo_secondary_src_700 | strip
+      assign promo_secondary_srcset = promo_secondary_src_450 | strip | append: ' 450w, '
+      assign promo_secondary_srcset = promo_secondary_srcset | append: promo_secondary_src | append: ' 700w'
+    endif
+  endif
+
+  comment
+    A menu running compact columns gets a tighter gap between them as well: five columns at the
+    gap the two- and three-column menus use would not hold their row beside the promo picture at
+    the narrow end, and the fifth dropped to a row of its own. Read off the columns rather than
+    set per menu, so a menu that asks for compact columns gets the gap that goes with them.
+  endcomment
+  assign columns_tight = false
+  for column in browse_columns
+    assign column_probe = column | split: '|'
+    if column_probe[2] contains 'compact'
+      assign columns_tight = true
+      break
+    endif
+  endfor
+-%}
+
+{%- comment -%}
+  The menu's own handle rides on the page as a modifier, so a panel that wants something the
+  others don't - Wedding's shorter heading rules and narrower columns - can be reached from CSS
+  without a class per column. A menu with no rules of its own is unaffected by carrying it.
+{%- endcomment -%}
+<div
+  class="menu-drawer-desktop__page menu-drawer-desktop__page--links menu-drawer-desktop__page--{{ parent_key }}"
+  id="{{ drawer_id }}"
+  data-menu-drawer-page
+  hidden
+>
+  <section class="menu-drawer-desktop__half menu-drawer-desktop__half--browse">
+    <div
+      class="
+        menu-drawer-desktop__columns
+        {%- if columns_tight %} menu-drawer-desktop__columns--tight{% endif -%}
+      "
+    >
+      {%- for column in browse_columns -%}
+        {%- liquid
+          assign column_parts = column | split: '|'
+          assign column_group = column_parts[0]
+          assign column_heading = column_parts[1] | default: column_parts[0]
+          assign column_styles = column_parts[2] | split: ' '
+          # Compared against '' rather than blank: a column with no heading url has no fourth
+          # field at all, and `nil != blank` is not reliable across Liquid versions.
+          assign column_url = column_parts[3] | default: ''
+
+          capture column_source
+            render 'menu-static-items', group: column_group, parent: link.title
+          endcapture
+          assign column_source = column_source | strip
+
+          # Only the first section of a group is drawn: a second would need a heading of its own,
+          # which the columns have no room for. Wedding lists its second section as a column.
+          assign column_sections = column_source | split: ';;'
+          assign column_parts_raw = column_sections[0] | split: '::'
+          assign column_items_raw = column_parts_raw[0]
+          if column_parts_raw.size > 1
+            assign column_items_raw = column_parts_raw[1]
+          endif
+          assign column_items = column_items_raw | split: '~'
+
+          # Which set of drawings the names in this column carry, if any. `render` takes no
+          # variable for the snippet it renders, so each set is a branch of its own below.
+          assign column_icons = ''
+          if column_styles contains 'shapes'
+            assign column_icons = 'shapes'
+          elsif column_styles contains 'ring-styles'
+            assign column_icons = 'ring-styles'
+          elsif column_styles contains 'band-styles'
+            assign column_icons = 'band-styles'
+          elsif column_styles contains 'types'
+            assign column_icons = 'types'
+          elsif column_styles contains 'stones'
+            assign column_icons = 'stones'
+          endif
+        -%}
+        {%- if column_items.size > 0 -%}
+          <div
+            class="
+              menu-drawer-desktop__column
+              {%- for style in column_styles %} menu-drawer-desktop__column--{{ style }}{% endfor -%}
+            "
+          >
+            {%- comment -%}
+              Plain text, never a link. The heading labels the column; a shopper who wants the
+              category itself takes the "View all" under the names, which is the one place a
+              column's own destination is offered.
+            {%- endcomment -%}
+            <h2 class="menu-drawer-desktop__column-heading">{{ column_heading | escape }}</h2>
+            <ul class="menu-drawer-desktop__link-list" role="list">
+              {%- for item in column_items -%}
+                {%- liquid
+                  assign item_parts = item | split: '|'
+                  assign item_title = item_parts[0]
+                  assign item_url = item_parts[1]
+                  unless item_url contains '/'
+                    assign item_url = item_url | prepend: '/collections/'
+                  endunless
+                  # `render` takes no filters in its arguments, so the icon's key is made here
+                  assign item_key = item_title | handle
+                -%}
+                <li>
+                  <a class="menu-drawer-desktop__link" href="{{ item_url }}">
+                    {%- render 'menu-link-icon', icons: column_icons, key: item_key, prefix: 'menu-drawer-desktop__link-icon' -%}
+                    <span class="menu-drawer-desktop__link-text">{{ item_title | escape }}</span>
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+            {%- if column_url != '' -%}
+              {%- comment -%}
+                The column's own way in to everything under it. The words stay short so they hold
+                one line in a compact column, and the heading rides on the link as its label: five
+                bare "View all"s read alike to anything that meets one out of its column.
+              {%- endcomment -%}
+              {%- assign column_cta_label = column_heading | prepend: 'View all ' -%}
+              <a
+                class="menu-drawer-desktop__column-cta"
+                href="{{ column_url }}"
+                aria-label="{{ column_cta_label | escape }}"
+              >
+                <span class="menu-drawer-desktop__link-text">View all</span>
+                <span class="menu-drawer-desktop__column-cta-arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </section>
+
+  <section class="menu-drawer-desktop__half menu-drawer-desktop__half--promo">
+    <h2 class="menu-drawer-desktop__column-heading">
+      <a class="menu-drawer-desktop__promo-heading-link" href="{{ promo_url }}">
+        {{- promo_heading | escape -}}
+      </a>
+    </h2>
+
+    {%- comment -%}
+      A row, so that a menu carrying a second picture sets it beside the first under the one
+      heading rule, and a menu carrying none is the row of one it was before.
+    {%- endcomment -%}
+    <div class="menu-drawer-desktop__promo-pair">
+      <div
+        class="
+          menu-drawer-desktop__promo
+          {%- if promo_style != '' %} menu-drawer-desktop__promo--{{ promo_style }}{% endif -%}
+        "
+      >
+        <span class="menu-drawer-desktop__promo-media" aria-hidden="true">
+          <img
+            src="{{ promo_src }}"
+            srcset="{{ promo_srcset }}"
+            sizes="(min-width: 1200px) 34vw, 30vw"
+            alt=""
+            width="{{ promo_width }}"
+            height="{{ promo_height }}"
+            loading="lazy"
+          >
+        </span>
+        <div class="menu-drawer-desktop__promo-overlay">
+          <p class="menu-drawer-desktop__promo-text">{{ promo_text | escape }}</p>
+          <div class="menu-drawer-desktop__promo-actions">
+            {%- for action in promo_actions -%}
+              {%- assign action_parts = action | split: '|' -%}
+              <a
+                class="menu-drawer-desktop__button menu-drawer-desktop__button--on-image"
+                href="{{ action_parts[1] }}"
+              >{{ action_parts[0] | escape }}</a>
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%}
+        The second picture, where a menu asks for one. A link rather than a panel of its own:
+        the picture beside it carries the copy and the two buttons, and this is one more way in,
+        so the whole tile is the hit area and the name over its foot is the only word on it.
+      {%- endcomment -%}
+      {%- if promo_secondary_show -%}
+        <a
+          class="menu-drawer-desktop__promo menu-drawer-desktop__promo--secondary eden-action-host"
+          href="{{ promo_secondary_url }}"
+        >
+          <span class="menu-drawer-desktop__promo-media" aria-hidden="true">
+            <img
+              src="{{ promo_secondary_src }}"
+              srcset="{{ promo_secondary_srcset }}"
+              sizes="(min-width: 1400px) 22vw, 30vw"
+              alt=""
+              width="{{ promo_secondary_width }}"
+              height="{{ promo_secondary_height }}"
+              loading="lazy"
+            >
+          </span>
+          <span class="menu-drawer-desktop__promo-overlay">
+            {%- comment -%}
+              Spans, not a link: the whole tile is already the anchor. They carry the promo's
+              button classes so this reads as the third button in the row rather than a label of
+              its own kind - see 'menu-drawer-desktop__promo-label' in the stylesheet.
+            {%- endcomment -%}
+            <span class="
+              menu-drawer-desktop__button
+              menu-drawer-desktop__button--on-image
+              menu-drawer-desktop__promo-label
+            ">{{ promo_secondary_label | escape }}</span>
+          </span>
+        </a>
+      {%- endif -%}
+    </div>
+  </section>
+
+  <div class="menu-drawer-desktop__links-footer">
+    {%- if link.url != blank -%}
+      <a class="menu-drawer-desktop__footer-cta" href="{{ link.url }}">
+        <span class="menu-drawer-desktop__link-text">{{ view_all_label | escape }}</span>
+        <span class="menu-drawer-desktop__footer-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    {%- endif -%}
+  </div>
+</div>

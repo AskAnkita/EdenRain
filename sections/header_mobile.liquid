@@ -83,25 +83,160 @@
                             </summary>
                             <div class="mnav__panel">
                               {%- if link.links != blank -%}
-                                <ul class="mnav__sub" role="list">
-                                  {%- for child in link.links -%}
-                                    <li>
-                                      <a href="{{ child.url }}">{{ child.title | escape }}</a>
-                                      {%- if child.links != blank -%}
-                                        <ul class="mnav__sub mnav__sub--nested" role="list">
-                                          {%- for grandchild in child.links -%}
-                                            <li><a href="{{ grandchild.url }}">{{ grandchild.title | escape }}</a></li>
+                                {%- liquid
+                                  # A group that lists names of its own - "Shop by Style" over the ten settings - is drawn as
+                                  # a section with a heading of its own; a menu whose children are destinations rather than
+                                  # groups is one flat list of rows.
+                                  assign has_grandchild_links = false
+                                  for child in link.links
+                                    capture static_probe
+                                      render 'menu-static-items', group: child.title, parent: link.title
+                                    endcapture
+                                    assign static_probe = static_probe | strip
+                                    if child.links != blank or static_probe != ''
+                                      assign has_grandchild_links = true
+                                      break
+                                    endif
+                                  endfor
+                                -%}
+
+                                {%- if has_grandchild_links -%}
+                                  <ul class="mnav__sections" role="list">
+                                    {%- for child in link.links -%}
+                                      {%- liquid
+                                        capture static_items
+                                          render 'menu-static-items', group: child.title, parent: link.title
+                                        endcapture
+                                        assign static_items = static_items | strip
+
+                                        # Which drawings this group's names carry, decided by the same rules the desktop
+                                        # panel's columns follow ('menu-icon-set'), so a name is drawn the same on both.
+                                        capture child_icons
+                                          render 'menu-icon-set', group: child.title, parent: link.title
+                                        endcapture
+                                        assign child_icons = child_icons | strip
+
+                                        # The navigation carries the group's own destination among its names, as an "All ..."
+                                        # item. It comes out of the list and becomes the step out of the section underneath it.
+                                        assign all_link = blank
+                                        for grandchild in child.links
+                                          assign grandchild_title_lower = grandchild.title | downcase
+                                          if grandchild_title_lower contains 'all ' or grandchild_title_lower == 'all'
+                                            assign all_link = grandchild
+                                            break
+                                          endif
+                                        endfor
+                                      -%}
+                                      <li class="mnav__section">
+                                        <h3 class="mnav__section-heading">{{ child.title | escape }}</h3>
+
+                                        {%- if child.links != blank -%}
+                                          <ul class="mnav__links" role="list">
+                                            {%- for grandchild in child.links -%}
+                                              {%- liquid
+                                                if all_link != blank and grandchild == all_link
+                                                  continue
+                                                endif
+                                                # The item's own name, never its collection: "Round" is `round` under both
+                                                # Engagement and Diamonds, where the collections are named differently.
+                                                assign item_key = grandchild.title | handle
+                                              -%}
+                                              <li>
+                                                <a class="mnav__link" href="{{ grandchild.url }}">
+                                                  {%- render 'menu-link-icon', icons: child_icons, key: item_key, prefix: 'mnav__link-icon' -%}
+                                                  <span class="mnav__link-text">{{ grandchild.title | escape }}</span>
+                                                </a>
+                                              </li>
+                                            {%- endfor -%}
+                                          </ul>
+                                        {%- elsif static_items != '' -%}
+                                          {%- assign item_sections = static_items | split: ';;' -%}
+                                          {%- for section_raw in item_sections -%}
+                                            {%- liquid
+                                              assign section_parts = section_raw | split: '::'
+                                              assign section_subhead = ''
+                                              assign section_items = section_parts[0]
+                                              if section_parts.size > 1
+                                                assign section_subhead = section_parts[0]
+                                                assign section_items = section_parts[1]
+                                              endif
+                                              assign section_rows = section_items | split: '~'
+
+                                              # Only the first section of a group carries the drawings, which is the rule the desktop
+                                              # columns follow too: a second section is a different list under the same heading -
+                                              # Wedding's featured collections under its band styles - and none of its names is drawn
+                                              # in the set the group asked for, so every one of them would carry an empty box.
+                                              assign section_icons = ''
+                                              if forloop.first
+                                                assign section_icons = child_icons
+                                              endif
+                                            -%}
+                                            {%- if section_subhead != '' -%}
+                                              <p class="mnav__section-subhead">{{ section_subhead | escape }}</p>
+                                            {%- endif -%}
+                                            <ul class="mnav__links" role="list">
+                                              {%- for row_item in section_rows -%}
+                                                {%- liquid
+                                                  assign parts = row_item | split: '|'
+                                                  assign item_title = parts[0]
+                                                  assign item_handle = parts[1]
+                                                  assign item_url = item_handle
+                                                  unless item_handle contains '/'
+                                                    assign item_url = item_handle | prepend: '/collections/'
+                                                  endunless
+                                                  assign item_key = item_title | handle
+                                                -%}
+                                                <li>
+                                                  <a class="mnav__link" href="{{ item_url }}">
+                                                    {%- render 'menu-link-icon', icons: section_icons, key: item_key, prefix: 'mnav__link-icon' -%}
+                                                    <span class="mnav__link-text">{{ item_title | escape }}</span>
+                                                  </a>
+                                                </li>
+                                              {%- endfor -%}
+                                            </ul>
                                           {%- endfor -%}
-                                        </ul>
-                                      {%- endif -%}
-                                    </li>
-                                  {%- endfor -%}
-                                </ul>
+                                        {%- endif -%}
+
+                                        {%- comment -%}
+                                          One way in to the category a section lists, under its names, in the panel's small
+                                          caps rather than the size the names take - the same step out of a list the desktop
+                                          columns carry.
+                                        {%- endcomment -%}
+                                        {%- if all_link != blank -%}
+                                          <a class="mnav__section-cta" href="{{ all_link.url }}">
+                                            <span class="mnav__link-text">{{ all_link.title | escape }}</span>
+                                            <span class="mnav__section-cta-arrow" aria-hidden="true">&rarr;</span>
+                                          </a>
+                                        {%- elsif child.url != blank and child.url != '#' -%}
+                                          {%- assign child_cta_label = child.title | prepend: 'View all ' -%}
+                                          <a class="mnav__section-cta" href="{{ child.url }}" aria-label="{{ child_cta_label | escape }}">
+                                            <span class="mnav__link-text">View all</span>
+                                            <span class="mnav__section-cta-arrow" aria-hidden="true">&rarr;</span>
+                                          </a>
+                                        {%- endif -%}
+                                      </li>
+                                    {%- endfor -%}
+                                  </ul>
+                                {%- else -%}
+                                  <ul class="mnav__links" role="list">
+                                    {%- for child in link.links -%}
+                                      <li>
+                                        <a class="mnav__link" href="{{ child.url }}">
+                                          <span class="mnav__link-text">{{ child.title | escape }}</span>
+                                        </a>
+                                      </li>
+                                    {%- endfor -%}
+                                  </ul>
+                                {%- endif -%}
                               {%- else -%}
-                                <ul class="mnav__sub" role="list">
+                                <ul class="mnav__links" role="list">
                                   {%- for type in link_collection.all_types limit: 6 -%}
                                     {%- if type != blank -%}
-                                      <li><a href="{{ link_collection.url }}?filter.p.product_type={{ type | url_encode }}">{{ type | escape }}</a></li>
+                                      <li>
+                                        <a class="mnav__link" href="{{ link_collection.url }}?filter.p.product_type={{ type | url_encode }}">
+                                          <span class="mnav__link-text">{{ type | escape }}</span>
+                                        </a>
+                                      </li>
                                     {%- endif -%}
                                   {%- endfor -%}
                                 </ul>
@@ -134,6 +269,40 @@
                   </ul>
                 </nav>
                 <div class="mnav__utility">
+                  {%- comment -%}
+                    The desktop header carries a "Meet a Consultant" chip; the drawer is the
+                    only place that link exists on a phone, so it sits at the foot of the
+                    drawer beside Wish lists, drawn the same way: icon, then the words.
+                  {%- endcomment -%}
+                  {%- liquid
+                    assign consultant_label = section.settings.consultant_text | default: 'Meet a Consultant' | strip
+                    assign consultant_link = section.settings.consultant_link | default: '/pages/book-a-consultation'
+                    assign consultant_size = section.settings.consultant_font_size
+                    if consultant_size == 'auto'
+                      assign consultant_size = blank
+                    endif
+                  -%}
+                  {%- if section.settings.show_consultant != false and consultant_label != blank -%}
+                    {%- capture consultant_styles -%}
+                      {%- if consultant_size != blank -%}--mnav-consultant-size: {{ consultant_size }};{%- endif -%}
+                      {%- if section.settings.consultant_text_color != blank -%}--mnav-consultant-color: {{ section.settings.consultant_text_color }};{%- endif -%}
+                      {%- if section.settings.consultant_hover_text_color != blank -%}--mnav-consultant-color-hover: {{ section.settings.consultant_hover_text_color }};{%- endif -%}
+                      {%- if section.settings.consultant_icon_color != blank -%}--mnav-consultant-icon-color: {{ section.settings.consultant_icon_color }};{%- endif -%}
+                    {%- endcapture -%}
+                    {%- assign consultant_styles = consultant_styles | strip_newlines | strip -%}
+                    <a
+                      class="mnav__consultant"
+                      href="{{ consultant_link }}"
+                      {% if consultant_styles != blank %}style="{{ consultant_styles }}"{% endif %}
+                    >
+                      {%- if section.settings.consultant_show_icon != false -%}
+                        <span class="mnav__consultant-icon svg-wrapper" aria-hidden="true">
+                          {{- 'icon-consultant.svg' | inline_asset_content -}}
+                        </span>
+                      {%- endif -%}
+                      <span class="mnav__consultant-text">{{ consultant_label }}</span>
+                    </a>
+                  {%- endif -%}
                   {%- render 'menu-drawer-utility', sec_settings: section.settings -%}
                 </div>
               </div>
@@ -235,6 +404,84 @@
       "label": "t:settings.width",
       "default": 50,
       "visible_if": "{{ section.settings.show_image_sub_menu == true }}"
+    },
+    {
+      "type": "header",
+      "content": "Consultant"
+    },
+    {
+      "type": "paragraph",
+      "content": "The \"Meet a Consultant\" call to action at the foot of the mobile menu. The desktop chip is set separately, under Header."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_consultant",
+      "label": "Show consultant link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "consultant_text",
+      "label": "Text",
+      "default": "Meet a Consultant",
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "url",
+      "id": "consultant_link",
+      "label": "Link",
+      "info": "Defaults to the booking page (\/pages\/book-a-consultation) when left empty.",
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "consultant_show_icon",
+      "label": "Show icon",
+      "default": true,
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "select",
+      "id": "consultant_font_size",
+      "label": "Size",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Match Wish lists"
+        },
+        {
+          "value": "1.3rem",
+          "label": "13px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        }
+      ],
+      "default": "auto",
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "color",
+      "id": "consultant_text_color",
+      "label": "Text",
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "color",
+      "id": "consultant_hover_text_color",
+      "label": "Text on hover",
+      "visible_if": "{{ section.settings.show_consultant }}"
+    },
+    {
+      "type": "color",
+      "id": "consultant_icon_color",
+      "label": "Icon",
+      "visible_if": "{{ section.settings.show_consultant and section.settings.consultant_show_icon }}"
     },
     {
       "type": "header",

@@ -1,7 +1,19 @@
 {% comment %}
-  Category tiles: one tall picture card per menu item, in a row you can scroll sideways.
-  Pictures come from each linked collection (its image, or its first product's photo), so no
-  separate uploads are needed. A tile's picture can be overridden with a block.
+  Category tiles: one tall picture card per category. On desktop the whole row fits in
+  one row by default ("Fit every tile on desktop"); turn that off and the row scrolls
+  sideways instead, a set number of tiles at a time. Narrower screens always scroll.
+
+  Which tiles the row shows is "Tiles" in the theme editor: a comma separated list of
+  titles, in the order they appear. A title that matches an item in the menu borrows that
+  item's link; one that does not links to /collections/<title>. Leave "Tiles" empty to show
+  every item in the menu instead.
+
+  Where a tile's picture comes from, in order:
+    1. a "Picture for a tile" block in the theme editor, matched to the tile's title, or
+       to its place in the row when the block's title is left empty;
+    2. the TILE PICTURES list below, which is the place to set pictures in code;
+    3. category-<tile>.png in Content > Files, e.g. category-rings.png for a tile titled Rings.
+  A tile with none of the three is dropped (the script below removes the tile).
 {% endcomment %}
 
 {%- liquid
@@ -10,17 +22,88 @@
     assign menu = linklists['category']
   endif
   assign overrides = section.blocks
+
+  # ------------------------------------------------------------------
+  # THE TILES - each one "Title|link", collected into a list. Either the
+  # titles typed into "Tiles" in the theme editor, in that order, or the
+  # whole menu when that setting is left empty.
+  # ------------------------------------------------------------------
+  assign tile_rows = ''
+  if section.settings.items == blank
+    for link in menu.links
+      assign tile_rows = tile_rows | append: link.title | append: '|' | append: link.url | append: '~~'
+    endfor
+  else
+    assign wanted_titles = section.settings.items | split: ','
+    for wanted_title in wanted_titles
+      assign tile_title = wanted_title | strip
+      if tile_title == blank
+        continue
+      endif
+      assign wanted_handle = tile_title | handleize
+      assign tile_url = ''
+      for link in menu.links
+        assign link_handle = link.title | handleize
+        if link_handle == wanted_handle
+          assign tile_title = link.title
+          assign tile_url = link.url
+        endif
+      endfor
+      if tile_url == blank
+        assign tile_url = '/collections/' | append: wanted_handle
+      endif
+      assign tile_rows = tile_rows | append: tile_title | append: '|' | append: tile_url | append: '~~'
+    endfor
+  endif
+  assign tiles = tile_rows | split: '~~'
+
+  # On desktop in "fit" mode every tile shares the row, so a tile is 100/<tiles> of
+  # the screen; otherwise it is one of "Tiles across on desktop".
+  assign tile_count = tiles.size
+  if tile_count < 1
+    assign tile_count = 1
+  endif
+  if section.settings.fit_all
+    assign desktop_tile_vw = 100 | divided_by: tile_count | plus: 1 | round
+  else
+    assign desktop_tile_vw = 100 | divided_by: section.settings.per_row | plus: 1 | round
+  endif
+  assign tile_sizes = '(min-width: 990px) ' | append: desktop_tile_vw | append: 'vw, (min-width: 750px) 45vw, 100vw'
+
+  # ------------------------------------------------------------------
+  # TILE PICTURES - the one place to change a tile's picture in code.
+  # One "tile: file name" pair per tile, comma separated. The files
+  # live in Shopify's Content > Files, not in the theme, so a picture can
+  # also be replaced in the admin by uploading a new file of the same
+  # name. A picture chosen in the theme editor always wins over this
+  # list, so a tile never ignores it.
+  # ------------------------------------------------------------------
+  assign tile_pictures = 'Engagement Rings: category-engagement-rings-model.png, Rings: category-rings.png, Earrings: category-earrings.png, Necklaces: category-necklaces.png, Bracelets: category-bracelets.png, Best Sellers: category-best-sellers.png, Wedding Bands: category-wedding-bands-product.png'
+  assign tile_picture_pairs = tile_pictures | split: ','
+
+  # The words sit straight on the photograph, so they carry a soft glow of the opposite
+  # tone to keep them readable whatever the picture does behind them.
+  assign label_brightness = section.settings.label_color | color_brightness
+  if label_brightness > 127
+    assign label_glow = 'rgb(0 0 0 / 0.55)'
+  else
+    assign label_glow = 'rgb(255 255 255 / 0.65)'
+  endif
 -%}
 
 {%- style -%}
   #category-tiles-{{ section.id }} {
+    /* --er-arrow-size is the shared scroller arrow size, set in assets/base.css */
+    --ct-arrow-size: var(--er-arrow-size, 40px);
     padding-block: {{ section.settings.padding_top }}px {{ section.settings.padding_bottom }}px;
   }
 
+  /* "Full width" runs the row to the edges of the screen, with only the gutter the arrows need
+     (they sit half outside the row, so the gutter is never smaller than half an arrow). */
   #category-tiles-{{ section.id }} .ct-inner {
-    max-width: var(--page-width, 160rem);
+    max-width: {% if section.settings.width == 'page' %}var(--page-width, 160rem){% else %}none{% endif %};
     margin: 0 auto;
-    padding-inline: 2.4rem;
+    padding-inline: max(2.4rem, calc(var(--ct-arrow-size) / 2 + 0.8rem));
   }
 
   #category-tiles-{{ section.id }} .ct-heading {
@@ -39,7 +122,13 @@
   #category-tiles-{{ section.id }} .ct-track {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: calc((100% - {{ section.settings.per_row | minus: 1 }} * 2rem) / {{ section.settings.per_row }});
+    /* The tiles share the whole width between them, so on a wide screen the tile grows rather
+       than another tile joining the row - four across stays four across, just bigger. The floor
+       is "Smallest tile width": below it the row scrolls instead of squeezing. */
+    grid-auto-columns: max(
+      {{ section.settings.min_tile_width }}px,
+      calc((100% - {{ section.settings.per_row | minus: 1 }} * 2rem) / {{ section.settings.per_row }})
+    );
     gap: 2rem;
     margin: 0;
     padding: 0;
@@ -63,9 +152,28 @@
     display: block;
     aspect-ratio: {{ section.settings.ratio }};
     overflow: hidden;
-    background: #f4f4f0;
+    background: #f8f8f8;
     color: #111;
     text-decoration: none;
+  }
+
+  {%- if section.settings.tile_height > 0 -%}
+    /* A set height for the tile, so the row fills more of the screen than its shape alone
+       would give. "Tile shape" is switched off with it (aspect-ratio: auto): left on, the
+       tile would take its WIDTH from that height too - a 460px tall square is 460px wide -
+       and each tile would spill over its column, closing the gaps and overlapping its
+       neighbour. On a phone, one tile across the whole screen, the shape still decides. */
+    @media screen and (min-width: 750px) {
+      #category-tiles-{{ section.id }} .ct-link {
+        aspect-ratio: auto;
+        height: {{ section.settings.tile_height }}px;
+      }
+    }
+  {%- endif -%}
+
+  #category-tiles-{{ section.id }} .ct-link:focus-visible {
+    outline: 3px solid #111;
+    outline-offset: 4px;
   }
 
   #category-tiles-{{ section.id }} .ct-link img {
@@ -77,23 +185,57 @@
     transition: transform 0.6s ease;
   }
 
-  #category-tiles-{{ section.id }} .ct-link:hover img {
-    transform: scale(1.04);
+  #category-tiles-{{ section.id }} .ct-link:hover img,
+  #category-tiles-{{ section.id }} .ct-link:focus-visible img {
+    transform: scale(1.06);
   }
 
+  /* A permanent text label keeps the tile simple; its full underline closes
+     into the centre while the tile is hovered. */
   #category-tiles-{{ section.id }} .ct-label {
     position: absolute;
     left: 50%;
     bottom: 2.4rem;
-    transform: translateX(-50%);
-    padding: 0.8rem 1.6rem;
-    background: rgb(255 255 255 / 0.92);
-    font-family: var(--font-body--family);
-    font-size: 1.3rem;
+    z-index: 1;
+    display: inline-block;
+    padding-bottom: 0.9rem;
+    color: {{ section.settings.label_color }};
+    font-size: 1.35rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.16em;
+    line-height: 1.2;
     text-transform: uppercase;
+    transform: translateX(-50%);
     white-space: nowrap;
+    text-shadow: 0 0 0.8rem {{ label_glow }};
+  }
+
+  #category-tiles-{{ section.id }} .ct-label::before,
+  #category-tiles-{{ section.id }} .ct-label::after {
+    position: absolute;
+    bottom: 0;
+    width: 50%;
+    height: 1px;
+    background: currentColor;
+    content: "";
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #category-tiles-{{ section.id }} .ct-label::before {
+    left: 0;
+    transform-origin: right center;
+  }
+
+  #category-tiles-{{ section.id }} .ct-label::after {
+    right: 0;
+    transform-origin: left center;
+  }
+
+  #category-tiles-{{ section.id }} .ct-link:hover .ct-label::before,
+  #category-tiles-{{ section.id }} .ct-link:focus-visible .ct-label::before,
+  #category-tiles-{{ section.id }} .ct-link:hover .ct-label::after,
+  #category-tiles-{{ section.id }} .ct-link:focus-visible .ct-label::after {
+    transform: scaleX(0);
   }
 
   #category-tiles-{{ section.id }} .ct-arrow {
@@ -102,16 +244,40 @@
     z-index: 1;
     display: grid;
     place-items: center;
-    width: 4.4rem;
-    height: 4.4rem;
+    width: var(--ct-arrow-size);
+    height: var(--ct-arrow-size);
+    /* The same white disc as every other scroller, set in assets/base.css */
     border: 0;
     border-radius: 50%;
     background: #fff;
-    box-shadow: 0 0.4rem 1.6rem rgb(0 0 0 / 0.12);
-    color: #111;
+    box-shadow: 0 2px 9px rgb(0 0 0 / 0.13);
+    color: #1a1a1a;
     cursor: pointer;
     transform: translateY(-50%);
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Hover draws a ring in from the middle of the disc to its edge */
+  #category-tiles-{{ section.id }} .ct-arrow::after {
+    position: absolute;
+    inset: 0;
+    border: 1.5px solid #1a1a1a;
+    border-radius: 50%;
+    content: "";
+    opacity: 0;
+    transform: scale(0.7);
+    transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.22s ease;
+    pointer-events: none;
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow:hover::after,
+  #category-tiles-{{ section.id }} .ct-arrow:focus-visible::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow:active {
+    transform: translateY(-50%) scale(0.9);
   }
 
   #category-tiles-{{ section.id }} .ct-arrow[disabled] {
@@ -119,22 +285,31 @@
     pointer-events: none;
   }
 
-  #category-tiles-{{ section.id }} .ct-arrow--prev { left: 1.2rem; }
-  #category-tiles-{{ section.id }} .ct-arrow--next { right: 1.2rem; }
+  #category-tiles-{{ section.id }} .ct-arrow--prev { left: calc(var(--ct-arrow-size) * -0.5); }
+  #category-tiles-{{ section.id }} .ct-arrow--next { right: calc(var(--ct-arrow-size) * -0.5); }
 
-  #category-tiles-{{ section.id }} .ct-arrow span {
-    width: 0.9rem;
-    height: 0.9rem;
-    border-top: 1.5px solid currentColor;
-    border-right: 1.5px solid currentColor;
+  #category-tiles-{{ section.id }} .ct-arrow .svg-wrapper {
+    width: auto;
+    height: auto;
   }
 
-  #category-tiles-{{ section.id }} .ct-arrow--next span { transform: translateX(-0.2rem) rotate(45deg); }
-  #category-tiles-{{ section.id }} .ct-arrow--prev span { transform: translateX(0.2rem) rotate(-135deg); }
+  #category-tiles-{{ section.id }} .ct-arrow .icon {
+    width: var(--er-arrow-icon-size, 1.4rem);
+  }
+
+  #category-tiles-{{ section.id }} .ct-arrow--prev .icon-caret { transform: rotate(90deg); }
+  #category-tiles-{{ section.id }} .ct-arrow--next .icon-caret { transform: rotate(-90deg); }
+  #category-tiles-{{ section.id }} .ct-arrow--prev .icon-arrow { transform: rotate(180deg); }
 
   #category-tiles-{{ section.id }} .ct-progress {
-    height: 2px;
+    width: 100%;
+    max-width: min(280px, calc(100% - 40px));
+    height: 3px;
     margin-top: 2.8rem;
+    margin-left: 0;
+    margin-right: auto;
+    border-radius: 999px;
+    overflow: hidden;
     background: rgb(0 0 0 / 0.1);
   }
 
@@ -143,6 +318,7 @@
     height: 100%;
     width: var(--ct-progress, 50%);
     background: #111;
+    border-radius: 999px;
     transition: width 0.2s ease;
   }
 
@@ -152,6 +328,33 @@
     color: rgb(0 0 0 / 0.55);
   }
 
+  {%- if section.settings.fit_all -%}
+    /* Every tile shares the desktop row, so the whole menu is there without scrolling.
+       "minmax(0, 1fr)" lets a tile shrink below its picture's own width, and the columns
+       are auto, not a fixed count, so a tile the script drops closes its gap rather than
+       leaving a hole. */
+    @media screen and (min-width: 990px) {
+      #category-tiles-{{ section.id }} .ct-track {
+        grid-auto-columns: minmax(0, 1fr);
+        overflow-x: clip;
+        scroll-snap-type: none;
+      }
+
+      #category-tiles-{{ section.id }} .ct-arrow,
+      #category-tiles-{{ section.id }} .ct-progress {
+        display: none;
+      }
+
+      /* The tiles are narrower the more there are, so the label follows the tile down
+         rather than wrapping or running past its edge. */
+      #category-tiles-{{ section.id }} .ct-label {
+        max-width: calc(100% - 2.4rem);
+        font-size: clamp(1.05rem, 0.72vw, 1.35rem);
+        letter-spacing: 0.14em;
+      }
+    }
+  {%- endif -%}
+
   @media screen and (max-width: 989px) {
     #category-tiles-{{ section.id }} .ct-track {
       grid-auto-columns: calc((100% - 2rem) / 2.3);
@@ -159,13 +362,23 @@
   }
 
   @media screen and (max-width: 749px) {
+    #category-tiles-{{ section.id }} {
+      padding-block-start: 12px;
+    }
+
     #category-tiles-{{ section.id }} .ct-inner {
       padding-inline: 1.6rem;
     }
 
     #category-tiles-{{ section.id }} .ct-track {
-      grid-auto-columns: 72%;
+      grid-auto-columns: 100%;
       gap: 1.2rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #category-tiles-{{ section.id }} .ct-tile {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
     }
 
     #category-tiles-{{ section.id }} .ct-arrow {
@@ -175,7 +388,10 @@
 
   @media (prefers-reduced-motion: reduce) {
     #category-tiles-{{ section.id }} .ct-track { scroll-behavior: auto; }
-    #category-tiles-{{ section.id }} .ct-link img { transition: none; }
+    #category-tiles-{{ section.id }} .ct-link img,
+    #category-tiles-{{ section.id }} .ct-label,
+    #category-tiles-{{ section.id }} .ct-label::before,
+    #category-tiles-{{ section.id }} .ct-label::after { transition: none; }
   }
 {%- endstyle -%}
 
@@ -185,44 +401,90 @@
       <h2 class="ct-heading">{{ section.settings.heading | escape }}</h2>
     {%- endif -%}
 
-    {%- if menu == blank or menu.links.size == 0 -%}
-      <p class="ct-empty">Choose a menu for this section in the theme editor.</p>
+    {%- if tiles.size == 0 -%}
+      <p class="ct-empty">Type the tiles you want, or choose a menu, in the theme editor.</p>
     {%- else -%}
       <div class="ct-viewport">
-        <button type="button" class="ct-arrow ct-arrow--prev" aria-label="Previous" disabled><span></span></button>
+        <button type="button" class="ct-arrow ct-arrow--prev" aria-label="Previous" disabled>
+          <span class="svg-wrapper">{%- render 'icon-arrow' -%}</span>
+        </button>
         <ul class="ct-track" role="list">
-          {%- for link in menu.links -%}
+          {%- for tile in tiles -%}
             {%- liquid
+              assign tile_parts = tile | split: '|'
+              assign tile_title = tile_parts[0]
+              assign tile_url = tile_parts[1]
+              assign tile_handle = tile_title | handleize
+              assign tile_index = forloop.index0
+
+              # A picture set on a block wins over everything else. Titles are compared
+              # loosely, so "Best Sellers" and "best sellers" both reach the same tile.
               assign tile_image = blank
               for block in overrides
-                if block.settings.title == link.title and block.settings.image != blank
-                  assign tile_image = block.settings.image
+                if block.settings.image != blank
+                  assign override_handle = block.settings.title | handleize
+                  if override_handle == tile_handle
+                    assign tile_image = block.settings.image
+                  endif
                 endif
               endfor
+
+              # A block with no title typed takes the tile in the same place in the row, so a
+              # picture can be uploaded in the theme editor without matching any wording.
               if tile_image == blank
-                case link.type
-                  when 'collection_link'
-                    assign tile_image = link.object.featured_image
-                  when 'product_link'
-                    assign tile_image = link.object.featured_image
-                  when 'catalog_link'
-                    assign tile_image = collections.all.featured_image
-                endcase
+                assign placed = overrides[tile_index]
+                if placed.settings.title == blank and placed.settings.image != blank
+                  assign tile_image = placed.settings.image
+                endif
+              endif
+
+              # Otherwise the TILE PICTURES list at the top of this file, and failing that
+              # the category-<menu item>.png naming convention in assets/. A menu
+              # item with no picture of any kind is hidden (the script below drops the
+              # tile), rather than falling back to the collection photo.
+              assign tile_asset = blank
+              if tile_image == blank
+                for pair in tile_picture_pairs
+                  assign pair_parts = pair | split: ':'
+                  assign pair_handle = pair_parts[0] | handleize
+                  if pair_handle == tile_handle
+                    assign tile_asset = pair_parts[1] | strip
+                  endif
+                endfor
+                if tile_asset == blank
+                  assign tile_asset = 'category-' | append: tile_handle | append: '.png'
+                endif
               endif
             -%}
             <li class="ct-tile">
-              <a class="ct-link" href="{{ link.url }}">
-                {%- if tile_image != blank -%}
-                  {{ tile_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, 72vw', alt: link.title }}
+              <a class="ct-link eden-action-host" href="{{ tile_url }}">
+                {%- if tile_asset != blank -%}
+                  {%- comment -%} The pictures are 1122x1402; Shopify's CDN resizes them here. {%- endcomment -%}
+                  <img
+                    src="{% render 'image-source', file: tile_asset, width: 900 %}"
+                    srcset="{% render 'image-source', file: tile_asset, width: 450 %} 450w, {% render 'image-source', file: tile_asset, width: 700 %} 700w, {% render 'image-source', file: tile_asset, width: 900 %} 900w, {% render 'image-source', file: tile_asset, width: 1200 %} 1200w"
+                    sizes="{{ tile_sizes }}"
+                    alt="{{ tile_title | escape }}"
+                    width="1122"
+                    height="1402"
+                    loading="lazy"
+                    data-ct-asset
+                  >
+                {%- elsif tile_image != blank -%}
+                  {{ tile_image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: tile_sizes, alt: tile_title }}
                 {%- endif -%}
-                <span class="ct-label">{{ link.title | escape }}</span>
+                <span class="ct-label">{{ tile_title | escape }}</span>
               </a>
             </li>
           {%- endfor -%}
         </ul>
-        <button type="button" class="ct-arrow ct-arrow--next" aria-label="Next"><span></span></button>
+        <button type="button" class="ct-arrow ct-arrow--next" aria-label="Next">
+          <span class="svg-wrapper">{%- render 'icon-arrow' -%}</span>
+        </button>
       </div>
-      <div class="ct-progress" aria-hidden="true"><span></span></div>
+      {%- if section.settings.show_progress -%}
+        <div class="ct-progress" aria-hidden="true"><span></span></div>
+      {%- endif -%}
     {%- endif -%}
   </div>
 </div>
@@ -242,13 +504,36 @@
       next.disabled = track.scrollLeft >= max - 2;
       const shown = track.clientWidth / track.scrollWidth;
       const progress = max > 0 ? shown + (1 - shown) * (track.scrollLeft / max) : 1;
-      bar.style.setProperty('--ct-progress', `${Math.round(progress * 100)}%`);
-      bar.hidden = max <= 0;
+      if (bar) {
+        bar.style.setProperty('--ct-progress', `${Math.round(progress * 100)}%`);
+        bar.hidden = max <= 0;
+      }
     };
-    const step = () => track.clientWidth * 0.8;
+    // Scroll by whole tiles, so a click always lands on a tile edge rather than part way
+    // through one and letting scroll snapping decide where it ends up.
+    const step = () => {
+      const tile = track.querySelector('.ct-tile');
+      if (!tile) return track.clientWidth;
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+      const tileWidth = tile.getBoundingClientRect().width + gap;
+      if (!tileWidth) return track.clientWidth;
+      return tileWidth * Math.max(1, Math.floor(track.clientWidth / tileWidth));
+    };
 
-    prev.addEventListener('click', () => track.scrollBy({ left: -step() }));
-    next.addEventListener('click', () => track.scrollBy({ left: step() }));
+    // A tile asks for category-<menu item>.png in Content > Files. Until the shop adds that picture, the
+    // whole tile is dropped rather than shown empty; adding the file brings the tile back.
+    root.querySelectorAll('.ct-link img[data-ct-asset]').forEach((img) => {
+      img.addEventListener('error', () => {
+        img.closest('.ct-tile')?.remove();
+        update();
+      });
+      // A tile that is still loading when the row is measured would leave the arrows in the
+      // wrong state, so each picture re-checks once it has arrived.
+      img.addEventListener('load', update);
+    });
+
+    prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
     track.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     update();
@@ -261,10 +546,17 @@
   "class": "section-wrapper",
   "settings": [
     {
+      "type": "text",
+      "id": "items",
+      "label": "Tiles",
+      "default": "Engagement Rings, Wedding Bands, Necklaces, Earrings, Bracelets",
+      "info": "One title per tile, comma separated, in the order they appear. A title that matches an item in the menu below uses that item's link; any other links to \/collections\/<title>. Leave empty to show every item in the menu instead."
+    },
+    {
       "type": "link_list",
       "id": "menu",
       "label": "Menu",
-      "info": "One tile per menu item. Pictures come from each collection (its image, or its first product)."
+      "info": "Where the tiles get their links. With \"Tiles\" empty, every item in this menu gets a tile. A tile's picture comes from a \"Picture for a tile\" block below, or from the TILE PICTURES list at the top of sections\/category-tiles.liquid, or from category-<tile>.png in Content > Files."
     },
     {
       "type": "text",
@@ -272,13 +564,43 @@
       "label": "Heading"
     },
     {
+      "type": "select",
+      "id": "width",
+      "label": "Section width",
+      "options": [
+        { "value": "page", "label": "Page width" },
+        { "value": "full", "label": "Full width" }
+      ],
+      "default": "page",
+      "info": "Full width runs the tiles to the edges of the screen, leaving only the margin the arrows need."
+    },
+    {
+      "type": "checkbox",
+      "id": "fit_all",
+      "label": "Fit every tile on desktop",
+      "info": "The whole menu shares the desktop row, so there is nothing to scroll to and the arrows are hidden. Narrower screens still scroll. Turn this off to show a set number of tiles at a time.",
+      "default": true
+    },
+    {
       "type": "range",
       "id": "per_row",
       "label": "Tiles across on desktop",
+      "info": "Only with \"Fit every tile on desktop\" off. The tiles share the full width between them, so fewer across means a bigger tile on a wide screen. A half, e.g. 4.5, leaves the next tile peeking at the edge.",
       "min": 3,
-      "max": 6,
-      "step": 1,
+      "max": 8,
+      "step": 0.5,
       "default": 4
+    },
+    {
+      "type": "range",
+      "id": "min_tile_width",
+      "label": "Smallest tile width",
+      "info": "Only with \"Fit every tile on desktop\" off. A tile never shrinks below this; on a narrower screen the row scrolls instead.",
+      "min": 180,
+      "max": 480,
+      "step": 20,
+      "unit": "px",
+      "default": 240
     },
     {
       "type": "select",
@@ -290,6 +612,31 @@
         { "value": "2 / 3", "label": "Tall" }
       ],
       "default": "3 / 4"
+    },
+    {
+      "type": "range",
+      "id": "tile_height",
+      "label": "Tile height",
+      "info": "How tall a tile is on a tablet or desktop, whatever its width, so the row can fill more of the screen. It replaces \"Tile shape\" there; a phone, where one tile fills the screen, still uses the shape. Set it to 0 to let the shape decide everywhere.",
+      "min": 0,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress",
+      "label": "Show the scroll progress bar",
+      "info": "The bar under the row that fills as the tiles scroll. The arrows either side still work with it off.",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Tile title colour",
+      "info": "The words over each picture. The glow behind them flips to suit, so a pale title stays readable on a pale photograph.",
+      "default": "#ffffff"
     },
     {
       "type": "color_scheme",
@@ -327,7 +674,7 @@
           "type": "text",
           "id": "title",
           "label": "Menu item title",
-          "info": "Exactly as in the menu, e.g. Earrings"
+          "info": "As in the menu, e.g. Earrings. Capitals and spacing do not have to match. Leave it empty and the block takes the tile in the same place in the row: first block, first tile."
         },
         {
           "type": "image_picker",

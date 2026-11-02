@@ -1,0 +1,53 @@
+{% comment %}
+  Social links for the classic footer. Each icon shows only when its link is filled in under
+  Theme settings > Social media, so the row grows as accounts are added.
+
+  Accepts:
+  - text_color: {String} optional; colour for the icons
+{% endcomment %}
+
+{%- liquid
+  assign has_any = false
+  if settings.social_facebook_link != blank or settings.social_instagram_link != blank
+    assign has_any = true
+  elsif settings.social_youtube_link != blank or settings.social_tiktok_link != blank
+    assign has_any = true
+  elsif settings.social_twitter_link != blank or settings.social_pinterest_link != blank
+    assign has_any = true
+  endif
+-%}
+
+{%- if has_any -%}
+  <div class="fc-social"{% if text_color %} style="color: {{ text_color }};"{% endif %}>
+    {%- if settings.social_facebook_link != blank -%}
+      <a href="{{ settings.social_facebook_link }}" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.3 0-1.3-.1-2.45-.1-2.4 0-4.05 1.5-4.05 4.2v2.2H7.5V13h2.7v8h3.3Z"/></svg>
+      </a>
+    {%- endif -%}
+    {%- if settings.social_instagram_link != blank -%}
+      <a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.25.07 1.63.07 4.81s-.01 3.56-.07 4.81c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.25.06-1.63.07-4.85.07s-3.6-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.8 3.8 0 0 1-1.38-.9 3.8 3.8 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.21 15.56 2.2 15.18 2.2 12s.01-3.56.07-4.81c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.44 2.21 8.82 2.2 12 2.2Zm0 1.8c-3.14 0-3.5.01-4.73.07-.9.04-1.39.19-1.71.32-.43.17-.74.37-1.06.69-.32.32-.52.63-.69 1.06-.13.32-.28.81-.32 1.71C3.43 9.08 3.42 9.44 3.42 12s.01 2.92.07 4.15c.04.9.19 1.39.32 1.71.17.43.37.74.69 1.06.32.32.63.52 1.06.69.32.13.81.28 1.71.32 1.23.06 1.59.07 4.73.07s3.5-.01 4.73-.07c.9-.04 1.39-.19 1.71-.32.43-.17.74-.37 1.06-.69.32-.32.52-.63.69-1.06.13-.32.28-.81.32-1.71.06-1.23.07-1.59.07-4.15s-.01-2.92-.07-4.15c-.04-.9-.19-1.39-.32-1.71a2.9 2.9 0 0 0-.69-1.06 2.9 2.9 0 0 0-1.06-.69c-.32-.13-.81-.28-1.71-.32C15.5 4.01 15.14 4 12 4Zm0 3.05A4.95 4.95 0 1 1 7.05 12 4.95 4.95 0 0 1 12 7.05Zm0 1.8A3.15 3.15 0 1 0 15.15 12 3.15 3.15 0 0 0 12 8.85Zm5.15-3.2a1.16 1.16 0 1 1-1.16 1.15 1.16 1.16 0 0 1 1.16-1.15Z"/></svg>
+      </a>
+    {%- endif -%}
+    {%- if settings.social_pinterest_link != blank -%}
+      <a href="{{ settings.social_pinterest_link }}" target="_blank" rel="noopener" aria-label="Pinterest">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a9.8 9.8 0 0 0-3.6 18.9c-.08-.78-.15-1.98.03-2.83l1.14-4.84s-.29-.58-.29-1.44c0-1.35.78-2.36 1.76-2.36.83 0 1.23.62 1.23 1.37 0 .84-.53 2.09-.8 3.25-.23.97.49 1.77 1.45 1.77 1.74 0 3.08-1.84 3.08-4.49 0-2.35-1.69-3.99-4.1-3.99a4.25 4.25 0 0 0-4.43 4.26c0 .85.33 1.75.74 2.25a.3.3 0 0 1 .07.28l-.27 1.1c-.04.18-.14.22-.33.13-1.23-.57-2-2.36-2-3.8 0-3.1 2.25-5.94 6.48-5.94 3.4 0 6.05 2.42 6.05 5.67 0 3.38-2.13 6.1-5.09 6.1-.99 0-1.93-.52-2.25-1.13l-.61 2.34c-.22.85-.82 1.92-1.22 2.57A9.8 9.8 0 1 0 12 2.2Z"/></svg>
+      </a>
+    {%- endif -%}
+    {%- if settings.social_tiktok_link != blank -%}
+      <a href="{{ settings.social_tiktok_link }}" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3v13.1a2.4 2.4 0 1 1-2.4-2.4c.23 0 .45.03.66.1V9.7a5.6 5.6 0 1 0 4.74 5.53V8.7a6.5 6.5 0 0 0 3.7 1.16V6.8a3.73 3.73 0 0 1-3.7-3.6V2Z"/></svg>
+      </a>
+    {%- endif -%}
+    {%- if settings.social_youtube_link != blank -%}
+      <a href="{{ settings.social_youtube_link }}" target="_blank" rel="noopener" aria-label="YouTube">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.76-1.77C18.25 5 12 5 12 5s-6.25 0-7.84.43A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.76 1.77C5.75 19 12 19 12 19s6.25 0 7.84-.43a2.5 2.5 0 0 0 1.76-1.77A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8ZM10 15.1V8.9l5.2 3.1Z"/></svg>
+      </a>
+    {%- endif -%}
+    {%- if settings.social_twitter_link != blank -%}
+      <a href="{{ settings.social_twitter_link }}" target="_blank" rel="noopener" aria-label="X">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 3h3l-6.6 7.5L21.8 21h-6l-4.7-6.1L5.7 21h-3l7-8L2.5 3h6.2l4.2 5.6ZM16.4 19.2h1.7L7.7 4.7H5.9Z"/></svg>
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}

@@ -65,6 +65,7 @@
             >
             <label class="field__label" for="{{ input_id }}">{{ 'content.search' | t }}</label>
             <input type="hidden" name="options[prefix]" value="last">
+            <input type="hidden" name="type" value="product">
             <button
               type="reset"
               class="reset__button field__button{% if search.terms == blank %} hidden{% endif %}"
