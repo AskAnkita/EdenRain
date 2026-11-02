@@ -218,7 +218,8 @@
         "tile_necklaces": {
           "type": "tile_picture",
           "settings": {
-            "title": "Necklaces"
+            "title": "Necklaces",
+            "image": "shopify://shop_images/White_Gold_Round_Brilliant_Diamond_Tennis_Necklace.jpg"
           }
         },
         "tile_earrings": {
