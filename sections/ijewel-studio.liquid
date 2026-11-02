@@ -214,7 +214,7 @@
 {%- endcapture -%}
 
 <section
-  class="ijewel-studio{% if section.settings.full_width %} ijewel-studio--wide{% endif %}{% if section.settings.fill_screen %} ijewel-studio--fullscreen{% endif %}"
+  class="ijewel-studio{% if section.settings.full_width %} ijewel-studio--wide{% endif %}{% if section.settings.fill_screen %} ijewel-studio--fullscreen{% endif %}{% if section.settings.hide_toolbar_mobile %} ijewel-studio--notoolbar{% endif %}{% if section.settings.hide_announcement_mobile %} ijewel-studio--noannounce{% endif %}"
   style="{{ section_styles }}"
 >
   <div class="ijw-shell">
@@ -380,6 +380,8 @@
     { "type": "text", "id": "embed_title", "label": "Frame title for screen readers", "default": "Design your own jewellery" },
     { "type": "checkbox", "id": "lazy_load", "label": "Load the designer when it scrolls into view", "default": true, "info": "Untick to load it with the page. A 3D scene is a heavy first load." },
     { "type": "checkbox", "id": "fill_screen", "label": "Fill the screen", "default": false, "info": "The designer takes the whole window below the header, with no border, padding or wash. The two heights below are ignored." },
+    { "type": "checkbox", "id": "hide_toolbar_mobile", "label": "Hide the phone toolbar on this page", "default": true, "info": "The builder has its own add-to-cart bar across the bottom. Leaving the theme's toolbar under it stacks two bars and two cart buttons, and costs the builder the height. Untick to keep the toolbar." },
+    { "type": "checkbox", "id": "hide_announcement_mobile", "label": "Hide the announcement bar on this page", "default": false, "info": "Gives the builder back the bar's height, which is worth roughly one more row of choices on a phone. The bar still shows on every other page." },
     { "type": "range", "id": "frame_height", "label": "Frame height (desktop)", "min": 400, "max": 1400, "step": 20, "unit": "px", "default": 760 },
     { "type": "range", "id": "frame_height_mobile", "label": "Frame height (mobile)", "min": 320, "max": 1200, "step": 20, "unit": "px", "default": 560 },
     { "type": "text", "id": "loading_label", "label": "Line shown while it loads", "info": "Leave empty to hide it.", "default": "Loading the designer" },
@@ -396,31 +398,31 @@
     { "type": "range", "id": "splash_stage_width", "label": "Cover width (desktop)", "min": 10, "max": 100, "step": 2, "unit": "%", "default": 66, "info": "How much of the frame's width the stage takes, before the builder's own panel starts." },
     { "type": "range", "id": "splash_stage_height", "label": "Cover height (desktop)", "min": 10, "max": 100, "step": 2, "unit": "%", "default": 100 },
     { "type": "range", "id": "splash_stage_width_mobile", "label": "Cover width (mobile)", "min": 10, "max": 100, "step": 2, "unit": "%", "default": 100 },
-    { "type": "range", "id": "splash_stage_height_mobile", "label": "Cover height (mobile)", "min": 10, "max": 100, "step": 2, "unit": "%", "default": 44 },
+    { "type": "range", "id": "splash_stage_height_mobile", "label": "Cover height (mobile)", "min": 10, "max": 100, "step": 2, "unit": "%", "default": 34 },
 
     { "type": "header", "content": "Cover the builder's logo", "info": "The builder is a page on the vendor's own domain, so its branding cannot be restyled from here. This lays a panel over the frame's top-left corner and puts our own mark on it. Match the panel colour to the builder's background, then nudge the size until the vendor's logo is gone." },
     { "type": "checkbox", "id": "brand_cover", "label": "Cover the builder's logo", "default": true },
     { "type": "text", "id": "brand_text", "label": "Wordmark", "default": "Eden Raine", "info": "Used when none of the three image fields below is filled in, and as the image's alt text." },
     { "type": "image_picker", "id": "brand_image", "label": "Logo image" },
-    { "type": "text", "id": "brand_image_asset", "label": "Or a file name", "info": "A file in Content > Files or in the theme's assets folder, e.g. Eden_Raine_Logo_Full.png.", "default": "Eden_Raine_Logo_Full.png" },
+    { "type": "text", "id": "brand_image_asset", "label": "Or a file name", "info": "A file in Content > Files or in the theme's assets folder, e.g. eden-raine-monogram.png.", "default": "eden-raine-monogram.png" },
     { "type": "text", "id": "brand_image_url", "label": "Or an image URL" },
     { "type": "color", "id": "brand_background", "label": "Panel colour", "default": "#ffffff" },
     { "type": "color", "id": "brand_text_color", "label": "Wordmark colour" },
     { "type": "select", "id": "brand_alignment", "label": "Mark sits", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centred" } ], "default": "left" },
     { "type": "range", "id": "brand_pad", "label": "Inset from the panel edge (desktop)", "min": 0, "max": 96, "step": 4, "unit": "px", "default": 32 },
-    { "type": "range", "id": "brand_pad_mobile", "label": "Inset from the panel edge (mobile)", "min": 0, "max": 64, "step": 2, "unit": "px", "default": 18 },
+    { "type": "range", "id": "brand_pad_mobile", "label": "Inset from the panel edge (mobile)", "min": 0, "max": 64, "step": 2, "unit": "px", "default": 14 },
     { "type": "range", "id": "brand_text_size", "label": "Wordmark size", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
     { "type": "range", "id": "brand_top", "label": "Panel from the top (desktop)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 0 },
     { "type": "range", "id": "brand_left", "label": "Panel from the left (desktop)", "min": 0, "max": 320, "step": 4, "unit": "px", "default": 0 },
-    { "type": "range", "id": "brand_width", "label": "Panel width (desktop)", "min": 80, "max": 600, "step": 10, "unit": "px", "default": 300 },
-    { "type": "range", "id": "brand_height", "label": "Panel height (desktop)", "min": 40, "max": 280, "step": 4, "unit": "px", "default": 132 },
-    { "type": "range", "id": "brand_logo_width", "label": "Logo width (desktop)", "min": 60, "max": 480, "step": 10, "unit": "px", "default": 150 },
+    { "type": "range", "id": "brand_width", "label": "Panel width (desktop)", "min": 80, "max": 600, "step": 10, "unit": "px", "default": 220, "info": "Only as big as the builder's own logo - on a desktop that is about 172x61px, inset 34px from the frame's top-left corner." },
+    { "type": "range", "id": "brand_height", "label": "Panel height (desktop)", "min": 40, "max": 280, "step": 4, "unit": "px", "default": 104 },
+    { "type": "range", "id": "brand_logo_width", "label": "Logo width (desktop)", "min": 60, "max": 480, "step": 10, "unit": "px", "default": 60 },
     { "type": "checkbox", "id": "brand_hide_mobile", "label": "Hide the panel on mobile", "default": false },
     { "type": "range", "id": "brand_top_mobile", "label": "Panel from the top (mobile)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 0 },
     { "type": "range", "id": "brand_left_mobile", "label": "Panel from the left (mobile)", "min": 0, "max": 320, "step": 4, "unit": "px", "default": 0 },
-    { "type": "range", "id": "brand_width_mobile", "label": "Panel width (mobile)", "min": 80, "max": 600, "step": 10, "unit": "px", "default": 150 },
-    { "type": "range", "id": "brand_height_mobile", "label": "Panel height (mobile)", "min": 40, "max": 280, "step": 4, "unit": "px", "default": 92 },
-    { "type": "range", "id": "brand_logo_width_mobile", "label": "Logo width (mobile)", "min": 60, "max": 480, "step": 10, "unit": "px", "default": 100 },
+    { "type": "range", "id": "brand_width_mobile", "label": "Panel width (mobile)", "min": 80, "max": 600, "step": 10, "unit": "px", "default": 120, "info": "Only as big as the builder's own logo - on a phone that is about 88x31px in the top-left corner. A taller panel eats the 3D view." },
+    { "type": "range", "id": "brand_height_mobile", "label": "Panel height (mobile)", "min": 40, "max": 280, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "brand_logo_width_mobile", "label": "Logo width (mobile)", "min": 20, "max": 480, "step": 10, "unit": "px", "default": 40, "info": "The mark only has to read, not fill the panel - it sits where the builder's own logo was." },
 
     { "type": "header", "content": "Above the designer" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "DESIGN STUDIO" },

@@ -44,9 +44,39 @@
    the variable is unset on desktop, where it resolves to 0px. The selectors are two classes deep so they
    outrank the desktop frame heights further down the file whatever the order. */
 .ijewel-studio--fullscreen {
-  --ijw-fill: calc(100vh - var(--header-group-height, 0px) - var(--toolbar-mobile-height, 0px));
-  --ijw-fill: calc(100svh - var(--header-group-height, 0px) - var(--toolbar-mobile-height, 0px));
+  --ijw-toolbar: var(--toolbar-mobile-height, 0px);
+  --ijw-fill: calc(100vh - var(--header-group-height, 0px) - var(--ijw-toolbar));
+  --ijw-fill: calc(100svh - var(--header-group-height, 0px) - var(--ijw-toolbar));
   padding: 0;
+}
+
+/* The builder draws its own price and add-to-cart across the bottom of the
+   frame. The theme's phone toolbar is fixed over the same strip, so the page
+   ends up with two bars and two cart buttons stacked, and the builder loses
+   the toolbar's height from a window it is already short of - its option list
+   is around 1450px of content shown through whatever is left. On this page the
+   toolbar goes and the height comes back. The body padding that holds space
+   for the toolbar goes with it, or the frame would scroll by that much. */
+.ijewel-studio--fullscreen.ijewel-studio--notoolbar {
+  --ijw-toolbar: 0px;
+}
+
+body:has(.ijewel-studio--fullscreen.ijewel-studio--notoolbar) .toolbar-mobile {
+  display: none;
+}
+
+body:has(.ijewel-studio--fullscreen.ijewel-studio--notoolbar) {
+  padding-bottom: 0;
+}
+
+/* The same trade for the announcement bar. The builder's option list is the
+   part that is short of room, so on a phone the promo strip is worth about one
+   more row of choices - but whether that trade is worth making is the shop's
+   call, so it is a setting and it is off until someone ticks it. The group
+   height is measured on load, after this file has been parsed, so the frame
+   grows by exactly what the bar gave up. */
+body:has(.ijewel-studio--fullscreen.ijewel-studio--noannounce) #header-group > *:has(announcement-bar) {
+  display: none;
 }
 
 .ijewel-studio--fullscreen .ijw-shell {
@@ -311,10 +341,10 @@ ijewel-studio {
   align-items: center;
   justify-content: var(--ijw-brand-justify, flex-start);
   box-sizing: border-box;
-  width: var(--ijw-brand-width-mobile, 150px);
-  height: var(--ijw-brand-height-mobile, 92px);
+  width: var(--ijw-brand-width-mobile, 120px);
+  height: var(--ijw-brand-height-mobile, 56px);
   max-width: 100%;
-  padding: 0 var(--ijw-brand-pad-mobile, 18px);
+  padding: 0 var(--ijw-brand-pad-mobile, 14px);
   background: var(--ijw-brand-bg, #ffffff);
 }
 
@@ -324,7 +354,7 @@ ijewel-studio {
 
 .ijw-brand__image {
   display: block;
-  width: var(--ijw-brand-logo-width-mobile, 100px);
+  width: var(--ijw-brand-logo-width-mobile, 40px);
   max-width: 100%;
   height: auto;
 }
