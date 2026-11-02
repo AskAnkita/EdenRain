@@ -506,16 +506,15 @@
       "type": "eden-quote",
       "settings": {
         "width": "full",
-        "desktop_height": 360,
-        "mobile_height": 320,
-        "text_color": "#191614",
+        "desktop_height": 480,
+        "mobile_height": 560,
+        "text_color": "#243a3b",
         "quote": "Made to be worn, and loved, for a lifetime.",
         "attribution": "Eden Raine",
-        "quote_size": 32,
+        "quote_size": 44,
         "attribution_size": 11,
         "inner_width": 1000,
-        "rule_color": "#d9cfc7",
-        "attribution_color": "#8a7d74"
+        "attribution_color": "#536968"
       }
     },
     "featured_collection_QbxCWk": {
