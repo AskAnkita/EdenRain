@@ -65,6 +65,29 @@
     assign embed_src = ''
   endunless
 
+  # Pressing the builder's own "Add to cart" posts the finished design out to
+  # this page - from the builder's origin and no other, so the listener is told
+  # which one to trust rather than guessing. Without a variant to put it on
+  # there is nothing to add, so that route quietly becomes the enquiry.
+  assign embed_origin = ''
+  if embed_src != blank
+    assign embed_host = embed_src | split: '//' | last | split: '/' | first
+    assign embed_origin = 'https://' | append: embed_host
+  endif
+
+  assign cart_variant = ''
+  if section.settings.cart_product != blank
+    assign cart_variant = section.settings.cart_product.selected_or_first_available_variant.id
+  endif
+
+  assign cart_action = section.settings.cart_action | default: 'none'
+  if cart_action == 'cart' and cart_variant == blank
+    assign cart_action = 'enquiry'
+  endif
+  if cart_action == 'enquiry' and section.settings.fallback_link == blank
+    assign cart_action = 'none'
+  endif
+
   assign app_blocks = 0
   for block in section.blocks
     if block.type == '@app'
@@ -85,12 +108,15 @@
   assign brand_height = section.settings.brand_height | plus: 0
   assign brand_logo_width = section.settings.brand_logo_width | plus: 0
   assign brand_top_mobile = section.settings.brand_top_mobile | plus: 0
+  assign brand_top_mobile_vw = section.settings.brand_top_mobile_vw | plus: 0
   assign brand_left_mobile = section.settings.brand_left_mobile | plus: 0
   assign brand_width_mobile = section.settings.brand_width_mobile | plus: 0
   assign brand_height_mobile = section.settings.brand_height_mobile | plus: 0
   assign brand_logo_width_mobile = section.settings.brand_logo_width_mobile | plus: 0
   assign brand_pad = section.settings.brand_pad | plus: 0
   assign brand_pad_mobile = section.settings.brand_pad_mobile | plus: 0
+  assign brand_feather = section.settings.brand_feather | plus: 0
+  assign brand_feather_mobile = section.settings.brand_feather_mobile | plus: 0
   assign brand_text_size = section.settings.brand_text_size | plus: 0
 
   assign splash_hold = section.settings.splash_hold | plus: 0 | times: 1000
@@ -101,9 +127,64 @@
   assign splash_stage_width_mobile = section.settings.splash_stage_width_mobile | plus: 0
   assign splash_stage_height_mobile = section.settings.splash_stage_height_mobile | plus: 0
 
+  assign brand_plate_where = section.settings.brand_plate_where | default: 'always'
+  if section.settings.brand_background == blank
+    assign brand_plate_where = 'never'
+  endif
+
+  assign brand_bare_class = ''
+  case brand_plate_where
+    when 'never'
+      assign brand_bare_class = ' ijw-brand--bare'
+    when 'mobile'
+      assign brand_bare_class = ' ijw-brand--bare-desktop'
+    when 'desktop'
+      assign brand_bare_class = ' ijw-brand--bare-mobile'
+  endcase
+
   assign brand_justify = 'flex-start'
   if section.settings.brand_alignment == 'center'
     assign brand_justify = 'center'
+  endif
+
+  assign price_bottom = section.settings.price_bottom | plus: 0
+  assign price_right = section.settings.price_right | plus: 0
+  assign price_width = section.settings.price_width | plus: 0
+  assign price_height = section.settings.price_height | plus: 0
+  assign price_pad = section.settings.price_pad | plus: 0
+  assign price_feather = section.settings.price_feather | plus: 0
+  assign price_bottom_mobile = section.settings.price_bottom_mobile | plus: 0
+  assign price_right_mobile = section.settings.price_right_mobile | plus: 0
+  assign price_width_mobile = section.settings.price_width_mobile | plus: 0
+  assign price_height_mobile = section.settings.price_height_mobile | plus: 0
+  assign price_pad_mobile = section.settings.price_pad_mobile | plus: 0
+  assign price_feather_mobile = section.settings.price_feather_mobile | plus: 0
+  assign price_text_size = section.settings.price_text_size | plus: 0
+  assign price_note_size = section.settings.price_note_size | plus: 0
+
+  assign price_justify = 'flex-start'
+  assign price_align = 'left'
+  if section.settings.price_alignment == 'center'
+    assign price_justify = 'center'
+    assign price_align = 'center'
+  elsif section.settings.price_alignment == 'right'
+    assign price_justify = 'flex-end'
+    assign price_align = 'right'
+  endif
+
+  assign price_anchor = section.settings.price_anchor | default: 'bottom-right'
+  assign price_classes = ''
+  if price_anchor contains 'left'
+    assign price_classes = price_classes | append: ' ijw-price--left'
+  endif
+  if price_anchor contains 'top'
+    assign price_classes = price_classes | append: ' ijw-price--top'
+  endif
+  if section.settings.price_background == blank or section.settings.price_background == transparent
+    assign price_classes = price_classes | append: ' ijw-price--bare'
+  endif
+  if section.settings.price_hide_mobile
+    assign price_classes = price_classes | append: ' ijw-price--desktop'
   endif
 -%}
 
@@ -179,8 +260,13 @@
   {%- if eyebrow_size > 0 -%}--ijw-eyebrow-size: {{ eyebrow_size }}px;{%- endif -%}
   {%- if text_size > 0 -%}--ijw-text-size: {{ text_size }}px;{%- endif -%}
   {%- if note_size > 0 -%}--ijw-note-size: {{ note_size }}px;{%- endif -%}
+  --ijw-crop-left: {{ section.settings.frame_crop_left | default: 0 }}px;
+  --ijw-crop-left-mobile: {{ section.settings.frame_crop_left_mobile | default: 0 }}px;
+  --ijw-crop-top: {{ section.settings.frame_crop_top | default: 0 }}px;
+  --ijw-crop-top-mobile: {{ section.settings.frame_crop_top_mobile | default: 0 }}px;
   --ijw-frame-height: {{ section.settings.frame_height }}px;
   --ijw-frame-height-mobile: {{ section.settings.frame_height_mobile }}px;
+  --ijw-boost-mobile: {{ section.settings.frame_boost_mobile | default: 0 }}px;
   {%- if content_width > 0 and section.settings.full_width == false -%}--ijw-shell-max: {{ content_width }}px;{%- endif -%}
   {%- if section.settings.brand_cover -%}
     {%- if section.settings.brand_background != blank and section.settings.brand_background != transparent -%}--ijw-brand-bg: {{ section.settings.brand_background }};{%- endif -%}
@@ -190,15 +276,38 @@
     --ijw-brand-width: {{ brand_width }}px;
     --ijw-brand-height: {{ brand_height }}px;
     --ijw-brand-logo-width: {{ brand_logo_width }}px;
-    --ijw-brand-top-mobile: {{ brand_top_mobile }}px;
+    {%- if brand_top_mobile_vw > 0 -%}--ijw-brand-top-mobile: {{ brand_top_mobile_vw }}vw;{%- else -%}--ijw-brand-top-mobile: {{ brand_top_mobile }}px;{%- endif -%}
     --ijw-brand-left-mobile: {{ brand_left_mobile }}px;
     --ijw-brand-width-mobile: {{ brand_width_mobile }}px;
     --ijw-brand-height-mobile: {{ brand_height_mobile }}px;
     --ijw-brand-logo-width-mobile: {{ brand_logo_width_mobile }}px;
     --ijw-brand-pad: {{ brand_pad }}px;
     --ijw-brand-pad-mobile: {{ brand_pad_mobile }}px;
+    --ijw-brand-feather: {{ brand_feather }}px;
+    --ijw-brand-feather-mobile: {{ brand_feather_mobile }}px;
     --ijw-brand-justify: {{ brand_justify }};
     {%- if brand_text_size > 0 -%}--ijw-brand-text-size: {{ brand_text_size }}px;{%- endif -%}
+  {%- endif -%}
+  {%- if section.settings.price_cover -%}
+    {%- if section.settings.price_background != blank and section.settings.price_background != transparent -%}--ijw-price-bg: {{ section.settings.price_background }};{%- endif -%}
+    {%- if section.settings.price_text_color != blank and section.settings.price_text_color != transparent -%}--ijw-price-ink: {{ section.settings.price_text_color }};{%- endif -%}
+    {%- if section.settings.price_note_color != blank and section.settings.price_note_color != transparent -%}--ijw-price-note-ink: {{ section.settings.price_note_color }};{%- endif -%}
+    --ijw-price-bottom: {{ price_bottom }}px;
+    --ijw-price-right: {{ price_right }}px;
+    --ijw-price-width: {{ price_width }}px;
+    --ijw-price-height: {{ price_height }}px;
+    --ijw-price-pad: {{ price_pad }}px;
+    --ijw-price-feather: {{ price_feather }}px;
+    --ijw-price-bottom-mobile: {{ price_bottom_mobile }}px;
+    --ijw-price-right-mobile: {{ price_right_mobile }}px;
+    --ijw-price-width-mobile: {{ price_width_mobile }}px;
+    --ijw-price-height-mobile: {{ price_height_mobile }}px;
+    --ijw-price-pad-mobile: {{ price_pad_mobile }}px;
+    --ijw-price-feather-mobile: {{ price_feather_mobile }}px;
+    --ijw-price-justify: {{ price_justify }};
+    --ijw-price-align: {{ price_align }};
+    {%- if price_text_size > 0 -%}--ijw-price-text-size: {{ price_text_size }}px;{%- endif -%}
+    {%- if price_note_size > 0 -%}--ijw-price-note-size: {{ price_note_size }}px;{%- endif -%}
   {%- endif -%}
   {%- if section.settings.splash_cover -%}
     {%- if section.settings.splash_background != blank and section.settings.splash_background != transparent -%}--ijw-splash-bg: {{ section.settings.splash_background }};{%- endif -%}
@@ -214,7 +323,7 @@
 {%- endcapture -%}
 
 <section
-  class="ijewel-studio{% if section.settings.full_width %} ijewel-studio--wide{% endif %}{% if section.settings.fill_screen %} ijewel-studio--fullscreen{% endif %}{% if section.settings.hide_toolbar_mobile %} ijewel-studio--notoolbar{% endif %}{% if section.settings.hide_announcement_mobile %} ijewel-studio--noannounce{% endif %}"
+  class="ijewel-studio{% if section.settings.full_width %} ijewel-studio--wide{% endif %}{% if section.settings.fill_screen %} ijewel-studio--fullscreen{% endif %}{% if section.settings.hide_toolbar_mobile %} ijewel-studio--notoolbar{% endif %}{% if section.settings.hide_announcement_mobile %} ijewel-studio--noannounce{% endif %}{% if section.settings.hide_header_mobile %} ijewel-studio--noheader{% endif %}"
   style="{{ section_styles }}"
 >
   <div class="ijw-shell">
@@ -249,9 +358,14 @@
       {%- elsif embed_src != blank -%}
         <ijewel-studio
           data-src="{{ embed_src | escape }}"
+          data-guided-mobile="{{ section.settings.guided_mobile }}"
+          data-guided-document="{{ 'ijewel-guided-document.js' | asset_url }}"
           data-title="{{ section.settings.embed_title | default: 'Design your own jewellery' | escape }}"
+          data-price-note="{% if section.settings.price_cover %}{{ section.settings.price_text | escape | default: ' ' }}{% endif %}"
           data-lazy="{% if section.settings.lazy_load %}true{% else %}false{% endif %}"
           data-hold="{% if section.settings.splash_cover %}{{ splash_hold }}{% else %}0{% endif %}"
+          data-origin="{{ embed_origin | escape }}"
+          data-wait-ready="{% if section.settings.splash_cover and section.settings.splash_wait_ready %}true{% else %}false{% endif %}"
         >
           <noscript>
             <iframe
@@ -262,6 +376,18 @@
             ></iframe>
           </noscript>
         </ijewel-studio>
+
+        {%- if cart_action != 'none' -%}
+          <script src="{{ 'ijewel-cart.js' | asset_url }}" defer="defer"></script>
+          <ijewel-cart
+            data-action="{{ cart_action }}"
+            data-variant="{{ cart_variant }}"
+            data-origin="{{ embed_origin | escape }}"
+            data-embed="{{ embed_src | escape }}"
+            data-enquiry="{{ section.settings.fallback_link }}"
+            data-price="{% if section.settings.price_cover %}hidden{% else %}shown{% endif %}"
+          ></ijewel-cart>
+        {%- endif -%}
 
         <div class="ijw-poster{% if section.settings.splash_cover %} ijw-poster--cover{% endif %}">
           {%- if poster_set -%}
@@ -295,7 +421,7 @@
         </div>
 
         {%- if section.settings.brand_cover -%}
-          <div class="ijw-brand{% if section.settings.brand_hide_mobile %} ijw-brand--desktop{% endif %}">
+          <div class="ijw-brand{% if section.settings.brand_hide_mobile %} ijw-brand--desktop{% endif %}{{ brand_bare_class }}{% if section.settings.brand_anchor == 'bottom' %} ijw-brand--bottom{% endif %}">
             {%- if brand_src != blank -%}
               <img
                 class="ijw-brand__image"
@@ -307,6 +433,29 @@
               >
             {%- else -%}
               <span class="ijw-brand__text">{{ section.settings.brand_text | default: shop.name | escape }}</span>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- comment -%}
+          The same trick over the builder's price line. Their figures come from
+          a rate card that is not ours, so the number is covered and the line we
+          stand behind is put in its place. The panel stops above Add to cart on
+          purpose: the button still works. On a phone running the guided steps
+          the price is replaced at its source instead - that document is ours -
+          so this panel is hidden there by the stylesheet.
+        {%- endcomment -%}
+        {%- if section.settings.price_cover -%}
+          <div class="ijw-price{{ price_classes }}">
+            {%- if section.settings.price_text != blank -%}
+              {%- if section.settings.price_link != blank -%}
+                <a class="ijw-price__text" href="{{ section.settings.price_link }}">{{ section.settings.price_text | escape }}</a>
+              {%- else -%}
+                <span class="ijw-price__text">{{ section.settings.price_text | escape }}</span>
+              {%- endif -%}
+            {%- endif -%}
+            {%- if section.settings.price_note != blank -%}
+              <span class="ijw-price__note">{{ section.settings.price_note | escape }}</span>
             {%- endif -%}
           </div>
         {%- endif -%}
@@ -377,17 +526,29 @@
   "settings": [
     { "type": "header", "content": "The 3D designer", "info": "Paste the embed your builder gives you. Pencil: the share or embed link for the builder. iJewel: open the file in iJewel Drive, go to Embedding, and copy what it gives you - the file must be public or the frame loads empty." },
     { "type": "textarea", "id": "embed_url", "label": "Embed URL or iframe code", "info": "Paste either the bare URL or the whole <iframe> snippet - the src is taken out of it either way. Leave empty to show the enquiry card instead. An app block added to this section wins over whatever is here." },
+    { "type": "checkbox", "id": "guided_mobile", "label": "Guided mobile design steps", "default": false, "info": "Uses the bundled demo project with Diamond, Setting, Metal and Review steps. Finish with a bespoke enquiry; Shopify checkout is not connected." },
     { "type": "text", "id": "embed_title", "label": "Frame title for screen readers", "default": "Design your own jewellery" },
     { "type": "checkbox", "id": "lazy_load", "label": "Load the designer when it scrolls into view", "default": true, "info": "Untick to load it with the page. A 3D scene is a heavy first load." },
-    { "type": "checkbox", "id": "fill_screen", "label": "Fill the screen", "default": false, "info": "The designer takes the whole window below the header, with no border, padding or wash. The two heights below are ignored." },
+    { "type": "checkbox", "id": "fill_screen", "label": "Fill the screen", "default": false, "info": "The designer takes the whole window below the header, with no border, padding or wash. The two frame heights below are ignored - on a phone use \"Extra frame height\" instead." },
     { "type": "checkbox", "id": "hide_toolbar_mobile", "label": "Hide the phone toolbar on this page", "default": true, "info": "The builder has its own add-to-cart bar across the bottom. Leaving the theme's toolbar under it stacks two bars and two cart buttons, and costs the builder the height. Untick to keep the toolbar." },
     { "type": "checkbox", "id": "hide_announcement_mobile", "label": "Hide the announcement bar on this page", "default": false, "info": "Gives the builder back the bar's height, which is worth roughly one more row of choices on a phone. The bar still shows on every other page." },
+    { "type": "checkbox", "id": "hide_header_mobile", "label": "Hide the header on a phone, on this page", "default": false, "info": "The 3D ring is about a third of the frame's height, so the frame's height is what makes the ring bigger - and on a phone the header row is the last of it going spare. The header still shows on every other page, and on this one from a tablet up. Note it takes the menu and the cart with it on a phone: the section's brand cover stands in for the logo." },
+    { "type": "range", "id": "frame_boost_mobile", "label": "Extra frame height (mobile)", "min": 0, "max": 400, "step": 20, "unit": "px", "default": 0, "info": "With \"Fill the screen\" on, height added on top of the window. It makes the ring bigger, but it pushes the builder's own add-to-cart bar below the fold, and a touch over the frame scrolls the builder rather than the page - so what goes below is hard to reach. Raise it a little at a time and check add-to-cart on a phone." },
     { "type": "range", "id": "frame_height", "label": "Frame height (desktop)", "min": 400, "max": 1400, "step": 20, "unit": "px", "default": 760 },
     { "type": "range", "id": "frame_height_mobile", "label": "Frame height (mobile)", "min": 320, "max": 1200, "step": 20, "unit": "px", "default": 560 },
     { "type": "text", "id": "loading_label", "label": "Line shown while it loads", "info": "Leave empty to hide it.", "default": "Loading the designer" },
 
+    { "type": "header", "content": "When the shopper presses Add to cart", "info": "The builder sits on its own domain, so its Add to cart button cannot reach our cart - it posts the finished design out to this page instead, and this decides what happens to it. Every choice, the design code, the builder's price and the key that reopens the design travel with it either way." },
+    { "type": "select", "id": "cart_action", "label": "What happens", "default": "none", "options": [
+      { "value": "none", "label": "Nothing - leave it to the builder" },
+      { "value": "cart", "label": "Add a product to the cart" },
+      { "value": "enquiry", "label": "Send them to the bespoke enquiry" }
+    ] },
+    { "type": "product", "id": "cart_product", "label": "Product added to the cart", "info": "Shopify charges this product's own price. A cart add takes a variant and never a price, so a configured ring's own price cannot be sent with it - pick the product the shop means to charge (a bespoke deposit, a fixed design fee) and read the real figure off the line's properties. With nothing picked here the design goes to the enquiry instead." },
+
     { "type": "header", "content": "Cover the builder's loading screen", "info": "The builder shows its own splash while its scene downloads, inside the frame where our CSS cannot reach it. This holds our own cover over the stage - the part of the frame the piece is drawn in - for a moment after the frame has loaded, then fades it out. It deliberately leaves the builder's own panel showing, so the page never looks empty while it loads. Lengthen the hold if their splash flashes up at the end of it; widen the cover if it shows at the edges." },
     { "type": "checkbox", "id": "splash_cover", "label": "Cover the builder's loading screen", "default": true },
+    { "type": "checkbox", "id": "splash_wait_ready", "label": "Hold the cover until the designer is ready", "default": false, "info": "The builder's page arrives quickly but its 3D scene waits to be tapped, so taking the cover away when the frame loads uncovers the builder's own poster, play button and logo. With this on, the cover stays until the builder says it is running - and it takes no clicks, so the tap that starts it goes straight through. The hold above is then unused. Set the loading line to tell people to tap. Falls back after 45 seconds, and only works with a builder that speaks to the page, which iJewel does." },
     { "type": "range", "id": "splash_hold", "label": "Hold the cover after the frame loads", "min": 0, "max": 20, "step": 1, "unit": "s", "default": 6 },
     { "type": "color", "id": "splash_background", "label": "Cover colour", "default": "#ffffff" },
     { "type": "image_picker", "id": "splash_image", "label": "Mark on the cover" },
@@ -406,23 +567,58 @@
     { "type": "image_picker", "id": "brand_image", "label": "Logo image" },
     { "type": "text", "id": "brand_image_asset", "label": "Or a file name", "info": "A file in Content > Files or in the theme's assets folder, e.g. eden-raine-monogram.png.", "default": "eden-raine-monogram.png" },
     { "type": "text", "id": "brand_image_url", "label": "Or an image URL" },
+    { "type": "select", "id": "brand_plate_where", "label": "Paint a panel behind the mark", "options": [ { "value": "always", "label": "Desktop and mobile" }, { "value": "mobile", "label": "Mobile only" }, { "value": "desktop", "label": "Desktop only" }, { "value": "never", "label": "Never - let the mark float" } ], "default": "always", "info": "The panel is what hides the builder's own logo. Where the frame is cropped instead (below), the panel is not needed and the mark can float on the render." },
+    { "type": "select", "id": "brand_anchor", "label": "Mark sits at the", "options": [ { "value": "top", "label": "Top of the frame" }, { "value": "bottom", "label": "Bottom of the frame" } ], "default": "top" },
     { "type": "color", "id": "brand_background", "label": "Panel colour", "default": "#ffffff" },
     { "type": "color", "id": "brand_text_color", "label": "Wordmark colour" },
     { "type": "select", "id": "brand_alignment", "label": "Mark sits", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centred" } ], "default": "left" },
     { "type": "range", "id": "brand_pad", "label": "Inset from the panel edge (desktop)", "min": 0, "max": 96, "step": 4, "unit": "px", "default": 32 },
     { "type": "range", "id": "brand_pad_mobile", "label": "Inset from the panel edge (mobile)", "min": 0, "max": 64, "step": 2, "unit": "px", "default": 14 },
+    { "type": "range", "id": "frame_crop_left", "label": "Crop the frame's left edge (desktop)", "min": 0, "max": 400, "step": 10, "unit": "px", "default": 0, "info": "Pulls the iframe left and widens it by the same amount, so the builder's own logo falls outside the frame instead of being covered up. The ring sits that much further left, so take only what the logo needs - about 220px." },
+    { "type": "range", "id": "frame_crop_left_mobile", "label": "Crop the frame's left edge (mobile)", "min": 0, "max": 400, "step": 10, "unit": "px", "default": 0, "info": "Usually 0: the builder stacks its options full width on a phone, so cropping the left cuts the option labels off too." },
+    { "type": "range", "id": "frame_crop_top", "label": "Crop the frame's top edge (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 0, "info": "Pulls the iframe up and makes it taller by the same amount, so a bar across the top of the builder falls outside the frame. iJewel's Drive view (a /view link rather than /embedded) carries a 64px bar with their logo, a report flag and a Sign in button - cropping it takes the buttons with it, where covering it would leave them clickable." },
+    { "type": "range", "id": "frame_crop_top_mobile", "label": "Crop the frame's top edge (mobile)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 0, "info": "The same bar is shorter on a phone. Check it at phone width before trusting the desktop number." },
+    { "type": "range", "id": "brand_feather", "label": "Soften the panel edge (desktop)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 48, "info": "How far the right and bottom edges fade out, so the ring behind the panel is not cut off by a straight line. 0 keeps a hard rectangle." },
+    { "type": "range", "id": "brand_feather_mobile", "label": "Soften the panel edge (mobile)", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 24 },
     { "type": "range", "id": "brand_text_size", "label": "Wordmark size", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
-    { "type": "range", "id": "brand_top", "label": "Panel from the top (desktop)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 0 },
+    { "type": "range", "id": "brand_top", "label": "Panel from the frame's edge (desktop)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 0 },
     { "type": "range", "id": "brand_left", "label": "Panel from the left (desktop)", "min": 0, "max": 320, "step": 4, "unit": "px", "default": 0 },
     { "type": "range", "id": "brand_width", "label": "Panel width (desktop)", "min": 80, "max": 600, "step": 10, "unit": "px", "default": 220, "info": "Only as big as the builder's own logo - on a desktop that is about 172x61px, inset 34px from the frame's top-left corner." },
     { "type": "range", "id": "brand_height", "label": "Panel height (desktop)", "min": 40, "max": 280, "step": 4, "unit": "px", "default": 104 },
     { "type": "range", "id": "brand_logo_width", "label": "Logo width (desktop)", "min": 60, "max": 480, "step": 10, "unit": "px", "default": 60 },
     { "type": "checkbox", "id": "brand_hide_mobile", "label": "Hide the panel on mobile", "default": false },
-    { "type": "range", "id": "brand_top_mobile", "label": "Panel from the top (mobile)", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 0 },
+    { "type": "range", "id": "brand_top_mobile", "label": "Panel from the frame's edge (mobile)", "min": 0, "max": 400, "step": 4, "unit": "px", "default": 0, "info": "On a phone the builder stacks its 3D stage above its own controls and puts its logo in the bottom-left corner of that stage - a long way down from the frame's top edge, and further down on a taller phone. Measured on the current embed it sits between 220px and 290px down, so a panel from about 204px covers it on every size." },
+    { "type": "range", "id": "brand_top_mobile_vw", "label": "...or track the stage (mobile)", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 0, "info": "Measured as a share of the frame's width, and it wins over the setting above when it is not 0. The builder sizes its 3D stage from the frame's width - about 74% of it - and drops its logo into that stage's bottom-left corner, so on a taller phone the logo is further down the screen while a fixed offset in pixels stays put. 61% puts the panel over the logo on every phone size measured. Only right while the section is full width." },
     { "type": "range", "id": "brand_left_mobile", "label": "Panel from the left (mobile)", "min": 0, "max": 320, "step": 4, "unit": "px", "default": 0 },
-    { "type": "range", "id": "brand_width_mobile", "label": "Panel width (mobile)", "min": 80, "max": 600, "step": 10, "unit": "px", "default": 120, "info": "Only as big as the builder's own logo - on a phone that is about 88x31px in the top-left corner. A taller panel eats the 3D view." },
+    { "type": "range", "id": "brand_width_mobile", "label": "Panel width (mobile)", "min": 80, "max": 600, "step": 10, "unit": "px", "default": 120, "info": "Only as big as the builder's own logo - on the current embed that is a mark of about 26px square near the left edge. A wider panel eats into the ring." },
     { "type": "range", "id": "brand_height_mobile", "label": "Panel height (mobile)", "min": 40, "max": 280, "step": 4, "unit": "px", "default": 56 },
     { "type": "range", "id": "brand_logo_width_mobile", "label": "Logo width (mobile)", "min": 20, "max": 480, "step": 10, "unit": "px", "default": 40, "info": "The mark only has to read, not fill the panel - it sits where the builder's own logo was." },
+
+    { "type": "header", "content": "Cover the builder's price", "info": "The builder costs the ring from its own rate card and prints the figure above its Add to cart. Until those rates are the shop's own, that number is not a quote we can stand behind - and it cannot be switched off from here, because the builder is the vendor's own page in a frame. This lays a panel over the price line and writes our own line on it, stopping short of Add to cart. Nudge the offsets until the figure is gone, on a desktop and on a phone." },
+    { "type": "checkbox", "id": "price_cover", "label": "Cover the builder's price", "default": true, "info": "The panel waits for the builder to say it is on screen before it fades up, so it never floats over the loading poster. A builder that does not speak iJewel's bridge never says it, and its price is then left showing." },
+    { "type": "text", "id": "price_text", "label": "Line shown instead", "default": "Contact us for price", "info": "Leave empty to show nothing at all - the panel still covers the figure." },
+    { "type": "text", "id": "price_note", "label": "Second line", "info": "Smaller, under the first. Leave empty to hide it - it ships empty, because one plain line next to Add to cart is enough." },
+    { "type": "url", "id": "price_link", "label": "Link on the first line", "info": "Leave empty for plain text. A link makes the line clickable where the builder's price used to be - the contact page or the enquiry form." },
+    { "type": "select", "id": "price_anchor", "label": "The price sits in the frame's", "options": [ { "value": "bottom-right", "label": "Bottom right" }, { "value": "bottom-left", "label": "Bottom left" }, { "value": "top-right", "label": "Top right" }, { "value": "top-left", "label": "Top left" } ], "default": "bottom-right", "info": "Which corner the offsets below are measured from. iJewel draws its price at the foot of the option rail, on the right." },
+    { "type": "color", "id": "price_background", "label": "Panel colour", "default": "#ffffff", "info": "Match the builder's own panel. Clear it and the line floats on the builder's panel with the figure still showing behind." },
+    { "type": "color", "id": "price_text_color", "label": "First line colour" },
+    { "type": "color", "id": "price_note_color", "label": "Second line colour" },
+    { "type": "select", "id": "price_alignment", "label": "Lines sit", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centred" }, { "value": "right", "label": "Right" } ], "default": "left" },
+    { "type": "range", "id": "price_text_size", "label": "First line size", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
+    { "type": "range", "id": "price_note_size", "label": "Second line size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
+    { "type": "range", "id": "price_bottom", "label": "Panel from the top or bottom (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 86, "info": "Measured from the corner chosen above. The shipped numbers cover iJewel's price line on a full-screen desktop frame and stop 2px above its Add to cart." },
+    { "type": "range", "id": "price_right", "label": "Panel from the side (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 22 },
+    { "type": "range", "id": "price_width", "label": "Panel width (desktop)", "min": 80, "max": 700, "step": 10, "unit": "px", "default": 450, "info": "iJewel's option rail is about 470px wide, inset 20px from the frame's right edge." },
+    { "type": "range", "id": "price_height", "label": "Panel height (desktop)", "min": 24, "max": 200, "step": 2, "unit": "px", "default": 56 },
+    { "type": "range", "id": "price_pad", "label": "Inset from the panel edge (desktop)", "min": 0, "max": 96, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "price_feather", "label": "Soften the panel edge (desktop)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 0, "info": "How far the leading edges fade out. 0 keeps a hard rectangle, which is what a panel sitting inside the builder's own white rail wants." },
+    { "type": "checkbox", "id": "price_hide_mobile", "label": "Hide the panel on mobile", "default": false, "info": "The guided mobile steps replace the price at its source, so this panel is hidden there whatever this says." },
+    { "type": "range", "id": "price_bottom_mobile", "label": "Panel from the top or bottom (mobile)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 64, "info": "Measured on an iPhone-width preview of iJewel's own rail. Check them on a real phone if the builder changes - a panel in the wrong place covers the wrong thing." },
+    { "type": "range", "id": "price_right_mobile", "label": "Panel from the side (mobile)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "price_width_mobile", "label": "Panel width (mobile)", "min": 60, "max": 600, "step": 10, "unit": "px", "default": 390, "info": "On a phone iJewel puts the price at the left of the rail's foot with Add to cart as a full-width bar under it, so the panel is the whole strip. It is capped at the frame's width, so a number wider than the phone is simply full width." },
+    { "type": "range", "id": "price_height_mobile", "label": "Panel height (mobile)", "min": 24, "max": 200, "step": 2, "unit": "px", "default": 48 },
+    { "type": "range", "id": "price_pad_mobile", "label": "Inset from the panel edge (mobile)", "min": 0, "max": 64, "step": 2, "unit": "px", "default": 20 },
+    { "type": "range", "id": "price_feather_mobile", "label": "Soften the panel edge (mobile)", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 0 },
 
     { "type": "header", "content": "Above the designer" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "DESIGN STUDIO" },

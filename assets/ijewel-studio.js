@@ -44,6 +44,7 @@ if (!customElements.get('ijewel-studio')) {
 
       disconnectedCallback() {
         this.observer?.disconnect();
+        if (this.listen) window.removeEventListener('message', this.listen);
       }
 
       build() {
@@ -51,22 +52,73 @@ if (!customElements.get('ijewel-studio')) {
         this.built = true;
 
         const iframe = document.createElement('iframe');
-        iframe.src = this.src;
+        const guided = this.dataset.guidedMobile === 'true' && window.matchMedia('(max-width: 749px)').matches;
+
+        // The builder's document arrives in a moment but the scene behind it
+        // waits for a tap on its own play button, so "the frame loaded" is the
+        // wrong moment to take our cover away - it uncovers the vendor's poster
+        // and the vendor's logo. When the builder speaks a bridge, its own ready
+        // event is the right moment, and our cover takes no clicks (the
+        // stylesheet gives it pointer-events: none), so the tap that starts the
+        // scene goes straight through it.
+        //
+        // The same bridge says when the builder's own panel is on screen, and
+        // that is the only moment anything of ours may sit over it. Before the
+        // tap the frame is the vendor's poster and a full-bleed render: there
+        // is no price under our price patch, and the line floats on a
+        // photograph. So the first word from the builder, whatever it is, marks
+        // the element live and the stylesheet fades the patch in. It is
+        // listened for whether or not the cover is waiting on it.
+        this.waitReady = this.dataset.waitReady === 'true';
+        this.listen = (event) => {
+          if (this.dataset.origin && event.origin !== this.dataset.origin) return;
+          const message = event.data;
+          if (!message || typeof message !== 'object' || message.source !== 'ijewel') return;
+          this.setAttribute('data-live', 'true');
+          if (this.waitReady && message.event === 'ready') this.ready();
+        };
+        window.addEventListener('message', this.listen);
+        if (guided) {
+          this.setAttribute('data-guided', 'true');
+          // Load the locally owned interface without trying to restyle a remote frame.
+          if (!window.edenGuidedDocumentPromise) {
+            window.edenGuidedDocumentPromise = new Promise((resolve, reject) => {
+              const script = document.createElement('script');
+              script.src = this.dataset.guidedDocument;
+              script.onload = () => window.edenGuidedDocument ? resolve(window.edenGuidedDocument) : reject(new Error('Missing guided document'));
+              script.onerror = reject;
+              document.head.appendChild(script);
+            });
+          }
+          window.edenGuidedDocumentPromise.then(html => { iframe.srcdoc = html; }).catch(() => {
+            this.removeAttribute('data-guided');
+            iframe.src = this.src;
+          });
+        } else {
+          iframe.src = this.src;
+        }
         iframe.title = this.dataset.title || 'Design your own jewellery';
         // The viewer asks for these: autoplay to spin the scene, xr-spatial-tracking
         // for view-in-room, camera for try-on, web-share for the share button.
         iframe.setAttribute('allow', 'autoplay; camera; fullscreen; xr-spatial-tracking; web-share');
         iframe.setAttribute('allowfullscreen', '');
-        iframe.addEventListener('load', () => this.ready());
+        iframe.addEventListener('load', () => {
+          if (guided && !iframe.srcdoc && !iframe.hasAttribute('src')) return;
+          if (this.waitReady) return;
+          this.ready();
+        });
         this.appendChild(iframe);
 
         // A viewer that never fires load - a blocked frame, a slow CDN - would
-        // otherwise sit behind the poster for good.
-        this.timer = setTimeout(() => this.ready(), 12000);
+        // otherwise sit behind the poster for good. Waiting on the bridge gets
+        // longer rope, since it is waiting on a person to tap as well.
+        this.timer = setTimeout(() => this.ready(), this.waitReady ? 45000 : 12000);
       }
 
       ready() {
         clearTimeout(this.timer);
+        // The listener stays: the cover is only one of the things the bridge
+        // is telling us about, and the price patch is still waiting on it.
         this.setAttribute('data-ready', 'true');
 
         const poster = this.parentElement?.querySelector('.ijw-poster');
@@ -77,7 +129,7 @@ if (!customElements.get('ijewel-studio')) {
         // the frame and cannot be styled from here. The cover is held over it
         // for as long as the section says, then faded rather than cut, so an
         // early reveal is a soft one.
-        const hold = parseInt(this.dataset.hold || '0', 10) || 0;
+        const hold = this.waitReady ? 0 : parseInt(this.dataset.hold || '0', 10) || 0;
         const fade = () => {
           poster.setAttribute('data-fading', 'true');
           setTimeout(() => poster.remove(), 500);

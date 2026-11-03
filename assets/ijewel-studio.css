@@ -45,8 +45,9 @@
    outrank the desktop frame heights further down the file whatever the order. */
 .ijewel-studio--fullscreen {
   --ijw-toolbar: var(--toolbar-mobile-height, 0px);
-  --ijw-fill: calc(100vh - var(--header-group-height, 0px) - var(--ijw-toolbar));
-  --ijw-fill: calc(100svh - var(--header-group-height, 0px) - var(--ijw-toolbar));
+  --ijw-boost: 0px;
+  --ijw-fill: calc(100vh - var(--header-group-height, 0px) - var(--ijw-toolbar) + var(--ijw-boost));
+  --ijw-fill: calc(100svh - var(--header-group-height, 0px) - var(--ijw-toolbar) + var(--ijw-boost));
   padding: 0;
 }
 
@@ -79,6 +80,39 @@ body:has(.ijewel-studio--fullscreen.ijewel-studio--noannounce) #header-group > *
   display: none;
 }
 
+/* The same trade again, for the whole header group. The stage - the 3D ring
+   itself - is a fixed share of the frame's height (about a third of it on a
+   phone), so the only way to show the ring bigger is to hand the frame more
+   height, and below the announcement bar the header row is the last of it
+   that is free. With the group gone the frame is the whole window, and the
+   section's own brand cover stands in for the logo at the top of the frame.
+   Phones only: on a desktop the height is not what is short, and the nav is
+   worth more than the pixels. The group is hidden rather than the header
+   inside it, because the group holds a desktop header and a phone header and
+   this must take whichever one is showing. Its height is measured on load, so
+   a hidden group measures 0 and the frame grows by exactly that much. */
+@media screen and (max-width: 749px) {
+  /* Every child as well as the group: base.css gives the group
+     display: contents while the header is sticky, from a selector with two
+     ids in it, so a rule on the group alone loses the cascade and the rows
+     stay. Hiding the rows is what counts either way - the group is measured
+     by adding its children up, so emptied rows measure 0 and the frame takes
+     the height back. */
+  body:has(.ijewel-studio--fullscreen.ijewel-studio--noheader) #header-group,
+  body:has(.ijewel-studio--fullscreen.ijewel-studio--noheader) #header-group > * {
+    display: none;
+  }
+
+  /* Past the window: height the merchant adds on top of the fill, for a
+     builder whose option list still has nowhere to go. It pushes the foot of
+     the frame - the builder's own add-to-cart bar - below the fold, and a
+     touch over the frame scrolls the builder, not the page, so what is down
+     there is hard to reach. It is 0 unless someone decides otherwise. */
+  .ijewel-studio--fullscreen {
+    --ijw-boost: var(--ijw-boost-mobile, 0px);
+  }
+}
+
 .ijewel-studio--fullscreen .ijw-shell {
   max-width: none;
 }
@@ -90,8 +124,8 @@ body:has(.ijewel-studio--fullscreen.ijewel-studio--noannounce) #header-group > *
 }
 
 .ijewel-studio--fullscreen .ijw-frame iframe {
-  min-height: var(--ijw-fill);
-  height: var(--ijw-fill);
+  min-height: calc(var(--ijw-fill) + var(--ijw-crop-y));
+  height: calc(var(--ijw-fill) + var(--ijw-crop-y));
 }
 
 .ijewel-studio h1,
@@ -153,6 +187,7 @@ body:has(.ijewel-studio--fullscreen.ijewel-studio--noannounce) #header-group > *
    scrolling inside its own frame on a phone. */
 .ijw-frame {
   position: relative;
+  overflow: hidden;
   min-height: var(--ijw-frame-height-mobile, 560px);
   border: 1px solid var(--ijw-frame-border, var(--ijw-line));
   background: var(--ijw-frame-bg, var(--ijw-wash));
@@ -167,11 +202,22 @@ ijewel-studio {
   min-height: inherit;
 }
 
+/* The crop: the iframe is pulled left and up by whatever the section asks for
+   and made bigger by the same amount, so a strip of the builder's own chrome -
+   their logo down one side, their bar across the top - falls outside the frame
+   rather than being covered over. Cropping beats covering wherever the strip
+   holds buttons: a Sign in under a white panel is still a Sign in. The crop is
+   read into --ijw-crop-y on the iframe itself so every height below can add it
+   without naming the breakpoint twice. */
 .ijw-frame iframe {
+  --ijw-crop-y: var(--ijw-crop-top-mobile, 0px);
   display: block;
-  width: 100%;
-  min-height: var(--ijw-frame-height-mobile, 560px);
-  height: var(--ijw-frame-height-mobile, 560px);
+  max-width: none;
+  width: calc(100% + var(--ijw-crop-left-mobile, 0px));
+  margin-left: calc(-1 * var(--ijw-crop-left-mobile, 0px));
+  margin-top: calc(-1 * var(--ijw-crop-y));
+  min-height: calc(var(--ijw-frame-height-mobile, 560px) + var(--ijw-crop-y));
+  height: calc(var(--ijw-frame-height-mobile, 560px) + var(--ijw-crop-y));
   border: 0;
 }
 
@@ -179,6 +225,7 @@ ijewel-studio {
    so a slow first paint of a 3D scene is never a blank grey rectangle. */
 .ijw-poster {
   position: absolute;
+  box-sizing: border-box;
   inset: 0;
   display: flex;
   flex-direction: column;
@@ -316,6 +363,14 @@ ijewel-studio {
   opacity: 0;
 }
 
+/* While the cover waits for the builder to be tapped, the frame behind it is
+   the builder's idle poster, which puts its logo somewhere else entirely - so
+   the patch over that logo has nothing to cover yet and would read as a stray
+   mark sitting on our own cover. It arrives with the scene. */
+.ijw-frame:has(ijewel-studio[data-wait-ready='true']:not([data-ready])) .ijw-brand {
+  opacity: 0;
+}
+
 .ijw-poster__mark {
   display: block;
   width: var(--ijw-splash-logo-width-mobile, 150px);
@@ -345,7 +400,46 @@ ijewel-studio {
   height: var(--ijw-brand-height-mobile, 56px);
   max-width: 100%;
   padding: 0 var(--ijw-brand-pad-mobile, 14px);
+  background: transparent;
+}
+
+/* The fill is a layer of its own, not the panel's own background, so our mark
+   can sit on nothing at all - the way it does in the footer - while the paint
+   underneath stays only as big as the vendor's logo. Clear the panel colour in
+   the editor and the fill is dropped entirely: the mark floats, and the
+   builder's own logo is then visible behind it. Only the edge of the fill ever
+   shows, as a straight line through the ring, so the right and bottom edges
+   fade out; 0px feather brings the hard rectangle back. */
+.ijw-brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: var(--ijw-brand-bg, #ffffff);
+  --ijw-brand-fade: var(--ijw-brand-feather-mobile, 0px);
+  -webkit-mask-image:
+    linear-gradient(to right, #000 calc(100% - var(--ijw-brand-fade)), transparent),
+    linear-gradient(to bottom, #000 calc(100% - var(--ijw-brand-fade)), transparent);
+  mask-image:
+    linear-gradient(to right, #000 calc(100% - var(--ijw-brand-fade)), transparent),
+    linear-gradient(to bottom, #000 calc(100% - var(--ijw-brand-fade)), transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.ijw-brand--bare::before {
+  content: none;
+}
+
+.ijw-brand--bare-mobile::before {
+  content: none;
+}
+
+/* Bare, the mark has to clear the vendor's own logo in the frame's top-left,
+   so it moves to the bottom corner. The offset setting is then read from the
+   bottom edge up. */
+.ijw-brand--bottom {
+  top: auto;
+  bottom: var(--ijw-brand-top-mobile, 0px);
 }
 
 .ijw-brand--desktop {
@@ -353,6 +447,7 @@ ijewel-studio {
 }
 
 .ijw-brand__image {
+  position: relative;
   display: block;
   width: var(--ijw-brand-logo-width-mobile, 40px);
   max-width: 100%;
@@ -360,6 +455,7 @@ ijewel-studio {
 }
 
 .ijw-brand__text {
+  position: relative;
   color: var(--ijw-brand-ink, var(--ijw-ink));
   font-family: var(--font-heading--family);
   font-size: var(--ijw-brand-text-size, 1.9rem);
@@ -369,14 +465,135 @@ ijewel-studio {
   white-space: nowrap;
 }
 
+/* ------------------------------------------------------- the price patch */
+
+/* The builder costs the ring from its own rate card and prints the figure at
+   the foot of its option rail. Those rates are not the shop's, so the number
+   is not one we will quote - and it cannot be switched off from here any more
+   than their logo can be restyled. So it is covered the way the logo is: a
+   panel in the rail's own colour over the price line, carrying the line we do
+   stand behind. It keeps its clicks, so the price breakdown underneath cannot
+   be opened, and it is sized to stop above the builder's Add to cart - that
+   button still has to work. Mobile values first, desktop in the query below,
+   because a rail of a different width puts its price somewhere else. */
+.ijw-price {
+  position: absolute;
+  right: var(--ijw-price-right-mobile, 0px);
+  bottom: var(--ijw-price-bottom-mobile, 0px);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: var(--ijw-price-justify, flex-start);
+  gap: 2px;
+  box-sizing: border-box;
+  width: var(--ijw-price-width-mobile, 200px);
+  height: var(--ijw-price-height-mobile, 44px);
+  max-width: 100%;
+  padding: 0 var(--ijw-price-pad-mobile, 0px);
+  background: transparent;
+  text-align: var(--ijw-price-align, left);
+}
+
+/* Read from the opposite edge instead, for a builder that draws its price in
+   another corner. The offset settings do not change meaning - they are always
+   measured from the corner the section names. */
+.ijw-price--left {
+  right: auto;
+  left: var(--ijw-price-right-mobile, 0px);
+}
+
+.ijw-price--top {
+  top: var(--ijw-price-bottom-mobile, 0px);
+  bottom: auto;
+}
+
+/* The fill is a layer of its own, as on the brand patch: clear the colour in
+   the editor and our line floats on the builder's own panel, with its figure
+   still showing behind it. The leading edges - left and top, the two that face
+   into the rail - are the ones that feather; 0px keeps the hard rectangle,
+   which is what a panel sitting inside a white rail wants. */
+.ijw-price::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ijw-price-bg, #ffffff);
+  --ijw-price-fade: var(--ijw-price-feather-mobile, 0px);
+  -webkit-mask-image:
+    linear-gradient(to left, #000 calc(100% - var(--ijw-price-fade)), transparent),
+    linear-gradient(to top, #000 calc(100% - var(--ijw-price-fade)), transparent);
+  mask-image:
+    linear-gradient(to left, #000 calc(100% - var(--ijw-price-fade)), transparent),
+    linear-gradient(to top, #000 calc(100% - var(--ijw-price-fade)), transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.ijw-price--bare::before {
+  content: none;
+}
+
+/* The patch waits for the builder's own panel. Until the shopper taps the
+   vendor's play button the frame is a poster and a full-bleed render with no
+   price anywhere on it, and a line about prices floating over a photograph
+   reads as a broken page - which is what our own loading cover going first
+   left behind. The builder says when it is up: assets/ijewel-studio.js marks
+   the element live on the first word from its bridge, and until that word,
+   and for as long as our cover is still over it, the patch is not there.
+   Opacity rather than display, so it fades in with the panel it belongs to;
+   pointer-events with it, or an invisible patch would still be swallowing
+   clicks over the render. */
+.ijw-price {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms ease;
+}
+
+.ijw-frame:has(ijewel-studio[data-live]):not(:has(.ijw-poster)) .ijw-price {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ijw-price--desktop {
+  display: none;
+}
+
+.ijw-price__text {
+  position: relative;
+  color: var(--ijw-price-ink, var(--ijw-ink));
+  font-size: var(--ijw-price-text-size, 1.8rem);
+  line-height: 1.2;
+}
+
+a.ijw-price__text {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+
+a.ijw-price__text:hover {
+  text-decoration-color: var(--ijw-price-ink, var(--ijw-ink));
+  text-underline-offset: 2px;
+}
+
+.ijw-price__note {
+  position: relative;
+  color: var(--ijw-price-note-ink, var(--ijw-muted));
+  font-size: var(--ijw-price-note-size, 1.3rem);
+  line-height: 1.3;
+}
+
 @media screen and (min-width: 750px) {
   .ijw-frame {
     min-height: var(--ijw-frame-height, 760px);
   }
 
   .ijw-frame iframe {
-    min-height: var(--ijw-frame-height, 760px);
-    height: var(--ijw-frame-height, 760px);
+    --ijw-crop-y: var(--ijw-crop-top, 0px);
+    width: calc(100% + var(--ijw-crop-left, 0px));
+    margin-left: calc(-1 * var(--ijw-crop-left, 0px));
+    min-height: calc(var(--ijw-frame-height, 760px) + var(--ijw-crop-y));
+    height: calc(var(--ijw-frame-height, 760px) + var(--ijw-crop-y));
   }
 }
 
@@ -389,12 +606,55 @@ ijewel-studio {
     height: var(--ijw-brand-height, 132px);
   }
 
+  .ijw-brand--bottom {
+    top: auto;
+    bottom: var(--ijw-brand-top, 0px);
+  }
+
+  .ijw-brand::before {
+    --ijw-brand-fade: var(--ijw-brand-feather, 0px);
+  }
+
+  .ijw-brand--bare-mobile::before {
+    content: '';
+  }
+
+  .ijw-brand--bare-desktop::before {
+    content: none;
+  }
+
   .ijw-brand--desktop {
     display: flex;
   }
 
   .ijw-brand__image {
     width: var(--ijw-brand-logo-width, 150px);
+  }
+
+  .ijw-price {
+    right: var(--ijw-price-right, 0px);
+    bottom: var(--ijw-price-bottom, 0px);
+    width: var(--ijw-price-width, 450px);
+    height: var(--ijw-price-height, 56px);
+    padding: 0 var(--ijw-price-pad, 0px);
+  }
+
+  .ijw-price--left {
+    right: auto;
+    left: var(--ijw-price-right, 0px);
+  }
+
+  .ijw-price--top {
+    top: var(--ijw-price-bottom, 0px);
+    bottom: auto;
+  }
+
+  .ijw-price::before {
+    --ijw-price-fade: var(--ijw-price-feather, 0px);
+  }
+
+  .ijw-price--desktop {
+    display: flex;
   }
 
   .ijw-poster--cover {
@@ -405,4 +665,13 @@ ijewel-studio {
   .ijw-poster__mark {
     width: var(--ijw-splash-logo-width, 240px);
   }
+}
+
+/* The guided document owns its mobile layout, its branding and its price line -
+   it is our document, so the price is replaced at its source rather than
+   covered over, and a panel on top of it would only hide the real line. */
+@media screen and (max-width: 749px) {
+  .ijw-frame:has(ijewel-studio[data-guided]) .ijw-brand,
+  .ijw-frame:has(ijewel-studio[data-guided]) .ijw-price { display: none; }
+  .ijw-frame ijewel-studio[data-guided] iframe { width: 100%; margin-left: 0; margin-top: 0; --ijw-crop-y: 0px; }
 }

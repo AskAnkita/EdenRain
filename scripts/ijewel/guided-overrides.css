@@ -1,0 +1,12 @@
+/* Mobile guided controls; desktop continues using the original remote embed. */
+:root{--pad:18px;--radius:0;--radius-sm:0}
+.shell{height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding:0;gap:0}
+.stage{width:100%;flex:0 0 29%;height:auto;min-height:145px;max-height:260px;aspect-ratio:auto}
+.stage-brand{display:none}.rail{width:100%;flex:1;min-height:0;height:auto;border:0;border-radius:0;padding:0 var(--pad)}
+.product{padding:10px var(--pad);display:flex;align-items:center;justify-content:space-between;gap:10px}.product h1{font-size:18px}.product .summary{display:none}
+.guided-progress{display:flex;gap:6px;padding:12px 0 4px}.guided-progress span{height:3px;flex:1;background:#e4e1db}.guided-progress span.current{background:#353e31}
+.guided-heading{display:flex;flex-direction:column;gap:3px;padding:8px 0 12px}.guided-heading small{color:#65675e;font-size:12px}.guided-heading h2{font:400 22px var(--display);margin:0}
+#railBody{padding:10px 0 20px}.sec-body[hidden]{display:none}.rail-scroll{overflow:auto}.sec-body{gap:18px}.tile{min-height:44px}.tile:focus-visible{outline:2px solid #353e31;outline-offset:2px}
+.rail-foot{padding:10px var(--pad) max(12px,env(safe-area-inset-bottom))}.price-row .price{font-size:20px}.bd-toggle{min-height:30px;padding:4px 0;font-size:12px}.guided-actions{display:flex;gap:10px;margin-top:8px}.guided-actions button,.guided-actions a{font:400 14px var(--ui);padding:13px 16px;min-height:44px;border:1px solid #353e31;cursor:pointer;text-align:center;text-decoration:none}.guided-back{background:#fff;color:#353e31}.guided-next{flex:1;background:#353e31;color:#fff}.guided-back:disabled{opacity:.4;cursor:default}#addToCart{display:none}
+.guided-review{display:flex;flex-direction:column;gap:0}.guided-review div{padding:12px 0;border-bottom:1px solid #ededed;display:flex;gap:16px;justify-content:space-between}.guided-review dt{color:#65675e}.guided-review dd{margin:0;text-align:right}.guided-note{font-size:12px;color:#65675e;line-height:1.5}.breakdown{max-height:120px}.tryon{top:10px;right:10px}.tryon-note{top:50px}
+@media(max-height:600px){.stage{flex-basis:23%;min-height:100px}.product{display:none}.guided-heading h2{font-size:19px}.guided-heading{padding:4px 0}.rail-foot{padding-top:6px}.bd-toggle{display:none}}
