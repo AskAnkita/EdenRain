@@ -1,0 +1,401 @@
+{% comment %}
+  Studio options - the option list that sits under the 3D viewer on a phone.
+
+  Place this section directly after the iJewel studio section on the design
+  studio page. It finds that section's frame on the page and talks to it over
+  the configurator's v2 postMessage bridge: every row below is filled from the
+  builder itself, so the choices, their labels, their icons and which one is on
+  are whatever iJewel says they are at the moment it is asked. Nothing is typed
+  in here but the row's name, its question and which axis it stands for.
+
+  One `row` block is one row. Its axis is one of the seven the builder answers
+  for - shape, carat, centerStone, head, shank, shankMetal, headMetal - and a
+  row may carry a second axis under the first as a plain radio list, which is
+  how a gold colour and the carat of that gold belong in the same row.
+
+  Mobile only, unless the box at the bottom is ticked: the desktop studio is
+  the full-bleed frame and the builder's own panel, and this list would fight
+  it.
+
+  The builder does not boot until someone taps the play overlay in the frame,
+  so it tells us nothing on a page nobody has touched. Until the first word
+  arrives the rows are dimmed under a line asking for that tap.
+
+  Looks come from assets/studio-options.css; buttons from assets/eden-actions.css.
+  Behaviour from assets/studio-options.js - a custom element, not an inline
+  script, so it re-arms when the section re-renders in the theme editor.
+
+  Every restylable setting is written onto the section element as a CSS custom
+  property, with the stylesheet's own value as the fallback, so a setting left
+  at "use the default" (a cleared colour, a size of 0) writes nothing at all.
+{% endcomment %}
+
+{{ 'studio-options.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'studio-options.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign transparent = 'rgba(0,0,0,0)'
+
+  assign label_size = section.settings.label_size | plus: 0
+  assign text_size = section.settings.text_size | plus: 0
+  assign ask_size = section.settings.ask_size | plus: 0
+  assign sub_size = section.settings.sub_size | plus: 0
+  assign tile_label_size = section.settings.tile_label_size | plus: 0
+  assign price_size = section.settings.price_size | plus: 0
+  assign note_size = section.settings.note_size | plus: 0
+
+  assign row_height = section.settings.row_height | plus: 0
+  assign tick_size = section.settings.tick_size | plus: 0
+  assign tile_width = section.settings.tile_width | plus: 0
+  assign tile_height = section.settings.tile_height | plus: 0
+  assign tile_gap = section.settings.tile_gap | plus: 0
+  assign icon_size = section.settings.icon_size | plus: 0
+
+  assign content_width = section.settings.content_width | plus: 0
+  assign pad_inline = section.settings.padding_horizontal | plus: 0
+  assign pad_top = section.settings.padding_top | plus: 0
+  assign pad_bottom = section.settings.padding_bottom | plus: 0
+
+  assign rows = section.blocks | where: 'type', 'row'
+  assign notes = section.settings.notes | split: '|'
+
+  comment
+    Only the builder's own origin is ever posted to and only it is listened to:
+    every frame on the page can speak to us, and this one is handed the design.
+  endcomment
+  assign origin = section.settings.origin | strip | default: 'https://ijewel3d.com'
+  unless origin contains 'https://'
+    assign origin = 'https://ijewel3d.com'
+  endunless
+-%}
+
+{%- capture section_styles -%}
+  {%- if section.settings.section_background != blank and section.settings.section_background != transparent -%}--eso-section-bg: {{ section.settings.section_background }};{%- endif -%}
+  {%- if section.settings.label_color != blank and section.settings.label_color != transparent -%}--eso-label-color: {{ section.settings.label_color }};{%- endif -%}
+  {%- if section.settings.text_color != blank and section.settings.text_color != transparent -%}--eso-text-color: {{ section.settings.text_color }};{%- endif -%}
+  {%- if section.settings.rule_color != blank and section.settings.rule_color != transparent -%}--eso-rule: {{ section.settings.rule_color }};{%- endif -%}
+  {%- if section.settings.tick_color != blank and section.settings.tick_color != transparent -%}--eso-tick-color: {{ section.settings.tick_color }};{%- endif -%}
+  {%- if section.settings.chosen_color != blank and section.settings.chosen_color != transparent -%}--eso-chosen-color: {{ section.settings.chosen_color }};{%- endif -%}
+  {%- if section.settings.chevron_color != blank and section.settings.chevron_color != transparent -%}--eso-chevron-color: {{ section.settings.chevron_color }};{%- endif -%}
+  {%- if section.settings.price_color != blank and section.settings.price_color != transparent -%}--eso-price-color: {{ section.settings.price_color }};{%- endif -%}
+  {%- if section.settings.summary_background != blank and section.settings.summary_background != transparent -%}--eso-summary-bg: {{ section.settings.summary_background }};{%- endif -%}
+
+  {%- comment -%}
+    The button takes its fill and its label colour from eden-actions.css, so its
+    colours are set by rebinding that file's two properties here.
+  {%- endcomment -%}
+  {%- if section.settings.button_background != blank and section.settings.button_background != transparent -%}--eden-action-ink: {{ section.settings.button_background }};{%- endif -%}
+  {%- if section.settings.button_text_color != blank and section.settings.button_text_color != transparent -%}--eden-action-on-ink: {{ section.settings.button_text_color }};{%- endif -%}
+
+  {%- if label_size > 0 -%}--eso-label-size: {{ label_size }}px;{%- endif -%}
+  {%- if text_size > 0 -%}--eso-text-size: {{ text_size }}px;{%- endif -%}
+  {%- if ask_size > 0 -%}--eso-ask-size: {{ ask_size }}px;{%- endif -%}
+  {%- if sub_size > 0 -%}--eso-sub-size: {{ sub_size }}px;{%- endif -%}
+  {%- if tile_label_size > 0 -%}--eso-tile-label-size: {{ tile_label_size }}px;{%- endif -%}
+  {%- if price_size > 0 -%}--eso-price-size: {{ price_size }}px;{%- endif -%}
+  {%- if note_size > 0 -%}--eso-note-size: {{ note_size }}px;{%- endif -%}
+
+  {%- if row_height > 0 -%}--eso-row-height: {{ row_height }}px;{%- endif -%}
+  {%- if tick_size > 0 -%}--eso-tick-size: {{ tick_size }}px;{%- endif -%}
+  {%- if tile_width > 0 -%}--eso-tile-width: {{ tile_width }}px;{%- endif -%}
+  {%- if tile_height > 0 -%}--eso-tile-height: {{ tile_height }}px;{%- endif -%}
+  {%- if tile_gap > 0 -%}--eso-tile-gap: {{ tile_gap }}px;{%- endif -%}
+  {%- if icon_size > 0 -%}--eso-icon-size: {{ icon_size }}px;{%- endif -%}
+  --eso-grid-columns: {{ section.settings.grid_columns }};
+
+  {%- if section.settings.full_width -%}
+    --eso-shell-max: none;
+  {%- elsif content_width > 0 -%}
+    --eso-shell-max: {{ content_width }}px;
+  {%- endif -%}
+  {%- if pad_inline > 0 -%}--eso-pad-inline: {{ pad_inline }}px;{%- endif -%}
+  {%- if section.settings.custom_padding -%}--eso-pad-top: {{ pad_top }}px;--eso-pad-bottom: {{ pad_bottom }}px;{%- endif -%}
+{%- endcapture -%}
+
+{%- comment -%}
+  The crop of the viewer above.
+
+  iJewel's own option panel is inside the frame, on their domain, and it cannot
+  be restyled from here - so this section replaces it rather than decorating
+  it. Replacing it means the panel has to go, and the only way to hide part of
+  a cross-origin frame is to show less of the frame: the viewer is cut to the
+  height of its 3D stage and everything below - their title, their option
+  panel, their add-to-cart - falls outside it.
+
+  This is the one place a section reaches into another section's markup. It is
+  deliberate and it is narrow: phones only, only while this section is on the
+  page, and it goes away the moment the section is removed. It is done here
+  rather than on the studio section because "Fill the screen" over there is not
+  a mobile-only setting, and the brief was the phone.
+
+  The studio's own price panel is anchored to the bottom of the frame, so a
+  shorter frame would leave it floating over the ring. Our bar below carries
+  the price now, so it is hidden with the rest.
+{%- endcomment -%}
+{%- comment -%}
+  The stage is measured either in pixels or as a share of the phone's screen.
+  A share is the usual answer - "the ring takes the top 60% and the list starts
+  under it" holds on a small phone and a large one alike, where a fixed 340px is
+  half the screen on one and a third of it on the other.
+
+  svh, not vh: vh on a phone is the screen with the browser's bars hidden, so a
+  stage sized in vh is taller than what is on screen until the address bar
+  scrolls away, and the first row of the list starts below the fold. svh is the
+  screen as it is with the bars showing. vh is written first as the fallback for
+  anything too old to know svh, and is overwritten by the line after it.
+{%- endcomment -%}
+{%- if section.settings.crop_viewer -%}
+  {%- assign viewer_height = section.settings.viewer_height | plus: 0 -%}
+  {%- assign viewer_share = section.settings.viewer_height_share | plus: 0 -%}
+  {%- if section.settings.viewer_height_unit == 'share' -%}
+    {%- assign stage = viewer_share | append: 'svh' -%}
+    {%- assign stage_fallback = viewer_share | append: 'vh' -%}
+  {%- else -%}
+    {%- assign stage = viewer_height | append: 'px' -%}
+    {%- assign stage_fallback = stage -%}
+  {%- endif -%}
+  {%- assign stage_ratio = section.settings.viewer_stage_ratio | divided_by: 100.0 -%}
+  <style>
+    @media screen and (max-width: 749px) {
+      .ijw-frame,
+      .ijewel-studio--fullscreen .ijw-frame {
+        min-height: {{ stage_fallback }} !important;
+        height: {{ stage_fallback }} !important;
+        min-height: {{ stage }} !important;
+        height: {{ stage }} !important;
+        overflow: hidden;
+      }
+
+      /* Making the window taller does not make the ring bigger on its own: the
+         builder hands its 3D stage a fixed share of the frame it is given, so a
+         window taller than that share just scrolls their title, price and
+         add-to-cart into view - the whole reason this crop exists. Measured on
+         this studio at phone widths: the stage always begins 151px down (their
+         bar) and is 0.34 of the frame's height, to a floor of 260px, whatever
+         the frame's width. So the frame is made as tall as it has to be for the
+         stage alone to fill the window, and the window clips the rest. */
+      .ijw-frame iframe,
+      .ijewel-studio--fullscreen .ijw-frame iframe {
+        min-height: max(calc({{ stage_fallback }} + var(--ijw-crop-y, 0px)), calc({{ stage_fallback }} / {{ stage_ratio }})) !important;
+        height: max(calc({{ stage_fallback }} + var(--ijw-crop-y, 0px)), calc({{ stage_fallback }} / {{ stage_ratio }})) !important;
+        min-height: max(calc({{ stage }} + var(--ijw-crop-y, 0px)), calc({{ stage }} / {{ stage_ratio }})) !important;
+        height: max(calc({{ stage }} + var(--ijw-crop-y, 0px)), calc({{ stage }} / {{ stage_ratio }})) !important;
+      }
+
+      {%- if section.settings.hide_frame_price -%}
+        .ijw-price { display: none !important; }
+      {%- endif -%}
+    }
+  </style>
+{%- endif -%}
+
+<studio-options
+  class="er-studio-options{% if section.settings.show_on_desktop %} er-studio-options--desktop{% endif %}{% if section.settings.show_row_value %} er-studio-options--values{% endif %}"
+  style="{{ section_styles | strip_newlines | strip }}"
+  data-origin="{{ origin }}"
+  data-frame="{{ section.settings.frame_selector | escape }}"
+  data-single="{{ section.settings.one_open_at_a_time }}"
+  data-show-price="{{ section.settings.show_live_price }}"
+  data-currency="{{ section.settings.currency | escape }}"
+  data-swatches="{{ section.settings.swatches | escape }}"
+>
+  <div class="eso-shell">
+    {%- if section.settings.wake_text != blank -%}
+      <p class="eso-wake">{{ section.settings.wake_text | escape }}</p>
+    {%- endif -%}
+
+    <div class="eso-rows">
+      {%- for block in rows -%}
+        {%- liquid
+          assign sub_axis = block.settings.sub_axis
+          if sub_axis == 'none'
+            assign sub_axis = ''
+          endif
+        -%}
+        <div
+          class="eso-row"
+          data-axis="{{ block.settings.axis }}"
+          data-style="{{ block.settings.style }}"
+          data-chosen="false"
+          {% if sub_axis != blank %}
+            data-sub-axis="{{ sub_axis }}"
+          {% endif %}
+          {{ block.shopify_attributes }}
+        >
+          <button class="eso-row__head" type="button" aria-expanded="false">
+            <span class="eso-row__label">{{ block.settings.label | escape }}</span>
+            <svg class="eso-row__tick" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path d="M2 8.5 6 12.5 14 3.5" fill="none" stroke="currentColor" stroke-width="2"></path>
+            </svg>
+            <span class="eso-row__value"></span>
+            <span class="eso-row__chev" aria-hidden="true"></span>
+          </button>
+
+          <div class="eso-row__panel">
+            {%- if block.settings.question != blank -%}
+              <p class="eso-row__ask">{{ block.settings.question | escape }}</p>
+            {%- endif -%}
+            <div class="eso-choices"></div>
+            {%- if sub_axis != blank -%}
+              {%- if block.settings.sub_label != blank -%}
+                <p class="eso-sublabel">{{ block.settings.sub_label | escape }}</p>
+              {%- endif -%}
+              <div class="eso-sublist"></div>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.show_summary -%}
+      <details class="eso-summary" {% if section.settings.summary_open %}open{% endif %}>
+        <summary>{{ section.settings.summary_label | escape }}</summary>
+        <div class="eso-summary__body"></div>
+      </details>
+    {%- endif -%}
+
+    {%- if notes.size > 0 -%}
+      <div class="eso-notes">
+        {%- for note in notes -%}
+          {%- assign note_text = note | strip -%}
+          {%- if note_text != blank -%}
+            <span>{{ note_text | escape }}</span>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.show_bar -%}
+    <div class="eso-bar{% unless section.settings.sticky_bar %} eso-bar--static{% endunless %}">
+      <span class="eso-bar__price">
+        {%- if section.settings.price_label != blank -%}
+          <span class="eso-bar__label">{{ section.settings.price_label | escape }}</span>
+        {%- endif -%}
+        <span class="eso-bar__total" data-total>{{ section.settings.price_text | escape }}</span>
+      </span>
+
+      {%- if section.settings.button_label != blank -%}
+        <a
+          class="eden-action eden-action--{{ section.settings.button_style }}"
+          href="{{ section.settings.button_link | default: '#' }}"
+          data-cta
+        >
+          {{- section.settings.button_label | escape -}}
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+</studio-options>
+
+{% schema %}
+{
+  "name": "Studio options (mobile)",
+  "tag": "section",
+  "class": "section-studio-options",
+  "settings": [
+    { "type": "header", "content": "What this is", "info": "The option list under the 3D viewer on a phone. Put it directly after the iJewel studio section. Each row block names one axis of the configurator and the choices are read from the builder itself, so nothing here needs updating when a stone or a setting is added in iJewel Drive." },
+
+    { "type": "header", "content": "The viewer above", "info": "iJewel's own option panel sits inside the frame and cannot be restyled from outside it, so this section replaces it: the frame is cut to its 3D stage on phones and their title, panel and add-to-cart fall below the cut. Turn this off to leave the frame alone and show both." },
+    { "type": "checkbox", "id": "crop_viewer", "label": "Cut the viewer down to its 3D stage on mobile", "default": true },
+    { "type": "select", "id": "viewer_height_unit", "label": "Measure the 3D stage", "default": "share", "options": [{ "value": "share", "label": "As a share of the screen" }, { "value": "px", "label": "In pixels" }], "info": "A share keeps the same proportion on every phone. Pixels pin it to one height." },
+    { "type": "range", "id": "viewer_height_share", "label": "Share of the screen the 3D stage takes", "min": 20, "max": 90, "step": 5, "unit": "%", "default": 60, "info": "Measured against the screen with the browser's bars showing, so the list below always starts where you see it start." },
+    { "type": "range", "id": "viewer_height", "label": "Height of the 3D stage on mobile", "min": 200, "max": 800, "step": 10, "unit": "px", "default": 340, "info": "Used only when the stage is measured in pixels. Raise it until the ring is as big as you want and lower it until their title and options are out of sight." },
+    { "type": "range", "id": "viewer_stage_ratio", "label": "Share of the frame the builder gives its 3D stage", "min": 10, "max": 100, "step": 1, "unit": "%", "default": 34, "info": "Measured at 34% on iJewel at phone widths. The frame is made tall enough that this share covers the height above, so only the ring shows. Lower it if their title creeps in, raise it if the ring is cut off." },
+    { "type": "checkbox", "id": "hide_frame_price", "label": "Hide the studio's own price panel on mobile", "info": "The bar below carries the price instead. That panel is anchored to the bottom of the frame, so a shorter frame leaves it over the ring.", "default": true },
+
+    { "type": "header", "content": "Parts" },
+    { "type": "checkbox", "id": "one_open_at_a_time", "label": "Only one row open at a time", "default": true },
+    { "type": "checkbox", "id": "show_row_value", "label": "Show the chosen value in the closed row", "info": "Off keeps the list to names and ticks, with the choices gathered in the summary.", "default": false },
+    { "type": "checkbox", "id": "show_summary", "label": "Show the summary", "default": true },
+    { "type": "checkbox", "id": "summary_open", "label": "Open the summary by default", "default": true },
+    { "type": "text", "id": "summary_label", "label": "Summary heading", "default": "Summary" },
+    { "type": "text", "id": "wake_text", "label": "Line shown before the viewer is tapped", "info": "The 3D viewer does not start, and tells us nothing, until it is tapped. Leave empty to hide the line.", "default": "Tap the ring above to begin" },
+    { "type": "text", "id": "notes", "label": "Lines under the rows (separate with |)", "info": "Short and factual. Leave empty to hide them.", "default": "Free insured delivery | Made to order | 30-day returns" },
+
+    { "type": "header", "content": "Price and button" },
+    { "type": "checkbox", "id": "show_bar", "label": "Show the price and button bar", "default": true },
+    { "type": "checkbox", "id": "sticky_bar", "label": "Pin the bar to the bottom of the screen", "default": true },
+    { "type": "checkbox", "id": "show_live_price", "label": "Show the configurator's live price", "info": "Off by default. The builder prices in USD and those figures are covered on the frame, so leave this off until real prices land and untick the price cover on the studio section at the same time.", "default": false },
+    { "type": "text", "id": "price_label", "label": "Label above the price", "default": "Your design" },
+    { "type": "text", "id": "price_text", "label": "Price text", "info": "Shown when the live price above is off.", "default": "Contact us for price" },
+    { "type": "text", "id": "currency", "label": "Currency code for the live price", "default": "USD" },
+    { "type": "text", "id": "button_label", "label": "Button label", "info": "Leave empty to hide the button.", "default": "Enquire" },
+    { "type": "url", "id": "button_link", "label": "Button link", "info": "The design's state key is added to this link, so the page it opens can reopen this exact ring." },
+    { "type": "select", "id": "button_style", "label": "Button style", "options": [ { "value": "solid", "label": "Filled" }, { "value": "outline", "label": "Outlined" }, { "value": "light", "label": "Outlined, for a dark background" }, { "value": "invert", "label": "Filled white, for a dark background" } ], "default": "solid" },
+
+    { "type": "header", "content": "Swatch colours", "info": "The builder sends an icon for some options and nothing for others. Map an option to a colour and a tile with no icon is filled with it. One per line: the option key or its label, then a colour." },
+    { "type": "textarea", "id": "swatches", "label": "Option colours, one per line", "default": "White Gold | #d8d8da\nYellow Gold | #e6c584\nRose Gold | #e0b09c\nPlatinum | #d9dadc" },
+
+    { "type": "header", "content": "Sizes" },
+    { "type": "range", "id": "row_height", "label": "Row height", "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the default of 53px." },
+    { "type": "range", "id": "tick_size", "label": "Tick size", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 16px." },
+    { "type": "range", "id": "tile_width", "label": "Tile minimum width", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the default of 87px. Tiles share the row evenly." },
+    { "type": "range", "id": "tile_height", "label": "Tile height", "min": 0, "max": 120, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 46px." },
+    { "type": "range", "id": "tile_gap", "label": "Gap between tiles", "min": 0, "max": 24, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 4px." },
+    { "type": "select", "id": "grid_columns", "label": "Icons per row, for icon grid rows", "options": [ { "value": "3", "label": "3" }, { "value": "4", "label": "4" }, { "value": "5", "label": "5" }, { "value": "6", "label": "6" } ], "default": "4" },
+    { "type": "range", "id": "icon_size", "label": "Icon size, for icon grid rows", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 40px." },
+
+    { "type": "header", "content": "Colours", "info": "Clear a colour to use the stylesheet default." },
+    { "type": "color", "id": "section_background", "label": "Section background", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "label_color", "label": "Row names", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "text_color", "label": "Body text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "rule_color", "label": "Hairlines and unchosen borders", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "tick_color", "label": "Tick", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "chosen_color", "label": "Chosen option", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "chevron_color", "label": "Chevrons", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "price_color", "label": "Price", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "summary_background", "label": "Summary panel", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_background", "label": "Button fill", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "button_text_color", "label": "Button label", "default": "rgba(0,0,0,0)" },
+
+    { "type": "header", "content": "Typography", "info": "Set a size to 0 to keep the stylesheet default." },
+    { "type": "range", "id": "label_size", "label": "Row name size", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "ask_size", "label": "Question size", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "tile_label_size", "label": "Tile label size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "sub_size", "label": "Radio list size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "text_size", "label": "Body text size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "price_size", "label": "Price size", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "note_size", "label": "Small print size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+
+    { "type": "header", "content": "Where it shows" },
+    { "type": "checkbox", "id": "show_on_desktop", "label": "Show on desktop as well", "info": "Off by default: on a laptop the studio is the full frame and the builder's own panel.", "default": false },
+    { "type": "checkbox", "id": "full_width", "label": "Stretch content to the screen edge", "default": false },
+    { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "0 keeps the default 1480px. Ignored when the box above is ticked." },
+    { "type": "range", "id": "padding_horizontal", "label": "Side padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the default of 16px." },
+    { "type": "checkbox", "id": "custom_padding", "label": "Use custom section padding", "default": false },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 2, "unit": "px", "default": 24 },
+
+    { "type": "header", "content": "Advanced", "info": "Only change these if the studio section or the configurator moves." },
+    { "type": "text", "id": "origin", "label": "Configurator origin", "info": "The scheme and host of the embed, and the only origin messages are sent to or accepted from.", "default": "https://ijewel3d.com" },
+    { "type": "text", "id": "frame_selector", "label": "Viewer frame selector", "info": "How this section finds the 3D frame on the page.", "default": "ijewel-studio iframe" }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Option row",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Row name", "default": "Metal Type" },
+        { "type": "text", "id": "question", "label": "Question inside the row", "info": "Leave empty to hide it.", "default": "What metal are you thinking?" },
+        { "type": "select", "id": "axis", "label": "Which part of the ring", "info": "The axis the configurator answers for. Shape, carat and centre stone are the diamond; head is the setting that holds it; shank is the band.", "options": [ { "value": "head", "label": "Setting (head)" }, { "value": "shank", "label": "Band (shank)" }, { "value": "shape", "label": "Diamond shape" }, { "value": "carat", "label": "Diamond size (carat)" }, { "value": "centerStone", "label": "Centre stone" }, { "value": "shankMetal", "label": "Band metal" }, { "value": "headMetal", "label": "Setting metal" } ], "default": "shape" },
+        { "type": "select", "id": "style", "label": "Shown as", "options": [ { "value": "tiles", "label": "Tiles" }, { "value": "grid", "label": "Icon grid" }, { "value": "list", "label": "Radio list" } ], "default": "tiles" },
+        { "type": "text", "id": "sub_label", "label": "Heading for the second axis", "info": "Leave empty to hide it. Band metal and setting metal offer the same metals, so the list needs to say which one it is.", "default": "Metal of the setting" },
+        { "type": "select", "id": "sub_axis", "label": "Second axis under the first", "info": "Shown as a radio list beneath, for the thing inside the thing - the carat of gold under its colour. Choose None for a single-axis row.", "options": [ { "value": "none", "label": "None" }, { "value": "head", "label": "Setting (head)" }, { "value": "shank", "label": "Band (shank)" }, { "value": "shape", "label": "Diamond shape" }, { "value": "carat", "label": "Diamond size (carat)" }, { "value": "centerStone", "label": "Centre stone" }, { "value": "shankMetal", "label": "Band metal" }, { "value": "headMetal", "label": "Setting metal" } ], "default": "none" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Studio options (mobile)",
+      "blocks": [
+        { "type": "row", "settings": { "label": "Your Setting", "question": "Which setting do you have in mind?", "axis": "head", "style": "grid", "sub_axis": "none" } },
+        { "type": "row", "settings": { "label": "Metal Type", "question": "What metal is the band?", "axis": "shankMetal", "style": "tiles", "sub_label": "Metal of the setting", "sub_axis": "headMetal" } },
+        { "type": "row", "settings": { "label": "Diamond Shape", "question": "Which shape should the centre stone be?", "axis": "shape", "style": "grid", "sub_axis": "none" } },
+        { "type": "row", "settings": { "label": "Diamond Size", "question": "How big should it be?", "axis": "carat", "style": "tiles", "sub_axis": "none" } },
+        { "type": "row", "settings": { "label": "Diamond Quality", "question": "Which stone would you like?", "axis": "centerStone", "style": "tiles", "sub_axis": "none" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

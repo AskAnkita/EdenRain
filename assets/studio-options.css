@@ -1,0 +1,481 @@
+/*
+  Studio options - the option list that sits under the 3D viewer on a phone.
+
+  The shape of it: a hairline-ruled list of rows, each a name, a tick once it
+  has been chosen and a chevron. Tapping a row unfolds its choices in place, so
+  the ring above is never scrolled off. A row's choices are tiles - the metal,
+  the shape, the setting - and a row may carry a second, plainer radio list
+  under them for the thing inside the thing, which is how a gold colour and the
+  carat of that gold belong in one row.
+
+  Everything is filled by assets/studio-options.js from the configurator itself,
+  so this file styles elements that do not exist until the builder has spoken.
+
+  Mobile only by default: the desktop studio is the full-bleed frame and the
+  builder's own panel, and this list would fight it. The section can be told to
+  show on desktop too.
+
+  Every value a merchant can move is a --eso-* custom property written onto the
+  section element, with the value this file always had as its fallback. Square
+  corners throughout, as the rest of this theme has.
+*/
+
+.er-studio-options {
+  --eso-ink: #171714;
+  --eso-muted: #69675f;
+  --eso-line: rgba(23, 23, 20, 0.18);
+  --eso-wash: #f4f2ef;
+  display: block;
+  color: var(--eso-ink);
+  background: var(--eso-section-bg, transparent);
+  padding: var(--eso-pad-top, 0) 0 var(--eso-pad-bottom, 24px);
+}
+
+/* The studio on a laptop is the full frame and the builder's own panel; this
+   list is the phone's answer to it and stays out of the way there. */
+@media screen and (min-width: 750px) {
+  .er-studio-options:not(.er-studio-options--desktop) {
+    display: none;
+  }
+}
+
+.eso-shell {
+  max-width: var(--eso-shell-max, 1480px);
+  margin: 0 auto;
+  padding: 0 var(--eso-pad-inline, 16px);
+}
+
+/* Until the builder has been tapped awake it has told us nothing, so there is
+   nothing truthful to put in the rows. */
+.eso-wake {
+  padding: 16px 0;
+  color: var(--eso-text-color, var(--eso-muted));
+  font-size: var(--eso-text-size, 1.4rem);
+  text-align: center;
+}
+
+.er-studio-options[data-live="true"] .eso-wake {
+  display: none;
+}
+
+.er-studio-options:not([data-live="true"]) .eso-rows,
+.er-studio-options:not([data-live="true"]) .eso-summary {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* A change is a round trip to the frame and then a re-render of the scene, so
+   the list says so rather than appearing to have ignored the tap. */
+.er-studio-options[data-busy="true"] .eso-rows {
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+/* --------------------------------------------------------------------- rows */
+
+.eso-row {
+  border-top: 1px solid var(--eso-rule, var(--eso-line));
+}
+
+.eso-row:last-of-type {
+  border-bottom: 1px solid var(--eso-rule, var(--eso-line));
+}
+
+.eso-row[data-empty] {
+  display: none;
+}
+
+.eso-row__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--eso-row-height, 53px);
+  cursor: pointer;
+  border: 0;
+  padding: 14px 0;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+}
+
+.eso-row__label {
+  color: var(--eso-label-color, var(--eso-ink));
+  font-family: var(--font-heading--family);
+  font-size: var(--eso-label-size, 2rem);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* The tick is the whole progress indicator: a row with a choice on it is done,
+   and the list of ticks is how far through the ring you are. */
+.eso-row__tick {
+  flex: 0 0 auto;
+  width: var(--eso-tick-size, 16px);
+  height: var(--eso-tick-size, 16px);
+  opacity: 0;
+  color: var(--eso-tick-color, #2f8f5b);
+  transition: opacity 0.2s ease;
+}
+
+.eso-row[data-chosen="true"] .eso-row__tick {
+  opacity: 1;
+}
+
+/* Off by default: the closed row is the name and its tick, and the chosen
+   values are gathered in the summary rather than repeated up the list. */
+.er-studio-options:not(.er-studio-options--values) .eso-row__value {
+  display: none;
+}
+
+.eso-row__value {
+  flex: 1 1 auto;
+  overflow: hidden;
+  color: var(--eso-text-color, var(--eso-muted));
+  font-size: var(--eso-text-size, 1.4rem);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Closed, the row offers to open; open, it offers to close. One glyph, turned. */
+.eso-row__chev {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid var(--eso-chevron-color, var(--eso-ink));
+  border-right: 1.5px solid var(--eso-chevron-color, var(--eso-ink));
+  margin-left: auto;
+  transform: rotate(45deg);
+  transition: transform 0.25s ease;
+}
+
+.eso-row[data-open] .eso-row__chev {
+  transform: rotate(135deg) translate(-3px, 3px);
+}
+
+.eso-row__panel {
+  display: none;
+  padding-bottom: 22px;
+}
+
+.eso-row[data-open] .eso-row__panel {
+  display: block;
+}
+
+.eso-row__ask {
+  margin: 0 0 16px;
+  color: var(--eso-text-color, var(--eso-ink));
+  font-size: var(--eso-ask-size, 1.8rem);
+  line-height: 1.35;
+}
+
+/* ------------------------------------------------------------------ choices */
+
+.eso-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--eso-tile-gap, 4px);
+}
+
+/* Shapes and settings are many and small, so they lay out on a grid rather
+   than a wrapping row, which would leave a ragged last line. */
+.eso-choices--grid {
+  display: grid;
+  grid-template-columns: repeat(var(--eso-grid-columns, 4), minmax(0, 1fr));
+}
+
+.eso-choices--list {
+  flex-direction: column;
+  gap: 0;
+}
+
+.eso-pick {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.eso-pick:focus-visible {
+  outline: 2px solid var(--eso-ink);
+  outline-offset: 2px;
+}
+
+/* A tile is the material itself, its name sitting on it. They lay out on a
+   grid that fits as many even columns as the screen takes, so a wrapped last
+   tile is the same width as the rest rather than stretched across the row. */
+.eso-choices--tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--eso-tile-width, 87px), 1fr));
+}
+
+.eso-choices--tiles .eso-pick {
+  position: relative;
+  min-height: var(--eso-tile-height, 46px);
+  background: var(--eso-tile-fill, var(--eso-wash));
+  padding: 8px 10px;
+}
+
+.eso-choices--tiles .eso-pick__swatch {
+  position: absolute;
+  inset: 0;
+}
+
+.eso-choices--tiles .eso-pick__swatch img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.eso-choices--tiles .eso-pick__label {
+  position: relative;
+  font-size: var(--eso-tile-label-size, 1.5rem);
+  text-align: center;
+}
+
+.eso-choices--tiles .eso-pick[aria-pressed="true"] {
+  border-color: var(--eso-chosen-color, var(--eso-ink));
+}
+
+/* a grid cell: the icon over its name, for shapes and settings */
+.eso-choices--grid .eso-pick {
+  flex-direction: column;
+  gap: 6px;
+  border-color: var(--eso-rule, var(--eso-line));
+  padding: 10px 4px;
+}
+
+.eso-choices--grid .eso-pick__swatch {
+  display: block;
+  width: var(--eso-icon-size, 40px);
+  height: var(--eso-icon-size, 40px);
+}
+
+.eso-choices--grid .eso-pick__swatch img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* The name is the builder's own, printed as the builder prints it. Setting and
+   shape names are read against the panel in the desktop studio and against the
+   summary below, so a tile that shouts SECRET HIDDEN HALO where everything else
+   says Secret Hidden Halo reads as a different option rather than the same one.
+   No case change, no tracking: the string arrives from the bridge and is shown. */
+.eso-choices--grid .eso-pick__label {
+  font-size: var(--eso-tile-label-size, 1.3rem);
+  text-align: center;
+}
+
+.eso-choices--grid .eso-pick[aria-pressed="true"] {
+  border-color: var(--eso-chosen-color, var(--eso-ink));
+}
+
+/* A tile whose material the builder sent as a picture: the picture is the
+   tile and the name sits under it, because a name laid over a photographed
+   metal cannot be read. */
+.eso-choices--tiles .eso-pick--image {
+  flex-direction: column;
+  gap: 6px;
+  background: none;
+  padding: 0 0 6px;
+}
+
+.eso-choices--tiles .eso-pick--image .eso-pick__swatch {
+  position: relative;
+  inset: auto;
+  display: block;
+  width: 100%;
+  height: var(--eso-tile-height, 46px);
+}
+
+.eso-choices--tiles .eso-pick--image .eso-pick__label {
+  padding: 0 6px;
+}
+
+/* the second axis: a plain radio list, the thing inside the thing */
+.eso-sublist {
+  display: flex;
+  flex-direction: column;
+  margin-top: 6px;
+}
+
+/* Band metal and setting metal are different axes offering the same four
+   metals, so the list needs to say which one it is. */
+.eso-sublabel {
+  margin: 18px 0 2px;
+  color: var(--eso-text-color, var(--eso-muted));
+  font-size: var(--eso-text-size, 1.4rem);
+}
+
+.eso-sublist .eso-pick {
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 7px 0;
+  color: var(--eso-text-color, var(--eso-ink));
+  font-size: var(--eso-sub-size, 1.8rem);
+  text-align: left;
+}
+
+.eso-sublist .eso-pick::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--eso-rule, var(--eso-line));
+  border-radius: 50%;
+}
+
+.eso-sublist .eso-pick[aria-pressed="true"] {
+  color: var(--eso-chosen-color, var(--eso-ink));
+}
+
+.eso-sublist .eso-pick[aria-pressed="true"]::before {
+  border-color: currentColor;
+  box-shadow: inset 0 0 0 3.5px var(--eso-section-bg, #fff), inset 0 0 0 18px currentColor;
+}
+
+.eso-pick__delta {
+  color: inherit;
+  font-size: inherit;
+}
+
+.eso-choices--tiles .eso-pick__delta,
+.eso-choices--grid .eso-pick__delta {
+  position: relative;
+  display: block;
+  font-size: 1.2rem;
+}
+
+/* ------------------------------------------------------------------ summary */
+
+.eso-summary {
+  border-bottom: 1px solid var(--eso-rule, var(--eso-line));
+}
+
+.eso-summary summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--eso-row-height, 53px);
+  cursor: pointer;
+  padding: 14px 0;
+  font-family: var(--font-heading--family);
+  font-size: var(--eso-label-size, 2rem);
+  font-weight: 500;
+  list-style: none;
+}
+
+.eso-summary summary::-webkit-details-marker {
+  display: none;
+}
+
+.eso-summary summary::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid var(--eso-chevron-color, var(--eso-ink));
+  border-right: 1.5px solid var(--eso-chevron-color, var(--eso-ink));
+  transform: rotate(45deg);
+  transition: transform 0.25s ease;
+}
+
+.eso-summary[open] summary::after {
+  transform: rotate(135deg) translate(-3px, 3px);
+}
+
+.eso-summary__body {
+  padding-bottom: 18px;
+}
+
+.eso-specs {
+  margin: 0;
+  background: var(--eso-summary-bg, var(--eso-wash));
+  padding: 16px;
+}
+
+.eso-spec {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.eso-spec dt {
+  color: var(--eso-text-color, var(--eso-muted));
+  font-size: var(--eso-text-size, 1.4rem);
+}
+
+.eso-spec dd {
+  margin: 0;
+  color: var(--eso-ink);
+  font-size: var(--eso-text-size, 1.4rem);
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------- bar */
+
+/*
+  The price and the button leave the flow and sit on the screen, so the thing
+  the shopper came to do is never scrolled away from.
+*/
+.eso-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px var(--eso-pad-inline, 16px);
+  background: var(--eso-section-bg, #fff);
+  box-shadow: 0 -1px 0 var(--eso-rule, var(--eso-line));
+}
+
+.eso-bar--static {
+  position: static;
+  box-shadow: none;
+}
+
+.eso-bar__price {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.eso-bar__label {
+  color: var(--eso-text-color, var(--eso-muted));
+  font-size: var(--eso-note-size, 1.2rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.eso-bar__total {
+  color: var(--eso-price-color, var(--eso-ink));
+  font-size: var(--eso-price-size, 1.8rem);
+}
+
+.eso-bar .eden-action {
+  flex: 0 0 auto;
+}
+
+.eso-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  padding: 14px var(--eso-pad-inline, 16px) 0;
+  color: var(--eso-text-color, var(--eso-muted));
+  font-size: var(--eso-note-size, 1.2rem);
+}

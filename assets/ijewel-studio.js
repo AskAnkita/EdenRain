@@ -124,12 +124,16 @@ if (!customElements.get('ijewel-studio')) {
         const poster = this.parentElement?.querySelector('.ijw-poster');
         if (!poster) return;
 
-        // The frame's load event only says its document arrived - a 3D viewer
-        // spends the next few seconds on its own splash screen, which is inside
-        // the frame and cannot be styled from here. The cover is held over it
-        // for as long as the section says, then faded rather than cut, so an
-        // early reveal is a soft one.
-        const hold = this.waitReady ? 0 : parseInt(this.dataset.hold || '0', 10) || 0;
+        // Neither signal means the scene is on screen. The frame's load event
+        // only says its document arrived, and the bridge's ready event comes
+        // while the builder is still fetching and rendering the model - measured
+        // on this studio, ready lands 2-3 seconds before the ring first paints,
+        // and the gap is wider on a slow line. Uncovering on either one hands the
+        // viewer its own loading screen, logo and progress bar, which is the one
+        // thing the cover exists to hide. So the hold applies to both: it is the
+        // rope after the signal, not instead of it. Then faded rather than cut,
+        // so an early reveal is a soft one.
+        const hold = parseInt(this.dataset.hold || '0', 10) || 0;
         const fade = () => {
           poster.setAttribute('data-fading', 'true');
           setTimeout(() => poster.remove(), 500);

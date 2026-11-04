@@ -54,7 +54,7 @@
         "brand_width": 260,
         "brand_height": 80,
         "brand_logo_width": 60,
-        "brand_hide_mobile": false,
+        "brand_hide_mobile": true,
         "brand_top_mobile": 204,
         "brand_top_mobile_vw": 61,
         "brand_left_mobile": 0,
@@ -106,6 +106,7 @@
         "fallback_text": "<p>Tell us what you have in mind - a stone, a setting, a piece you want remade - and we will come back with a sketch and a price.</p>",
         "fallback_label": "Start a bespoke enquiry",
         "fallback_link": "/pages/bespoke-jewellery-request",
+        "cart_action": "enquiry",
         "section_background": "rgba(0,0,0,0)",
         "heading_color": "rgba(0,0,0,0)",
         "eyebrow_color": "rgba(0,0,0,0)",
@@ -137,10 +138,130 @@
       "settings": {
         "include_margins": true
       }
+    },
+    "studio-options": {
+      "type": "studio-options",
+      "blocks": {
+        "row-setting": {
+          "type": "row",
+          "settings": {
+            "label": "Your Setting",
+            "question": "Which setting do you have in mind?",
+            "axis": "head",
+            "style": "grid",
+            "sub_axis": "none"
+          }
+        },
+        "row-metal": {
+          "type": "row",
+          "settings": {
+            "label": "Metal Type",
+            "question": "What metal is the band?",
+            "axis": "shankMetal",
+            "style": "tiles",
+            "sub_axis": "headMetal",
+            "sub_label": "Metal of the setting"
+          }
+        },
+        "row-shape": {
+          "type": "row",
+          "settings": {
+            "label": "Diamond Shape",
+            "question": "Which shape should the centre stone be?",
+            "axis": "shape",
+            "style": "grid",
+            "sub_axis": "none"
+          }
+        },
+        "row-carat": {
+          "type": "row",
+          "settings": {
+            "label": "Diamond Size",
+            "question": "How big should it be?",
+            "axis": "carat",
+            "style": "tiles",
+            "sub_axis": "none"
+          }
+        },
+        "row-stone": {
+          "type": "row",
+          "settings": {
+            "label": "Diamond Quality",
+            "question": "Which stone would you like?",
+            "axis": "centerStone",
+            "style": "tiles",
+            "sub_axis": "none"
+          }
+        }
+      },
+      "block_order": [
+        "row-setting",
+        "row-metal",
+        "row-shape",
+        "row-carat",
+        "row-stone"
+      ],
+      "settings": {
+        "crop_viewer": true,
+        "viewer_height": 230,
+        "hide_frame_price": true,
+        "one_open_at_a_time": true,
+        "show_row_value": false,
+        "show_summary": true,
+        "summary_open": true,
+        "summary_label": "Summary",
+        "wake_text": "Tap the ring above to begin",
+        "notes": "Free insured delivery | Made to order | 30-day returns",
+        "show_bar": true,
+        "sticky_bar": true,
+        "show_live_price": false,
+        "price_label": "Your design",
+        "price_text": "Contact us for price",
+        "currency": "USD",
+        "button_label": "Enquire",
+        "button_link": "/pages/bespoke-jewellery-request",
+        "button_style": "solid",
+        "swatches": "White Gold | #d8d8da\nYellow Gold | #e6c584\nRose Gold | #e0b09c\nPlatinum | #d9dadc",
+        "row_height": 0,
+        "tick_size": 0,
+        "tile_width": 0,
+        "tile_height": 0,
+        "tile_gap": 0,
+        "grid_columns": "4",
+        "icon_size": 0,
+        "section_background": "rgba(0,0,0,0)",
+        "label_color": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "rule_color": "rgba(0,0,0,0)",
+        "tick_color": "rgba(0,0,0,0)",
+        "chosen_color": "rgba(0,0,0,0)",
+        "chevron_color": "rgba(0,0,0,0)",
+        "price_color": "rgba(0,0,0,0)",
+        "summary_background": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "label_size": 0,
+        "ask_size": 0,
+        "tile_label_size": 0,
+        "sub_size": 0,
+        "text_size": 0,
+        "price_size": 0,
+        "note_size": 0,
+        "show_on_desktop": false,
+        "full_width": false,
+        "content_width": 0,
+        "padding_horizontal": 0,
+        "custom_padding": false,
+        "padding_top": 0,
+        "padding_bottom": 24,
+        "origin": "https://ijewel3d.com",
+        "frame_selector": "ijewel-studio iframe"
+      }
     }
   },
   "order": [
     "studio",
+    "studio-options",
     "1792391324512c4c70"
   ]
 }
