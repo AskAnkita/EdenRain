@@ -1,6 +1,23 @@
+{%- comment -%}
+  Shopify answers an unknown URL with this template, and a /collections/<handle> whose collection
+  is not in the store is one of those. A mega menu row can name a category the shop has not
+  created yet ('menu-static-items' keeps the lists, scripts/shopify/store-config.mjs declares the
+  collections), and "Page not found" is the wrong thing to say about a category of the shop: the
+  shopper asked for Plain Metal Wedding Bands, not for a page that never existed.
+
+  So both pages are rendered here - 'empty-category' first, then the 404's own blocks - and
+  assets/empty-category.js shows one of them. It has to be the browser that decides, because
+  Shopify rewrites the path before this template is rendered: `request.path` is "/404" by then,
+  and no Liquid object still holds the handle that was asked for. A path with /collections/ in it
+  gets the category page, anything else gets the 404, and with the script blocked the 404 stands.
+
+  The status code is 404 either way, which is what it should be: nothing is indexed because of
+  this, and a category that is created later starts answering for itself.
+{%- endcomment -%}
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 <div
   class="
+    main-404
     section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}
     {% if section.settings.section_height != "" %} {{ section.settings.section_height | prepend: "section--height-" }}{% endif %}
   "
@@ -20,14 +37,30 @@
   "
 >
   <div class="custom-section-background">
-    {% render 'background-media',
-      background_media: section.settings.background_media,
-      background_video: section.settings.video,
-      background_video_position: section.settings.video_position,
-      background_image: section.settings.background_image,
-      background_image_position: section.settings.background_image_position,
-      image_behavior: section.settings.image_behavior
+    {%- comment -%}
+      Only when there is something to show. 'background-image' falls back to Shopify's own
+      `hero-apparel-3` placeholder when no image is set, and this section is set to "image" with
+      no image - so the page came up behind a stock illustration of folded t-shirts, on a jewellery
+      shop. Set a background image in the theme editor and it is drawn as before.
+    {%- endcomment -%}
+    {% liquid
+      assign has_background = false
+      if section.settings.background_media == 'image' and section.settings.background_image != blank
+        assign has_background = true
+      elsif section.settings.background_media == 'video' and section.settings.video != blank
+        assign has_background = true
+      endif
     %}
+    {% if has_background %}
+      {% render 'background-media',
+        background_media: section.settings.background_media,
+        background_video: section.settings.video,
+        background_video_position: section.settings.video_position,
+        background_image: section.settings.background_image,
+        background_image_position: section.settings.background_image_position,
+        image_behavior: section.settings.image_behavior
+      %}
+    {% endif %}
   </div>
 
   <div
@@ -51,7 +84,12 @@
         {% render 'spacing-style', settings: section.settings %}
       "
     >
-      {% content_for 'blocks' %}
+      {%- unless section.settings.empty_category_enabled == false -%}
+        {% render 'empty-category', from_path: true, section_settings: section.settings %}
+      {%- endunless -%}
+      <div class="main-404__standard" data-main-404-standard>
+        {% content_for 'blocks' %}
+      </div>
     </div>
   </div>
 </div>
@@ -427,6 +465,149 @@
       "step": 1,
       "unit": "px",
       "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Empty category page",
+      "info": "A category URL whose collection is not in the store (a mega menu row for a category that has not been created yet) shows this instead of the 404 above: the category's name, worked out from the URL, over the message below. A dead product or page URL still shows the 404."
+    },
+    {
+      "type": "checkbox",
+      "id": "empty_category_enabled",
+      "label": "Show a category page for /collections/ URLs",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "empty_category_message",
+      "label": "Message",
+      "default": "No products found in this category.",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "empty_category_note",
+      "label": "Supporting line",
+      "default": "Nothing is listed here just yet. New pieces are added every week, or talk to us and we will make yours.",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "empty_category_image",
+      "label": "Picture above the heading",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "color",
+      "id": "empty_category_band_color",
+      "label": "Band colour",
+      "default": "#f4f4f0",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "color",
+      "id": "empty_category_heading_color",
+      "label": "Heading colour",
+      "default": "#171714",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "color",
+      "id": "empty_category_text_color",
+      "label": "Text colour",
+      "default": "#6f6f66",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "empty_category_heading_size",
+      "label": "Heading size",
+      "min": 0,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 32,
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "empty_category_heading_size_mobile",
+      "label": "Heading size on mobile",
+      "min": 0,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 26,
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "range",
+      "id": "empty_category_text_size",
+      "label": "Text size",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 17,
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "empty_category_show_parent",
+      "label": "Offer the nearest category that has products",
+      "default": true,
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "empty_category_parent_prefix",
+      "label": "Wording before that category's name",
+      "default": "Shop",
+      "visible_if": "{{ section.settings.empty_category_enabled and section.settings.empty_category_show_parent }}"
+    },
+    {
+      "type": "text",
+      "id": "empty_category_button_label",
+      "label": "Button label",
+      "default": "Shop all jewellery",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "url",
+      "id": "empty_category_button_link",
+      "label": "Button link",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "select",
+      "id": "empty_category_button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "solid",
+          "label": "Filled"
+        },
+        {
+          "value": "outline",
+          "label": "Outlined"
+        }
+      ],
+      "default": "solid",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "color",
+      "id": "empty_category_button_background",
+      "label": "Button colour",
+      "default": "#171714",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "color",
+      "id": "empty_category_button_text_color",
+      "label": "Button text colour",
+      "default": "#ffffff",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
     }
   ]
 }

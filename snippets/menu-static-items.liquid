@@ -20,9 +20,12 @@
   "~" and "::" are the separators rather than a comma because labels contain commas
   ("Climbers, Jackets & Cuffs"). Nothing is output for a group that isn't listed.
 
-  Every collection named here has to exist, or the tile opens a 404 — which is what the
-  MiaDonna-shaped lists that used to be here did. `scripts/shopify/store-config.mjs` is where they
-  are declared and `scripts/shopify/tag-products.mjs` is what fills them; keep the three in step.
+  Every collection named here should exist. One that does not no longer opens a 404 — the 404
+  template hands a /collections/ path to 'empty-category', which heads it with the category's name
+  and says there are no products in it — but that page has no banner, no filters and no products,
+  so it is a net under a broken row rather than a reason to leave one. `scripts/shopify/store-config.mjs`
+  is where collections are declared and `scripts/shopify/tag-products.mjs` is what fills them; keep
+  the three in step.
 {% endcomment %}
 
 {%- liquid
@@ -178,6 +181,12 @@
       # rather than a 404. Swap it for heart-engagement-rings once the collection is there.
       echo '::Round|round-engagement-rings~Oval|oval-engagement-rings~Cushion|cushion-engagement-rings~Emerald|emerald-engagement-rings~Pear|pear-engagement-rings~Princess|princess-engagement-rings~Radiant|radiant-engagement-rings~Marquise|marquise-engagement-rings~Asscher|asscher-engagement-rings~Heart|/collections/engagement-rings?filter.p.tag=shape:heart'
     when 'wedding/by-style' or 'wedding/womens'
+      # Plain Metal is the one row here whose collection is not in the store. There is no `style:`
+      # tag for a band with no stones in it either (scripts/shopify/tag-rules.mjs), so it cannot be
+      # a filter URL the way Tennis and the bracelet styles are. It opens the category page
+      # 'empty-category' draws - "Plain Metal Wedding Bands", "No products found in this category"
+      # and the way back to Wedding Bands - rather than a 404. Declare it in store-config.mjs and
+      # run `setup-store.mjs --apply --only=collections` and the row starts answering for itself.
       echo '::Wedding|wedding-bands~Anniversary|anniversary-rings~Eternity|eternity-rings~Plain Metal|plain-metal-wedding-bands'
       echo ';;Featured Collections::Curved|curved-wedding-bands~Stackable|stackable-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship'
     when 'wedding/featured'

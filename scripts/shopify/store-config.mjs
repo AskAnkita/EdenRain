@@ -63,6 +63,13 @@ export const collections = [
   { handle: 'eternity-rings', title: 'Eternity Rings', rule: tag('style:eternity') },
   { handle: 'curved-wedding-bands', title: 'Curved Wedding Bands', rule: tag('style:curved') },
   { handle: 'stackable-rings', title: 'Stackable Rings', rule: tag('style:stackable') },
+  // Wedding > Women's > Plain Metal in the mega menu (snippets/menu-static-items.liquid) has
+  // always pointed here, and until this row existed the tile opened a 404. Manual, and empty
+  // until someone puts a band in it: a plain metal band is one with no stones, which no title
+  // says and no `style:` tag in tag-rules.mjs derives, so there is nothing to automate it on.
+  // It behaves like ready-to-ship, which is also manual and also empty - a real category page
+  // with its banner and its filters that says it has no products yet.
+  { handle: 'plain-metal-wedding-bands', title: 'Plain Metal Wedding Bands' },
 
   // Jewelry. The four top-level groups, each a manual collection that was holding a fraction of
   // what the shop sells — Earrings listed 56 of 209, Rings 14 of 38, Bracelets 2 of 18. Same

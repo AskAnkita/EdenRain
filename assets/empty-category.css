@@ -1,0 +1,241 @@
+/*
+  Empty category - the page a category with nothing in it shows. sections/main-404.liquid and the
+  collection grid sections both draw it through snippets/empty-category.liquid.
+
+  It is built to look like the collection page it stands in for, because on the 404 side it IS
+  the collection page as far as the shopper is concerned: a tinted band across the full width
+  with the breadcrumb at its left and the category's name centred under it, the product count
+  below that, and then "No products found in this category" over the way back into the catalogue.
+  The band's colour, padding and type are the collection hero's own, read off a real collection
+  page (.collection-hero in sections/main-collection-banner.liquid, color-scheme-3): 2.4rem /
+  5.2rem / 5.6rem of padding, a 14px breadcrumb at 75% opacity, a 32px heading in the heading
+  face. Keep them in step if that section's scheme or padding changes.
+
+  The grid sections ask for `compact`, which is only the lower half: their own banner has already
+  drawn the top of the page. That is what makes an empty collection and a collection that is not
+  in the store read as the same page.
+
+  Every look here is a custom property with its default written in this file, so a setting left at
+  "use the default" (a cleared colour, a size of 0) writes nothing onto the element and this value
+  stands. Buttons come from assets/eden-actions.css and must not be given a hover of their own.
+*/
+
+.empty-category {
+  --ec-band-bg: #f4f4f0;
+  --ec-heading-color: #121212;
+  --ec-text-color: #6f6f66;
+  --ec-crumb-color: #545454;
+  --ec-count-color: rgba(0, 0, 0, 0.68);
+  --ec-rule-color: rgba(23, 23, 20, 0.14);
+
+  --ec-heading-size: 32px;
+  --ec-heading-size-mobile: 26px;
+  --ec-heading-tracking: normal;
+  --ec-heading-case: none;
+  --ec-text-size: 17px;
+  --ec-crumb-size: 14px;
+  --ec-measure: 46ch;
+  --ec-image-width: 220px;
+
+  /*
+    The band runs the full width of the window, and this element sits inside the 404 section's
+    page-width column. assets/empty-category.js measures the window - documentElement.clientWidth,
+    which leaves out the scrollbar where 100vw would include it and push the page sideways - and
+    writes it here before anything is painted.
+  */
+  --ec-viewport: 100%;
+
+  display: block;
+  width: 100%;
+}
+
+/*
+  On the 404 the panel breaks out of the section's page-width column and runs the full width of
+  the window, the way the collection page does. The width is measured rather than written as
+  100vw; the note on --ec-viewport above says why.
+*/
+.empty-category--path {
+  width: var(--ec-viewport);
+  margin-inline: calc(50% - var(--ec-viewport) / 2);
+}
+
+/* The tinted band: the collection hero's colour, padding and arrangement. */
+.empty-category__banner {
+  width: 100%;
+  padding: 2.4rem 5.2rem 5.6rem;
+  background: var(--ec-band-bg);
+}
+
+.empty-category__crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0 0 1.6rem;
+  opacity: 0.75;
+  color: var(--ec-heading-color);
+  font-size: var(--ec-crumb-size);
+  line-height: 1.6;
+}
+
+.empty-category__crumbs a {
+  color: var(--ec-crumb-color);
+  text-decoration: none;
+}
+
+.empty-category__crumbs a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.empty-category__crumbs span[aria-hidden='true'] {
+  opacity: 0.55;
+}
+
+.empty-category__title {
+  margin: 0;
+  color: var(--ec-heading-color);
+  font-family: var(--font-heading--family, var(--font-subheading--family, inherit));
+  font-size: var(--ec-heading-size);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: var(--ec-heading-tracking);
+  text-align: center;
+  text-transform: var(--ec-heading-case);
+  text-wrap: balance;
+}
+
+/* The product count sits where the collection grid's own count sits, at the page edge. */
+.empty-category__count {
+  padding: 2.4rem 2rem 0;
+  color: var(--ec-count-color);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.empty-category__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: 6rem 1.6rem 8rem;
+  text-align: center;
+}
+
+.empty-category--compact .empty-category__body {
+  padding-block: 4rem 6rem;
+}
+
+.empty-category__image {
+  display: block;
+  width: 100%;
+  max-width: var(--ec-image-width);
+  height: auto;
+}
+
+.empty-category__rule {
+  width: 6rem;
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: var(--ec-rule-color);
+}
+
+.empty-category__message,
+.empty-category__note {
+  max-width: var(--ec-measure);
+  margin: 0;
+  color: var(--ec-text-color);
+  font-size: var(--ec-text-size);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.empty-category__message {
+  color: var(--ec-heading-color);
+}
+
+.empty-category__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-block-start: 0.8rem;
+}
+
+.empty-category__parent[hidden] {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .empty-category__banner {
+    padding: 1.6rem 1.6rem 3.2rem;
+  }
+
+  .empty-category__title {
+    font-size: var(--ec-heading-size-mobile);
+  }
+
+  .empty-category__body {
+    gap: 1.6rem;
+    padding-block: 4rem 6rem;
+  }
+
+  .empty-category__actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .empty-category__actions > * {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/*
+  The 404 section is laid out as a tall, centred, generously padded panel, which is right for
+  "Oops! Page Not Found" and wrong for a category page: it pushed the band a third of the way
+  down the window. With the category page showing, the section gives up its height and its
+  padding so the band starts under the header, where a collection page's does. Only the 404
+  template ever carries `is-empty-category`, and `main-404` is this section alone, so nothing
+  else in the shop is touched.
+*/
+.is-empty-category .main-404 {
+  min-height: 0;
+  padding-block: 0;
+}
+
+.is-empty-category .main-404 .section-content-wrapper {
+  gap: 0;
+  min-height: 0;
+  padding-block: 0;
+  justify-content: flex-start;
+}
+
+/*
+  Which of the two pages the 404 template shows. Both are rendered - this panel and the 404's own
+  blocks - and assets/empty-category.js puts `is-empty-category` on <html> for a /collections/
+  path. Until it does, this panel is not displayed and the 404 is, so a dead product or page URL
+  is still a 404 and a browser with the script blocked still sees one. The panel the collection
+  grid renders for a real but empty collection has no --path class and is never hidden by this.
+*/
+.empty-category--path {
+  display: none;
+}
+
+.is-empty-category .empty-category--path {
+  display: block;
+}
+
+.is-empty-category .main-404__standard {
+  display: none;
+}
+
+.main-404__standard {
+  width: 100%;
+}

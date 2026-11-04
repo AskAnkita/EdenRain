@@ -1,0 +1,231 @@
+{% comment %}
+  The category page for a category with nothing in it.
+
+  Two things land here:
+
+  - A /collections/<handle> URL for a collection that does not exist, with `from_path: true`.
+    Shopify answers those with the 404 template, and a mega menu row can name a category the
+    store has not created yet ('menu-static-items' keeps the lists, scripts/shopify/store-config.mjs
+    declares the collections). "Page not found" is the wrong thing to say about a category of the
+    shop, so 'main-404' renders this instead and it says "No products found in this category"
+    under the category's own name.
+
+    Liquid cannot name that category, because Shopify rewrites the path before the 404 template
+    is rendered: `request.path` is "/404" by then and the handle the shopper asked for is gone
+    from every object the template can see. The browser still has it, so the heading, the
+    breadcrumb and the tab title are filled in by assets/empty-category.js from
+    location.pathname, and the panel only appears on a path that has /collections/ in it - any
+    other dead URL keeps the ordinary 404, which is drawn right beside this and hidden by the
+    class the script puts on <html>. With the script blocked, nothing here shows and the 404
+    stands, which is why the 404's own blocks are still rendered.
+
+  - A collection that is real but holds nothing, from the collection grid sections, which pass
+    `category` and `compact: true` because the banner above has already printed the title. Both
+    say the same thing in the same words, so a shopper cannot tell which of the two they are on.
+
+  Accepts:
+  - from_path: {Boolean} fill the heading from the URL in the browser (the 404 case)
+  - category: {Collection} the collection itself, for the real-but-empty case
+  - compact: {Boolean} drop the breadcrumb, the picture and the heading (default false)
+  - section_settings: {Object} a section's settings, for the copy, colours, sizes and button.
+    Not called `settings`, which is Shopify's own global for the theme's settings: a snippet given
+    no `settings` still sees that object, so there is no telling whether a section passed its own.
+  - image: {Image} optional picture above the heading
+
+  Styles: assets/empty-category.css. Buttons: assets/eden-actions.css, which owns their hover.
+{% endcomment %}
+
+{{ 'empty-category.css' | asset_url | stylesheet_tag }}
+{{ 'eden-actions.css' | asset_url | stylesheet_tag }}
+{%- comment -%}
+  Not deferred, and before the markup below rather than in the head: the element has to be
+  upgraded as the parser reaches it, so the class that hides the 404 beside it is on <html>
+  before the 404's own markup is parsed. Deferred, the 404 paints first and is then swapped,
+  which reads as a fault. That is what ParserBlockingScript warns about and why it is turned off
+  for this one line: the file is under a kilobyte, it is served from the shop's own CDN, and the
+  only page that loads it is a 404.
+{%- endcomment -%}
+{%- if from_path -%}
+  {% # theme-check-disable ParserBlockingScript %}
+  <script src="{{ 'empty-category.js' | asset_url }}"></script>
+  {% # theme-check-enable ParserBlockingScript %}
+{%- endif -%}
+
+{%- liquid
+  assign ec = section_settings
+
+  comment
+    A real collection has its title; in the 404 case there is nothing to put here yet, so the
+    heading and the breadcrumb are left empty for the script to fill in and the panel stays
+    hidden if it never does.
+  endcomment
+  assign title = category.title
+  if title == blank and from_path != true
+    assign title = 'Collection'
+  endif
+
+  comment
+    Where to send the shopper instead. The handle says which family the category belongs to, and
+    that family's own collection is the nearest thing to what they asked for. Every family is
+    looked up in `collections` and dropped unless it is in the store and has something in it, so
+    the button can never point at a second empty page. The script picks one of these by matching
+    the words against the handle in the URL; a real-but-empty collection has its own handle
+    matched against the same list below.
+  endcomment
+  assign families = 'engagement-rings:engagement|wedding-bands:wedding,anniversary,eternity,bridal,band|earrings:earring,stud,hoop,huggie,dangle,climber|necklaces:necklace,pendant,chain,charm|bracelets:bracelet,bangle,cuff|lab-grown-diamonds:diamonds|rings:ring' | split: '|'
+-%}
+
+{%- capture family_json -%}
+[
+  {%- assign printed = 0 -%}
+  {%- for family in families -%}
+    {%- assign pair = family | split: ':' -%}
+    {%- assign family_collection = collections[pair[0]] -%}
+    {%- if family_collection.handle == pair[0] and family_collection.all_products_count > 0 -%}
+      {%- if printed > 0 -%},{%- endif -%}
+      {"handle": {{ pair[0] | json }}, "words": {{ pair[1] | split: ',' | json }}, "label": {{ family_collection.title | json }}, "url": {{ family_collection.url | json }}}
+      {%- assign printed = printed | plus: 1 -%}
+    {%- endif -%}
+  {%- endfor -%}
+]
+{%- endcapture -%}
+
+{%- liquid
+  assign family_json = family_json | strip
+
+  comment
+    The nearest family for a real collection, worked out here rather than in the script because
+    this case never reaches the script. The handle is matched against the same word lists.
+  endcomment
+  assign parent_label = ''
+  assign parent_url = ''
+  if category.handle != blank
+    for family in families
+      assign pair = family | split: ':'
+      if pair[0] == category.handle
+        continue
+      endif
+      assign family_collection = collections[pair[0]]
+      if family_collection.handle != pair[0] or family_collection.all_products_count == 0
+        continue
+      endif
+      assign words = pair[1] | split: ','
+      for word in words
+        if category.handle contains word
+          assign parent_label = family_collection.title
+          assign parent_url = family_collection.url
+          break
+        endif
+      endfor
+      if parent_label != blank
+        break
+      endif
+    endfor
+  endif
+
+  comment
+    The copy. A section that has these settings decides them, and a cleared setting there means
+    the merchant wants that line gone; the collection grid passes no settings at all, so the
+    wording below stands for it and the two pages still read alike.
+  endcomment
+  assign message = ec.empty_category_message
+  assign note = ec.empty_category_note
+  unless section_settings
+    assign note = 'Nothing is listed here just yet. New pieces are added every week, or talk to us and we will make yours.'
+  endunless
+  assign message = message | default: 'No products found in this category.'
+  assign parent_prefix = ec.empty_category_parent_prefix | default: 'Shop'
+  assign button_label = ec.empty_category_button_label | default: 'Shop all jewellery'
+  assign button_link = ec.empty_category_button_link | default: routes.all_products_collection_url
+  assign button_style = ec.empty_category_button_style | default: 'solid'
+  assign second_style = 'outline'
+  if button_style == 'outline'
+    assign second_style = 'solid'
+  endif
+
+  assign show_parent = true
+  if ec.empty_category_show_parent == false
+    assign show_parent = false
+  endif
+
+  assign heading_size = ec.empty_category_heading_size | default: 0
+  assign heading_size_mobile = ec.empty_category_heading_size_mobile | default: 0
+  assign text_size = ec.empty_category_text_size | default: 0
+  assign picture = image | default: ec.empty_category_image
+
+-%}
+
+{%- capture ec_style -%}
+  {%- if ec.empty_category_band_color != blank and ec.empty_category_band_color != 'rgba(0,0,0,0)' -%}--ec-band-bg: {{ ec.empty_category_band_color }};{%- endif -%}
+  {%- if ec.empty_category_heading_color != blank and ec.empty_category_heading_color != 'rgba(0,0,0,0)' -%}--ec-heading-color: {{ ec.empty_category_heading_color }};{%- endif -%}
+  {%- if ec.empty_category_text_color != blank and ec.empty_category_text_color != 'rgba(0,0,0,0)' -%}--ec-text-color: {{ ec.empty_category_text_color }};{%- endif -%}
+  {%- if heading_size > 0 -%}--ec-heading-size: {{ heading_size }}px;{%- endif -%}
+  {%- if heading_size_mobile > 0 -%}--ec-heading-size-mobile: {{ heading_size_mobile }}px;{%- endif -%}
+  {%- if text_size > 0 -%}--ec-text-size: {{ text_size }}px;{%- endif -%}
+  {%- if ec.empty_category_button_background != blank and ec.empty_category_button_background != 'rgba(0,0,0,0)' -%}--eden-action-ink: {{ ec.empty_category_button_background }};{%- endif -%}
+  {%- if ec.empty_category_button_text_color != blank and ec.empty_category_button_text_color != 'rgba(0,0,0,0)' -%}--eden-action-on-ink: {{ ec.empty_category_button_text_color }};{%- endif -%}
+{%- endcapture -%}
+
+<empty-category-page
+  class="empty-category{% if from_path %} empty-category--path{% endif %}{% if compact %} empty-category--compact{% endif %}"
+  style="{{ ec_style }}"
+  {% if from_path %}
+    data-families="{{ family_json | escape }}"
+    data-parent-prefix="{{ parent_prefix | escape }}"
+    data-show-parent="{% if show_parent %}true{% else %}false{% endif %}"
+  {% endif %}
+>
+  {%- unless compact -%}
+    {%- comment -%}
+      The collection hero, rebuilt: the band, the breadcrumb at its left and the category's name
+      centred under it, in the colours and the padding sections/main-collection-banner.liquid
+      gives a real collection. The count below it is where the grid's own count sits, and says
+      what a real empty collection's count says.
+    {%- endcomment -%}
+    <div class="empty-category__banner">
+      <nav class="empty-category__crumbs" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}">{{ 'content.breadcrumb.home' | t }}</a>
+        <span aria-hidden="true">/</span>
+        <a href="{{ routes.collections_url }}">{{ 'content.breadcrumb.collections' | t }}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page" data-empty-category-crumb>{{ title }}</span>
+      </nav>
+      <h1 class="empty-category__title" data-empty-category-title>{{ title }}</h1>
+    </div>
+
+    <div class="empty-category__count">{{ 'products.facets.product_count_simple' | t: count: 0 }}</div>
+  {%- endunless -%}
+
+  <div class="empty-category__body">
+    {%- if picture != blank and compact != true -%}
+      <img
+        class="empty-category__image"
+        src="{{ picture | image_url: width: 600 }}"
+        alt=""
+        width="{{ picture.width }}"
+        height="{{ picture.height }}"
+        loading="lazy"
+      >
+    {%- endif -%}
+
+    <p class="empty-category__message">{{ message }}</p>
+
+    {%- if note != blank -%}
+      <p class="empty-category__note">{{ note }}</p>
+    {%- endif -%}
+
+    <div class="empty-category__actions">
+      {%- if show_parent -%}
+        <a
+          class="eden-action eden-action--{{ second_style }} empty-category__parent"
+          href="{{ parent_url | default: routes.all_products_collection_url }}"
+          data-empty-category-parent
+          {% if from_path or parent_label == blank %}hidden{% endif %}
+        ><span data-empty-category-parent-label>{{ parent_prefix }} {{ parent_label }}</span></a>
+      {%- endif -%}
+      {%- if button_label != blank and button_link != blank -%}
+        <a class="eden-action eden-action--{{ button_style }}" href="{{ button_link }}">{{ button_label }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</empty-category-page>

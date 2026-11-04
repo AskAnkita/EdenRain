@@ -67,10 +67,18 @@
           echo '~New Wedding Arrivals|/collections/new-in|featured-wedding-new.jpg|featured-wedding-new.mp4'
           echo '~Shop Anniversary Rings|/collections/anniversary-rings|featured-wedding-anniversary.jpg|'
         when 'jewellery'
-          echo 'Shop Signature Earrings|/collections/signature-earrings|featured-jewellery-earrings.jpg|'
+          comment
+            There is no signature-earrings or signature-necklaces collection and there never has
+            been - they came over with the MiaDonna-shaped lists - so both cards opened a 404.
+            They point at the categories themselves now: a real collection page, with its banner,
+            its breadcrumb and its filters, which starts selling the moment a piece is added to
+            it. Earrings is still empty, so it says so ('empty-category'); necklaces is not.
+            Swap either for its own collection once one exists in store-config.mjs.
+          endcomment
+          echo 'Shop Signature Earrings|/collections/earrings|featured-jewellery-earrings.jpg|'
           echo '~Shop Must-Have Studs|/collections/studs|featured-jewellery-studs.jpg|featured-jewellery-studs.mp4'
           echo '~Shop Tennis Bracelets|/collections/tennis-bracelets|featured-jewellery-bracelets.jpg|featured-jewellery-bracelets.mp4'
-          echo '~Shop Signature Necklaces|/collections/signature-necklaces|featured-jewellery-necklaces.jpg|'
+          echo '~Shop Signature Necklaces|/collections/necklaces|featured-jewellery-necklaces.jpg|'
       endcase
   endcase
 -%}

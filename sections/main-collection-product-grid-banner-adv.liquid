@@ -293,16 +293,30 @@
             <div class="loading-overlay gradient">
               {% render 'loading-spinner' %}
             </div>
-            <div class="title-wrapper center">
-              <h2 class="title title--primary">
-                {{ 'content.no_products_found' | t -}}
-                <br>
-                {{
-                  'content.use_fewer_filters_html'
-                  | t: link: collection.url, class: 'underlined-link link'
-                }}
-              </h2>
-            </div>
+            {%- comment -%}
+              Two different empty pages used to be one. A filter that matches nothing should say so
+              and offer to drop the filters; a collection that holds nothing has no filters to drop,
+              and "try fewer filters" on a category the shop has not stocked yet reads as a fault of
+              the shopper's. So an empty collection is drawn by 'empty-category', the same snippet
+              'main-404' uses for a category URL whose collection is not in the store at all - the
+              two then say the same thing in the same words. Its copy and colours are the snippet's
+              own defaults here; the settings that override them are on the 404 section, which is
+              the page that needs them.
+            {%- endcomment -%}
+            {%- if collection.all_products_count == 0 -%}
+              {% render 'empty-category', category: collection, compact: true %}
+            {%- else -%}
+              <div class="title-wrapper center">
+                <h2 class="title title--primary">
+                  {{ 'content.no_products_found' | t -}}
+                  <br>
+                  {{
+                    'content.use_fewer_filters_html'
+                    | t: link: collection.url, class: 'underlined-link link'
+                  }}
+                </h2>
+              </div>
+            {%- endif -%}
           </div>
         {% else %}
           <div

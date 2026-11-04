@@ -68,15 +68,20 @@
   });
 
   document.querySelectorAll('[data-sizer-download]').forEach((content) => {
-    // Use the selected wrist sizer image when available; otherwise use the first body image.
+    // A hot reload can run this file a second time; one button under the sizer is enough.
+    if (content.querySelector('.gp-sizer-download')) return;
+
+    /*
+      What the button saves is the sizer the reader is looking at - the picture in
+      the page content - so the file that arrives is the one on screen. A guide can
+      name a different file in the theme editor ("Sizer download file"), which is
+      there for a print-resolution copy of the same sizer.
+    */
     const images = [...content.querySelectorAll('img')];
     const preferredSource = content.dataset.sizerDownloadSrc;
-    const preferredName = preferredSource
-      ? new URL(preferredSource, window.location.href).pathname.split('/').pop()
-      : '';
-    const image = (preferredName && images.find((candidate) =>
-      new URL(candidate.src, window.location.href).pathname.endsWith(preferredName)
-    )) || images[0];
+    const preferredName = preferredSource ? nameFor(preferredSource) : '';
+    const image = (preferredName && images.find((candidate) => nameFor(candidate.src) === preferredName))
+      || images[0];
     if (!image) return;
     const source = preferredSource || image.getAttribute('src');
     if (!source) return;
