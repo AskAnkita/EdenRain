@@ -94,6 +94,17 @@
   assign hero_wash_alpha = stts.hero_wash | divided_by: 100.0
   assign hero_pill_alpha = stts.hero_eyebrow_opacity | divided_by: 100.0
   assign cta_scrim_alpha = stts.cta_overlay | divided_by: 100.0
+  comment
+    The pool of extra darkness under the centred copy. It is painted over the
+    wash rather than instead of it, so this is the step it adds, not a total:
+    a 60% wash with this on top reads about 72% where the words are.
+  endcomment
+  assign cta_core_alpha = 0.28
+  comment
+    And the alpha the wash falls to at the far side of a wide band, where the
+    photograph is doing the work and nothing is written over it.
+  endcomment
+  assign cta_edge_alpha = cta_scrim_alpha | times: 0.4
 
   assign pillar_sizes = '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw'
   assign half_sizes = '(min-width: 750px) 50vw, 100vw'
@@ -153,6 +164,8 @@
     --ab-cta-bg: {{ stts.cta_background }};
     --ab-cta-ink: {{ stts.cta_text_color }};
     --ab-cta-scrim: {{ stts.cta_overlay_color | color_modify: 'alpha', cta_scrim_alpha }};
+    --ab-cta-core: {{ stts.cta_overlay_color | color_modify: 'alpha', cta_core_alpha }};
+    --ab-cta-edge: {{ stts.cta_overlay_color | color_modify: 'alpha', cta_edge_alpha }};
     --ab-cta-heading-size: {{ stts.cta_heading_size | divided_by: 10.0 }}rem;
     --ab-btn-bg: {{ stts.cta_button_background }};
     --ab-btn-ink: {{ stts.cta_button_text_color }};
@@ -209,7 +222,7 @@
             <div class="ab-actions">
               {%- if stts.hero_button_label != blank -%}
                 <a
-                  class="eden-action ab-hero__button--primary"
+                  class="eden-action ab-hero__button--primary{% if hero_has_media %} eden-action--sweep-out{% endif %}"
                   href="{{ stts.hero_button_link | default: '#' }}"
                 >
                   {{- stts.hero_button_label | escape -}}
@@ -546,7 +559,7 @@
 
     {%- if stts.show_cta and stts.cta_heading != blank -%}
       <div class="ab-band">
-        <div class="ab-cta">
+        <div class="ab-cta{% if cta_has_media %} ab-cta--media{% endif %}">
           {%- if cta_has_media -%}
             <div class="ab-cta__media" data-ab-media>
               {%- render 'about-image',
@@ -571,7 +584,10 @@
           {%- if stts.cta_button_label != blank or stts.cta_button_2_label != blank -%}
             <div class="ab-cta__actions">
               {%- if stts.cta_button_label != blank -%}
-                <a class="eden-action ab-cta__button--primary" href="{{ stts.cta_button_link | default: '#' }}">
+                <a
+                  class="eden-action ab-cta__button--primary{% if cta_has_media %} eden-action--sweep-out{% endif %}"
+                  href="{{ stts.cta_button_link | default: '#' }}"
+                >
                   {{- stts.cta_button_label | escape -}}
                 </a>
               {%- endif -%}

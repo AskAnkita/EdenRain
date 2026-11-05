@@ -17,8 +17,8 @@
           "settings": {
             "title": "The 4 C's",
             "text": "Cut, colour, clarity and carat weight, what each one changes, and where it is worth spending.",
-            "image": "shopify://shop_images/Unknown-14.png",
-            "image_asset": "featured-diamonds-education.jpg",
+            "image": "shopify://shop_images/guide-four-cs-diamond-cuts.jpg",
+            "image_asset": "guide-four-cs-diamond-cuts.jpg",
             "hero_image_asset": "featured-diamonds-education.jpg",
             "hero_use_page_image": false,
             "link": "/blogs/education-guides/4cs",

@@ -329,6 +329,34 @@
 {%- endcomment -%}
 {% assign film_share = block.settings.mobile_height | divided_by: 100.0 %}
 
+{%- liquid
+  # The two buttons trade places on hover: whichever starts filled empties into
+  # the outline the other one wears, and the outline one fills. Both states are
+  # drawn from the same four colours, so a button only has to say which way
+  # round it starts.
+  #
+  # eden-action--sweep-out is the shared sweep from assets/eden-actions.css run
+  # backwards, and it is what lets a filled button empty at all: "no fill" is
+  # not a colour the forward sweep can carry across, so the fill is painted by
+  # that same layer held at full width and retracted instead. The About page's
+  # hero pair works exactly this way.
+  assign button_1_style = block.settings.button_1_style | default: 'solid'
+  assign button_2_style = block.settings.button_2_style | default: 'outline'
+
+  assign cta_filled = 'ai-luxury-video-hero-cta-filled-' | append: ai_gen_id | append: ' eden-action--sweep-out'
+  assign cta_outlined = 'ai-luxury-video-hero-cta-outlined-' | append: ai_gen_id
+
+  assign button_1_cta_class = cta_outlined
+  if button_1_style == 'solid'
+    assign button_1_cta_class = cta_filled
+  endif
+
+  assign button_2_cta_class = cta_outlined
+  if button_2_style == 'solid'
+    assign button_2_cta_class = cta_filled
+  endif
+-%}
+
 {% style %}
   .ai-luxury-video-hero-{{ ai_gen_id }} {
     position: relative;
@@ -463,9 +491,16 @@
     The paint, the hover and the lift all come from assets/eden-actions.css,
     which matches these buttons on their class prefix and gives every call to
     action in the shop the same fill: a colour that wipes in from the left.
-    This block only says how big the button is and which two colours it
-    crosses between - it must not write a :hover of its own, or the hero falls
-    back out of step with add to cart and the rest of the homepage.
+    This block only says how big the button is and which colours it crosses
+    between - it must not write a :hover of its own, or the hero falls back out
+    of step with add to cart and the rest of the homepage.
+
+    Both buttons rest on no fill of their own and name the same fill as the
+    colour the sweep carries. What tells them apart is one class: the filled
+    one wears eden-action--sweep-out, which holds that fill at full width and
+    retracts it, so the pair swap appearances on hover rather than both turning
+    into the same dark slab. The label colours are the only thing that has to
+    be stated per button, just below.
   {%- endcomment -%}
   .ai-luxury-video-hero-button-{{ ai_gen_id }} {
     display: inline-flex;
@@ -482,21 +517,20 @@
     font-size: {{ block.settings.button_font_size }}px;
     font-weight: {{ block.settings.button_font_weight }};
     letter-spacing: {{ block.settings.button_letter_spacing }}px;
-    {% if block.settings.button_style == 'solid' %}
-      --cta-fill: {{ block.settings.button_background_color }};
-      --cta-ink: {{ block.settings.button_text_color }};
-      --cta-edge: {{ block.settings.button_background_color }};
-      --cta-fill-hover: {{ block.settings.button_hover_background_color }};
-      --cta-ink-hover: {{ block.settings.button_hover_text_color }};
-      --cta-edge-hover: {{ block.settings.button_hover_background_color }};
-    {% else %}
-      --cta-fill: transparent;
-      --cta-ink: {{ block.settings.button_text_color }};
-      --cta-edge: {{ block.settings.button_border_color }};
-      --cta-fill-hover: {{ block.settings.button_border_color }};
-      --cta-ink-hover: {{ block.settings.button_background_color }};
-      --cta-edge-hover: {{ block.settings.button_border_color }};
-    {% endif %}
+    --cta-fill: transparent;
+    --cta-edge: {{ block.settings.button_border_color }};
+    --cta-fill-hover: {{ block.settings.button_background_color }};
+    --cta-edge-hover: {{ block.settings.button_border_color }};
+  }
+
+  .ai-luxury-video-hero-button-{{ ai_gen_id }}.ai-luxury-video-hero-cta-filled-{{ ai_gen_id }} {
+    --cta-ink: {{ block.settings.button_text_color }};
+    --cta-ink-hover: {{ block.settings.button_outline_text_color }};
+  }
+
+  .ai-luxury-video-hero-button-{{ ai_gen_id }}.ai-luxury-video-hero-cta-outlined-{{ ai_gen_id }} {
+    --cta-ink: {{ block.settings.button_outline_text_color }};
+    --cta-ink-hover: {{ block.settings.button_text_color }};
   }
 
   .ai-luxury-video-hero-mobile-content-{{ ai_gen_id }} {
@@ -588,7 +622,10 @@
 
     {%- comment -%}
       As above: size here, colours as the shared --cta-* pairs, hover in
-      assets/eden-actions.css.
+      assets/eden-actions.css. These sit on the white panel under the film
+      rather than on the film itself, so they carry their own four colours -
+      the white pair that reads over a photograph would leave the filled one
+      invisible here.
     {%- endcomment -%}
     .ai-luxury-video-hero-mobile-button-{{ ai_gen_id }} {
       display: inline-flex;
@@ -621,21 +658,20 @@
       {% endif %}
       font-weight: {{ block.settings.mobile_button_font_weight }};
       letter-spacing: {{ block.settings.mobile_button_letter_spacing }}px;
-      {% if block.settings.button_style == 'solid' %}
-        --cta-fill: {{ block.settings.button_background_color }};
-        --cta-ink: {{ block.settings.button_text_color }};
-        --cta-edge: {{ block.settings.button_background_color }};
-        --cta-fill-hover: {{ block.settings.button_hover_background_color }};
-        --cta-ink-hover: {{ block.settings.button_hover_text_color }};
-        --cta-edge-hover: {{ block.settings.button_hover_background_color }};
-      {% else %}
-        --cta-fill: transparent;
-        --cta-ink: {{ block.settings.button_text_color }};
-        --cta-edge: {{ block.settings.button_border_color }};
-        --cta-fill-hover: {{ block.settings.button_border_color }};
-        --cta-ink-hover: {{ block.settings.button_background_color }};
-        --cta-edge-hover: {{ block.settings.button_border_color }};
-      {% endif %}
+      --cta-fill: transparent;
+      --cta-edge: {{ block.settings.mobile_button_border_color }};
+      --cta-fill-hover: {{ block.settings.mobile_button_background_color }};
+      --cta-edge-hover: {{ block.settings.mobile_button_border_color }};
+    }
+
+    .ai-luxury-video-hero-mobile-button-{{ ai_gen_id }}.ai-luxury-video-hero-cta-filled-{{ ai_gen_id }} {
+      --cta-ink: {{ block.settings.mobile_button_text_color }};
+      --cta-ink-hover: {{ block.settings.mobile_button_outline_text_color }};
+    }
+
+    .ai-luxury-video-hero-mobile-button-{{ ai_gen_id }}.ai-luxury-video-hero-cta-outlined-{{ ai_gen_id }} {
+      --cta-ink: {{ block.settings.mobile_button_outline_text_color }};
+      --cta-ink-hover: {{ block.settings.mobile_button_text_color }};
     }
   }
 {% endstyle %}
@@ -759,13 +795,13 @@
       {% if block.settings.button_1_text != blank or block.settings.button_2_text != blank %}
         <div class="ai-luxury-video-hero-buttons-{{ ai_gen_id }}">
           {% if block.settings.button_1_text != blank %}
-            <a href="{{ block.settings.button_1_link }}" class="ai-luxury-video-hero-button-{{ ai_gen_id }}">
+            <a href="{{ block.settings.button_1_link }}" class="ai-luxury-video-hero-button-{{ ai_gen_id }} {{ button_1_cta_class }}">
               {{ block.settings.button_1_text }}
             </a>
           {% endif %}
 
           {% if block.settings.button_2_text != blank %}
-            <a href="{{ block.settings.button_2_link }}" class="ai-luxury-video-hero-button-{{ ai_gen_id }}">
+            <a href="{{ block.settings.button_2_link }}" class="ai-luxury-video-hero-button-{{ ai_gen_id }} {{ button_2_cta_class }}">
               {{ block.settings.button_2_text }}
             </a>
           {% endif %}
@@ -786,13 +822,13 @@
     {% if block.settings.button_1_text != blank or block.settings.button_2_text != blank %}
       <div class="ai-luxury-video-hero-mobile-buttons-{{ ai_gen_id }}">
         {% if block.settings.button_1_text != blank %}
-          <a href="{{ block.settings.button_1_link }}" class="ai-luxury-video-hero-mobile-button-{{ ai_gen_id }}">
+          <a href="{{ block.settings.button_1_link }}" class="ai-luxury-video-hero-mobile-button-{{ ai_gen_id }} {{ button_1_cta_class }}">
             {{ block.settings.button_1_text }}
           </a>
         {% endif %}
 
         {% if block.settings.button_2_text != blank %}
-          <a href="{{ block.settings.button_2_link }}" class="ai-luxury-video-hero-mobile-button-{{ ai_gen_id }}">
+          <a href="{{ block.settings.button_2_link }}" class="ai-luxury-video-hero-mobile-button-{{ ai_gen_id }} {{ button_2_cta_class }}">
             {{ block.settings.button_2_text }}
           </a>
         {% endif %}
@@ -1612,34 +1648,62 @@
     },
     {
       "type": "header",
-      "content": "Button style"
+      "content": "Button style",
+      "info": "The two buttons trade places on hover: the filled one empties into an outline, the outline one fills. Set them the same way round if you would rather they matched."
     },
     {
       "type": "select",
-      "id": "button_style",
-      "label": "Style",
+      "id": "button_1_style",
+      "label": "Button 1",
       "options": [
         {
           "value": "solid",
-          "label": "Solid"
+          "label": "Filled, empties on hover"
         },
         {
           "value": "outline",
-          "label": "Outline"
+          "label": "Outline, fills on hover"
         }
       ],
       "default": "solid"
     },
     {
+      "type": "select",
+      "id": "button_2_style",
+      "label": "Button 2",
+      "options": [
+        {
+          "value": "solid",
+          "label": "Filled, empties on hover"
+        },
+        {
+          "value": "outline",
+          "label": "Outline, fills on hover"
+        }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "header",
+      "content": "Desktop button colours",
+      "info": "These sit over the film, so they are usually white on a dark scrim."
+    },
+    {
       "type": "color",
       "id": "button_background_color",
-      "label": "Background",
-      "default": "#000000"
+      "label": "Fill",
+      "default": "#ffffff"
     },
     {
       "type": "color",
       "id": "button_text_color",
-      "label": "Text",
+      "label": "Text on the fill",
+      "default": "#001514"
+    },
+    {
+      "type": "color",
+      "id": "button_outline_text_color",
+      "label": "Text on the outline",
       "default": "#ffffff"
     },
     {
@@ -1649,16 +1713,33 @@
       "default": "#ffffff"
     },
     {
-      "type": "color",
-      "id": "button_hover_background_color",
-      "label": "Hover background",
-      "default": "#333333"
+      "type": "header",
+      "content": "Mobile button colours",
+      "info": "On a phone the buttons sit on the panel below the film, not on the film, so they need their own pair - dark on the white panel."
     },
     {
       "type": "color",
-      "id": "button_hover_text_color",
-      "label": "Hover text",
+      "id": "mobile_button_background_color",
+      "label": "Fill",
+      "default": "#001514"
+    },
+    {
+      "type": "color",
+      "id": "mobile_button_text_color",
+      "label": "Text on the fill",
       "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "mobile_button_outline_text_color",
+      "label": "Text on the outline",
+      "default": "#001514"
+    },
+    {
+      "type": "color",
+      "id": "mobile_button_border_color",
+      "label": "Border",
+      "default": "#001514"
     },
     {
       "type": "header",

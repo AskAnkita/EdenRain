@@ -203,8 +203,14 @@
 /*
   The hero's own two buttons, coloured from the schema and handed to the shared
   sweep in eden-actions.css as the --cta-* pairs; nothing here writes a :hover.
-  The filled one used to drop to the photograph on hover, which gave the sweep
-  no colour to carry, so it swaps with its own ink instead.
+
+  The pair trade places on hover: the filled one empties into the outline its
+  neighbour wears at rest, and the outline one fills. Over a photograph the
+  filled one does that with .eden-action--sweep-out - the shared sweep run
+  backwards, because "no fill" is not a colour the sweep can carry forwards, so
+  the white is painted by the same layer and retracted. The section only adds
+  that class when there is a picture to empty onto; without one the button
+  keeps the straight swap below, which stays legible on the fallback colour.
 */
 .about-page .ab-hero__button--primary {
   --cta-fill: var(--ab-hero-btn-bg, #ffffff);
@@ -213,6 +219,12 @@
   --cta-fill-hover: var(--ab-hero-btn-ink, #171714);
   --cta-ink-hover: var(--ab-hero-btn-bg, #ffffff);
   --cta-edge-hover: var(--ab-hero-btn-bg, #ffffff);
+}
+
+.about-page .ab-hero__button--primary.eden-action--sweep-out {
+  --cta-fill: transparent;
+  --cta-fill-hover: var(--ab-hero-btn-bg, #ffffff);
+  --cta-ink-hover: var(--ab-hero-btn-bg, #ffffff);
 }
 
 .about-page .ab-hero__button--secondary {
@@ -524,17 +536,32 @@
 
 /* ----------------------------------------------------------------------- CTA */
 
+/*
+  The closing band. With a picture behind it this is the hero again at the foot
+  of the page, so it is given the hero's proportions rather than a strip of
+  photograph: a minimum height, the words held in the middle of it, and room
+  either side of them. A short wide band crops the picture to a slot and leaves
+  the copy sitting on whatever happens to be in the middle of the frame.
+*/
 .about-page .ab-cta {
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 2.4rem;
-  padding: 4.8rem 2.8rem;
+  justify-content: center;
+  gap: 3.2rem;
+  min-height: var(--ab-cta-height, 52rem);
+  padding: 7.2rem 2.8rem;
   border-radius: var(--ab-radius);
   background: var(--ab-cta-bg, var(--ab-accent));
   color: var(--ab-cta-ink, var(--ab-ink));
   text-align: center;
+}
+
+/* Without a picture there is nothing to hold the height open. */
+.about-page .ab-cta:not(.ab-cta--media) {
+  min-height: 0;
+  padding-block: 5.6rem;
 }
 
 .about-page .ab-cta__media,
@@ -549,10 +576,22 @@
   object-fit: cover;
 }
 
+/*
+  The overlay the merchant sets, plus a soft pool of the same colour in the
+  middle of the frame. The flat wash alone has to be taken up to something like
+  70% before centred words are safe over a busy photograph, and by then the
+  picture is gone; the pool darkens only what the copy sits on and leaves the
+  corners of the image as they were.
+*/
 .about-page .ab-cta__scrim {
   position: absolute;
   inset: 0;
-  background: var(--ab-cta-scrim, rgba(23, 23, 20, 0.45));
+  background: radial-gradient(
+      62% 78% at 50% 50%,
+      var(--ab-cta-core, rgba(23, 23, 20, 0.55)),
+      transparent 72%
+    ),
+    var(--ab-cta-scrim, rgba(23, 23, 20, 0.45));
 }
 
 .about-page .ab-cta__copy {
@@ -561,10 +600,52 @@
   max-width: 60rem;
 }
 
+/*
+  Wide, with a photograph: the words move off the middle of the picture and
+  take the left of the frame, because a band this wide puts whatever the
+  photograph is of directly behind the copy - and on this page that is three
+  rings. The wash follows them across, heavy where the words are and thinning
+  to almost nothing at the right, so the piece is still the piece and not a
+  darkened backdrop. Narrow screens keep the centred stack below.
+*/
+@media screen and (min-width: 750px) {
+  .about-page .ab-cta--media {
+    align-items: flex-start;
+    padding-inline: clamp(3.2rem, 6vw, 8rem);
+    text-align: left;
+  }
+
+  .about-page .ab-cta--media .ab-cta__copy {
+    margin-inline: 0;
+    max-width: 48rem;
+  }
+
+  .about-page .ab-cta--media .ab-cta__actions {
+    justify-content: flex-start;
+  }
+
+  .about-page .ab-cta--media .ab-cta__scrim {
+    background: linear-gradient(
+        to right,
+        var(--ab-cta-core, rgba(23, 23, 20, 0.55)),
+        transparent 62%
+      ),
+      linear-gradient(
+        to right,
+        var(--ab-cta-scrim, rgba(23, 23, 20, 0.45)) 30%,
+        var(--ab-cta-edge, rgba(23, 23, 20, 0.18)) 78%
+      );
+  }
+}
+
 .about-page .ab-cta__heading {
   margin: 0;
   font-family: var(--font-heading--family);
-  font-size: var(--ab-cta-heading-size, 2.8rem);
+  /*
+    The merchant's number is the size on a wide screen, not everywhere: at its
+    full value a heading of any length turns into four lines on a phone.
+  */
+  font-size: clamp(2.6rem, 5.4vw, var(--ab-cta-heading-size, 2.8rem));
   font-weight: 400;
   line-height: 1.2;
 }
@@ -584,9 +665,10 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1.2rem;
+  gap: 1.6rem;
 }
 
+/* The same trade as the hero's pair, for the same reason. */
 .about-page .ab-cta__button--primary {
   --cta-fill: var(--ab-btn-bg, var(--ab-ink));
   --cta-ink: var(--ab-btn-ink, #ffffff);
@@ -594,6 +676,12 @@
   --cta-fill-hover: var(--ab-btn-ink, #ffffff);
   --cta-ink-hover: var(--ab-btn-bg, var(--ab-ink));
   --cta-edge-hover: var(--ab-btn-bg, var(--ab-ink));
+}
+
+.about-page .ab-cta__button--primary.eden-action--sweep-out {
+  --cta-fill: transparent;
+  --cta-fill-hover: var(--ab-btn-bg, var(--ab-ink));
+  --cta-ink-hover: var(--ab-btn-bg, var(--ab-ink));
 }
 
 .about-page .ab-cta__button--secondary {
@@ -641,7 +729,8 @@
   }
 
   .about-page .ab-cta {
-    padding: 3.6rem 2rem;
+    min-height: var(--ab-cta-height-mobile, 34rem);
+    padding: 5.6rem 2rem;
   }
 
   /* A row of buttons becomes a stack rather than two half-width stubs. */

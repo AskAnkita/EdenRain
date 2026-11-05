@@ -76,12 +76,16 @@
             "button_1_link": "shopify://collections/engagement-rings",
             "button_2_text": "FINE JEWELLERY",
             "button_2_link": "shopify://collections/all",
-            "button_style": "solid",
+            "button_1_style": "solid",
+            "button_2_style": "outline",
             "button_background_color": "#ffffff",
             "button_text_color": "#001514",
+            "button_outline_text_color": "#ffffff",
             "button_border_color": "#ffffff",
-            "button_hover_background_color": "#000000",
-            "button_hover_text_color": "#ffffff",
+            "mobile_button_background_color": "#001514",
+            "mobile_button_text_color": "#ffffff",
+            "mobile_button_outline_text_color": "#001514",
+            "mobile_button_border_color": "#001514",
             "button_width": 200,
             "button_height": 50,
             "button_padding_horizontal": 30,
@@ -107,7 +111,7 @@
       ],
       "custom_css": [
         "[class*=\"ai-luxury-video-hero-button\"] {white-space: nowrap; min-width: 200px; width: auto !important;}",
-        "[class*=\"ai-luxury-video-hero-mobile-button\"] {--cta-ink: #001514; --cta-edge: #001514; white-space: nowrap;}"
+        "[class*=\"ai-luxury-video-hero-mobile-button\"] {white-space: nowrap;}"
       ],
       "settings": {}
     },

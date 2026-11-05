@@ -468,6 +468,42 @@ button.shopify-payment-button__button--unbranded:focus-visible::before {
   border-color: var(--cta-edge-hover, var(--cta-edge, transparent));
 }
 
+/* ------------------------------------------------- the same sweep, reversed */
+
+/*
+  For a button that rests filled and hovers to bare - the white button on the
+  About hero's photograph, which empties out into the outline its neighbour
+  wears at rest.
+
+  It cannot be done with the colour pairs alone: the sweep only shows what
+  --cta-fill-hover names, and "no fill" is not a colour it can carry across.
+  So the button itself is left transparent, its resting fill is painted by that
+  very layer held at full width, and hover retracts it to the left edge. Same
+  colours, same duration, same curve as every other call to action; only the
+  direction is turned around, which is why it lives here with the rest of hover
+  rather than in a section's own file.
+
+  A button wearing this names --cta-fill-hover as its RESTING fill and
+  --cta-ink-hover as the colour the label takes once that fill has gone.
+*/
+.eden-action--sweep-out::before {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) {
+  .eden-action--sweep-out:hover::before,
+  .eden-action-host:hover .eden-action--sweep-out::before {
+    transform: scaleX(0);
+  }
+}
+
+/* Focus lands on the hovered state here too: the fill gone, no sweep. */
+.eden-action--sweep-out:focus-visible::before,
+.eden-action-host:focus-visible .eden-action--sweep-out::before {
+  transform: scaleX(0);
+  transition: none;
+}
+
 /* -------------------------------------------------------------------- links */
 
 .eden-link {
