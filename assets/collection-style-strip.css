@@ -1,0 +1,278 @@
+/*
+  The row of style cards under a collection banner - sections/collection-style-strip.liquid.
+
+  One card is a picture box beside a label, the two sharing a single hairline border. The row
+  scrolls sideways and snaps; the arrows are a convenience over the scroll rather than a slider of
+  their own, so the row still works with the script blocked.
+
+  Square corners throughout: every radius in this theme is 0.
+*/
+
+.style-strip {
+  --strip-card-bg: #ffffff;
+  --strip-media-bg: #f4f3ef;
+  --strip-card-border: #e6e6e6;
+  --strip-label-color: currentColor;
+  --strip-heading-color: currentColor;
+  --strip-active-border: #171714;
+  --strip-arrow-color: currentColor;
+  --strip-gap: 20px;
+  --strip-per-row: 6.4;
+  --strip-per-row-mobile: 2.2;
+  --strip-card-height: 90px;
+  --strip-media-width: 84px;
+  --strip-media-width-mobile: 72px;
+  --strip-label-size: 13px;
+  --strip-label-size-mobile: 11px;
+  --strip-label-tracking: 0.08em;
+  --strip-label-case: uppercase;
+  --strip-border-width: 1px;
+}
+
+.style-strip__inner--page {
+  margin-inline: auto;
+  max-width: var(--page-width, 157rem);
+  padding-inline: 1.5rem;
+}
+
+.style-strip__inner:not(.style-strip__inner--page) {
+  padding-inline: 1.5rem;
+}
+
+.style-strip__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  margin-block-end: 1.6rem;
+}
+
+/* No heading: the arrows keep their place at the right of the row on their own. */
+.style-strip__head--bare {
+  justify-content: flex-end;
+  min-height: 2.8rem;
+}
+
+.style-strip__heading {
+  margin: 0;
+  font-size: var(--strip-heading-size, 18px);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--strip-heading-color);
+}
+
+.style-strip__arrows {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.style-strip__arrows[hidden] {
+  display: none;
+}
+
+.style-strip__arrow {
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--strip-arrow-color);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.style-strip__arrow svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.style-strip__arrow--next svg {
+  transform: scaleX(-1);
+}
+
+.style-strip__arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.style-strip__track {
+  display: flex;
+  gap: var(--strip-gap);
+  /*
+    A family with only a few styles - Necklaces has five - leaves the row half empty, and a short
+    run of cards pinned to the left edge of a full-width page reads as a row that failed to load
+    the rest. Centred, it reads as the whole set.
+
+    `safe` is what makes this usable on a scroller: with a plain `center`, a row that is wider
+    than the page centres its overflow too, which puts the first cards off the left edge where no
+    amount of scrolling reaches them. `safe` falls back to start alignment the moment the cards
+    overflow, so Engagement's eleven still begin at the left. A browser that does not know the
+    keyword drops the whole declaration and gets that same start alignment, which is why it is
+    not paired with a plain `center` fallback.
+  */
+  justify-content: safe center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  /* The scrollbar is the arrows' job; on a phone the row is swiped. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.style-strip__track::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .style-strip__track {
+    scroll-behavior: auto;
+  }
+}
+
+.style-strip__item {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: calc(
+    (100% - (var(--strip-per-row-mobile) - 1) * var(--strip-gap)) / var(--strip-per-row-mobile)
+  );
+}
+
+@media screen and (min-width: 750px) {
+  .style-strip__item {
+    width: calc((100% - (var(--strip-per-row) - 1) * var(--strip-gap)) / var(--strip-per-row));
+  }
+}
+
+.style-strip__card {
+  display: grid;
+  grid-template-columns: var(--strip-media-width-mobile) 1fr;
+  align-items: center;
+  height: 100%;
+  min-height: var(--strip-card-height);
+  border: var(--strip-border-width) solid var(--strip-card-border);
+  border-radius: 0;
+  background-color: var(--strip-card-bg);
+  color: var(--strip-label-color);
+  text-decoration: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+@media screen and (min-width: 750px) {
+  .style-strip__card {
+    grid-template-columns: var(--strip-media-width) 1fr;
+  }
+}
+
+.style-strip__card:hover,
+.style-strip__card:focus-visible {
+  border-color: var(--strip-active-border);
+}
+
+.style-strip__card--active {
+  border-color: var(--strip-active-border);
+  background-color: var(--strip-active-bg, var(--strip-card-bg));
+}
+
+/*
+  A card whose picture is a drawing rather than a photograph. The tint stays behind a photograph,
+  whose own white background covers it so the card reads as one clean panel; behind a small line
+  drawing the same tint is a visible grey slab taking half the card, which makes a drawn card look
+  chunkier and taller than the photographed one beside it even though the two are the same height
+  to the pixel. So the tint comes off and the drawing sits on the card.
+*/
+.style-strip__card--drawn .style-strip__media {
+  background-color: transparent;
+}
+
+/*
+  A card with no picture at all: the box would otherwise be an empty tinted square, which reads as
+  a picture that failed. The name takes the whole card instead.
+*/
+.style-strip__card--wordmark {
+  grid-template-columns: 1fr;
+}
+
+.style-strip__card--wordmark .style-strip__media {
+  display: none;
+}
+
+.style-strip__media {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  overflow: hidden;
+  background-color: var(--strip-media-bg);
+}
+
+/* A photograph chosen for the card itself; a fallback drawing is sized by the rules below it. */
+.style-strip__media > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: var(--strip-card-height);
+  object-fit: contain;
+}
+
+/*
+  The fallback drawings from 'menu-link-icon'. A set's picture keeps its own proportions - the cuts
+  are square, the settings and the bands are wider than they are tall - so each is fitted to the
+  box rather than stretched to it.
+*/
+.style-strip__icon,
+.style-strip__icon--image,
+.style-strip__icon--shape,
+.style-strip__icon--band {
+  display: block;
+  width: 60%;
+  max-width: 6.4rem;
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+/*
+  A drawn icon is sized to sit in the picture box the way a photograph does. At 3.2rem it was a
+  small mark floating in a tall tinted panel, which made a drawn card read as taller and emptier
+  than a photographed one beside it even though the two are the same height to the pixel.
+*/
+.style-strip__icon svg,
+svg.style-strip__icon {
+  display: block;
+  width: var(--strip-icon-size, 5.4rem);
+  height: var(--strip-icon-size, 5.4rem);
+  margin: 0 auto;
+  color: currentColor;
+}
+
+.style-strip__label {
+  padding: 0.8rem 1.2rem;
+  font-size: var(--strip-label-size-mobile);
+  line-height: 1.3;
+  letter-spacing: var(--strip-label-tracking);
+  text-transform: var(--strip-label-case);
+  text-align: center;
+}
+
+@media screen and (min-width: 750px) {
+  .style-strip__label {
+    font-size: var(--strip-label-size);
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .style-strip--no-arrows-mobile .style-strip__arrows {
+    display: none;
+  }
+
+  .style-strip--no-arrows-mobile .style-strip__head--bare {
+    display: none;
+  }
+}

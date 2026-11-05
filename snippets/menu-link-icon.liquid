@@ -24,9 +24,16 @@
   - prefix: {String} the class the calling menu names its icon box with, e.g.
       "menu-drawer-desktop__link-icon". "--image", "--shape" and "--band" are appended to it, so
       each menu sizes the same markup for itself. Defaults to the desktop panel's.
+  - source_width: {Number} the width to pull from the CDN, in pixels. Defaults to twice the box
+      each set sits in in the menus. A caller whose box is a different size passes twice its own
+      width, or the picture is resampled on screen.
 
   Only a list whose every name is drawn in the set it asks for may ask for it, or the names it
   misses each carry an empty box.
+
+  It is not only the menus that call this. The shape row on a product card and the shape swatches
+  on a product page ask for "shapes" too, so a cut is the same drawing wherever it is shown; they
+  pass their own prefix and source_width and size the markup in their own stylesheet.
 {% endcomment %}
 
 {%- liquid
@@ -63,6 +70,10 @@
   elsif icons == 'band-styles' and band_styles_with_images contains key
     assign icon_asset = key | prepend: 'band-style-' | append: '.png'
     assign icon_modifier = ' ' | append: icon_prefix | append: '--image ' | append: icon_prefix | append: '--band'
+  endif
+
+  if source_width != blank
+    assign icon_source_width = source_width
   endif
 
   comment

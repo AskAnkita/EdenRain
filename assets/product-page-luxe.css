@@ -305,12 +305,25 @@
   display: none !important;
 }
 
-.product-form__input--pill input[type='radio'] + label.shape-swatch .icon-diamond-shape {
+/* The cut drawings the mega menu's shape column carries, asked for through 'menu-link-icon':
+   an <img> in a box this stylesheet sizes, or the drawn outline for a cut with no picture. */
+.product-form__input--pill input[type='radio'] + label.shape-swatch .shape-swatch__icon {
   display: block;
   width: 3.2rem;
   height: 3.2rem;
-  opacity: 0.7;
+  /* The drawings are already fine grey hairlines, so the rest state sits higher than the 0.7
+     the drawn icons took or the unselected cuts go pale. */
+  opacity: 0.85;
   transition: opacity var(--duration-short) ease;
+}
+
+.shape-swatch__icon img,
+.shape-swatch__icon .icon-diamond-shape {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .shape-swatch__name {
@@ -328,9 +341,9 @@
   border-bottom-color: var(--pdp-ink) !important;
 }
 
-.product-form__input--pill input[type='radio']:checked + label.shape-swatch .icon-diamond-shape,
-.product-form__input--pill input[type='radio'].checked + label.shape-swatch .icon-diamond-shape,
-.product-form__input--pill input[type='radio'] + label.shape-swatch.checked .icon-diamond-shape {
+.product-form__input--pill input[type='radio']:checked + label.shape-swatch .shape-swatch__icon,
+.product-form__input--pill input[type='radio'].checked + label.shape-swatch .shape-swatch__icon,
+.product-form__input--pill input[type='radio'] + label.shape-swatch.checked .shape-swatch__icon {
   opacity: 1;
 }
 
@@ -342,7 +355,7 @@
 }
 
 @media (hover: hover) {
-  .product-form__input--pill input[type='radio']:not(:checked) + label.shape-swatch:hover .icon-diamond-shape {
+  .product-form__input--pill input[type='radio']:not(:checked) + label.shape-swatch:hover .shape-swatch__icon {
     opacity: 1;
   }
 }

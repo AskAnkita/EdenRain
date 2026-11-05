@@ -51,8 +51,10 @@
   # Only the fallback below uses this now -- products that carry the metal grouping tags
   # are matched by group instead -- but for the rest, another metal's variant shot reads
   # as a different ring, so a detail or lifestyle frame is still preferred.
+  # A card can now be moved by the shape the page is about rather than by a metal
+  # ('shape-context'), and then there is no metal to hold other metals out against.
   assign other_metal_media = '|'
-  if metal_override
+  if metal_override and metal_value != blank
     for variant in card_product.variants
       if variant.featured_media != blank and variant.options[metal_index] != metal_value
         assign other_metal_media = other_metal_media | append: variant.featured_media.id | append: '|'

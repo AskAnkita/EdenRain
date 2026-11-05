@@ -16,8 +16,8 @@
   non-interactive dots.
 {%- enddoc -%}
 
-{%- capture default_metal -%}
-  {%- render 'card-default-metal', card_product: block.settings.product -%}
+{%- capture default_variant -%}
+  {%- render 'card-default-variant', card_product: block.settings.product -%}
 {%- endcapture -%}
 
 {%- liquid
@@ -99,29 +99,29 @@
 
   # The card's photo belongs to one particular variant, so underline that metal
   # rather than always the first -- the way the reference cards do it. The card opens on
-  # the metal card-default-metal picked for this product (snippets/card-product-media.liquid
+  # the variant card-default-variant picked for this product (snippets/card-product-media.liquid
   # shows that variant's photo), so that one wins; products it leaves alone still fall
   # back to whichever variant owns the featured image.
   assign active_tone = ''
-  assign default_metal = default_metal | strip
+  assign default_variant = default_variant | strip
 
-  # The media snippet only moves the photo when the chosen metal has one of its own, so
-  # check the same thing here rather than underlining a metal the card isn't showing.
-  assign default_metal_shown = false
-  if default_metal != blank
-    assign default_metal_parts = default_metal | split: '||'
-    assign default_metal_index = default_metal_parts.first | plus: 0
-    assign default_metal_value = default_metal_parts.last
+  # Read off the chosen variant itself rather than off the metal that was asked for. On
+  # a page about one diamond cut ('shape-context') the cut outranks the metal, so a card
+  # whose preferred metal is not photographed in that cut opens on another metal -- and
+  # this row has to say which one, not which one was wanted.
+  assign default_metal_text = ''
+  if default_variant != blank and metal_index >= 0
+    assign default_variant_id = default_variant | split: '||' | first
     for variant in card_product.variants
-      if variant.options[default_metal_index] == default_metal_value and variant.featured_image != blank
-        assign default_metal_shown = true
+      assign variant_id_text = variant.id | append: ''
+      if variant_id_text == default_variant_id
+        assign default_metal_text = variant.options[metal_index] | downcase
         break
       endif
     endfor
   endif
 
-  if default_metal_shown
-    assign default_metal_text = default_metal_value | downcase
+  if default_metal_text != blank
     if default_metal_text contains 'rose' or default_metal_text contains 'pink'
       assign active_tone = 'rg'
     elsif default_metal_text contains 'white'

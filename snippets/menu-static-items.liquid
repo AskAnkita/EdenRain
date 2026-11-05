@@ -74,13 +74,14 @@
     own picture. Heart, triangle, baguette and square came off the list with them: the drawings
     exist for none of the last three, and the shop holds none of them either.
 
-    Radiant is the one that is not a collection. There is no shape-radiant yet - store-config.mjs
-    describes it now, but until `setup-store.mjs --apply --only=collections` is run it does not
-    exist, and a tile that 404s is worse than one that is a filter - so it opens the catalogue
-    with the `shape:radiant` tag filter applied, which is the same tag the collection would be
-    automated on. Swap it for shape-radiant once the collection is there.
+    All nine are collections now. Radiant used to open `/collections/all` with the
+    `shape:radiant` tag filter applied, because shape-radiant did not exist - and that URL never
+    filtered anything: Shopify drops a `filter.p.tag` parameter unless a product-tag filter is
+    switched on in Search & Discovery, which it is not here, so the tile handed back the whole
+    catalogue instead of the radiant pieces. shape-radiant was created on 2026-11-05 and the tile
+    points at it. Never reach for a `filter.p.tag` URL as a stand-in for a missing collection.
   endcomment
-  assign shapes = '::Round|shape-round~Oval|shape-oval~Cushion|shape-cushion~Emerald|shape-emerald~Pear|shape-pear~Princess|shape-princess~Radiant|/collections/all?filter.p.tag=shape:radiant~Marquise|shape-marquise~Asscher|shape-asscher'
+  assign shapes = '::Round|shape-round~Oval|shape-oval~Cushion|shape-cushion~Emerald|shape-emerald~Pear|shape-pear~Princess|shape-princess~Radiant|shape-radiant~Marquise|shape-marquise~Asscher|shape-asscher'
   assign stones = '::Cubic Zirconia|stone-cubic-zirconia~Lab-Grown Diamond|stone-lab-grown-diamond~Pearl|stone-pearl~Shell & Abalone|stone-shell~Turquoise|stone-turquoise~Black Onyx|stone-onyx~Opal|stone-opal~Birthstone|stone-birthstone'
 
   comment
@@ -174,12 +175,12 @@
     when 'engagement/by-style' or 'engagement/shop-by-style'
       echo '::Solitaire|solitaire~Side Stone|side-stone~Halo|halo~Hidden Halo|hidden-halo~Three Stone|three-stone~Bridal Sets|bridal-sets~Vintage|vintage~Nature Inspired|nature-inspired~Toi et Moi|toi-et-moi~Promise|promise'
     when 'engagement/by-shape' or 'engagement/shop-by-shape'
-      # Heart last, and the one of the ten that is not a collection: there is no
-      # heart-engagement-rings yet. store-config.mjs describes it, and until
-      # `setup-store.mjs --apply --only=collections` is run it opens the engagement rings with
-      # the `shape:heart` tag filter applied - the same tag the collection is automated on -
-      # rather than a 404. Swap it for heart-engagement-rings once the collection is there.
-      echo '::Round|round-engagement-rings~Oval|oval-engagement-rings~Cushion|cushion-engagement-rings~Emerald|emerald-engagement-rings~Pear|pear-engagement-rings~Princess|princess-engagement-rings~Radiant|radiant-engagement-rings~Marquise|marquise-engagement-rings~Asscher|asscher-engagement-rings~Heart|/collections/engagement-rings?filter.p.tag=shape:heart'
+      # Heart last. It was the one of the ten that was not a collection, and it opened the
+      # engagement rings with a `shape:heart` tag filter instead - which quietly showed every
+      # published engagement ring, heart or not: Shopify ignores `filter.p.tag` unless a
+      # product-tag filter is switched on in Search & Discovery, and none is. heart-engagement-
+      # rings was created on 2026-11-05, so all ten rows are collection handles now.
+      echo '::Round|round-engagement-rings~Oval|oval-engagement-rings~Cushion|cushion-engagement-rings~Emerald|emerald-engagement-rings~Pear|pear-engagement-rings~Princess|princess-engagement-rings~Radiant|radiant-engagement-rings~Marquise|marquise-engagement-rings~Asscher|asscher-engagement-rings~Heart|heart-engagement-rings'
     when 'wedding/by-style' or 'wedding/womens'
       # Plain Metal is the one row here whose collection is not in the store. There is no `style:`
       # tag for a band with no stones in it either (scripts/shopify/tag-rules.mjs), so it cannot be

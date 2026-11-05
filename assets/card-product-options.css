@@ -25,10 +25,24 @@
   border-bottom: 1px solid transparent;
 }
 
-.card-shapes__item .icon-diamond-shape {
+/* The cut drawings the mega menu's shape column carries, asked for through 'menu-link-icon':
+   an <img> in a box this stylesheet sizes, or the drawn outline for a cut with no picture.
+   The menu softens its copies to 0.8 and brings them up on hover; these are not softened,
+   because at card size the drawings are fine grey hairlines already and the active cut is
+   called out by the underline under the item rather than by weight. */
+.card-shapes__icon {
   display: block;
   width: 2.2rem;
   height: 2.2rem;
+}
+
+.card-shapes__icon img,
+.card-shapes__icon .icon-diamond-shape {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
   color: rgba(0, 0, 0, 0.75);
 }
 
@@ -152,7 +166,7 @@
     padding-bottom: 0.4rem;
   }
 
-  .card-shapes__item .icon-diamond-shape {
+  .card-shapes__icon {
     width: 1.8rem;
     height: 1.8rem;
   }

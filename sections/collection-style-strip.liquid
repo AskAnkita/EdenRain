@@ -1,0 +1,650 @@
+{% comment %}
+  The row of style cards under a collection banner - All, Solitaire, Side Stone, Halo ... - that
+  lets a shopper move sideways between the styles of the range they are already in.
+
+  WHY THIS IS A SECTION AND NOT BLOCKS IN THE TEMPLATE
+
+  It used to be a `section` of hand-placed group/image/text blocks inside templates/collection.json,
+  holding the ten engagement settings written out by name. A JSON template cannot ask which
+  collection it is drawing, so every collection on that template - the default one, which is to say
+  every collection with no template of its own - carried the engagement strip: Pendants offered
+  "Solitaire, Side Stone, Halo, Hidden Halo" and each card took the shopper out of necklaces
+  altogether. Wedding's own template had an unedited copy of the same ten.
+
+  So the strip is Liquid now, and decides for itself whether it belongs on the page. It draws on
+  Engagement and on Wedding, and on the collections under those two, and on nothing else. A
+  necklace, bracelet or earring collection gets no strip at all rather than the wrong one. To give
+  those families a strip of their own, add their root and group to `families` below - the lists are
+  already in 'menu-static-items' - rather than writing names out again here.
+
+  WHERE THE NAMES COME FROM
+
+  Not from settings. The items are whatever 'menu-static-items' lists for that family's style
+  group, which is the same list the mega menu and the mobile drawer draw, so the strip cannot say
+  one thing while the menu says another. Rename a style or add one in that snippet and it arrives
+  here on its own.
+
+  WHERE THE PICTURES COME FROM
+
+  Each card looks for a photograph in Content > Files named after its label with the spaces turned
+  into underscores - "Side Stone" takes `Side_Stone.png` - which is the naming the hand-built strip
+  used, so the engagement cards keep the photographs they already had. A label with no such file
+  falls back to 'menu-link-icon', which finds that set's menu picture or, failing that, the drawn
+  outline from 'icon-ring-style' / 'icon-band-style'. A card can therefore never show a broken
+  image, and the wedding bands - which have no strip photographs - draw their outlines instead.
+
+  Styles: assets/collection-style-strip.css. Arrows: assets/collection-style-strip.js, a custom
+  element rather than an inline script so the row survives a section swap in the editor.
+{% endcomment %}
+
+{%- liquid
+  assign cs = section.settings
+
+  comment
+    Which families carry a strip, one per line as
+
+        Parent | group to match on | root collection | group to show | drawings
+
+    The first two fields are what 'menu-static-items' is asked for when working out whether the
+    collection on screen belongs to this family. The third is where the "All" card goes. The
+    fourth is the list the cards are actually drawn from, which is usually the same group. The
+    fifth is which set of drawings the cards fall back on - "ring-styles", "band-styles", "types",
+    "shapes", "stones", or empty for none.
+
+    ORDER MATTERS. A handle is looked for down this list in order and the first family to claim it
+    wins, and the lists overlap on purpose: Jewellery > Rings lists Engagement and Wedding Bands,
+    because a ring shopper who came in through Jewellery should not have to go back out for them.
+    Engagement and Wedding are above it, so those two keep their own strips and Jewellery > Rings
+    is left with the collections no other family claims. Men's is last for the same reason - its
+    list ends with Bracelets.
+
+    Engagement is listed twice: a shopper on /collections/oval-engagement-rings came in by shape
+    rather than by style, and the shape list is the one that has their handle in it. Both entries
+    show the styles, because that is the axis the cards browse.
+
+    The drawings are named here rather than taken from 'menu-icon-set', which answers nothing for
+    a Jewellery group on purpose: the desktop panel's Jewellery columns carry names
+    'icon-jewellery-type' does not draw - the metals, the men's pieces, every ring - so a set
+    there would leave half of them with an empty box. The strip's lists are narrower than those
+    columns, so it can ask for "types" directly. Check a new family's every name against the key
+    lists in 'menu-link-icon' before giving it a set.
+  endcomment
+  comment
+    Double quotes, not single: "Men's" has an apostrophe in it and Liquid has no escape character
+    inside a single-quoted string.
+  endcomment
+  assign families = "Engagement|By Style|engagement-rings|By Style|ring-styles,Engagement|By Shape|engagement-rings|By Style|ring-styles,Wedding|By Style|wedding-bands|By Style|band-styles,Jewellery|Earrings|earrings|Earrings|types,Jewellery|Necklaces|necklaces|Necklaces|types,Jewellery|Bracelets|bracelets|Bracelets|types,Jewellery|Rings|rings|Rings|,Jewellery|Men's|mens-rings|Men's|" | split: ','
+
+  comment
+    The pictures the strip has always carried, as `Label|url`, kept exactly as the hand-built
+    blocks in templates/collection.json had them so the engagement cards look as they always have.
+
+    These are hosted on miadonna.com, not here. The blocks named `shopify://shop_images/All.png`,
+    `Solitaire.png` and so on first and fell back to these; not one of those file names has ever
+    existed in this shop's Files, so these URLs are what was on screen. Upload a file of the same
+    name - "Side Stone" takes `Side_Stone.png` - and the card takes ours instead, with no change
+    here: Files is checked first, every time. Until then, leave these alone; dropping one takes
+    that card's photograph away.
+  endcomment
+  assign legacy_photos = 'All|https://www.miadonna.com/cdn/shop/files/Shop_All_Engagement_Rings_Filter.png?v=1737652482&width=300~Solitaire|https://www.miadonna.com/cdn/shop/files/Solitaire_Engagement_Rings_Filter.png?v=1737593298&width=300~Side Stone|https://www.miadonna.com/cdn/shop/files/Accented_Engagement_Ring_Style_Thumbnail_407e6ff9-4d4b-4c77-bb59-c6e4766c05e7.png?v=1737592685&width=300~Halo|https://www.miadonna.com/cdn/shop/files/Halo_Engagement_Rings_Filter.png?v=1737651680&width=300~Hidden Halo|https://www.miadonna.com/cdn/shop/files/hidden-halo-engagement-rings-thumbnail_f6fe77c3-fd2d-493a-b9c8-706e129c0a4f.png?v=1750292548&width=300~Three Stone|https://www.miadonna.com/cdn/shop/files/Three_Stone_Engagement_Rings_fce0a1bd-330f-4514-b808-3d0b4a2dd641.png?v=1737651441&width=300~Bridal Sets|https://www.miadonna.com/cdn/shop/files/bridal_sets_filter_image.png?v=1750368359&width=300~Vintage|https://www.miadonna.com/cdn/shop/files/Antique_Engagement_Rings_Filter.png?v=1737593297&width=300~Nature Inspired|https://www.miadonna.com/cdn/shop/files/Nature_Insppired_Thumb_b6bed990-d5f7-4645-90a5-f71cf9798fd3.png?v=1778258552&width=300~Promise|https://www.miadonna.com/cdn/shop/files/Promise_Rings.png?v=1770159314&width=300~Toi et Moi|https://www.miadonna.com/cdn/shop/files/6_92d6634f-4289-43fb-a512-50a8917ce1c6.png?v=1779464196&width=300' | split: '~'
+
+  assign current_handle = collection.handle
+  assign matched_parent = ''
+  assign matched_root = ''
+  assign matched_show = ''
+  assign matched_icons = ''
+-%}
+
+{%- comment -%}
+  Extra handles the merchant has named, so a collection that is part of a family but is in neither
+  menu list still carries the strip without the lists having to be edited.
+{%- endcomment -%}
+{%- liquid
+  assign extra_engagement = cs.extra_engagement_handles | replace: ' ', '' | split: ','
+  assign extra_wedding = cs.extra_wedding_handles | replace: ' ', '' | split: ','
+
+  if extra_engagement contains current_handle
+    assign matched_parent = 'Engagement'
+    assign matched_root = 'engagement-rings'
+    assign matched_show = 'By Style'
+    assign matched_icons = 'ring-styles'
+  elsif extra_wedding contains current_handle
+    assign matched_parent = 'Wedding'
+    assign matched_root = 'wedding-bands'
+    assign matched_show = 'By Style'
+    assign matched_icons = 'band-styles'
+  endif
+-%}
+
+{%- if matched_parent == blank and current_handle != blank -%}
+  {%- for family in families -%}
+    {%- liquid
+      assign family_parts = family | split: '|'
+      assign family_parent = family_parts[0]
+      assign family_group = family_parts[1]
+      assign family_root = family_parts[2]
+      assign family_show = family_parts[3] | default: family_group
+      comment
+        A family with no drawings ends in an empty field, which `split` drops, so the fifth part
+        comes back nil rather than "" - hence the default rather than a plain assign.
+      endcomment
+      assign family_icons = family_parts[4] | default: ''
+    -%}
+
+    {%- if current_handle == family_root -%}
+      {%- liquid
+        assign matched_parent = family_parent
+        assign matched_root = family_root
+        assign matched_show = family_show
+        assign matched_icons = family_icons
+        break
+      -%}
+    {%- endif -%}
+
+    {%- capture family_source -%}
+      {%- render 'menu-static-items', group: family_group, parent: family_parent -%}
+    {%- endcapture -%}
+
+    {%- liquid
+      comment
+        A group can hand back more than one section ("Heading::items;;Heading::items"); the whole
+        family counts for matching, so every section's items are gathered rather than only the
+        first one the menus draw.
+      endcomment
+      assign family_sections = family_source | strip | split: ';;'
+      for family_section in family_sections
+        assign family_items = family_section | split: '::' | last | split: '~'
+        for family_item in family_items
+          assign item_target = family_item | split: '|' | last
+          if item_target == blank
+            continue
+          endif
+          if item_target == current_handle
+            assign matched_parent = family_parent
+            assign matched_root = family_root
+            assign matched_show = family_show
+            assign matched_icons = family_icons
+            break
+          endif
+          comment
+            A row that is a URL rather than a collection - a filter link such as
+            /collections/necklaces?filter.p.tag=style:tennis - still names a collection in its path,
+            and a shopper standing on that collection is in the family.
+          endcomment
+          assign first_character = item_target | slice: 0, 1
+          if first_character == '/' and item_target contains '/collections/'
+            assign path_handle = item_target | split: '/collections/' | last | split: '?' | first
+            if path_handle == current_handle
+              assign matched_parent = family_parent
+              assign matched_root = family_root
+              assign matched_show = family_show
+              assign matched_icons = family_icons
+              break
+            endif
+          endif
+        endfor
+        if matched_parent != blank
+          break
+        endif
+      endfor
+      if matched_parent != blank
+        break
+      endif
+    -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- liquid
+  comment
+    Which of the family's lists the cards are drawn from, and which drawings they fall back on:
+    both were settled when the family claimed the collection.
+  endcomment
+  assign show_group = matched_show
+  assign icon_set = matched_icons
+  assign root_collection = collections[matched_root]
+-%}
+
+{%- capture strip_source -%}
+  {%- if matched_parent != blank -%}
+    {%- render 'menu-static-items', group: show_group, parent: matched_parent -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- liquid
+  comment
+    Only the first section of the group is drawn, the same rule the desktop panel follows: a second
+    would need a heading of its own and the strip has nowhere to put one.
+  endcomment
+  assign strip_items = strip_source | strip | split: ';;' | first | split: '::' | last | split: '~'
+  assign has_items = false
+  if matched_parent != blank and strip_items.size > 0
+    assign has_items = true
+  endif
+-%}
+
+{%- if has_items -%}
+  {{ 'collection-style-strip.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'collection-style-strip.js' | asset_url }}" defer="defer"></script>
+
+  {%- liquid
+    assign all_label = cs.all_label | default: 'All'
+    assign all_url = cs.all_link
+    if all_url == blank
+      assign all_url = root_collection.url | default: routes.all_products_collection_url
+    endif
+
+    assign card_border = cs.card_border_color
+    assign label_case = cs.label_transform | default: 'uppercase'
+  -%}
+
+  {%- style -%}
+    #style-strip-{{ section.id }} {
+      display: block;
+      --strip-gap: {{ cs.gap }}px;
+      --strip-per-row: {{ cs.per_row }};
+      --strip-per-row-mobile: {{ cs.per_row_mobile }};
+      --strip-card-height: {{ cs.card_height }}px;
+      --strip-media-width: {{ cs.media_width }}px;
+      --strip-media-width-mobile: {{ cs.media_width_mobile }}px;
+      --strip-icon-size: {{ cs.icon_size }}px;
+      --strip-label-size: {{ cs.label_size }}px;
+      --strip-label-size-mobile: {{ cs.label_size_mobile }}px;
+      --strip-label-tracking: {{ cs.label_tracking | divided_by: 100.0 }}em;
+      --strip-label-case: {{ label_case }};
+      --strip-border-width: {{ cs.card_border_width }}px;
+      padding-block: {{ cs.padding_top }}px {{ cs.padding_bottom }}px;
+      {%- if cs.section_background != blank and cs.section_background != 'rgba(0,0,0,0)' %}
+      background-color: {{ cs.section_background }};
+      {%- endif %}
+      {%- if cs.card_background != blank and cs.card_background != 'rgba(0,0,0,0)' %}
+      --strip-card-bg: {{ cs.card_background }};
+      {%- endif %}
+      {%- if cs.media_background != blank and cs.media_background != 'rgba(0,0,0,0)' %}
+      --strip-media-bg: {{ cs.media_background }};
+      {%- endif %}
+      {%- if card_border != blank and card_border != 'rgba(0,0,0,0)' %}
+      --strip-card-border: {{ card_border }};
+      {%- endif %}
+      {%- if cs.label_color != blank and cs.label_color != 'rgba(0,0,0,0)' %}
+      --strip-label-color: {{ cs.label_color }};
+      {%- endif %}
+      {%- if cs.active_border_color != blank and cs.active_border_color != 'rgba(0,0,0,0)' %}
+      --strip-active-border: {{ cs.active_border_color }};
+      {%- endif %}
+      {%- if cs.active_background != blank and cs.active_background != 'rgba(0,0,0,0)' %}
+      --strip-active-bg: {{ cs.active_background }};
+      {%- endif %}
+      {%- if cs.arrow_color != blank and cs.arrow_color != 'rgba(0,0,0,0)' %}
+      --strip-arrow-color: {{ cs.arrow_color }};
+      {%- endif %}
+      {%- if cs.heading_color != blank and cs.heading_color != 'rgba(0,0,0,0)' %}
+      --strip-heading-color: {{ cs.heading_color }};
+      {%- endif %}
+      --strip-heading-size: {{ cs.heading_size }}px;
+      --strip-heading-size-mobile: {{ cs.heading_size_mobile }}px;
+    }
+  {%- endstyle -%}
+
+  <collection-style-strip
+    id="style-strip-{{ section.id }}"
+    class="style-strip{% unless cs.show_arrows_mobile %} style-strip--no-arrows-mobile{% endunless %}"
+  >
+    <div class="style-strip__inner{% if cs.width == 'page' %} style-strip__inner--page{% endif %}">
+      {%- if cs.heading != blank or cs.show_arrows -%}
+        <div class="style-strip__head{% if cs.heading == blank %} style-strip__head--bare{% endif %}">
+          {%- if cs.heading != blank -%}
+            <h2 class="style-strip__heading">{{ cs.heading }}</h2>
+          {%- endif -%}
+
+          {%- if cs.show_arrows -%}
+            <div class="style-strip__arrows" data-strip-arrows>
+              <button
+                type="button"
+                class="style-strip__arrow style-strip__arrow--prev"
+                aria-label="Previous"
+              >
+                {%- render 'icon-chevron-left' -%}
+              </button>
+              <button
+                type="button"
+                class="style-strip__arrow style-strip__arrow--next"
+                aria-label="Next"
+              >
+                {%- render 'icon-chevron-left' -%}
+              </button>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <ul class="style-strip__track" role="list" data-strip-track>
+        {%- if cs.show_all_card -%}
+          {%- liquid
+            comment
+              The "All" card has no name in any icon set to fall back on, so it works down a chain
+              instead: the picture the merchant chose, then All.png in Files - the name the
+              hand-built strip used - then the range's own collection image, then the first
+              product in it. With none of the four the box keeps its background rather than
+              showing a broken picture.
+            endcomment
+            assign all_photo = cs.all_image
+            if all_photo == blank
+              assign all_photo = images['All.png']
+            endif
+            comment
+              The same `category-<handle>.png` naming the cards below use, on the range's own
+              collection - `category-earrings.png` gives Earrings an "All" picture without
+              anything being set in the admin.
+            endcomment
+            if all_photo == blank
+              assign all_category_photo_name = matched_root | prepend: 'category-' | append: '.png'
+              assign all_photo = images[all_category_photo_name]
+            endif
+            assign all_photo_url = ''
+            if all_photo == blank
+              for legacy_photo in legacy_photos
+                assign legacy_parts = legacy_photo | split: '|'
+                if legacy_parts[0] == 'All'
+                  assign all_photo_url = legacy_parts[1]
+                  break
+                endif
+              endfor
+            endif
+            comment
+              Only the engagement "All" card has a picture of its own; every other family's falls
+              through to its range's collection image, or the first piece in it.
+            endcomment
+            if matched_parent != 'Engagement'
+              assign all_photo_url = ''
+            endif
+            if all_photo == blank and all_photo_url == blank
+              assign all_photo = root_collection.image
+            endif
+            if all_photo == blank and all_photo_url == blank
+              assign all_photo = root_collection.products.first.featured_image
+            endif
+          -%}
+          <li class="style-strip__item">
+            <a
+              class="style-strip__card{% if current_handle == matched_root %} style-strip__card--active{% endif %}"
+              href="{{ all_url }}"
+              {% if current_handle == matched_root %}aria-current="page"{% endif %}
+            >
+              <span class="style-strip__media">
+                {%- if all_photo != blank -%}
+                  <img
+                    src="{{ all_photo | image_url: width: 240 }}"
+                    srcset="{{ all_photo | image_url: width: 240 }} 240w, {{ all_photo | image_url: width: 480 }} 480w"
+                    sizes="{{ cs.media_width }}px"
+                    alt=""
+                    width="240"
+                    height="240"
+                    loading="lazy"
+                  >
+                {%- elsif all_photo_url != blank -%}
+                  <img src="{{ all_photo_url }}" alt="" width="240" height="240" loading="lazy">
+                {%- endif -%}
+              </span>
+              <span class="style-strip__label">{{ all_label }}</span>
+            </a>
+          </li>
+        {%- endif -%}
+
+        {%- for strip_item in strip_items -%}
+          {%- liquid
+            assign item_parts = strip_item | split: '|'
+            assign item_label = item_parts[0] | strip
+            assign item_target = item_parts | last | strip
+            if item_label == blank or item_target == blank
+              continue
+            endif
+
+            comment
+              A target that starts with "/" is a URL written out in full - a page, or a collection
+              with a filter on it - and is used exactly as it stands. Anything else is a collection
+              handle.
+            endcomment
+            assign item_first_character = item_target | slice: 0, 1
+            assign item_handle = ''
+            assign item_is_url = false
+            if item_first_character == '/'
+              comment
+                A row written as a URL is a sub-range the shop has no collection for yet, filtered
+                out of its family's collection - Tennis is /collections/necklaces with the
+                `style:tennis` tag on it. It is NOT that collection: the card is one of several
+                pointing into the same place, so it never counts as the card you are on, and it
+                never borrows that collection's picture - four cards carrying one photograph would
+                read as a fault. 'menu-static-items' explains why the rows are written this way
+                and says to swap each one for a collection as soon as that collection exists.
+              endcomment
+              assign item_is_url = true
+              assign item_url = item_target
+            else
+              assign item_handle = item_target
+              assign item_collection = collections[item_target]
+              comment
+                A handle the shop has no collection for still gets its ordinary /collections/ URL:
+                the 404 template hands that path to 'empty-category', which heads it with the
+                category's name rather than saying the page does not exist.
+              endcomment
+              if item_collection.handle == item_target
+                assign item_url = item_collection.url
+              else
+                assign item_url = item_target | prepend: '/collections/'
+              endif
+            endif
+
+            comment
+              The drawing is keyed on the item's own name, never on its collection: "Round" is
+              `round` under both Engagement and Diamonds, where the collections are
+              'round-engagement-rings' and 'round-diamonds'.
+            endcomment
+            assign item_key = item_label | handle
+            comment
+              Three names are tried in Content > Files, narrowest first.
+
+              1. `category-<family>-<handle>.png`. Two families can give a card the same name -
+                 Tennis is a necklace under Necklaces and a bracelet under Bracelets - and a name
+                 on its own cannot tell them apart, so a picture meant for one of them is filed
+                 against its family as well: `category-bracelets-tennis.png`.
+              2. The label with its spaces turned into underscores, `Side_Stone.png`. This is what
+                 the hand-built strip used and where the necklace pictures are filed.
+              3. `category-<handle>.png`, the naming the menu tiles already use
+                 ('header-menu-drawer-links' asks for `category-best-sellers.png`). Reach for this
+                 one whenever a label carries punctuation: Shopify rewrites a file name on upload,
+                 so "Climbers, Jackets & Cuffs" can never be relied on to come back as
+                 `Climbers,_Jackets_&_Cuffs.png`, while `category-climbers-jackets-cuffs.png` is
+                 safe in both directions.
+            endcomment
+            assign item_family_photo_name = matched_root | append: '-' | append: item_key | prepend: 'category-' | append: '.png'
+            assign item_photo = images[item_family_photo_name]
+            if item_photo == blank
+              assign item_photo_name = item_label | replace: ' ', '_' | append: '.png'
+              assign item_photo = images[item_photo_name]
+            endif
+            if item_photo == blank
+              assign item_category_photo_name = item_key | prepend: 'category-' | append: '.png'
+              assign item_photo = images[item_category_photo_name]
+            endif
+
+            comment
+              The picture the card has always carried, looked up by its label. Files is checked
+              first above, so ours wins the moment one is uploaded under that name.
+            endcomment
+            assign item_photo_url = ''
+            if item_photo == blank
+              for legacy_photo in legacy_photos
+                assign legacy_parts = legacy_photo | split: '|'
+                if legacy_parts[0] == item_label
+                  assign item_photo_url = legacy_parts[1]
+                  break
+                endif
+              endfor
+            endif
+          -%}
+
+          {%- capture item_icon -%}
+            {%- render 'menu-link-icon',
+              icons: icon_set,
+              key: item_key,
+              prefix: 'style-strip__icon',
+              source_width: 240
+            -%}
+          {%- endcapture -%}
+
+          {%- liquid
+            assign item_icon = item_icon | strip
+
+            comment
+              A real photograph beats a drawing. The collection the card opens stands in for
+              itself - the Image set on it in the admin first, then the first piece in it - and
+              only a category with neither falls back to the outline from 'menu-link-icon'.
+
+              Most of the jewellery categories have neither yet: Pendants, Chains, Charms and
+              every earring sub-range hold nothing and have no Image, so they draw. Set an Image
+              on the collection in Products > Collections, or put stock in it, and that card
+              turns into a photograph on its own with nothing to change here.
+
+              A card that is a filter URL rather than a collection is skipped: several of them
+              point into one collection, so they would all come back carrying the same picture.
+            endcomment
+            if item_photo == blank and item_photo_url == blank and item_is_url == false
+              assign item_photo = item_collection.image
+              if item_photo == blank
+                assign item_photo = item_collection.products.first.featured_image
+              endif
+            endif
+
+            assign is_current = false
+            if item_is_url == false and item_handle == current_handle
+              assign is_current = true
+            endif
+
+            comment
+              Wedding's style list opens with "Wedding", which is the wedding bands collection
+              itself - the same place the "All" card goes. Two cards side by side pointing at one
+              collection, both lit up as the card you are on, reads as a fault, so the list's own
+              row stands down when the "All" card is covering it.
+            endcomment
+            if cs.show_all_card and item_is_url == false and item_handle == matched_root
+              continue
+            endif
+          -%}
+
+          <li class="style-strip__item">
+            <a
+              class="style-strip__card{% if is_current %} style-strip__card--active{% endif %}{% if item_photo == blank and item_photo_url == blank and item_icon != blank %} style-strip__card--drawn{% endif %}{% if item_photo == blank and item_photo_url == blank and item_icon == blank %} style-strip__card--wordmark{% endif %}"
+              href="{{ item_url }}"
+              {% if is_current %}aria-current="page"{% endif %}
+            >
+              {%- comment -%}
+                Nothing to show in the picture box - a sub-range with no drawing and no collection
+                of its own to borrow from, such as Tennis - so the box goes and the name takes the
+                whole card. An empty tinted square beside the name reads as a picture that failed
+                to load.
+              {%- endcomment -%}
+              <span class="style-strip__media">
+                {%- if item_photo != blank -%}
+                  <img
+                    src="{{ item_photo | image_url: width: 240 }}"
+                    srcset="{{ item_photo | image_url: width: 240 }} 240w, {{ item_photo | image_url: width: 480 }} 480w"
+                    sizes="{{ cs.media_width }}px"
+                    alt=""
+                    width="240"
+                    height="240"
+                    loading="lazy"
+                  >
+                {%- elsif item_photo_url != blank -%}
+                  <img src="{{ item_photo_url }}" alt="" width="240" height="240" loading="lazy">
+                {%- else -%}
+                  {{ item_icon }}
+                {%- endif -%}
+              </span>
+              <span class="style-strip__label">{{ item_label }}</span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </collection-style-strip>
+{%- elsif request.design_mode -%}
+  {%- comment -%}
+    Nothing is drawn on a collection outside the two families, which is the whole point of the
+    section; in the editor that would leave an unselectable blank, so it says why instead. Shoppers
+    never see this.
+  {%- endcomment -%}
+  <div class="style-strip__design-note">
+    Style cards are hidden here. This row only appears on Engagement and Wedding collections and
+    the collections under them. On {{ collection.title | default: 'this page' }} it stays out of
+    the way.
+  </div>
+  <style>
+    .style-strip__design-note {
+      margin: 0 auto;
+      max-width: 60rem;
+      padding: 2.4rem;
+      border: 1px dashed rgba(0, 0, 0, 0.25);
+      font-size: 1.3rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+  </style>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Collection style cards",
+  "tag": "section",
+  "class": "section section-collection-style-strip",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "A row of style cards for browsing sideways within a range. It draws on Engagement and Wedding collections and the collections under them, and hides itself everywhere else, so one default template can carry it without a necklace or earring collection offering ring settings. The names come from the mega menu lists, so the two can never disagree."
+    },
+    { "type": "header", "content": "Heading" },
+    { "type": "text", "id": "heading", "label": "Heading", "info": "Leave empty for no heading - the cards then sit straight under the banner, which is how the row shipped." },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 12, "max": 48, "step": 1, "unit": "px", "default": 18 },
+    { "type": "range", "id": "heading_size_mobile", "label": "Heading size on mobile", "min": 10, "max": 36, "step": 1, "unit": "px", "default": 15 },
+    { "type": "color", "id": "heading_color", "label": "Heading colour", "default": "rgba(0,0,0,0)", "info": "Leave empty to use the page's own text colour." },
+    { "type": "header", "content": "The \"All\" card" },
+    { "type": "checkbox", "id": "show_all_card", "label": "Show an \"All\" card first", "default": true },
+    { "type": "text", "id": "all_label", "label": "\"All\" card label", "default": "All" },
+    { "type": "url", "id": "all_link", "label": "\"All\" card link", "info": "Leave empty to open the range's own collection - Engagement Rings or Wedding Bands, whichever family the page belongs to." },
+    { "type": "image_picker", "id": "all_image", "label": "\"All\" card picture", "info": "Leave empty to use All.png from Content > Files." },
+    { "type": "header", "content": "Cards" },
+    { "type": "range", "id": "per_row", "label": "Cards across", "min": 2, "max": 9, "step": 0.1, "default": 6.4, "info": "A fraction shows part of the next card, which tells a shopper the row scrolls." },
+    { "type": "range", "id": "per_row_mobile", "label": "Cards across on mobile", "min": 1, "max": 4, "step": 0.1, "default": 2.2 },
+    { "type": "range", "id": "gap", "label": "Space between cards", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 20 },
+    { "type": "range", "id": "card_height", "label": "Card height", "min": 60, "max": 200, "step": 2, "unit": "px", "default": 90 },
+    { "type": "range", "id": "media_width", "label": "Picture width", "min": 40, "max": 180, "step": 2, "unit": "px", "default": 84 },
+    { "type": "range", "id": "media_width_mobile", "label": "Picture width on mobile", "min": 32, "max": 140, "step": 2, "unit": "px", "default": 72 },
+    { "type": "range", "id": "icon_size", "label": "Drawing size", "min": 20, "max": 88, "step": 2, "unit": "px", "default": 40, "info": "Only the drawn categories - Pendants, Chains, the wedding bands. A photographed card fills its box, so this does not move it." },
+    { "type": "color", "id": "card_background", "label": "Card background", "default": "#ffffff" },
+    { "type": "color", "id": "media_background", "label": "Picture background", "default": "#f4f3ef" },
+    { "type": "color", "id": "card_border_color", "label": "Card border", "default": "#e6e6e6" },
+    { "type": "range", "id": "card_border_width", "label": "Card border width", "min": 0, "max": 4, "step": 1, "unit": "px", "default": 1 },
+    { "type": "color", "id": "active_border_color", "label": "Border of the card you are on", "default": "#171714" },
+    { "type": "color", "id": "active_background", "label": "Background of the card you are on", "default": "rgba(0,0,0,0)", "info": "Leave empty to keep the card background." },
+    { "type": "header", "content": "Labels" },
+    { "type": "range", "id": "label_size", "label": "Label size", "min": 9, "max": 24, "step": 1, "unit": "px", "default": 13 },
+    { "type": "range", "id": "label_size_mobile", "label": "Label size on mobile", "min": 8, "max": 20, "step": 1, "unit": "px", "default": 11 },
+    { "type": "range", "id": "label_tracking", "label": "Label letter spacing", "min": 0, "max": 30, "step": 1, "unit": "%", "default": 8 },
+    { "type": "select", "id": "label_transform", "label": "Label case", "default": "uppercase", "options": [ { "value": "uppercase", "label": "UPPERCASE" }, { "value": "none", "label": "As written" }, { "value": "capitalize", "label": "Title Case" } ] },
+    { "type": "color", "id": "label_color", "label": "Label colour", "default": "rgba(0,0,0,0)", "info": "Leave empty to use the page's own text colour." },
+    { "type": "header", "content": "Arrows" },
+    { "type": "checkbox", "id": "show_arrows", "label": "Show the arrows", "default": true, "info": "They hide themselves when every card already fits - there is nothing to scroll." },
+    { "type": "checkbox", "id": "show_arrows_mobile", "label": "Show the arrows on mobile", "default": false, "info": "Off: the row is swiped on a phone." },
+    { "type": "color", "id": "arrow_color", "label": "Arrow colour", "default": "rgba(0,0,0,0)" },
+    { "type": "header", "content": "Where it appears" },
+    { "type": "text", "id": "extra_engagement_handles", "label": "Extra Engagement collections", "info": "Comma-separated handles that should carry the engagement strip but are in no menu list, e.g. ready-to-ship." },
+    { "type": "text", "id": "extra_wedding_handles", "label": "Extra Wedding collections", "info": "Comma-separated handles that should carry the wedding strip but are in no menu list." },
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "width", "label": "Width", "default": "page", "options": [ { "value": "page", "label": "Page width" }, { "value": "full", "label": "Full width" } ] },
+    { "type": "color", "id": "section_background", "label": "Section background", "default": "rgba(0,0,0,0)" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 100, "step": 2, "unit": "px", "default": 30 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 100, "step": 2, "unit": "px", "default": 30 }
+  ],
+  "presets": [{ "name": "Collection style cards" }],
+  "enabled_on": { "templates": ["collection"] }
+}
+{% endschema %}

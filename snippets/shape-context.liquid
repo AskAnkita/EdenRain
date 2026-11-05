@@ -1,0 +1,76 @@
+{%- doc -%}
+  The diamond shape the page the shopper is on is about, or nothing.
+
+  The mega menu's Shop by Shape column opens a collection per cut - shape-round and
+  friends under Jewellery, <cut>-engagement-rings under Engagement, <cut>-diamonds under
+  Diamonds ('menu-static-items') - so a shopper who clicked Radiant has already said
+  which cut they want. Every card on that page should answer in that cut: the photo,
+  the icon underlined in the shape row, and the variant the card links to.
+  'card-default-variant' is what turns this into that variant.
+
+  Two sources, the filter first because it is the later thing the shopper did:
+
+  - A Shape filter applied from the filter drawer. Liquid cannot read the query string,
+    so this comes from the filters Shopify reports as applied, the same way
+    'card-default-metal' reads the metal the grid is filtered to.
+  - The collection handle. Read off the handle rather than kept in a list here, so a new
+    shape collection needs nothing adding. Matching is on whole hyphen segments, which
+    is what keeps "pearl-..." from reading as Pear.
+
+  Outputs one lowercase shape key ("radiant"), or nothing on any page that is not about
+  one cut. Only the ten cuts the theme draws an icon for are recognised - the same ten
+  'menu-link-icon' and 'blocks/_card-product-shapes.liquid' carry - because a cut with
+  no icon has nothing for a card to underline.
+
+  Usage:
+  {%- capture page_shape -%}{%- render 'shape-context' -%}{%- endcapture -%}
+{%- enddoc -%}
+
+{%- liquid
+  assign shape_keys = 'round,oval,cushion,emerald,princess,radiant,asscher,heart,marquise,pear' | split: ','
+  assign page_shape = ''
+
+  assign applied_filters = collection.filters
+  if applied_filters == blank
+    assign applied_filters = search.filters
+  endif
+
+  for applied_filter in applied_filters
+    assign filter_label = applied_filter.label | downcase
+    assign filter_names_shape = false
+    if filter_label contains 'shape' or filter_label contains 'cut'
+      assign filter_names_shape = true
+    endif
+
+    for applied_value in applied_filter.active_values
+      assign filter_text = applied_value.value | downcase
+      unless filter_names_shape or filter_text contains 'shape:'
+        continue
+      endunless
+      for shape in shape_keys
+        if filter_text contains shape
+          assign page_shape = shape
+          break
+        endif
+      endfor
+      if page_shape != blank
+        break
+      endif
+    endfor
+
+    if page_shape != blank
+      break
+    endif
+  endfor
+
+  if page_shape == blank and collection != blank and collection.handle != blank
+    assign handle_segments = collection.handle | split: '-'
+    for segment in handle_segments
+      if shape_keys contains segment
+        assign page_shape = segment
+        break
+      endif
+    endfor
+  endif
+-%}
+{{- page_shape -}}

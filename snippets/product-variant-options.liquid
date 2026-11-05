@@ -416,7 +416,12 @@
             <span class="metal-swatch__dot" aria-hidden="true">{{ metal_short }}</span>
             <span class="visually-hidden">{{ value | escape }}</span>
           {%- elsif shape != blank -%}
-            {%- render 'icon-diamond-shape', shape: shape -%}
+            {%- render 'menu-link-icon',
+              icons: 'shapes',
+              key: shape,
+              prefix: 'shape-swatch__icon',
+              source_width: 96
+            -%}
             <span class="shape-swatch__name">{{ value | escape }}</span>
           {%- else -%}
             {{ value | escape -}}

@@ -1,19 +1,25 @@
 {%- doc -%}
   The variant a product card opens on.
 
-  'card-default-metal' decides which metal a card should show; this turns that decision
-  into the variant behind it, so the photo, the underlined swatch and the link out all
-  describe the same ring. Without it a card shuffled to Rose Gold still linked to the
-  bare product URL, and the product page opened on its first variant - Sterling Silver -
-  which is not the ring the shopper clicked.
+  Two things get a say. 'card-default-metal' decides which metal a card should show, so
+  a grid is not one block of yellow gold. 'shape-context' says which diamond shape the
+  page itself is about - a shopper who clicked Radiant in the mega menu's Shop by Shape
+  column is on /collections/radiant-engagement-rings, and every card there should be
+  showing its radiant cut rather than whatever the product's own featured photo is in.
+  This turns the two into the variant behind them, so the photo, the underlined swatch,
+  the underlined shape icon and the link out all describe the same ring.
 
-  The variant is chosen the same way the card's photo is: the chosen metal paired with
-  whatever shape and carat the featured image already has, and failing that any
-  photographed variant of that metal. Both the media snippet and the title link read
-  this one answer, so they cannot drift apart.
+  The shape the shopper asked for outranks the metal: a card picks the variant in that
+  cut and the chosen metal, failing that any photographed variant in that cut, and only
+  if the product has no photograph of that cut at all does it fall back to the metal on
+  its own. Everything else - carat, and any other option - stays as the product's own
+  featured image has it, so the card's remaining rows keep describing what is on screen.
 
-  Outputs "<variant id>||<option index>||<option value>", or nothing when the product
-  has one metal, no metal option, or no photographed variant in the chosen metal.
+  Outputs "<variant id>||<metal option index>||<metal value>||<shape option index>||
+  <shape value>", or nothing when the product has no photographed variant worth moving
+  to. The metal pair is empty when the card moved on shape alone; the shape pair is
+  empty for a product with no shape option, and otherwise carries the chosen variant's
+  own cut, which is what the shape row underlines.
 
   @param {object} card_product - Product Liquid object
 
@@ -25,57 +31,127 @@
   {%- render 'card-default-metal', card_product: card_product -%}
 {%- endcapture -%}
 
+{%- capture page_shape -%}
+  {%- render 'shape-context' -%}
+{%- endcapture -%}
+
 {%- liquid
   assign default_metal = default_metal | strip
-  assign chosen_variant = null
+  assign page_shape = page_shape | strip
 
+  assign metal_index = -1
+  assign metal_value = ''
   if default_metal != blank
     assign metal_parts = default_metal | split: '||'
     assign metal_index = metal_parts.first | plus: 0
     assign metal_value = metal_parts.last
+  endif
 
-    assign featured_variant = null
-    for variant in card_product.variants
-      if variant.featured_media != blank and variant.featured_media.id == card_product.featured_media.id
-        assign featured_variant = variant
-        break
+  # The product's shape option is looked up whether or not the page asks for a cut: the
+  # card's shape row underlines the cut the chosen variant is in, so that answer has to
+  # travel with a metal-led override too.
+  assign shape_index = -1
+  assign shape_value = ''
+  for option in card_product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name contains 'shape'
+      assign shape_index = forloop.index0
+      # The product's own wording for the cut: "Radiant", "Radiant Cut", "Pear Shape".
+      if page_shape != blank
+        for value in option.values
+          assign value_compare = value | downcase
+          if value_compare contains page_shape
+            assign shape_value = value
+            break
+          endif
+        endfor
       endif
-    endfor
+      break
+    endif
+  endfor
 
-    # Only the metal changes: shape, carat and anything else stay as the featured image
-    # has them, so the card's other option rows still describe the photo.
+  assign featured_variant = null
+  for variant in card_product.variants
+    if variant.featured_media != blank and variant.featured_media.id == card_product.featured_media.id
+      assign featured_variant = variant
+      break
+    endif
+  endfor
+
+  # Only the axes something has asked about may move. When the page is about a cut the
+  # shape option is free to change; when it is not, the shape stays as the featured
+  # photo has it, the way every other option does.
+  assign free_index = -1
+  if shape_value != blank
+    assign free_index = shape_index
+  endif
+
+  # Scored rather than run as a cascade of passes, because the two preferences can pull
+  # apart - the chosen metal may not be photographed in the chosen cut - and a score
+  # says which way to give in one read: cut (8) over metal (4), and among equals the
+  # variant that leaves everything else alone (1). A variant that answers neither
+  # preference is not a move worth making, so the card stays on its own photo.
+  assign chosen_variant = null
+  assign best_score = 0
+
+  if metal_value != blank or shape_value != blank
     for variant in card_product.variants
-      if variant.options[metal_index] != metal_value or variant.featured_media == blank
+      if variant.featured_media == blank
         continue
       endif
+
+      assign score = 0
+      assign matched_any = false
+
+      if shape_value != blank and variant.options[shape_index] == shape_value
+        assign matched_any = true
+        assign score = score | plus: 8
+      endif
+
+      if metal_value != blank and variant.options[metal_index] == metal_value
+        assign matched_any = true
+        assign score = score | plus: 4
+      endif
+
+      unless matched_any
+        continue
+      endunless
+
       if featured_variant
         assign others_match = true
         for option_value in variant.options
-          unless forloop.index0 == metal_index
-            if option_value != featured_variant.options[forloop.index0]
-              assign others_match = false
-            endif
-          endunless
+          if forloop.index0 == metal_index or forloop.index0 == free_index
+            continue
+          endif
+          if option_value != featured_variant.options[forloop.index0]
+            assign others_match = false
+            break
+          endif
         endfor
-        unless others_match
-          continue
-        endunless
-      endif
-      assign chosen_variant = variant
-      break
-    endfor
-
-    # That exact pair may not be photographed -- any photo of the chosen metal will do.
-    unless chosen_variant
-      for variant in card_product.variants
-        if variant.options[metal_index] == metal_value and variant.featured_media != blank
-          assign chosen_variant = variant
-          break
+        if others_match
+          assign score = score | plus: 1
         endif
-      endfor
-    endunless
+      endif
+
+      if score > best_score
+        assign best_score = score
+        assign chosen_variant = variant
+      endif
+    endfor
+  endif
+
+  assign metal_index_out = ''
+  if metal_value != blank
+    assign metal_index_out = metal_index
+  endif
+
+  assign shape_index_out = ''
+  assign chosen_shape = ''
+  if chosen_variant and shape_index >= 0
+    assign shape_index_out = shape_index
+    assign chosen_shape = chosen_variant.options[shape_index]
   endif
 -%}
 {%- if chosen_variant -%}
-  {{- chosen_variant.id }}||{{ metal_index }}||{{ metal_value -}}
+  {{- chosen_variant.id }}||{{ metal_index_out }}||{{ metal_value }}||{{ shape_index_out }}||{{ chosen_shape -}}
 {%- endif -%}

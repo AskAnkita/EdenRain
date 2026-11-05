@@ -67,25 +67,29 @@
     enableDownload(link, name);
   });
 
+  /*
+    The printable sizers live in Content > Files as PDFs, and a PDF is what the
+    reader needs: the picture on the page is a web-sized render that prints at the
+    wrong scale, and a sizer printed at the wrong scale gives the wrong size. A
+    guide can name its own file in the theme editor ("Printable sizer PDF"); these
+    are the store's own sheets, used when it does not.
+  */
+  const SIZER_FILES = {
+    finger: 'https://cdn.shopify.com/s/files/1/0423/9668/0352/files/er_Ring_sizer.pdf?v=1624288621',
+    wrist: 'https://cdn.shopify.com/s/files/1/0423/9668/0352/files/ER_watch_sizer-2.pdf?v=1625475897',
+  };
+
   document.querySelectorAll('[data-sizer-download]').forEach((content) => {
     // A hot reload can run this file a second time; one button under the sizer is enough.
     if (content.querySelector('.gp-sizer-download')) return;
 
     /*
-      What the button saves is the sizer the reader is looking at - the picture in
-      the page content - so the file that arrives is the one on screen. A guide can
-      name a different file in the theme editor ("Sizer download file"), which is
-      there for a print-resolution copy of the same sizer.
+      The button is placed under the sizer the reader is looking at, so the picture
+      still has to be found even though the file handed over is the PDF. Order of
+      preference for that file: the guide's own "Printable sizer PDF", the store's
+      sheet for this kind of sizer, the theme editor's print-resolution image, and
+      finally the picture on the page.
     */
-    const images = [...content.querySelectorAll('img')];
-    const preferredSource = content.dataset.sizerDownloadSrc;
-    const preferredName = preferredSource ? nameFor(preferredSource) : '';
-    const image = (preferredName && images.find((candidate) => nameFor(candidate.src) === preferredName))
-      || images[0];
-    if (!image) return;
-    const source = preferredSource || image.getAttribute('src');
-    if (!source) return;
-
     const kind = content.dataset.sizerDownload;
     const labels = {
       finger: ['Download Finger Sizer', 'finger-sizer'],
@@ -93,6 +97,15 @@
     };
     const download = labels[kind];
     if (!download) return;
+
+    const images = [...content.querySelectorAll('img')];
+    const preferredSource = content.dataset.sizerDownloadSrc;
+    const preferredName = preferredSource ? nameFor(preferredSource) : '';
+    const image = (preferredName && images.find((candidate) => nameFor(candidate.src) === preferredName))
+      || images[0];
+    if (!image) return;
+    const source = content.dataset.sizerDownloadFile || SIZER_FILES[kind] || preferredSource || image.getAttribute('src');
+    if (!source) return;
 
     const button = document.createElement('a');
     button.className = 'gp-sizer-download';
