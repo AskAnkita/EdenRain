@@ -23,6 +23,36 @@
 {%- if is_color -%}
   {%- capture product_variants -%}
     {%- for value in option.values -%}
+      {%- capture value_text -%}{{ value }}{%- endcapture -%}
+      {%- liquid
+        # A centre-stone shape (or metal) the client has not priced yet sits at 0 across every
+        # one of its variants. These pieces are coming back the moment a price arrives, so
+        # nothing is deleted and nothing is un-merged — the value is simply not offered while
+        # it has no price, and it reappears on its own once one is set. Only a product that
+        # holds both a 0 and a real price pays for the lookup.
+        assign value_has_price = true
+        if product.price_min == 0 and product.price_max > 0
+          assign value_has_price = false
+          for priced_variant in product.variants
+            if priced_variant.price > 0
+              if option.position == 1 and priced_variant.option1 == value_text
+                assign value_has_price = true
+                break
+              elsif option.position == 2 and priced_variant.option2 == value_text
+                assign value_has_price = true
+                break
+              elsif option.position == 3 and priced_variant.option3 == value_text
+                assign value_has_price = true
+                break
+              endif
+            endif
+          endfor
+        endif
+        unless value_has_price
+          continue
+        endunless
+      -%}
+
       {%- liquid
         assign option_disabled = true
         if value.available
@@ -291,6 +321,36 @@
 {%- else -%}
   {%- capture product_variants -%}
     {%- for value in option.values -%}
+      {%- capture value_text -%}{{ value }}{%- endcapture -%}
+      {%- liquid
+        # A centre-stone shape (or metal) the client has not priced yet sits at 0 across every
+        # one of its variants. These pieces are coming back the moment a price arrives, so
+        # nothing is deleted and nothing is un-merged — the value is simply not offered while
+        # it has no price, and it reappears on its own once one is set. Only a product that
+        # holds both a 0 and a real price pays for the lookup.
+        assign value_has_price = true
+        if product.price_min == 0 and product.price_max > 0
+          assign value_has_price = false
+          for priced_variant in product.variants
+            if priced_variant.price > 0
+              if option.position == 1 and priced_variant.option1 == value_text
+                assign value_has_price = true
+                break
+              elsif option.position == 2 and priced_variant.option2 == value_text
+                assign value_has_price = true
+                break
+              elsif option.position == 3 and priced_variant.option3 == value_text
+                assign value_has_price = true
+                break
+              endif
+            endif
+          endfor
+        endif
+        unless value_has_price
+          continue
+        endunless
+      -%}
+
       {%- liquid
         assign option_disabled = true
         if value.available

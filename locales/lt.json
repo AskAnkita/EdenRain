@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Išparduota",
+      "price_on_request": "Kaina pagal užklausą",
       "sold_out_message": "Variantas išparduotas!",
       "step_by_step": {
         "next": "Kitas žingsnis",

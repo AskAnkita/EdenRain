@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "售罄",
+      "price_on_request": "价格请咨询",
       "sold_out_message": "选项售罄！",
       "step_by_step": {
         "next": "下一步",

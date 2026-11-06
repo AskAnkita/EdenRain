@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Uitverkocht",
+      "price_on_request": "Prijs op aanvraag",
       "sold_out_message": "Variant uitverkocht!",
       "step_by_step": {
         "next": "Volgende stap",

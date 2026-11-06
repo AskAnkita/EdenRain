@@ -830,6 +830,7 @@
       },
       "sku": "Cikkszám",
       "sold_out": "Elfogyott",
+      "price_on_request": "Ár érdeklődésre",
       "sold_out_message": "A változat elfogyott!",
       "step_by_step": {
         "next": "Következő lépés",

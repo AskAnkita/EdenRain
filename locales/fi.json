@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Loppuunmyyty",
+      "price_on_request": "Kysy hintaa",
       "sold_out_message": "Tuotevariaatio loppuunmyyty!",
       "step_by_step": {
         "next": "Seuraava vaihe",

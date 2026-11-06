@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Hết hàng",
+      "price_on_request": "Liên hệ để biết giá",
       "sold_out_message": "Phiên bản này đã hết!",
       "step_by_step": {
         "next": "Bước tiếp theo",

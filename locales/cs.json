@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Vyprodáno",
+      "price_on_request": "Cena na vyžádání",
       "sold_out_message": "Tato varianta je vyprodána!",
       "step_by_step": {
         "next": "Další krok",

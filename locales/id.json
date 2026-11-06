@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Habis terjual",
+      "price_on_request": "Hubungi kami untuk harga",
       "sold_out_message": "Varian ini habis terjual!",
       "step_by_step": {
         "next": "Langkah berikutnya",

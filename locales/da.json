@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Udsolgt",
+      "price_on_request": "Kontakt os for pris",
       "sold_out_message": "Varianten er udsolgt!",
       "step_by_step": {
         "next": "Næste trin",

@@ -830,6 +830,7 @@
       },
       "sku": "Artikelnr",
       "sold_out": "Slutsåld",
+      "price_on_request": "Kontakta oss för pris",
       "sold_out_message": "Varianten har sålts ut!",
       "step_by_step": {
         "next": "Nästa steg",

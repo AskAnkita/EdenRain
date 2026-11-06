@@ -144,6 +144,25 @@
       {%- for value in shape_values -%}
         {%- liquid
           assign value_text = value | strip
+
+          # A shape the client has not priced yet sits at 0 across every one of its variants.
+          # It comes back the moment a price arrives, so nothing is removed from the product --
+          # the icon is simply not drawn while the shape has no price. Only shapes that are a
+          # real product option can be checked; tag and metafield shapes have no variant behind
+          # them, and only a product holding both a 0 and a real price pays for the lookup.
+          if shape_index >= 0 and card_product.price_min == 0 and card_product.price_max > 0
+            assign shape_has_price = false
+            for priced_variant in card_product.variants
+              if priced_variant.price > 0 and priced_variant.options[shape_index] == value_text
+                assign shape_has_price = true
+                break
+              endif
+            endfor
+            unless shape_has_price
+              continue
+            endunless
+          endif
+
           assign value_compare = value_text | downcase
           assign matched_shape = ''
           for shape in icon_shapes

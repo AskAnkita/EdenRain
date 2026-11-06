@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Epuizat",
+      "price_on_request": "Preț la cerere",
       "sold_out_message": "Variantă epuizată!",
       "step_by_step": {
         "next": "Pasul următor",

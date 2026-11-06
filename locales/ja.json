@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "売り切れ",
+      "price_on_request": "価格はお問い合わせください",
       "sold_out_message": "この商品は売り切れました！",
       "step_by_step": {
         "next": "次のステップ",

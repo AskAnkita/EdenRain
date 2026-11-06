@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Esgotado",
+      "price_on_request": "Consulte o preço",
       "sold_out_message": "Variação esgotada!",
       "step_by_step": {
         "next": "Próximo passo",

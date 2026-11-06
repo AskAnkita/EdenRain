@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-// Writes the ring retail prices the client supplied (scripts/shopify/ring-prices.csv, transcribed
-// from the "Eden Raine Ring Price" sheet) onto every matching variant in the store.
+// Writes the retail prices the client supplied (scripts/shopify/client-prices.csv) onto every
+// matching variant in the store. The sheet covers rings (the "Eden Raine Ring Price" PDF) and the
+// tennis necklaces and bracelets, one row per style code in four metal tiers.
 //
-//   node scripts/shopify/sync-ring-prices.mjs                  preview only, changes nothing
-//   node scripts/shopify/sync-ring-prices.mjs --apply          write the prices
-//   node scripts/shopify/sync-ring-prices.mjs --only=AJLR134,AJLR272
-//   node scripts/shopify/sync-ring-prices.mjs --verbose        every variant, not just a sample
-//   node scripts/shopify/sync-ring-prices.mjs --skip-archived  leave the folded-in donors alone
+//   node scripts/shopify/sync-client-prices.mjs                  preview only, changes nothing
+//   node scripts/shopify/sync-client-prices.mjs --apply          write the prices
+//   node scripts/shopify/sync-client-prices.mjs --only=AJLR134,AJNT26
+//   node scripts/shopify/sync-client-prices.mjs --verbose        every variant, not just a sample
+//   node scripts/shopify/sync-client-prices.mjs --skip-archived  leave the folded-in donors alone
 //
 // How a variant finds its price
 //   Variant SKUs are <CODE>-<METAL>-<COLOUR>[-<SIZE>], e.g. AJLR300-G18K-Y-7.5. The CODE is the
@@ -19,17 +20,23 @@
 //   still worded "10k", which is a labelling question separate from the price. Colour (Y/W/R)
 //   never changes the price.
 //
-//   SIZE adds the store's standing ring-size surcharge: size 5 is the sheet price and each half
-//   size adds 1.25%, reaching +10% at size 9 (the same ladder config.eden.json has always used).
-//   A product with no Size option — the merged shape ones — takes the sheet price flat.
+//   The remaining option then adds the store's standing surcharge for that kind of piece:
+//
+//     Size   (rings)     size 5 is the sheet price, each half size adds 1.25%, size 9 is +10%
+//     Length (chains)    $25 an inch either side of the base length — 18 in for a necklace,
+//                        7 in for a bracelet, so a 16 in necklace is $50 UNDER the sheet price
+//
+//   Both ladders are the ones config.eden.json and config.eden-tennis.json have always used, so a
+//   re-run of the old import.js length/size syncs agrees with this script. A product with neither
+//   option — the merged shape ones, which traded their sizes for the shape slot — takes the sheet
+//   price flat.
 //
 // Prices round DOWN to a whole $10, the rule the rest of the store is priced by, so the sheet's
 // $3,100.75 is listed as $3,100.00.
 //
 // A code the sheet shows as #N/A has no price at all and its variants are LEFT UNTOUCHED at
 // whatever they are now (AJLR135, AJLR137, AJLR302, AJLR349 sit at $0 on purpose, waiting for the
-// client to supply the missing rows). Anything that is not a ring — the tennis necklaces and
-// bracelets — is not in this sheet and is never touched.
+// client to supply the missing rows). A code with no row at all is likewise never touched.
 //
 // Every variant's current price is written to scripts/shopify/backups/ before the first change.
 
@@ -52,6 +59,8 @@ const ONLY = (val('only') || '').split(',').map((s) => s.trim().toUpperCase()).f
 const ROUND_DOWN_TO = 10;       // the store's standing rule, same as config.eden.json priceList
 const PCT_PER_HALF_SIZE = 1.25; // size 5 is the base, size 9 is +10%
 const BASE_SIZE = 5;
+const PER_INCH = 25;            // chains: config.eden-tennis.json lengthPricePerInch
+const BASE_LENGTH = { NECKLACE: 18, BRACELET: 7 }; // ...and its lengthBase
 
 // SKU metal segment -> column in ring-prices.csv
 const METAL_COLUMN = {
@@ -108,8 +117,24 @@ function sizeSurcharge(sizeLabel) {
 const optionValue = (variant, name) =>
   (variant.selectedOptions || []).find((o) => o.name.trim().toLowerCase() === name)?.value || null;
 
-/** The price this variant should carry, or null if the sheet cannot price it. */
-function priceFor(variant, sheet) {
+/** Which length ladder a chain is on, read off the title the way import.js does. */
+function chainCategory(title) {
+  const t = String(title || '').toLowerCase();
+  if (/bracelet|bangle|anklet/.test(t)) return 'BRACELET';
+  if (/necklace|pendant|choker/.test(t)) return 'NECKLACE';
+  return null;
+}
+
+/** Dollars to add (or take off) for a length: a flat rate per inch either side of the base. */
+function lengthDelta(lengthLabel, title) {
+  const inches = Number(/([\d.]+)/.exec(String(lengthLabel || ''))?.[1]);
+  const base = BASE_LENGTH[chainCategory(title)];
+  if (!Number.isFinite(inches) || !base) return 0;
+  return (inches - base) * PER_INCH;
+}
+
+/** The price this variant should carry, or a reason the sheet cannot price it. */
+function priceFor(variant, sheet, product) {
   const sku = variant.sku || '';
   const code = styleCode(sku);
   if (!code) return { skip: 'no SKU' };
@@ -121,9 +146,13 @@ function priceFor(variant, sheet) {
   const base = row.prices[column];
   if (base == null) return { skip: 'sheet has no price for this code (#N/A)', code, missing: true };
 
+  // A ring is sized, a chain is cut to length, a merged shape product is neither.
   const size = optionValue(variant, 'size');
-  const price = roundDown(base * (1 + sizeSurcharge(size) / 100));
-  return { code, column, base, size, price: price.toFixed(2) };
+  const length = optionValue(variant, 'length');
+  let price = base;
+  if (size) price = base * (1 + sizeSurcharge(size) / 100);
+  else if (length) price = Math.max(0, base + lengthDelta(length, product.title));
+  return { code, column, base, size: size || length, price: roundDown(price).toFixed(2) };
 }
 
 // ---------- the store ----------
@@ -152,9 +181,9 @@ const BULK_UPDATE = `
 `;
 
 const cfg = config();
-const { sheet, conflicts } = readPriceSheet(resolve(here, 'ring-prices.csv'));
+const { sheet, conflicts } = readPriceSheet(resolve(here, 'client-prices.csv'));
 
-console.log(`\nring-prices.csv — ${sheet.size} style codes\n`);
+console.log(`\nclient-prices.csv — ${sheet.size} style codes\n`);
 for (const c of conflicts) {
   const show = (e) => Object.values(METAL_COLUMN).map((k) => e.prices[k] ?? '—').join(' / ');
   console.log(`! ${c.code} appears twice with different prices: ${show(c.prev)}  then  ${show(c.next)}`);
@@ -182,7 +211,7 @@ for (const product of products) {
   }
   const updates = [];
   for (const v of product.variants.nodes) {
-    const got = priceFor(v, sheet);
+    const got = priceFor(v, sheet, product);
     if (got.skip) {
       if (ONLY.length && !ONLY.includes(got.code)) continue;
       note(got.skip, v.sku || `(no sku) ${product.handle}`);
@@ -224,7 +253,7 @@ if (!total) { console.log('Nothing to do.\n'); process.exit(0); }
 
 // ---------- write ----------
 
-writeBackup(cfg, 'ring-prices-before', products.map((p) => ({
+writeBackup(cfg, 'client-prices-before', products.map((p) => ({
   handle: p.handle, status: p.status,
   variants: p.variants.nodes.map((v) => ({ id: v.id, sku: v.sku, price: v.price })),
 })));

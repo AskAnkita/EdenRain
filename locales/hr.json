@@ -830,6 +830,7 @@
       },
       "sku": "Šifra",
       "sold_out": "Rasprodano",
+      "price_on_request": "Cijena na upit",
       "sold_out_message": "Varijanta rasprodana!",
       "step_by_step": {
         "next": "Sljedeći korak",

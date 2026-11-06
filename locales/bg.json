@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Изчерпано",
+      "price_on_request": "Свържете се с нас за цена",
       "sold_out_message": "Този вариант е изчерпан!",
       "step_by_step": {
         "next": "Следваща стъпка",

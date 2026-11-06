@@ -830,6 +830,7 @@
       },
       "sku": "Артикул",
       "sold_out": "Нет в наличии",
+      "price_on_request": "Цена по запросу",
       "sold_out_message": "Вариант распродан!",
       "step_by_step": {
         "next": "Следующий шаг",

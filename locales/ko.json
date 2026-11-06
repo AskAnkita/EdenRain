@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "품절", 
+      "price_on_request": "가격 문의",
       "sold_out_message": "옵션 품절",
       "step_by_step": {
         "next": "다음 단계",

@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Tükendi",
+      "price_on_request": "Fiyat için bize ulaşın",
       "sold_out_message": "Varyant tükendi!",
       "step_by_step": {
         "next": "Sonraki adım",
