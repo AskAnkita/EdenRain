@@ -284,6 +284,15 @@ button.shopify-payment-button__button--unbranded,
   it, so its trailing edge leaves the button before the transition ends and no
   unfilled sliver is ever left standing at the far side.
 
+  It only ever travels one way: left to right, on the way in AND on the way
+  out. The layer rests anchored to its right edge at no width, so hovering
+  re-anchors it to the left and grows it across, and leaving hover drops that
+  anchor back to the right so the fill carries on out of the right-hand side
+  rather than reeling back to the corner it came from. The anchor is not
+  transitioned, and it only ever moves at a moment when the layer is either
+  full width (where the two anchors draw the same thing) or no width at all
+  (where there is nothing to see), so the swap itself is invisible.
+
   cart-remove-button sets `content: none` on this pseudo-element in
   component-cart-items.css; that is a deliberate opt-out, not an oversight.
 */
@@ -307,7 +316,7 @@ button.shopify-payment-button__button--unbranded::before,
   z-index: -1;
   background: var(--cta-fill-hover, transparent);
   transform: scaleX(0);
-  transform-origin: left center;
+  transform-origin: right center;
   transition: transform var(--cta-sweep-speed) var(--cta-sweep-easing);
   pointer-events: none;
 }
@@ -337,6 +346,7 @@ button.shopify-payment-button__button--unbranded::before,
   .shopify-challenge__button:hover:not([disabled])::before,
   button.shopify-payment-button__button--unbranded:hover:not([disabled])::before,
   .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button):hover:not([disabled])::before {
+    transform-origin: left center;
     transform: scaleX(1);
   }
 
@@ -479,20 +489,24 @@ button.shopify-payment-button__button--unbranded:focus-visible::before {
   --cta-fill-hover names, and "no fill" is not a colour it can carry across.
   So the button itself is left transparent, its resting fill is painted by that
   very layer held at full width, and hover retracts it to the left edge. Same
-  colours, same duration, same curve as every other call to action; only the
-  direction is turned around, which is why it lives here with the rest of hover
-  rather than in a section's own file.
+  colours, same duration, same curve as every other call to action, and the
+  fill still only ever travels left to right: it leaves by the right edge on
+  hover and comes back in from the left. Only the order of the two states is
+  turned around, which is why it lives here with the rest of hover rather than
+  in a section's own file.
 
   A button wearing this names --cta-fill-hover as its RESTING fill and
   --cta-ink-hover as the colour the label takes once that fill has gone.
 */
 .eden-action--sweep-out::before {
+  transform-origin: left center;
   transform: scaleX(1);
 }
 
 @media (hover: hover) {
   .eden-action--sweep-out:hover::before,
   .eden-action-host:hover .eden-action--sweep-out::before {
+    transform-origin: right center;
     transform: scaleX(0);
   }
 }
