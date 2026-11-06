@@ -124,6 +124,12 @@
   assign pillar_sizes = '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw'
   assign half_sizes = '(min-width: 750px) 50vw, 100vw'
   assign step_sizes = '(min-width: 990px) 25vw, (min-width: 750px) 50vw, 100vw'
+
+  # A template saved before a setting existed has no value for it, so these are
+  # coerced with 'plus: 0' and 0 is treated as "use the stylesheet's own figure".
+  assign shell_max = stts.content_width | plus: 0
+  assign feature_text_col = stts.feature_text_width | plus: 0
+  assign feature_width = stts.feature_width | plus: 0
 -%}
 
 {%- style -%}
@@ -134,6 +140,7 @@
     --ab-card-bg: {{ stts.card_background }};
     --ab-card-border: {{ stts.card_border_color }};
     --ab-radius: {{ stts.corner_radius }}px;
+    {%- if shell_max > 0 %}--ab-shell-max: {{ shell_max }}px;{% endif -%}
     --ab-gap: {{ stts.grid_gap | divided_by: 10.0 }}rem;
     --ab-band-gap: {{ stts.band_gap | divided_by: 10.0 }}rem;
     --ab-ratio: {{ stts.image_ratio }};
@@ -175,6 +182,8 @@
     --ab-pillar-columns-tablet: {{ stts.pillar_columns_tablet }};
     --ab-step-columns-desktop: {{ stts.step_columns }};
     --ab-feature-ratio: {{ stts.feature_image_ratio }};
+    {%- if feature_text_col > 0 %}--ab-feature-text-col: {{ feature_text_col }}%;{% endif -%}
+    {%- if feature_width > 0 %}--ab-feature-width: {{ feature_width }}px;{% endif -%}
 
     --ab-cta-bg: {{ stts.cta_background }};
     --ab-cta-ink: {{ stts.cta_text_color }};
@@ -1316,6 +1325,28 @@
       "default": "3 / 2"
     },
     {
+      "type": "range",
+      "id": "feature_width",
+      "label": "Chapter width",
+      "min": 800,
+      "max": 1400,
+      "step": 20,
+      "unit": "px",
+      "default": 1400,
+      "info": "Full page width by default, so a chapter lines up with every other band. Pull it in if you would rather the chapters sat inside the page."
+    },
+    {
+      "type": "range",
+      "id": "feature_text_width",
+      "label": "How much width the words take",
+      "min": 28,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "default": 46,
+      "info": "The picture takes the rest, so a lower number means a larger picture. The words keep a readable column of their own whatever you set here."
+    },
+    {
       "type": "header",
       "content": "The page's own text"
     },
@@ -1568,13 +1599,25 @@
     },
     {
       "type": "range",
+      "id": "content_width",
+      "label": "Content width",
+      "min": 1000,
+      "max": 1920,
+      "step": 20,
+      "unit": "px",
+      "default": 1400,
+      "info": "How wide the bands of the page run. The guide pages hold their content to 1400px; the theme's own page width is 1920px, which is wide for a page of prose."
+    },
+    {
+      "type": "range",
       "id": "corner_radius",
       "label": "Corner rounding",
       "min": 0,
       "max": 36,
       "step": 2,
       "unit": "px",
-      "default": 20
+      "default": 0,
+      "info": "Every other radius in this theme is 0. Anything above it makes the About page the only rounded page on the site."
     },
     {
       "type": "range",

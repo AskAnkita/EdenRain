@@ -37,7 +37,14 @@
 }
 
 .about-page .ab-shell {
-  max-width: var(--page-width, 160rem);
+  /*
+    Held to a measure of its own, not the theme's page width. --page-width is
+    1920px, which is right for a full-bleed band of product cards and wrong for
+    a page of prose: a 50/50 chapter at that width is a 900px photograph beside
+    a 900px line of type. The guide pages hold their content to 140rem, so this
+    takes the same cap and the merchant can move it from the schema.
+  */
+  max-width: var(--ab-shell-max, 140rem);
   margin: 0 auto;
   padding-inline: 2.4rem;
 }
@@ -262,6 +269,16 @@
   height: 100%;
   aspect-ratio: var(--ab-story-ratio, 4 / 5);
   object-fit: cover;
+}
+
+/*
+  The letter keeps its own measure inside its column. The portrait's share is a
+  merchant setting, so the words' column is whatever is left of the shell - at
+  58% of 140rem that is a 100-character line, well past what anyone reads
+  comfortably. This caps the line without narrowing the column it sits in.
+*/
+.about-page .ab-story__copy > * {
+  max-width: var(--ab-story-measure, 64ch);
 }
 
 .about-page .ab-story__caption {
@@ -504,11 +521,27 @@
 /*
   The long chapters - the global team, our future - each given the picture it is
   about, alternating sides down the page so the eye keeps moving.
+
+  The band fills the shell, like the letter and the stats above it. Pulling it in
+  to hold a square picture level with 50-70 words shrank the photograph to the
+  size of a thumbnail and left the chapter floating inside margins nothing else
+  on the page has - the picture lines up with no other edge, and the whole band
+  reads as the small print of the page above it. The words are held to a measure
+  instead, as the letter's are, so the column can be wide without the line being
+  long, and the picture takes whatever is left.
+
+  Size is controlled here and never on the picture itself. Insetting the media
+  inside its own column - the obvious fix - leaves the words running to the edge
+  of the band on one side and the picture stopping short on the other, and since
+  the chapters alternate, the inset swaps sides as you scroll. Both tracks fill
+  the band, so every chapter starts and ends on the same two lines.
 */
 .about-page .ab-feature {
   display: grid;
   gap: var(--ab-gap);
   align-items: center;
+  max-width: var(--ab-feature-width, 140rem);
+  margin-inline: auto;
 }
 
 .about-page .ab-feature + .ab-feature {
@@ -528,6 +561,25 @@
   height: 100%;
   aspect-ratio: var(--ab-feature-ratio, 3 / 2);
   object-fit: cover;
+}
+
+/*
+  The chapter's words keep their own measure inside a column that is now most of
+  the page wide, exactly as the letter's do. Without this the paragraph runs to
+  90 characters a line the moment the band fills the shell.
+*/
+.about-page .ab-feature__copy > * {
+  max-width: var(--ab-feature-measure, 54ch);
+}
+
+/*
+  The title keeps a tighter measure than the paragraph, in characters of its own
+  font, so a chapter title still breaks into the two-line stack the letter above
+  it uses. Left at the column's width one chapter stacked and the other ran out
+  in a single line, and the pair stopped looking like chapters of one page.
+*/
+.about-page .ab-feature__copy > .ab-heading {
+  max-width: var(--ab-feature-heading-measure, 28ch);
 }
 
 .about-page .ab-feature__copy > .ab-eyebrow {
@@ -799,14 +851,34 @@
     top: 3.2rem;
   }
 
+  /*
+    The picture takes the larger share, as it does in a guide chapter: these are
+    photographs you look at, and the prose beside one is a paragraph. An even
+    split gave the words a 900-character-wide line and the photograph a square
+    the height of the viewport. --ab-feature-text-col is the words' share,
+    written by the section from its schema.
+
+    Both tracks are pinned to row 1 and placed by column. Ordering the items
+    alone would have left the words in the wide track on a flipped chapter,
+    which is the opposite of the point, and auto-placement wraps a flipped pair
+    onto two rows - the words are placed first, land in column 2, and that moves
+    the cursor past the end of the row, so the picture asking for column 1 is
+    behind it.
+  */
   .about-page .ab-feature {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: var(--ab-feature-text-col, 46%) minmax(0, 1fr);
     gap: clamp(3.2rem, 5vw, 6.4rem);
   }
 
-  .about-page .ab-feature--flipped .ab-feature__media {
-    order: 2;
+  .about-page .ab-feature__copy { grid-column: 1; grid-row: 1; }
+  .about-page .ab-feature__media { grid-column: 2; grid-row: 1; }
+
+  .about-page .ab-feature--flipped {
+    grid-template-columns: minmax(0, 1fr) var(--ab-feature-text-col, 46%);
   }
+
+  .about-page .ab-feature--flipped .ab-feature__copy { grid-column: 2; grid-row: 1; }
+  .about-page .ab-feature--flipped .ab-feature__media { grid-column: 1; grid-row: 1; }
 
   .about-page .ab-section-head--centred {
     max-width: 68rem;

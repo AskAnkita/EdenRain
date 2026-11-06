@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "about": {
@@ -46,6 +55,7 @@
           "settings": {
             "title": "Craft and precision",
             "text": "From the first sketch to the final polish, every step is a blend of artistry and innovation - traditional handmade technique with the precision of CAD.",
+            "image": "shopify://shop_images/d5f5e059853ec8bb006863c81d8c60d8.jpg",
             "image_asset": "about-craft-workshop.png",
             "link": "/pages/education-guides",
             "link_label": "Read our guides"
@@ -65,35 +75,40 @@
           "type": "step",
           "settings": {
             "title": "The sketch",
-            "text": "Every piece starts as a drawing: the stone, the setting and the proportions, settled before anything is made."
+            "text": "Every piece starts as a drawing: the stone, the setting and the proportions, settled before anything is made.",
+            "image_asset": ""
           }
         },
         "step_cad": {
           "type": "step",
           "settings": {
             "title": "The CAD",
-            "text": "The drawing becomes a precise three-dimensional model, so every millimetre is right before a single gram of gold is cut."
+            "text": "The drawing becomes a precise three-dimensional model, so every millimetre is right before a single gram of gold is cut.",
+            "image_asset": ""
           }
         },
         "step_making": {
           "type": "step",
           "settings": {
             "title": "The making",
-            "text": "Skilled makers in our workshop build the piece by hand, the way the trade has done it in our family since 1957."
+            "text": "Skilled makers in our workshop build the piece by hand, the way the trade has done it in our family since 1957.",
+            "image_asset": ""
           }
         },
         "step_setting": {
           "type": "step",
           "settings": {
             "title": "The setting",
-            "text": "Stone setters place each stone by hand and check it twice, because a setting is what keeps a piece safe for a lifetime."
+            "text": "Stone setters place each stone by hand and check it twice, because a setting is what keeps a piece safe for a lifetime.",
+            "image_asset": ""
           }
         },
         "step_polish": {
           "type": "step",
           "settings": {
             "title": "The polish",
-            "text": "A final hand polish and a last inspection, then your piece is packed and sent to you."
+            "text": "A final hand polish and a last inspection, then your piece is packed and sent to you.",
+            "image_asset": ""
           }
         },
         "feature_team": {
@@ -102,8 +117,13 @@
             "eyebrow": "Our global team",
             "title": "Designed in the UK, made by hands we know",
             "text": "<p>As Eden Raine has grown, so has our team. Our designs are created in the UK, and our production is brought to life by skilled artisans in our workshop in India and our trusted partners in Dubai. From expert makers to stone setters, each person brings their own craft to make sure every piece meets the same standard.</p>",
+            "image": "shopify://shop_images/ChatGPT_Image_6_Nov_2026_14_32_14.png",
             "image_asset": "lifestyle-bracelet.jpg",
-            "flip": false
+            "flip": false,
+            "button_label": "",
+            "button_link": "",
+            "button_background": "#171714",
+            "button_text_color": "#ffffff"
           }
         },
         "feature_future": {
@@ -112,10 +132,11 @@
             "eyebrow": "Our future",
             "title": "A family tradition, still being written",
             "text": "<p>With decades of experience and a commitment to quality, we keep innovating - combining our family's rich tradition with new designs and techniques. We look forward to creating more timeless, handmade jewellery that holds a special place in your life.</p>",
+            "image": "shopify://shop_images/47de2f82dd11f3eef100aa52cec45bfe.jpg",
             "image_asset": "lifestyle-earring.jpg",
             "flip": false,
             "button_label": "Explore the collection",
-            "button_link": "/collections/all",
+            "button_link": "/collections/engagement-rings",
             "button_background": "#171714",
             "button_text_color": "#ffffff"
           }
@@ -149,7 +170,7 @@
         "hero_focal": "center",
         "hero_height": 560,
         "hero_height_mobile": 420,
-        "hero_radius": 20,
+        "hero_radius": 0,
         "hero_heading_size": 56,
         "hero_text_size": 18,
         "hero_overlay": 50,
@@ -172,6 +193,7 @@
         "story_eyebrow": "A letter from our founder",
         "story_heading": "Jewellery has always been more than a passion for me",
         "story_text": "<p>It is part of my family's legacy. Growing up in a family of jewellers since 1957, I was surrounded by the art of creating timeless pieces. But when my daughter, Eden, was born, she became my true inspiration to build something special. I wanted to design jewellery that connects people to their cherished memories and moments, just as I feel connected to her.</p><p>That is how Eden Raine was born. We combine traditional handmade techniques with modern CAD design, ensuring that each piece is hand crafted with precision and care. From the initial sketch to the final polish, every step of our process is a blend of artistry and innovation.</p>",
+        "story_image": "shopify://shop_images/ChatGPT_Image_6_Nov_2026_14_31_56.png",
         "story_image_asset": "lifestyle-heart-necklace.jpg",
         "story_image_theme_asset": "",
         "story_image_alt": "",
@@ -212,6 +234,8 @@
         "show_features": true,
         "features_alternate": true,
         "feature_image_ratio": "1 / 1",
+        "feature_text_width": 46,
+        "feature_width": 1400,
         "show_page_content": false,
         "content_measure": true,
         "show_cta": true,
@@ -222,7 +246,7 @@
         "cta_image_theme_asset": "",
         "cta_overlay": 45,
         "cta_overlay_color": "#171714",
-        "cta_background": "#F4F4F0",
+        "cta_background": "#f4f4f0",
         "cta_text_color": "#ffffff",
         "cta_heading_size": 44,
         "cta_button_label": "Shop the collection",
@@ -244,7 +268,8 @@
         "accent_color": "#ead9d1",
         "card_background": "#fdf9f7",
         "card_border_color": "#ebe4df",
-        "corner_radius": 20,
+        "corner_radius": 0,
+        "content_width": 1400,
         "grid_gap": 24,
         "band_gap": 72,
         "padding_top": 0,

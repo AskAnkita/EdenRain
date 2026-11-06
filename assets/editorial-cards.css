@@ -595,14 +595,31 @@
   border-radius: 0;
 }
 
-/* Keep the jewellery-care photos compact without changing other guide pages. */
+/*
+  Keep the jewellery-care photos compact without changing other guide pages.
+
+  The picture used to be held to 78% of its own column and centred in it. That
+  kept it compact, but it also left the words running to the edge of the band on
+  one side while the picture stopped 95px short on the other - and because the
+  chapters alternate, the short side swapped as you scrolled down the page. The
+  band is narrowed instead: both tracks fill it, so every chapter starts and
+  ends on the same two lines, and the picture comes out the same size it was.
+
+  The band is held to the same line as the about page rather than a round
+  number of its own: .about-page .ab-shell caps at 140rem and spends 2.4rem of
+  that on its gutters, so 135.2rem is where its words and pictures actually
+  start and stop. At 120rem the guide sat ~76px further in on each side, which
+  read as a wider margin than the rest of the site rather than a choice.
+*/
 .guide-page--jewellery-care .gp-split {
+  max-width: 135.2rem;
+  margin-inline: auto;
   margin-block: 3.2rem;
+  grid-template-columns: var(--gp-care-text-col, 43%) minmax(0, 1fr);
 }
 
-.guide-page--jewellery-care .gp-split__media {
-  width: 78%;
-  justify-self: center;
+.guide-page--jewellery-care .gp-split--flipped {
+  grid-template-columns: minmax(0, 1fr) var(--gp-care-text-col, 43%);
 }
 
 .guide-page--jewellery-care .gp-split__media img {

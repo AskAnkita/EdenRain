@@ -140,12 +140,17 @@
     "category_tiles": {
       "type": "category-tiles",
       "settings": {
+        "items": "Engagement Rings, Wedding Bands, Necklaces, Earrings, Bracelets",
         "menu": "category",
         "heading": "Shop the collection",
         "width": "page",
+        "fit_all": true,
         "per_row": 5,
         "min_tile_width": 240,
         "ratio": "3 / 4",
+        "tile_height": 0,
+        "show_progress": false,
+        "label_color": "#ffffff",
         "color_scheme": "scheme-1",
         "padding_top": 0,
         "padding_bottom": 88
