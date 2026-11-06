@@ -71,6 +71,35 @@ node scripts/shopify/tag-products.mjs --apply
 node scripts/shopify/setup-store.mjs --apply --update-rules
 ```
 
+## Ring prices
+
+`ring-prices.csv` is the client's "Eden Raine Ring Price" sheet, transcribed as sent — one row per
+style code, four metal tiers. It is the retail source of truth for rings; `price-list.csv` and the
+packing list in the parent folder are **cost** sheets and must not be used to price a ring.
+
+```bash
+node scripts/shopify/sync-ring-prices.mjs                  # preview: every price that would change
+node scripts/shopify/sync-ring-prices.mjs --verbose        # ...and every variant, not just a sample
+node scripts/shopify/sync-ring-prices.mjs --apply          # write them
+node scripts/shopify/sync-ring-prices.mjs --only=AJLR134   # one style code, to check a row
+node scripts/shopify/sync-ring-prices.mjs --skip-archived  # live products only
+```
+
+A variant finds its price from its own SKU (`AJLR300-G18K-Y-7.5`), never from its product — that is
+what lets a merged shape product, which holds a different style code per centre-stone shape, take a
+different price per shape out of one sheet. The SKU's metal segment picks the column, and the Size
+option adds the store's standing ladder: size 5 is the sheet price, each half size adds 1.25%, and
+size 9 is +10%. Prices round down to a whole $10.
+
+The sheet's fourth tier is **9K Gold** — 9 carat is what is sold in the UK — while the store's
+option values still read "10k" and the SKUs still read `G10K`. The 9K price goes on that tier.
+
+A code the sheet shows as `#N/A` has no price and is skipped, so its variants stay at $0 (AJLR135,
+AJLR137, AJLR302, AJLR349). The theme reads $0 as "no price yet", not as free: the product card
+falls back to the lowest variant that does have a price, and the product page shows "Contact us for
+price" with the buy button disabled. Every variant's current price goes to `backups/` before the
+first write.
+
 ## Undo the menu / match collection pictures to the homepage
 
 ```bash
