@@ -38,7 +38,7 @@ const HANDLE = 'er-sizing';
 const LOGO = 'https://cdn.shopify.com/s/files/1/0423/9668/0352/files/Eden_Raine_Logo_Full.png?v=1615321151';
 const SIZER_PDF = 'https://cdn.shopify.com/s/files/1/0423/9668/0352/files/er_Ring_sizer.pdf?v=1624288622';
 // The helpline the theme prints in the header and on the contact page.
-const PHONE = '+44 (0) 203 554 887';
+const PHONE = '+44 7879 914339';
 
 // Plain mistakes in the live page copy. Left-hand side must match exactly or the run
 // reports it, so a fixed page stops being patched here silently.

@@ -1248,8 +1248,23 @@
           </a>
           <div class="signature-editorial__product-info">
             <h3 class="signature-editorial__product-title"><a href="{{ tile_product.url }}">{{ tile_product.title | escape }}</a></h3>
-            {%- if tile_product.price_min > 0 -%}
-              <p class="signature-editorial__product-price">From {{ tile_product.price_min | money }}</p>
+            {%- liquid
+              # price_min is the minimum across every variant, so a shape the client has not
+              # priced yet (sitting at 0) would hide the price on an otherwise priced tile.
+              # Fall back to the lowest variant that has a real price.
+              assign tile_price = tile_product.price_min
+              if tile_price == 0 and tile_product.price_max > 0
+                for tile_variant in tile_product.variants
+                  if tile_variant.price > 0
+                    if tile_price == 0 or tile_variant.price < tile_price
+                      assign tile_price = tile_variant.price
+                    endif
+                  endif
+                endfor
+              endif
+            -%}
+            {%- if tile_price > 0 -%}
+              <p class="signature-editorial__product-price">From {{ tile_price | money }}</p>
             {%- endif -%}
             <a class="signature-editorial__product-action" href="{{ tile_product.url }}">View product</a>
           </div>

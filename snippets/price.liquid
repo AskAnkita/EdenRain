@@ -25,6 +25,29 @@
   assign price = target.price | default: 1999
   assign price_min = product.price_min
   assign price_max = product.price_max
+
+  comment
+    A merged shape product carries several style codes at once (one centre-stone shape
+    each), and a shape the client has not priced yet sits at 0. Shopify's product.price
+    is the minimum across every variant, so one unpriced shape makes the whole card read
+    "From 0.00" even though seven shapes have real prices. Fall back to the lowest
+    variant that actually has a price. The loop only runs for a product whose minimum is
+    0 while something in it is priced, so normal products never pay for it.
+  endcomment
+  if target == product and price == 0 and product.price_max > 0
+    assign lowest_real_price = 0
+    for price_variant in product.variants
+      if price_variant.price > 0
+        if lowest_real_price == 0 or price_variant.price < lowest_real_price
+          assign lowest_real_price = price_variant.price
+        endif
+      endif
+    endfor
+    if lowest_real_price > 0
+      assign price = lowest_real_price
+      assign price_min = lowest_real_price
+    endif
+  endif
   assign available = target.available | default: false
   assign money_price = price | money
   assign money_price_min = price_min | money
@@ -37,6 +60,14 @@
 
   if target == product and product.price_varies
     assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+  endif
+
+  comment
+    A piece the client has not priced yet sits at 0. "0.00" reads as free, so say what is
+    actually true instead. The buy button is disabled to match (blocks/buy-buttons.liquid).
+  endcomment
+  if price == 0
+    assign money_price = 'products.product.price_on_request' | t
   endif
 
   assign sale_price_color = settings.sale_price_color

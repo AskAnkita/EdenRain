@@ -35,6 +35,15 @@
     assign price = price | money
     assign compare_at_price = compare_at_price | money
   endif
+
+  comment
+    A variant the client has not priced yet sits at 0, and a money-filtered 0 reads as free.
+    Say what is actually true; blocks/buy-buttons.liquid disables the button to match.
+  endcomment
+  if product_resource != blank and selected_variant.price == 0
+    assign price = 'products.product.price_on_request' | t
+    assign show_compare_price = false
+  endif
 -%}
 
 <div 

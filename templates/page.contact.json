@@ -1144,7 +1144,7 @@
                   "name": "t:names.button",
                   "settings": {
                     "label": "CALL US",
-                    "link": "tel:+44203554887",
+                    "link": "tel:+447879914339",
                     "open_in_new_tab": false,
                     "show_icon_button": false,
                     "icon": "arrow_right",
@@ -1322,7 +1322,7 @@
                       "type": "text",
                       "name": "t:names.text",
                       "settings": {
-                        "text": "<p><a href=\"tel:+44203554887\" title=\"Call Eden Raine\">+44 (0) 203 554 887</a></p>",
+                        "text": "<p><a href=\"tel:+447879914339\" title=\"Call Eden Raine\">+44 7879 914339</a></p>",
                         "collection_description_only": false,
                         "collapse_text": false,
                         "typing_text": false,

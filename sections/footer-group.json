@@ -265,7 +265,7 @@
           "type": "text",
           "settings": {
             "heading": "Call us",
-            "text": "<p><a href=\"tel:+44203554887\" title=\"tel:+44203554887\">+44 (0) 203 554 887</a></p>"
+            "text": "<p><a href=\"tel:+447879914339\" title=\"tel:+447879914339\">+44 7879 914339</a></p>"
           }
         }
       },
@@ -1291,7 +1291,7 @@
                           "type": "text",
                           "name": "Text",
                           "settings": {
-                            "text": "<p><a href=\"tel:+44203554887\" title=\"tel:+44203554887\">+44 (0) 203 554 887</a></p>",
+                            "text": "<p><a href=\"tel:+447879914339\" title=\"tel:+447879914339\">+44 7879 914339</a></p>",
                             "collection_description_only": false,
                             "collapse_text": false,
                             "typing_text": false,
@@ -3170,7 +3170,7 @@
                           "type": "text",
                           "name": "Text",
                           "settings": {
-                            "text": "<p><a href=\"tel:+44203554887\" title=\"tel:+44203554887\">+44 (0) 203 554 887</a></p>",
+                            "text": "<p><a href=\"tel:+447879914339\" title=\"tel:+447879914339\">+44 7879 914339</a></p>",
                             "collection_description_only": false,
                             "collapse_text": false,
                             "typing_text": false,

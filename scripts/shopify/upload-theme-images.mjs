@@ -82,6 +82,8 @@ const DEFAULT_FILES = [
   // Guides and editorial
   'gemstones-hero.jpg',
   'gifting-banner-background.jpg',
+  'gifting-perfect-gift.jpg',
+  'gifting-perfect-gift-mobile.jpg',
   'ring-size-guide-original.png',
   // Lifestyle photography
   'lifestyle-bracelet.jpg',

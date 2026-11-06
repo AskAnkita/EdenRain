@@ -1,65 +1,400 @@
+{% comment %}
+  Gifting banner - the photograph on one side, the invitation to shop it on the other.
+
+  The band is one full-bleed photograph with a panel of content held over its empty half: a
+  small heading, the heading proper, a line of copy, up to four products from a collection and
+  one button. The photography (assets/gifting-perfect-gift.jpg) carries the gift box and the
+  rings across its left-hand side and leaves the marble clear on the right, so the content sits
+  on the right by default and "Content side" flips it for a picture shot the other way round.
+
+  Below 990px the picture stops being a background and goes on top at its own height, with the
+  content underneath it on the section's background colour. The band stacks there rather than at
+  the theme's usual 750px because the empty half of a 3:1 photograph is not wide enough to hold
+  a row of product cards on a tablet: the text ends up over the gift box. The smaller picture is
+  its own file (a left-hand crop of the same shot), so the box and the rings fill the frame once
+  the empty half is no longer needed.
+
+  Buttons come from assets/eden-actions.css, which names .gifting-banner__button in the one
+  call-to-action family and owns the hover for all of them; this section only says which two
+  colours the shared sweep crosses between.
+
+  Every restylable setting is written onto the section element as a CSS custom property, with
+  the stylesheet's own value as the fallback, so a setting left at "use the default" (a cleared
+  colour, a size of 0) writes nothing at all.
+{% endcomment %}
+
 {%- liquid
+  assign transparent = 'rgba(0,0,0,0)'
+
   assign gifting_collection = section.settings.collection | default: collections['best-sellers']
+
+  assign image = section.settings.image
+  assign desktop_asset = 'gifting-perfect-gift.jpg'
+  assign mobile_asset = 'gifting-perfect-gift-mobile.jpg'
+
+  comment
+    The small screens take the mobile picture if one was picked, and the desktop picture if one
+    was picked and the mobile one was not - a shop that swaps the photograph in the editor and
+    sets only the one field should not be left with the old crop on a phone. Only when neither
+    is picked does it fall back to this theme's own cropped file.
+  endcomment
+  assign mobile_image = section.settings.mobile_image | default: image
+
+  comment
+    A template saved before a setting existed has no value for it, so sizes are coerced with
+    'plus: 0' and treated as "keep the stylesheet default" at 0. The paddings cannot use that
+    sentinel - 0 is a real padding - and are gated by their own checkbox instead.
+  endcomment
+  assign heading_size = section.settings.heading_size | plus: 0
+  assign heading_size_mobile = section.settings.heading_size_mobile | plus: 0
+  assign heading_tracking = section.settings.heading_tracking | plus: 0
+  assign eyebrow_size = section.settings.eyebrow_size | plus: 0
+  assign text_size = section.settings.text_size | plus: 0
+  assign card_text_size = section.settings.card_text_size | plus: 0
+  assign band_height = section.settings.band_height | plus: 0
+  assign content_share = section.settings.content_share | plus: 0
+  assign measure = section.settings.text_measure | plus: 0
+
+  assign columns = section.settings.columns | plus: 0
+  if columns <= 0
+    assign columns = 3
+  endif
+  assign columns_mobile = section.settings.columns_mobile | plus: 0
+  if columns_mobile <= 0
+    assign columns_mobile = 2
+  endif
+
+  comment
+    The focal point is a real percentage, so 0 means "the left edge", not "use the default"; it
+    falls back only when the template predates the setting. The shot is framed left, so the
+    default pins the crop to the left edge rather than the centre.
+  endcomment
+  assign focal_x = section.settings.focal_x | default: 0
+  assign focal_y = section.settings.focal_y | default: 50
+
+  assign button_label = section.settings.button_label | strip
+  assign button_link = section.settings.button_link | default: gifting_collection.url
 -%}
+
+{%- capture section_styles -%}
+  {%- if section.settings.section_background != blank and section.settings.section_background != transparent -%}--gift-section-bg: {{ section.settings.section_background }};{%- endif -%}
+  {%- if section.settings.heading_color != blank and section.settings.heading_color != transparent -%}--gift-heading-color: {{ section.settings.heading_color }};{%- endif -%}
+  {%- if section.settings.eyebrow_color != blank and section.settings.eyebrow_color != transparent -%}--gift-eyebrow-color: {{ section.settings.eyebrow_color }};{%- endif -%}
+  {%- if section.settings.text_color != blank and section.settings.text_color != transparent -%}--gift-text-color: {{ section.settings.text_color }};{%- endif -%}
+  {%- if section.settings.card_background != blank -%}--gift-card-bg: {{ section.settings.card_background }};{%- endif -%}
+  {%- if section.settings.card_text_color != blank and section.settings.card_text_color != transparent -%}--gift-card-color: {{ section.settings.card_text_color }};{%- endif -%}
+
+  {%- comment -%}
+    The three pairs the shared sweep in eden-actions.css crosses between: what the button looks
+    like at rest, and what it looks like hovered. Nothing here writes a :hover of its own.
+  {%- endcomment -%}
+  {%- if section.settings.button_background != blank and section.settings.button_background != transparent -%}--gift-button-fill: {{ section.settings.button_background }};{%- endif -%}
+  {%- if section.settings.button_text_color != blank and section.settings.button_text_color != transparent -%}--gift-button-ink: {{ section.settings.button_text_color }};{%- endif -%}
+  {%- if section.settings.button_border_color != blank and section.settings.button_border_color != transparent -%}--gift-button-edge: {{ section.settings.button_border_color }};{%- endif -%}
+  {%- if section.settings.button_background_hover != blank and section.settings.button_background_hover != transparent -%}--gift-button-fill-hover: {{ section.settings.button_background_hover }};{%- endif -%}
+  {%- if section.settings.button_text_color_hover != blank and section.settings.button_text_color_hover != transparent -%}--gift-button-ink-hover: {{ section.settings.button_text_color_hover }};{%- endif -%}
+
+  {%- if heading_size > 0 -%}--gift-heading-size: {{ heading_size }}px;{%- endif -%}
+  {%- if heading_size_mobile > 0 -%}--gift-heading-size-mobile: {{ heading_size_mobile }}px;{%- endif -%}
+  {%- if heading_tracking > 0 -%}--gift-heading-tracking: {{ heading_tracking | divided_by: 100.0 }}em;{%- endif -%}
+  {%- unless section.settings.uppercase_heading -%}--gift-heading-case: none;{%- endunless -%}
+  {%- if eyebrow_size > 0 -%}--gift-eyebrow-size: {{ eyebrow_size }}px;{%- endif -%}
+  {%- if text_size > 0 -%}--gift-text-size: {{ text_size }}px;{%- endif -%}
+  {%- if card_text_size > 0 -%}--gift-card-text-size: {{ card_text_size }}px;{%- endif -%}
+  {%- if measure > 0 -%}--gift-measure: {{ measure }}ch;{%- endif -%}
+
+  {%- if band_height > 0 -%}--gift-band-height: {{ band_height }}px;{%- endif -%}
+  {%- if content_share > 0 -%}--gift-content-share: {{ content_share }}%;{%- endif -%}
+  --gift-focal-x: {{ focal_x }}%;
+  --gift-focal-y: {{ focal_y }}%;
+  --gift-scrim: {{ section.settings.scrim_opacity | divided_by: 100.0 }};
+  --gift-grid: repeat({{ columns }}, minmax(0, 1fr));
+  --gift-grid-mobile: repeat({{ columns_mobile }}, minmax(0, 1fr));
+
+  {%- if section.settings.custom_padding -%}
+    --gift-pad-top: {{ section.settings.padding_top }}px;
+    --gift-pad-bottom: {{ section.settings.padding_bottom }}px;
+    --gift-pad-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --gift-pad-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+  {%- endif -%}
+{%- endcapture -%}
+
+<section
+  id="eden-quote-{{ section.id }}"
+  class="eden-quote force-full-width eden-quote--content-{{ section.settings.content_side }} eden-quote--{{ section.settings.text_alignment }}"
+  style="{{ section_styles | strip_newlines | strip }}"
+  {{ section.shopify_attributes }}
+>
+  <div class="gifting-banner__media">
+    <picture>
+      {%- if mobile_image != blank -%}
+        <source
+          media="(max-width: 989px)"
+          srcset="
+            {{ mobile_image | image_url: width: 750 }} 750w,
+            {{ mobile_image | image_url: width: 1100 }} 1100w,
+            {{ mobile_image | image_url: width: 1400 }} 1400w
+          "
+          sizes="100vw"
+        >
+      {%- else -%}
+        <source
+          media="(max-width: 989px)"
+          srcset="
+            {% render 'image-source', file: mobile_asset, width: 750 %} 750w,
+            {% render 'image-source', file: mobile_asset, width: 1100 %} 1100w,
+            {% render 'image-source', file: mobile_asset, width: 1400 %} 1400w
+          "
+          sizes="100vw"
+        >
+      {%- endif -%}
+
+      {%- if image != blank -%}
+        {{
+          image
+          | image_url: width: 2400
+          | image_tag:
+            loading: 'lazy',
+            widths: '750, 1100, 1500, 1800, 2200, 2400',
+            sizes: '100vw',
+            alt: '',
+            class: 'gifting-banner__background'
+        }}
+      {%- else -%}
+        <img
+          class="gifting-banner__background"
+          src="{% render 'image-source', file: desktop_asset, width: 2172 %}"
+          srcset="
+            {% render 'image-source', file: desktop_asset, width: 750 %} 750w,
+            {% render 'image-source', file: desktop_asset, width: 1100 %} 1100w,
+            {% render 'image-source', file: desktop_asset, width: 1500 %} 1500w,
+            {% render 'image-source', file: desktop_asset, width: 1800 %} 1800w,
+            {% render 'image-source', file: desktop_asset, width: 2172 %} 2172w
+          "
+          sizes="100vw"
+          alt=""
+          loading="lazy"
+          width="2172"
+          height="724"
+        >
+      {%- endif -%}
+    </picture>
+  </div>
+
+  <div class="gifting-banner__content">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="gifting-banner__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.heading != blank -%}
+      <h2 class="gifting-banner__heading">{{ section.settings.heading | escape }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.text != blank -%}
+      <div class="gifting-banner__text rte">{{ section.settings.text }}</div>
+    {%- endif -%}
+
+    {%- if gifting_collection != blank and gifting_collection.products_count > 0 -%}
+      <ul class="gifting-banner__products" aria-label="Featured gifts">
+        {%- for product in gifting_collection.products limit: columns -%}
+          <li class="gifting-banner__product">
+            <a class="gifting-banner__product-link" href="{{ product.url }}">
+              <span class="gifting-banner__product-image-wrap">
+                {%- if product.featured_image != blank -%}
+                  <img
+                    class="gifting-banner__product-image"
+                    src="{{ product.featured_image | image_url: width: 700 }}"
+                    srcset="{{ product.featured_image | image_url: width: 350 }} 350w, {{ product.featured_image | image_url: width: 700 }} 700w"
+                    sizes="(max-width: 989px) 45vw, 16vw"
+                    alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                    loading="lazy"
+                    width="700"
+                    height="574"
+                  >
+                {%- endif -%}
+              </span>
+              <span class="gifting-banner__product-title">{{ product.title | escape }}</span>
+              {%- if section.settings.show_price -%}
+                <span class="gifting-banner__product-price">{{ product.price | money }}</span>
+              {%- endif -%}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if button_label != blank and button_link != blank -%}
+      <a class="gifting-banner__button" href="{{ button_link }}">{{ button_label | escape }}</a>
+    {%- endif -%}
+  </div>
+</section>
 
 {%- style -%}
   #eden-quote-{{ section.id }} {
+    --gift-section-bg: #ffffff;
+    --gift-heading-color: #171310;
+    --gift-eyebrow-color: #6c6259;
+    --gift-text-color: #3f3932;
+    --gift-card-bg: rgba(255, 255, 255, 0.92);
+    --gift-card-color: #171310;
+    --gift-button-fill: transparent;
+    --gift-button-ink: #171310;
+    --gift-button-edge: #171310;
+    --gift-button-fill-hover: #171310;
+    --gift-button-ink-hover: #ffffff;
+    --gift-heading-size: clamp(25px, 2.5vw, 40px);
+    --gift-heading-size-mobile: clamp(22px, 6vw, 30px);
+    --gift-heading-tracking: 0.045em;
+    --gift-heading-case: uppercase;
+    --gift-eyebrow-size: 11px;
+    --gift-text-size: clamp(13px, 1.05vw, 15px);
+    --gift-card-text-size: 12px;
+    --gift-measure: 42ch;
+    --gift-band-height: clamp(300px, 33.3vw, 620px);
+    --gift-content-share: 42%;
+    --gift-focal-x: 0%;
+    --gift-focal-y: 50%;
+    --gift-scrim: 0;
+    --gift-grid: repeat(3, minmax(0, 1fr));
+    --gift-grid-mobile: repeat(2, minmax(0, 1fr));
+    --gift-pad-top: 54px;
+    --gift-pad-bottom: 54px;
+    --gift-pad-top-mobile: 22px;
+    --gift-pad-bottom-mobile: 28px;
+    --gift-pad-inline-mobile: clamp(16px, 3vw, 28px);
+
     position: relative;
-    display: grid;
-    grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+    display: flex;
     align-items: center;
-    gap: clamp(24px, 4vw, 64px);
+    justify-content: flex-end;
     width: 100%;
-    min-height: clamp(400px, 37vw, 560px);
+    min-height: var(--gift-band-height);
     margin-block: 0 !important;
-    padding: 54px clamp(28px, 6vw, 96px);
+    padding: var(--gift-pad-top) clamp(28px, 6vw, 96px) var(--gift-pad-bottom);
     overflow: hidden;
+    background: var(--gift-section-bg);
     isolation: isolate;
   }
 
-  #eden-quote-{{ section.id }} .gifting-banner__background {
+  #eden-quote-{{ section.id }}.eden-quote--content-left { justify-content: flex-start; }
+
+  #eden-quote-{{ section.id }} .gifting-banner__media {
     position: absolute;
-    z-index: -1;
+    z-index: -2;
     inset: 0;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__media picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__background {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
+    object-position: var(--gift-focal-x) var(--gift-focal-y);
   }
 
-  #eden-quote-{{ section.id }} .gifting-banner__heading {
-    max-width: 440px;
-    margin: 0;
-    color: #171310;
-    font-family: var(--font-heading--family, Georgia, serif);
-    font-size: clamp(25px, 2.5vw, 40px);
-    font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: 0.045em;
+  /*
+    A wash under the content only, for a photograph whose empty half is busier than this one's.
+    It is transparent at 0, which is the default, so it costs nothing until it is asked for.
+  */
+  #eden-quote-{{ section.id }}::after {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: linear-gradient(
+      to left,
+      rgba(255, 255, 255, var(--gift-scrim)) 0%,
+      rgba(255, 255, 255, var(--gift-scrim)) 30%,
+      transparent 72%
+    );
+    content: '';
+    pointer-events: none;
+  }
+
+  #eden-quote-{{ section.id }}.eden-quote--content-left::after { transform: scaleX(-1); }
+
+  #eden-quote-{{ section.id }} .gifting-banner__content {
+    display: flex;
+    width: clamp(300px, var(--gift-content-share), 100%);
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  #eden-quote-{{ section.id }}.eden-quote--center .gifting-banner__content {
+    align-items: center;
+    text-align: center;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__eyebrow {
+    margin: 0 0 14px;
+    color: var(--gift-eyebrow-color);
+    font-family: var(--font-body--family, sans-serif);
+    font-size: var(--gift-eyebrow-size);
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    line-height: 1.4;
     text-transform: uppercase;
   }
 
+  #eden-quote-{{ section.id }} .gifting-banner__heading {
+    max-width: 100%;
+    margin: 0;
+    color: var(--gift-heading-color);
+    font-family: var(--font-heading--family, Georgia, serif);
+    font-size: var(--gift-heading-size);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: var(--gift-heading-tracking);
+    text-transform: var(--gift-heading-case);
+    text-wrap: balance;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__text {
+    max-width: var(--gift-measure);
+    margin-top: 14px;
+    color: var(--gift-text-color);
+    font-family: var(--font-body--family, sans-serif);
+    font-size: var(--gift-text-size);
+    line-height: 1.65;
+    letter-spacing: 0.02em;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__text > :first-child { margin-top: 0; }
+  #eden-quote-{{ section.id }} .gifting-banner__text > :last-child { margin-bottom: 0; }
+
   #eden-quote-{{ section.id }} .gifting-banner__products {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(10px, 1.5vw, 22px);
-    align-self: end;
-    margin: 110px 0 0;
+    width: 100%;
+    grid-template-columns: var(--gift-grid);
+    gap: clamp(10px, 1.1vw, 18px);
+    margin: clamp(18px, 2.2vw, 30px) 0 0;
     padding: 0;
     list-style: none;
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__product {
     min-width: 0;
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--gift-card-bg);
+    color: var(--gift-card-color);
     text-align: center;
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__product-link {
     display: block;
-    padding: 12px 12px 14px;
+    padding: 10px 10px 12px;
     color: inherit;
     text-decoration: none;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__product-link:focus-visible {
+    outline: 2px solid currentcolor;
+    outline-offset: 2px;
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__product-image-wrap {
@@ -75,6 +410,13 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+    transition: transform 0.5s var(--cta-sweep-easing, ease);
+  }
+
+  @media (hover: hover) {
+    #eden-quote-{{ section.id }} .gifting-banner__product-link:hover .gifting-banner__product-image {
+      transform: scale(1.04);
+    }
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__product-title {
@@ -83,107 +425,140 @@
     margin: 10px 0 4px;
     overflow: hidden;
     font-family: var(--font-body--family, sans-serif);
-    font-size: 12px;
+    font-size: var(--gift-card-text-size);
     line-height: 1.3;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__product-price {
+    display: block;
     margin: 0;
     font-family: var(--font-body--family, sans-serif);
-    font-size: 12px;
+    font-size: var(--gift-card-text-size);
     line-height: 1.3;
+  }
+
+  /*
+    The paint and the hover both come from assets/eden-actions.css, which names
+    .gifting-banner__button in the one call-to-action family. This only says which two
+    colours the shared sweep crosses between.
+  */
+  #eden-quote-{{ section.id }} .gifting-banner__button {
+    display: inline-flex;
+    min-width: 190px;
+    align-items: center;
+    justify-content: center;
+    margin-top: clamp(18px, 2vw, 26px);
+    padding: 12px 28px;
+    border-width: 1px;
+    border-style: solid;
+    font-family: var(--font-body--family, sans-serif);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-decoration: none;
+    text-transform: uppercase;
+    --cta-fill: var(--gift-button-fill);
+    --cta-ink: var(--gift-button-ink);
+    --cta-edge: var(--gift-button-edge);
+    --cta-fill-hover: var(--gift-button-fill-hover);
+    --cta-ink-hover: var(--gift-button-ink-hover);
+    --cta-edge-hover: var(--gift-button-fill-hover);
   }
 
   #eden-quote-{{ section.id }} + .section { margin-block-start: 0 !important; }
 
-  @media screen and (max-width: 749px) {
+  /*
+    Just above the stacking width the panel has to give ground: the photograph's subject takes
+    the same share of the frame however wide the screen is, so a panel held at its full width
+    starts to sit over the rings. It takes its own width back above 1365px.
+  */
+  @media screen and (min-width: 990px) and (max-width: 1365px) {
+    #eden-quote-{{ section.id }} {
+      padding-right: clamp(20px, 3.5vw, 44px);
+
+      /*
+        The crop grows with the band, and the band grows with the panel, so deep spacing here
+        zooms the photograph until the rings reach under the cards. The spacing is capped
+        rather than replaced, so a tighter setting is still honoured.
+      */
+      padding-top: min(var(--gift-pad-top), 24px);
+      padding-bottom: min(var(--gift-pad-bottom), 24px);
+    }
+
+    #eden-quote-{{ section.id }} .gifting-banner__content {
+      width: clamp(280px, calc(var(--gift-content-share) - 4%), 100%);
+    }
+  }
+
+  @media screen and (max-width: 989px) {
     #eden-quote-{{ section.id }} {
       display: block;
       min-height: 0;
-      padding: 0 16px 24px;
-      overflow: hidden;
-      background: #fff;
+      padding: 0 var(--gift-pad-inline-mobile) var(--gift-pad-bottom-mobile);
+    }
+
+    #eden-quote-{{ section.id }} .gifting-banner__media {
+      position: relative;
+      inset: auto;
+      width: calc(100% + (2 * var(--gift-pad-inline-mobile)));
+      margin-inline: calc(var(--gift-pad-inline-mobile) * -1);
     }
 
     #eden-quote-{{ section.id }} .gifting-banner__background {
-      position: relative;
-      inset: auto;
-      width: calc(100% + 32px);
-      max-width: none;
       height: auto;
-      margin-inline: -16px;
-      object-fit: contain;
+      object-fit: cover;
     }
 
-    #eden-quote-{{ section.id }} .gifting-banner__heading {
-      position: absolute;
-      top: 10%;
-      left: 7%;
-      width: 44%;
-      font-size: clamp(16px, 5vw, 23px);
-      letter-spacing: 0.025em;
+    #eden-quote-{{ section.id }}::after { content: none; }
+
+    #eden-quote-{{ section.id }} .gifting-banner__content {
+      width: 100%;
+      max-width: 820px;
+      align-items: center;
+      margin-inline: auto;
+      padding-top: var(--gift-pad-top-mobile);
+      text-align: center;
     }
+
+    #eden-quote-{{ section.id }} .gifting-banner__text { max-width: 52ch; }
+  }
+
+  /*
+    A tablet gets the stacked shape above but keeps the desktop row of cards and the desktop
+    type: "products per row on mobile" is for a phone, where three cards across would be
+    thumbnails.
+  */
+  @media screen and (max-width: 749px) {
+    #eden-quote-{{ section.id }} .gifting-banner__heading { font-size: var(--gift-heading-size-mobile); }
+    #eden-quote-{{ section.id }} .gifting-banner__eyebrow { margin-bottom: 10px; font-size: 9px; }
+    #eden-quote-{{ section.id }} .gifting-banner__text { margin-top: 10px; font-size: 13px; }
 
     #eden-quote-{{ section.id }} .gifting-banner__products {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: var(--gift-grid-mobile);
       gap: 10px;
-      margin: 14px 0 0;
+      margin-top: 16px;
     }
+
+    {%- if columns_mobile == 2 and columns == 3 -%}
+      /*
+        Three cards in a two-up grid leave one on its own on the second row; it is centred
+        rather than left hanging under the first column.
+      */
+      #eden-quote-{{ section.id }} .gifting-banner__product:last-child:nth-child(odd) {
+        width: calc(50% - 5px);
+        grid-column: 1 / -1;
+        justify-self: center;
+      }
+    {%- endif -%}
 
     #eden-quote-{{ section.id }} .gifting-banner__product-link { padding: 8px; }
     #eden-quote-{{ section.id }} .gifting-banner__product-title,
     #eden-quote-{{ section.id }} .gifting-banner__product-price { font-size: 11px; }
+    #eden-quote-{{ section.id }} .gifting-banner__button { width: 100%; margin-top: 18px; }
   }
 {%- endstyle -%}
-
-<section id="eden-quote-{{ section.id }}" class="eden-quote force-full-width">
-  <img
-    class="gifting-banner__background"
-    src="{% render 'image-source', file: 'gifting-perfect-gift.png', width: 2042 %}"
-    srcset="
-      {% render 'image-source', file: 'gifting-perfect-gift.png', width: 750 %} 750w,
-      {% render 'image-source', file: 'gifting-perfect-gift.png', width: 1100 %} 1100w,
-      {% render 'image-source', file: 'gifting-perfect-gift.png', width: 1600 %} 1600w,
-      {% render 'image-source', file: 'gifting-perfect-gift.png', width: 2042 %} 2042w
-    "
-    sizes="100vw"
-    alt=""
-    loading="lazy"
-    width="851"
-    height="315"
-  >
-
-  <h2 class="gifting-banner__heading">Find the perfect gift</h2>
-
-  {%- if gifting_collection != blank and gifting_collection.products_count > 0 -%}
-    <ul class="gifting-banner__products" aria-label="Featured gifts">
-      {%- for product in gifting_collection.products limit: 3 -%}
-        <li class="gifting-banner__product">
-          <a class="gifting-banner__product-link" href="{{ product.url }}">
-            <span class="gifting-banner__product-image-wrap">
-              {%- if product.featured_image != blank -%}
-                <img
-                  class="gifting-banner__product-image"
-                  src="{{ product.featured_image | image_url: width: 700 }}"
-                  srcset="{{ product.featured_image | image_url: width: 350 }} 350w, {{ product.featured_image | image_url: width: 700 }} 700w"
-                  sizes="(max-width: 749px) 45vw, 22vw"
-                  alt="{{ product.featured_image.alt | default: product.title | escape }}"
-                  loading="lazy"
-                  width="700"
-                  height="574"
-                >
-              {%- endif -%}
-            </span>
-            <span class="gifting-banner__product-title">{{ product.title | escape }}</span>
-            <span class="gifting-banner__product-price">{{ product.price | money }}</span>
-          </a>
-        </li>
-      {%- endfor -%}
-    </ul>
-  {%- endif -%}
-</section>
 
 {% schema %}
 {
@@ -191,7 +566,360 @@
   "tag": "section",
   "class": "section",
   "settings": [
-    { "type": "collection", "id": "collection", "label": "Products to feature" }
+    {
+      "type": "header",
+      "content": "Picture"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Desktop image",
+      "info": "Leave empty to use the shop's own gifting photograph. A shot with its subject on one side and clear space on the other works best."
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image",
+      "info": "Leave empty to use the desktop picture, or the theme's own cropped gifting photograph when no desktop picture is set."
+    },
+    {
+      "type": "range",
+      "id": "focal_x",
+      "label": "Focal point across",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "focal_y",
+      "label": "Focal point down",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "scrim_opacity",
+      "label": "Wash behind the text",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 0,
+      "info": "Lightens the photograph under the panel when the text is hard to read."
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Small heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Find the perfect gift"
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_heading",
+      "label": "Heading in capitals",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Products to feature"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Products shown",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Products per row on mobile",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show prices",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop gifts"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link",
+      "info": "Leave empty to link to the featured collection."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "content_side",
+      "label": "Content side",
+      "options": [
+        { "value": "right", "label": "Right" },
+        { "value": "left", "label": "Left" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Centred" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "content_share",
+      "label": "Panel width",
+      "min": 25,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "band_height",
+      "label": "Desktop height",
+      "min": 0,
+      "max": 760,
+      "step": 20,
+      "unit": "px",
+      "default": 0,
+      "info": "0 lets the band follow the shape of the photograph."
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_padding",
+      "label": "Set the spacing above and below",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 54
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 54
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Top spacing on mobile",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Bottom spacing on mobile",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Type sizes",
+      "info": "A size of 0 keeps the theme's own size, which scales with the width of the screen."
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 0,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size on mobile",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_tracking",
+      "label": "Heading letter spacing",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size",
+      "label": "Small heading size",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 0,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "text_measure",
+      "label": "Text line length",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "ch",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "card_text_size",
+      "label": "Product card text size",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "section_background",
+      "label": "Section background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading",
+      "default": "#171310"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Small heading",
+      "default": "#6c6259"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#3f3932"
+    },
+    {
+      "type": "color_background",
+      "id": "card_background",
+      "label": "Product card background",
+      "default": "rgba(255, 255, 255, 0.92)"
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "Product card text",
+      "default": "#171310"
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text",
+      "default": "#171310"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Border",
+      "default": "#171310"
+    },
+    {
+      "type": "color",
+      "id": "button_background_hover",
+      "label": "Background on hover",
+      "default": "#171310"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color_hover",
+      "label": "Text on hover",
+      "default": "#ffffff"
+    }
   ],
   "presets": [{ "name": "Gifting banner" }]
 }

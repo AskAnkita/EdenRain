@@ -463,7 +463,20 @@
               assign slide_title = slide_product.title
             endif
             if slide_price == blank
-              assign slide_price = slide_product.price_min | money
+              # price_min is the minimum across every variant, so a shape the client has not
+              # priced yet (sitting at 0) would make the panel read "From £0.00". Fall back to
+              # the lowest variant that has a real price.
+              assign slide_amount = slide_product.price_min
+              if slide_amount == 0 and slide_product.price_max > 0
+                for slide_variant in slide_product.variants
+                  if slide_variant.price > 0
+                    if slide_amount == 0 or slide_variant.price < slide_amount
+                      assign slide_amount = slide_variant.price
+                    endif
+                  endif
+                endfor
+              endif
+              assign slide_price = slide_amount | money
               if slide_product.price_varies
                 assign slide_price = 'From ' | append: slide_price
               endif

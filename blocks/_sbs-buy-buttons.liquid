@@ -45,6 +45,14 @@
     endif
   endif
 
+  # A variant the client has not priced yet sits at 0. Nothing should be addable to the
+  # cart for nothing, so the button asks the shopper to get in touch instead. It goes
+  # last so it overrides whatever the stock rules decided above.
+  if variant != blank and variant.price == 0
+    assign can_add_to_cart = false
+    assign add_to_cart_text = 'products.product.price_on_request' | t
+  endif
+
   assign variant_type = product.options_with_values.size
   if product.selected_or_first_available_variant.available and variant_type > 0
       if product.has_only_default_variant == true and require_item == blank

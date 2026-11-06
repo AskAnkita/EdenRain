@@ -830,6 +830,7 @@
       },
       "sku": "SKU",
       "sold_out": "Sold out",
+      "price_on_request": "Contact us for price",
       "sold_out_message": "This variant is sold out!",
       "step_by_step": {
         "next": "Next step",

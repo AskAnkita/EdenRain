@@ -243,7 +243,22 @@
                       {% endif %}
                     </div>
                     <span class="hj-product__title">{{ product.title | escape }}</span>
-                    <span class="hj-product__price">{% if product.price_varies %}{{ 'products.facets.from' | t }} {% endif %}{{ product.price_min | money }}</span>
+                    {%- liquid
+                      # A shape the client has not priced yet sits at 0, and price_min is the
+                      # minimum across every variant — so one unpriced shape would print
+                      # "From £0.00". Fall back to the lowest variant that has a real price.
+                      assign hj_price = product.price_min
+                      if hj_price == 0 and product.price_max > 0
+                        for hj_variant in product.variants
+                          if hj_variant.price > 0
+                            if hj_price == 0 or hj_variant.price < hj_price
+                              assign hj_price = hj_variant.price
+                            endif
+                          endif
+                        endfor
+                      endif
+                    -%}
+                    <span class="hj-product__price">{% if product.price_varies %}{{ 'products.facets.from' | t }} {% endif %}{{ hj_price | money }}</span>
                   </a>
                 </li>
             {% endfor %}
