@@ -211,7 +211,7 @@
         "step_columns": 5,
         "show_features": true,
         "features_alternate": true,
-        "feature_image_ratio": "3 / 2",
+        "feature_image_ratio": "1 / 1",
         "show_page_content": false,
         "content_measure": true,
         "show_cta": true,
