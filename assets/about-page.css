@@ -558,10 +558,27 @@
   text-align: center;
 }
 
-/* Without a picture there is nothing to hold the height open. */
+/*
+  Without a picture there is nothing to hold the height open.
+
+  There is also nothing dark to write on. The band's colour settings are the
+  ones a photograph needs - white words, a white button, a white outline beside
+  it - and with the picture gone they land on the pale background instead:
+  white copy on blush, and a primary button whose hover fill is the dark ink
+  while its border stays the white it rests on, which is the white edge left
+  standing around a black button. So the bare band takes the page's own ink and
+  the pair of buttons a light background wants - solid ink, and an outline of
+  the same ink - and the merchant's photograph colours take over again the
+  moment there is a photograph for them to sit on.
+*/
 .about-page .ab-cta:not(.ab-cta--media) {
   min-height: 0;
   padding-block: 5.6rem;
+  --ab-cta-ink: var(--ab-ink);
+  --ab-btn-bg: var(--ab-ink);
+  --ab-btn-ink: #ffffff;
+  --ab-btn2-ink: var(--ab-ink);
+  --ab-btn2-bg: #ffffff;
 }
 
 .about-page .ab-cta__media,
@@ -668,20 +685,25 @@
   gap: 1.6rem;
 }
 
-/* The same trade as the hero's pair, for the same reason. */
+/*
+  The same trade as the hero's pair, for the same reason: the primary rests
+  filled and empties out on hover, so it becomes the outline its neighbour
+  wears at rest rather than swapping to a second filled button beside one.
+
+  It wears .eden-action--sweep-out, which runs the shop's one sweep backwards
+  (see eden-actions.css), and that is why the colours below read oddly: the
+  button itself is transparent, --cta-fill-hover is its RESTING fill, painted
+  by the sweep layer held at full width, and --cta-ink-hover is the colour the
+  label takes once that fill has gone. Both of those are the button's own
+  background colour, because what is left on hover is an outline of it.
+*/
 .about-page .ab-cta__button--primary {
-  --cta-fill: var(--ab-btn-bg, var(--ab-ink));
+  --cta-fill: transparent;
   --cta-ink: var(--ab-btn-ink, #ffffff);
   --cta-edge: var(--ab-btn-bg, var(--ab-ink));
-  --cta-fill-hover: var(--ab-btn-ink, #ffffff);
-  --cta-ink-hover: var(--ab-btn-bg, var(--ab-ink));
-  --cta-edge-hover: var(--ab-btn-bg, var(--ab-ink));
-}
-
-.about-page .ab-cta__button--primary.eden-action--sweep-out {
-  --cta-fill: transparent;
   --cta-fill-hover: var(--ab-btn-bg, var(--ab-ink));
   --cta-ink-hover: var(--ab-btn-bg, var(--ab-ink));
+  --cta-edge-hover: var(--ab-btn-bg, var(--ab-ink));
 }
 
 .about-page .ab-cta__button--secondary {

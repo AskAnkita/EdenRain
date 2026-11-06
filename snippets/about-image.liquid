@@ -10,6 +10,7 @@
 
   @param {object} [image] - the image_picker setting
   @param {string} [asset] - a file name in Content > Files, used when no image is picked
+  @param {string} [theme_asset] - a file name in the theme assets folder
   @param {string} alt - alternative text
   @param {string} [sizes] - the sizes attribute. Default '100vw'.
   @param {string} [loading] - 'lazy' or 'eager'. Default 'lazy'.
@@ -23,6 +24,7 @@
 
 {%- liquid
   assign file = asset | default: '' | strip
+  assign theme_file = theme_asset | default: '' | strip
   assign img_sizes = sizes | default: '100vw'
   assign img_loading = loading | default: 'lazy'
   assign img_width = width | default: 1600
@@ -72,5 +74,15 @@
     loading="{{ img_loading }}"
     {% if fetchpriority == 'high' %}fetchpriority="high"{% endif %}
     data-ab-asset
+  >
+{%- elsif theme_file != blank -%}
+  <img
+    src="{{ theme_file | asset_url }}"
+    sizes="{{ img_sizes }}"
+    alt="{{ alt | escape }}"
+    width="{{ img_width }}"
+    height="{{ img_height }}"
+    loading="{{ img_loading }}"
+    {% if fetchpriority == 'high' %}fetchpriority="high"{% endif %}
   >
 {%- endif -%}

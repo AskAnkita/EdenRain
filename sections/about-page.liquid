@@ -64,7 +64,7 @@
   endif
 
   assign cta_has_media = false
-  if stts.cta_image != blank or stts.cta_image_asset != blank
+  if stts.cta_image != blank or stts.cta_image_asset != blank or stts.cta_image_theme_asset != blank
     assign cta_has_media = true
   endif
 
@@ -565,6 +565,7 @@
               {%- render 'about-image',
                 image: stts.cta_image,
                 asset: stts.cta_image_asset,
+                theme_asset: stts.cta_image_theme_asset,
                 alt: stts.cta_heading,
                 sizes: '100vw',
                 width: 2000,
@@ -585,7 +586,7 @@
             <div class="ab-cta__actions">
               {%- if stts.cta_button_label != blank -%}
                 <a
-                  class="eden-action ab-cta__button--primary{% if cta_has_media %} eden-action--sweep-out{% endif %}"
+                  class="eden-action ab-cta__button--primary eden-action--sweep-out"
                   href="{{ stts.cta_button_link | default: '#' }}"
                 >
                   {{- stts.cta_button_label | escape -}}
@@ -660,12 +661,13 @@
     {
       "type": "image_picker",
       "id": "hero_image",
-      "label": "Hero picture"
+      "label": "Hero picture",
+      "info": "Upload a picture here to replace the one showing on the page now. Leave this empty to keep the file named below."
     },
     {
       "type": "text",
       "id": "hero_image_asset",
-      "label": "Hero picture from theme files",
+      "label": "Hero picture from Content > Files",
       "info": "A file name from Content > Files, used when no picture is uploaded above. For example lifestyle-necklace.jpg."
     },
     {
@@ -923,12 +925,13 @@
     {
       "type": "image_picker",
       "id": "story_image",
-      "label": "Portrait"
+      "label": "Portrait",
+      "info": "Upload a picture here to replace the one showing on the page now. Leave this empty to keep the file named below."
     },
     {
       "type": "text",
       "id": "story_image_asset",
-      "label": "Portrait from theme files",
+      "label": "Portrait from Content > Files",
       "info": "A file name from Content > Files, used when no portrait is uploaded above."
     },
     {
@@ -1319,13 +1322,20 @@
     {
       "type": "image_picker",
       "id": "cta_image",
-      "label": "Background picture"
+      "label": "Background picture",
+      "info": "Upload a picture here to replace the one showing on the page now. Leave this empty to keep the file named below."
     },
     {
       "type": "text",
       "id": "cta_image_asset",
-      "label": "Background picture from theme files",
+      "label": "Background picture from Content > Files",
       "info": "A file name from Content > Files, used when no picture is uploaded above."
+    },
+    {
+      "type": "text",
+      "id": "cta_image_theme_asset",
+      "label": "Background picture from theme assets",
+      "info": "A file name from the theme assets folder, used when no picture is uploaded above."
     },
     {
       "type": "range",
@@ -1593,12 +1603,13 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Picture"
+          "label": "Picture",
+          "info": "Upload a picture here to replace the one showing on the page now. Leave this empty to keep the file named below."
         },
         {
           "type": "text",
           "id": "image_asset",
-          "label": "Picture from theme files",
+          "label": "Picture from Content > Files",
           "info": "A file name from Content > Files, used when no picture is uploaded above."
         },
         {
@@ -1632,12 +1643,13 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Picture"
+          "label": "Picture",
+          "info": "Upload a picture here to replace the one showing on the page now. Leave this empty to keep the file named below."
         },
         {
           "type": "text",
           "id": "image_asset",
-          "label": "Picture from theme files",
+          "label": "Picture from Content > Files",
           "info": "A file name from Content > Files, used when no picture is uploaded above. Shown only when \"Show pictures on the steps\" is on."
         }
       ]
@@ -1665,12 +1677,13 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Picture"
+          "label": "Picture",
+          "info": "Upload a picture here to replace the one showing on the page now. Leave this empty to keep the file named below."
         },
         {
           "type": "text",
           "id": "image_asset",
-          "label": "Picture from theme files",
+          "label": "Picture from Content > Files",
           "info": "A file name from Content > Files, used when no picture is uploaded above."
         },
         {
