@@ -1,0 +1,220 @@
+/*
+  Save design / Contact support - the actions under the configurator, and what
+  they put on the page. Behaviour is in assets/ijewel-design.js.
+
+  Three parts, in the order they appear: the two buttons, the status line they
+  speak through, and the panel that opens once a design is saved - the
+  reference, the choices, the link that reopens the ring. Under those, when
+  this device has any, the list of designs already saved.
+
+  Every value a merchant can move is a --ijd-* custom property written onto the
+  section element, with the value this file always had as its fallback, so a
+  setting left alone renders exactly as shipped. Square corners throughout -
+  this theme sets every radius to 0. Buttons come from assets/eden-actions.css
+  and name their colours as the --cta-* pairs, so they fill on hover with every
+  other call to action in the shop; there is no :hover written in this file.
+*/
+
+ijewel-design {
+  --ijd-ink: #171714;
+  --ijd-muted: #69675f;
+  --ijd-line: rgba(23, 23, 20, 0.18);
+  --ijd-wash: #f4f2ef;
+  display: block;
+  color: var(--ijd-ink);
+  margin-top: var(--ijd-gap, 24px);
+}
+
+/* ------------------------------------------------------------- the two actions */
+
+.ijd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ijd-actions-gap, 12px);
+  align-items: center;
+}
+
+/* The primary action is the one that keeps the work; "contact support" is the
+   second action, because most people save first and ask afterwards. */
+.ijd-actions .eden-action {
+  flex: 0 1 auto;
+}
+
+/* While the builder is being asked what is on screen. The press has to show
+   something - the read crosses a frame boundary and can take a moment on a
+   slow line - and a button that looks pressed is the smallest way to say it. */
+ijewel-design[data-busy='true'] .ijd-actions {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------- the status line */
+
+.ijd-status {
+  margin: var(--ijd-status-gap, 12px) 0 0;
+  color: var(--ijd-status-color, var(--ijd-muted));
+  font-size: var(--ijd-status-size, 1.35rem);
+  line-height: 1.5;
+}
+
+/* Asking for the tap that starts the viewer is not a failure, and it is the
+   most common thing this line ever says, so it is not dressed as an error. */
+.ijd-status[data-tone='wait'] {
+  color: var(--ijd-wait-color, var(--ijd-ink));
+}
+
+.ijd-status[data-tone='error'] {
+  color: var(--ijd-error-color, #8c2f1f);
+}
+
+/* ----------------------------------------------------------------- the panel */
+
+.ijd-panel {
+  margin-top: var(--ijd-panel-gap, 20px);
+  padding: var(--ijd-panel-pad, clamp(18px, 2vw, 28px));
+  border: 1px solid var(--ijd-panel-border, var(--ijd-line));
+  background: var(--ijd-panel-bg, var(--ijd-wash));
+}
+
+.ijd-panel:focus {
+  outline: none;
+}
+
+.ijd-panel__title {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: var(--ijd-panel-title-size, 1.9rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.ijd-panel__reference {
+  margin: var(--ijd-reference-gap, 6px) 0 0;
+  color: var(--ijd-reference-color, var(--ijd-muted));
+  font-size: var(--ijd-reference-size, 1.35rem);
+  line-height: 1.5;
+}
+
+/* The reference is what somebody reads down a telephone, so it is set apart
+   from the sentence around it rather than buried in it. */
+.ijd-panel__reference [data-design-reference] {
+  color: var(--ijd-ink);
+  font-size: var(--ijd-reference-code-size, 1.5rem);
+  letter-spacing: 0.08em;
+}
+
+/* The choices, as the builder names them. Two columns on anything wider than a
+   phone: these are short pairs and a single column of them is a long scroll
+   past the buttons that matter. */
+.ijd-specs {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--ijd-specs-row-gap, 4px) var(--ijd-specs-gap, 16px);
+  margin: var(--ijd-specs-top, 16px) 0 0;
+  font-size: var(--ijd-specs-size, 1.35rem);
+}
+
+.ijd-specs dt {
+  color: var(--ijd-specs-label-color, var(--ijd-muted));
+}
+
+.ijd-specs dd {
+  margin: 0;
+  color: var(--ijd-specs-value-color, var(--ijd-ink));
+}
+
+@media screen and (min-width: 750px) {
+  .ijd-specs {
+    grid-template-columns: auto 1fr auto 1fr;
+  }
+}
+
+.ijd-panel__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ijd-links-gap, 16px);
+  margin: var(--ijd-links-top, 18px) 0 0;
+  font-size: var(--ijd-links-size, 1.35rem);
+}
+
+/* A design the browser refused to write down. It is still on screen and the
+   reopen link still works, so the line explains what it is rather than
+   reporting a failure: private browsing is the usual reason. */
+.ijd-panel__unstored {
+  margin: var(--ijd-unstored-gap, 14px) 0 0;
+  color: var(--ijd-unstored-color, #8c2f1f);
+  font-size: var(--ijd-unstored-size, 1.3rem);
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------- designs already saved */
+
+.ijd-saved {
+  margin-top: var(--ijd-saved-gap, 28px);
+  padding-top: var(--ijd-saved-pad, 22px);
+  border-top: 1px solid var(--ijd-saved-rule, var(--ijd-line));
+}
+
+.ijd-saved__title {
+  margin: 0 0 var(--ijd-saved-title-gap, 14px);
+  color: var(--ijd-saved-title-color, var(--ijd-muted));
+  font-size: var(--ijd-saved-title-size, 1.2rem);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ijd-saved__list {
+  display: grid;
+  gap: var(--ijd-saved-row-gap, 16px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media screen and (min-width: 750px) {
+  .ijd-saved__list {
+    grid-template-columns: repeat(auto-fill, minmax(var(--ijd-saved-min, 260px), 1fr));
+  }
+}
+
+.ijd-saved__item {
+  padding: var(--ijd-saved-item-pad, 14px 16px);
+  border: 1px solid var(--ijd-saved-item-border, var(--ijd-line));
+}
+
+.ijd-saved__name {
+  margin: 0;
+  font-size: var(--ijd-saved-name-size, 1.4rem);
+  letter-spacing: 0.08em;
+}
+
+.ijd-saved__summary {
+  margin: 6px 0 0;
+  color: var(--ijd-saved-summary-color, var(--ijd-muted));
+  font-size: var(--ijd-saved-summary-size, 1.25rem);
+  line-height: 1.5;
+}
+
+.ijd-saved__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ijd-saved-actions-gap, 14px);
+  align-items: baseline;
+  margin: var(--ijd-saved-actions-top, 12px) 0 0;
+  font-size: var(--ijd-saved-actions-size, 1.25rem);
+}
+
+/* Remove is a button because it changes something, and it is set as the
+   quietest thing in the row because it is the last thing anybody wants. */
+.ijd-saved__drop {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ijd-saved-drop-color, var(--ijd-muted));
+  font-family: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}

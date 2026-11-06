@@ -275,11 +275,26 @@
         <span class="eso-bar__total" data-total>{{ section.settings.price_text | escape }}</span>
       </span>
 
+      {%- comment -%}
+        On a phone this is the only action surface there is. The frame above is
+        cropped to its 3D stage, so the builder's own add-to-cart button is
+        below the cut and cannot be reached - which means the save and support
+        actions have to be reachable from here or they are not reachable at
+        all. Naming the attribute is the whole wiring: the <ijewel-design>
+        element in the studio section above picks up these buttons wherever on
+        the page they are, and the design is read from the builder when one is
+        pressed. See assets/ijewel-design.js.
+
+        The href stays a real link underneath either action, so the button still
+        goes somewhere before the script has run and if it never runs.
+      {%- endcomment -%}
       {%- if section.settings.button_label != blank -%}
         <a
           class="eden-action eden-action--{{ section.settings.button_style }}"
           href="{{ section.settings.button_link | default: '#' }}"
           data-cta
+          {% if section.settings.button_action == 'save' %}data-design-save{% endif %}
+          {% if section.settings.button_action == 'support' %}data-design-support{% endif %}
         >
           {{- section.settings.button_label | escape -}}
         </a>
@@ -321,7 +336,12 @@
     { "type": "text", "id": "price_text", "label": "Price text", "info": "Shown when the live price above is off.", "default": "Contact us for price" },
     { "type": "text", "id": "currency", "label": "Currency code for the live price", "default": "USD" },
     { "type": "text", "id": "button_label", "label": "Button label", "info": "Leave empty to hide the button.", "default": "Enquire" },
-    { "type": "url", "id": "button_link", "label": "Button link", "info": "The design's state key is added to this link, so the page it opens can reopen this exact ring." },
+    { "type": "url", "id": "button_link", "label": "Button link", "info": "The design's state key is added to this link, so the page it opens can reopen this exact ring. With an action below other than \"just follow the link\", this is where the button goes before the script has run - point it at the support page." },
+    { "type": "select", "id": "button_action", "label": "What the button does", "default": "support", "info": "On a phone the frame is cropped to the 3D stage, so the builder's own add-to-cart is out of reach and this bar is the only way to save a design or contact support. Both actions read the design off the builder first; neither adds anything to a cart. Needs the 3D studio section above it on the page.", "options": [
+      { "value": "support", "label": "Save the design and go to support" },
+      { "value": "save", "label": "Save the design and stay here" },
+      { "value": "link", "label": "Just follow the link" }
+    ] },
     { "type": "select", "id": "button_style", "label": "Button style", "options": [ { "value": "solid", "label": "Filled" }, { "value": "outline", "label": "Outlined" }, { "value": "light", "label": "Outlined, for a dark background" }, { "value": "invert", "label": "Filled white, for a dark background" } ], "default": "solid" },
 
     { "type": "header", "content": "Swatch colours", "info": "The builder sends an icon for some options and nothing for others. Map an option to a colour and a tile with no icon is filled with it. One per line: the option key or its label, then a colour." },

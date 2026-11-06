@@ -1,0 +1,60 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "support": {
+      "type": "design-support",
+      "settings": {
+        "eyebrow": "Bespoke",
+        "heading": "Let's talk about your design",
+        "text": "<p>Send us the design you saved in the studio and we will come back with a firm price, the stone options and how long it will take to make. Nothing is charged until you have seen the quote.</p>",
+        "design_title": "Your design",
+        "reference_lead": "Reference",
+        "reopen_label": "Reopen in the studio",
+        "studio_link": "/pages/design-studio-builder",
+        "studio_label": "Back to the design studio",
+        "empty_text": "We could not find a saved design on this device. Send us a message below, or go back to the studio and save a design first.",
+        "show_preview": true,
+        "embed_url": "https://ijewel3d.com/drive/files/COlDZlgWRV626zRNLFxU4g/view",
+        "preview_title": "Your saved design in 3D",
+        "preview_loading": "Rebuilding your design",
+        "preview_height": 480,
+        "preview_height_mobile": 320,
+        "form_title": "Send it to our team",
+        "form_text": "",
+        "name_label": "Name",
+        "email_label": "Email",
+        "show_phone": true,
+        "phone_label": "Telephone (optional)",
+        "ring_size_label": "Ring size, if you know it",
+        "message_label": "Anything else we should know",
+        "submit_label": "Send to our team",
+        "success_text": "Thank you - your design is with us. We will come back to you with a quote by email.",
+        "form_note": "We reply to every design within one working day.",
+        "send_price": true,
+        "price_note": "Builder estimate, not a quote",
+        "show_other": true,
+        "other_title": "Your other saved designs",
+        "switch_label": "Ask about this one",
+        "heading_size": 0,
+        "eyebrow_size": 0,
+        "text_size": 0,
+        "label_size": 0,
+        "specs_size": 0,
+        "full_width": false,
+        "content_width": 1180,
+        "custom_padding": false,
+        "padding_top": 56,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["support"]
+}

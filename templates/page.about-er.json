@@ -173,10 +173,12 @@
         "story_heading": "Jewellery has always been more than a passion for me",
         "story_text": "<p>It is part of my family's legacy. Growing up in a family of jewellers since 1957, I was surrounded by the art of creating timeless pieces. But when my daughter, Eden, was born, she became my true inspiration to build something special. I wanted to design jewellery that connects people to their cherished memories and moments, just as I feel connected to her.</p><p>That is how Eden Raine was born. We combine traditional handmade techniques with modern CAD design, ensuring that each piece is hand crafted with precision and care. From the initial sketch to the final polish, every step of our process is a blend of artistry and innovation.</p>",
         "story_image_asset": "lifestyle-heart-necklace.jpg",
+        "story_image_theme_asset": "",
+        "story_image_alt": "",
         "story_caption": "",
         "story_flip": false,
         "story_media_width": 42,
-        "story_image_ratio": "4 / 5",
+        "story_image_ratio": "1 / 1",
         "signature_name": "Nathan",
         "signature_role": "Founder, Eden Raine",
         "story_button_label": "",
@@ -215,11 +217,12 @@
         "show_cta": true,
         "cta_heading": "Looking for something in particular?",
         "cta_text": "<p>Our team can help you choose the right stone, setting and size, and answer anything you want to know before you buy.</p>",
-        "cta_image_asset": "",
+        "cta_width": "full",
+        "cta_image_asset": "gemstones-hero.jpg",
         "cta_image_theme_asset": "",
         "cta_overlay": 45,
         "cta_overlay_color": "#171714",
-        "cta_background": "#ead9d1",
+        "cta_background": "#F4F4F0",
         "cta_text_color": "#ffffff",
         "cta_heading_size": 44,
         "cta_button_label": "Shop the collection",
@@ -245,7 +248,7 @@
         "grid_gap": 24,
         "band_gap": 72,
         "padding_top": 0,
-        "padding_bottom": 80
+        "padding_bottom": 0
       }
     }
   },

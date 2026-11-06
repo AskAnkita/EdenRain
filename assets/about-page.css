@@ -581,6 +581,18 @@
   --ab-btn2-bg: #ffffff;
 }
 
+/*
+  Full width means the same here as it does on the hero: the section renders
+  the band after .ab-shell closes rather than inside it, so it is already the
+  width of the screen and only the corners have to go. The copy keeps its own
+  measure and stays centred, which is what holds it over the middle of the
+  band once the band is wider than the page.
+*/
+.about-page .ab-cta--full {
+  border-radius: 0;
+  padding-inline: 2.4rem;
+}
+
 .about-page .ab-cta__media,
 .about-page .ab-cta__media img {
   position: absolute;

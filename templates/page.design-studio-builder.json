@@ -64,7 +64,7 @@
         "price_cover": true,
         "price_text": "Contact us for price",
         "price_note": "",
-        "price_link": "",
+        "price_link": "/pages/contact",
         "price_anchor": "bottom-right",
         "price_background": "#ffffff",
         "price_text_color": "rgba(0,0,0,0)",
@@ -106,7 +106,6 @@
         "fallback_text": "<p>Tell us what you have in mind - a stone, a setting, a piece you want remade - and we will come back with a sketch and a price.</p>",
         "fallback_label": "Start a bespoke enquiry",
         "fallback_link": "/pages/bespoke-jewellery-request",
-        "cart_action": "enquiry",
         "section_background": "rgba(0,0,0,0)",
         "heading_color": "rgba(0,0,0,0)",
         "eyebrow_color": "rgba(0,0,0,0)",
@@ -129,7 +128,15 @@
         "hide_toolbar_mobile": true,
         "hide_announcement_mobile": false,
         "hide_header_mobile": false,
-        "frame_boost_mobile": 0
+        "frame_boost_mobile": 0,
+        "support_link": "/pages/design-support",
+        "save_label": "Save this design",
+        "support_label": "Contact support",
+        "builder_button": "support",
+        "reference_prefix": "ER",
+        "show_saved": true,
+        "saved_title": "Your saved designs",
+        "panel_title": "Your design is saved"
       }
     },
     "1792391324512c4c70": {
@@ -218,8 +225,8 @@
         "price_label": "Your design",
         "price_text": "Contact us for price",
         "currency": "USD",
-        "button_label": "Enquire",
-        "button_link": "/pages/bespoke-jewellery-request",
+        "button_label": "Save this design",
+        "button_link": "/pages/design-support",
         "button_style": "solid",
         "swatches": "White Gold | #d8d8da\nYellow Gold | #e6c584\nRose Gold | #e0b09c\nPlatinum | #d9dadc",
         "row_height": 0,
@@ -255,7 +262,8 @@
         "padding_top": 0,
         "padding_bottom": 24,
         "origin": "https://ijewel3d.com",
-        "frame_selector": "ijewel-studio iframe"
+        "frame_selector": "ijewel-studio iframe",
+        "button_action": "save"
       }
     }
   },

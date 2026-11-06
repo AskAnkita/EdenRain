@@ -1,0 +1,319 @@
+/*
+  Design support - the page a saved design goes to be quoted. Markup is in
+  sections/design-support.liquid, behaviour in assets/design-support.js.
+
+  Two columns from a tablet up: the design on the left, the form on the right,
+  so somebody checking the ring and somebody filling in their email are looking
+  at the same screen. One column on a phone, design first - it is the thing
+  being talked about, and it is what reassures somebody that the right ring
+  made it here.
+
+  Every value a merchant can move is a --dsp-* custom property written onto the
+  section element, with the value this file always had as its fallback, so a
+  setting left alone renders exactly as shipped. Square corners throughout -
+  this theme sets every radius to 0. Buttons come from assets/eden-actions.css
+  and fill on hover with every other call to action in the shop, so there is no
+  :hover written in this file.
+*/
+
+.design-support {
+  --dsp-ink: #171714;
+  --dsp-muted: #69675f;
+  --dsp-line: rgba(23, 23, 20, 0.18);
+  --dsp-wash: #f4f2ef;
+  color: var(--dsp-ink);
+  background: var(--dsp-section-bg, transparent);
+  padding: var(--dsp-pad-top, clamp(36px, 5vw, 72px)) clamp(20px, 4vw, 64px)
+    var(--dsp-pad-bottom, clamp(48px, 6vw, 96px));
+}
+
+.dsp-shell {
+  max-width: var(--dsp-shell-max, 1180px);
+  margin: 0 auto;
+}
+
+.design-support--wide .dsp-shell {
+  max-width: none;
+}
+
+/* ---------------------------------------------------------------- the heading */
+
+.dsp-eyebrow {
+  margin: 0 0 10px;
+  color: var(--dsp-eyebrow-color, var(--dsp-muted));
+  font-size: var(--dsp-eyebrow-size, 1.15rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.dsp-heading {
+  margin: 0;
+  color: var(--dsp-heading-color, var(--dsp-ink));
+  font-family: var(--font-heading--family);
+  font-size: var(--dsp-heading-size, clamp(2.8rem, 3.4vw, 4.2rem));
+  font-weight: 400;
+  line-height: 1.12;
+}
+
+.dsp-text {
+  max-width: 62ch;
+  margin-top: 14px;
+  color: var(--dsp-text-color, var(--dsp-muted));
+  font-size: var(--dsp-text-size, 1.55rem);
+  line-height: 1.6;
+}
+
+.dsp-text p {
+  margin: 0 0 1em;
+}
+
+.dsp-text p:last-child {
+  margin-bottom: 0;
+}
+
+.dsp-text--form {
+  margin-top: 10px;
+}
+
+/* ----------------------------------------------------------------- the columns */
+
+.dsp-grid {
+  display: grid;
+  gap: clamp(28px, 4vw, 56px);
+  margin-top: clamp(28px, 4vw, 48px);
+}
+
+@media screen and (min-width: 750px) {
+  .dsp-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+/* ------------------------------------------------------------------ the design */
+
+.dsp-design {
+  padding: var(--dsp-panel-pad, clamp(18px, 2vw, 28px));
+  border: 1px solid var(--dsp-panel-border, var(--dsp-line));
+  background: var(--dsp-panel-bg, var(--dsp-wash));
+}
+
+.dsp-design__title,
+.dsp-form__title,
+.dsp-other__title {
+  margin: 0;
+  color: var(--dsp-heading-color, var(--dsp-ink));
+  font-family: var(--font-heading--family);
+  font-size: var(--dsp-panel-title-size, 2.1rem);
+  font-weight: 400;
+}
+
+.dsp-design__reference {
+  margin: 8px 0 0;
+  color: var(--dsp-muted);
+  font-size: var(--dsp-specs-size, 1.35rem);
+}
+
+/* The reference is what somebody reads down a telephone or types into an
+   email, so it is set apart from the word in front of it. */
+.dsp-design__reference strong {
+  color: var(--dsp-ink);
+  font-size: var(--dsp-reference-size, 1.5rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+/* The 3D preview. The frame is the vendor's page and cannot be restyled from
+   here, so it is given a plain box and a fixed height and left alone. The line
+   underneath it is what the box says before the frame has loaded; the loaded
+   frame covers it, and it is hidden outright once the frame reports in, so a
+   slow scene is never a blank box and a loaded one is never two things at
+   once. */
+.dsp-preview {
+  position: relative;
+  margin-top: 18px;
+  border: 1px solid var(--dsp-panel-border, var(--dsp-line));
+  background: var(--dsp-preview-bg, #ffffff);
+  min-height: var(--dsp-preview-height-mobile, 320px);
+}
+
+.dsp-preview iframe {
+  display: block;
+  width: 100%;
+  height: var(--dsp-preview-height-mobile, 320px);
+  border: 0;
+}
+
+.dsp-preview__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0 20px;
+  color: var(--dsp-muted);
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+.dsp-preview[data-ready='true'] .dsp-preview__label {
+  display: none;
+}
+
+@media screen and (min-width: 750px) {
+  .dsp-preview,
+  .dsp-preview iframe {
+    min-height: var(--dsp-preview-height, 480px);
+    height: var(--dsp-preview-height, 480px);
+  }
+
+  .dsp-preview iframe {
+    min-height: 0;
+  }
+}
+
+/* The choices, as the builder named them. */
+.dsp-specs {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  margin: 18px 0 0;
+  font-size: var(--dsp-specs-size, 1.35rem);
+}
+
+.dsp-specs dt {
+  color: var(--dsp-muted);
+}
+
+.dsp-specs dd {
+  margin: 0;
+}
+
+.dsp-design__links {
+  margin: 18px 0 0;
+  font-size: var(--dsp-specs-size, 1.35rem);
+}
+
+/* ------------------------------------------------------------------- the form */
+
+.dsp-empty {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  border: 1px solid var(--dsp-panel-border, var(--dsp-line));
+  color: var(--dsp-text-color, var(--dsp-muted));
+  font-size: var(--dsp-text-size, 1.4rem);
+  line-height: 1.6;
+}
+
+.dsp-form {
+  margin-top: 18px;
+}
+
+.dsp-field {
+  margin-bottom: 16px;
+}
+
+.dsp-field label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--dsp-text-color, var(--dsp-muted));
+  font-size: var(--dsp-label-size, 1.25rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dsp-field input,
+.dsp-field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--dsp-field-border, var(--dsp-line));
+  border-radius: 0;
+  background: var(--dsp-field-bg, #ffffff);
+  color: var(--dsp-ink);
+  font-family: inherit;
+  font-size: var(--dsp-text-size, 1.45rem);
+}
+
+.dsp-field textarea {
+  resize: vertical;
+}
+
+.dsp-form__message {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--dsp-panel-border, var(--dsp-line));
+  background: var(--dsp-panel-bg, var(--dsp-wash));
+  font-size: var(--dsp-text-size, 1.4rem);
+  line-height: 1.6;
+}
+
+.dsp-form__message--error {
+  border-color: #8c2f1f;
+  color: #8c2f1f;
+  background: none;
+}
+
+.dsp-form__note {
+  margin: 14px 0 0;
+  color: var(--dsp-muted);
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------- the other saved designs */
+
+.dsp-other {
+  margin-top: clamp(32px, 4vw, 56px);
+  padding-top: 24px;
+  border-top: 1px solid var(--dsp-panel-border, var(--dsp-line));
+}
+
+.dsp-other__list {
+  display: grid;
+  gap: 16px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media screen and (min-width: 750px) {
+  .dsp-other__list {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+.dsp-other__item {
+  padding: 14px 16px;
+  border: 1px solid var(--dsp-panel-border, var(--dsp-line));
+}
+
+.dsp-other__name {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: 0.08em;
+}
+
+.dsp-other__summary {
+  margin: 6px 0 0;
+  color: var(--dsp-muted);
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+/* A button, because it changes what the form is about rather than going
+   anywhere - dressed as the link it reads as. */
+.dsp-other__pick {
+  margin-top: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.dsp-back {
+  margin: clamp(28px, 4vw, 48px) 0 0;
+  font-size: 1.35rem;
+}

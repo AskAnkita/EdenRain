@@ -26,6 +26,25 @@ if (!customElements.get('ijewel-studio')) {
         this.src = this.dataset.src || '';
         if (!this.src) return;
 
+        // Reopening a saved design. The record kept by assets/eden-design-store.js
+        // holds the builder's state string, and feeding it back in as ?state=
+        // rebuilds the identical 3D scene - the stone, the head, the metal, the
+        // band, exactly as they were saved. The link in the saved-designs list
+        // points at this page with that key on it, so the ring comes back here
+        // rather than on iJewel's own domain.
+        //
+        // It is read here rather than in Liquid because Liquid cannot see a
+        // query parameter at all, and because this is the one place the frame's
+        // address is assembled.
+        try {
+          const state = new URL(window.location.href).searchParams.get('state');
+          if (state) {
+            this.src += (this.src.indexOf('?') === -1 ? '?' : '&') + 'state=' + encodeURIComponent(state);
+          }
+        } catch (error) {
+          /* an address we cannot parse - the studio opens on a fresh design */
+        }
+
         if (this.dataset.lazy === 'false' || !('IntersectionObserver' in window)) {
           this.build();
           return;

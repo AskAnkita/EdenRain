@@ -41,7 +41,7 @@
       assign hero_class = hero_class | append: ' ab-hero--bottom ab-hero--left'
   endcase
 
-  assign story_alt = stts.signature_name | default: stts.story_heading | default: page.title
+  assign story_alt = stts.story_image_alt | default: stts.story_heading | default: page.title
 
   comment
     A full-width hero is rendered before .ab-shell rather than inside it: a
@@ -66,6 +66,21 @@
   assign cta_has_media = false
   if stts.cta_image != blank or stts.cta_image_asset != blank or stts.cta_image_theme_asset != blank
     assign cta_has_media = true
+  endif
+
+  comment
+    The closing band takes the hero's two widths. Full width is rendered after
+    .ab-shell closes, for the reason the hero is rendered before it opens: a
+    full-bleed child of a padded, centred shell can only be built from 100vw.
+  endcomment
+  assign cta_class = 'ab-cta ab-cta--' | append: stts.cta_width
+  if cta_has_media
+    assign cta_class = cta_class | append: ' ab-cta--media'
+  endif
+
+  assign cta_outside = false
+  if stts.show_cta and stts.cta_width == 'full' and stts.cta_heading != blank
+    assign cta_outside = true
   endif
 
   comment
@@ -255,15 +270,16 @@
 
     {%- if stts.show_story and stts.story_text != blank -%}
       {%- comment -%}
-        The letter itself, beside the person who wrote it.
+        The founder’s letter, beside an editorial jewellery photograph.
       {%- endcomment -%}
       <div class="ab-band">
         <div class="{{ story_class }}">
-          {%- if stts.story_image != blank or stts.story_image_asset != blank -%}
+          {%- if stts.story_image != blank or stts.story_image_asset != blank or stts.story_image_theme_asset != blank -%}
             <figure class="ab-story__media" data-ab-media>
               {%- render 'about-image',
                 image: stts.story_image,
                 asset: stts.story_image_asset,
+                theme_asset: stts.story_image_theme_asset,
                 alt: story_alt,
                 sizes: half_sizes,
                 width: 1200,
@@ -558,8 +574,8 @@
     {%- endif -%}
 
     {%- if stts.show_cta and stts.cta_heading != blank -%}
-      <div class="ab-band">
-        <div class="ab-cta{% if cta_has_media %} ab-cta--media{% endif %}">
+      {%- capture cta -%}
+        <div class="{{ cta_class }}">
           {%- if cta_has_media -%}
             <div class="ab-cta__media" data-ab-media>
               {%- render 'about-image',
@@ -601,9 +617,17 @@
             </div>
           {%- endif -%}
         </div>
-      </div>
+      {%- endcapture -%}
+
+      {%- unless cta_outside -%}
+        <div class="ab-band">{{ cta }}</div>
+      {%- endunless -%}
     {%- endif -%}
   </div>
+
+  {%- if cta_outside -%}
+    <div class="ab-band">{{ cta }}</div>
+  {%- endif -%}
 </section>
 
 {%- comment -%}
@@ -933,6 +957,17 @@
       "id": "story_image_asset",
       "label": "Portrait from Content > Files",
       "info": "A file name from Content > Files, used when no portrait is uploaded above."
+    },
+    {
+      "type": "text",
+      "id": "story_image_theme_asset",
+      "label": "Portrait from theme assets",
+      "info": "Used when no uploaded portrait or Content > Files image is selected."
+    },
+    {
+      "type": "text",
+      "id": "story_image_alt",
+      "label": "Portrait image description"
     },
     {
       "type": "text",
@@ -1318,6 +1353,22 @@
       "id": "cta_text",
       "label": "Text",
       "default": "<p>Tell us what you are imagining and we will draw it with you, from the first sketch to the final polish.</p>"
+    },
+    {
+      "type": "select",
+      "id": "cta_width",
+      "label": "Panel width",
+      "options": [
+        {
+          "value": "page",
+          "label": "Page width, rounded corners"
+        },
+        {
+          "value": "full",
+          "label": "Full width of the screen"
+        }
+      ],
+      "default": "page"
     },
     {
       "type": "image_picker",

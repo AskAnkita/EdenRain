@@ -67,25 +67,35 @@
 
   # Pressing the builder's own "Add to cart" posts the finished design out to
   # this page - from the builder's origin and no other, so the listener is told
-  # which one to trust rather than guessing. Without a variant to put it on
-  # there is nothing to add, so that route quietly becomes the enquiry.
+  # which one to trust rather than guessing.
   assign embed_origin = ''
   if embed_src != blank
     assign embed_host = embed_src | split: '//' | last | split: '/' | first
     assign embed_origin = 'https://' | append: embed_host
   endif
 
-  assign cart_variant = ''
-  if section.settings.cart_product != blank
-    assign cart_variant = section.settings.cart_product.selected_or_first_available_variant.id
+  # NOTHING IS ADDED TO A CART HERE. A configured ring has no variant and no
+  # price Shopify will accept, so the studio does not pretend to sell one: the
+  # design is saved and sent to us to quote. The two actions, the record and
+  # what happens to the builder's own button are all in assets/ijewel-design.js.
+  #
+  # With no support page set there is nowhere to send anybody, so that action is
+  # not drawn and the builder's button falls back to saving the design.
+  assign support_link = section.settings.support_link
+  assign save_label = section.settings.save_label
+  assign support_label = section.settings.support_label
+  if support_link == blank
+    assign support_label = ''
   endif
 
-  assign cart_action = section.settings.cart_action | default: 'none'
-  if cart_action == 'cart' and cart_variant == blank
-    assign cart_action = 'enquiry'
+  assign intercept = section.settings.builder_button | default: 'support'
+  if intercept == 'support' and support_link == blank
+    assign intercept = 'save'
   endif
-  if cart_action == 'enquiry' and section.settings.fallback_link == blank
-    assign cart_action = 'none'
+
+  assign design_flow = false
+  if save_label != blank or support_label != blank or intercept != 'none'
+    assign design_flow = true
   endif
 
   assign app_blocks = 0
@@ -377,18 +387,6 @@
           </noscript>
         </ijewel-studio>
 
-        {%- if cart_action != 'none' -%}
-          <script src="{{ 'ijewel-cart.js' | asset_url }}" defer="defer"></script>
-          <ijewel-cart
-            data-action="{{ cart_action }}"
-            data-variant="{{ cart_variant }}"
-            data-origin="{{ embed_origin | escape }}"
-            data-embed="{{ embed_src | escape }}"
-            data-enquiry="{{ section.settings.fallback_link }}"
-            data-price="{% if section.settings.price_cover %}hidden{% else %}shown{% endif %}"
-          ></ijewel-cart>
-        {%- endif -%}
-
         <div class="ijw-poster{% if section.settings.splash_cover %} ijw-poster--cover{% endif %}">
           {%- if poster_set -%}
             <div class="ijw-poster__image">
@@ -479,6 +477,96 @@
       {%- endif -%}
     </div>
 
+    {%- comment -%}
+      Save design / Contact support - what this page does instead of an
+      add-to-cart. The element is outside the frame because it draws something:
+      the two buttons, the line they speak through, and the panel that opens
+      with the saved design's reference and the link that reopens the ring.
+
+      It is also the listener for the builder's own Add to cart. That button is
+      on iJewel's page inside a cross-origin frame, so it cannot be relabelled
+      or removed from out here - but it posts the finished design out and then
+      waits, so what the press MEANS is ours to decide. "What their button
+      does" below decides it. Nothing is ever added to a cart.
+
+      Only drawn with a builder in the frame: the enquiry card below has its own
+      button, and a saved design needs a builder to have made one.
+    {%- endcomment -%}
+    {%- if design_flow and embed_src != blank -%}
+      {{ 'ijewel-design.css' | asset_url | stylesheet_tag }}
+      <script src="{{ 'eden-design-store.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'ijewel-design.js' | asset_url }}" defer="defer"></script>
+      <ijewel-design
+        data-origin="{{ embed_origin | escape }}"
+        data-embed="{{ embed_src | escape }}"
+        data-studio="{{ request.path }}"
+        data-support="{{ support_link }}"
+        data-frame="ijewel-studio iframe"
+        data-prefix="{{ section.settings.reference_prefix | default: 'ER' | escape }}"
+        data-intercept="{{ intercept }}"
+        data-title="{{ section.settings.embed_title | escape }}"
+        data-currency="{{ cart.currency.iso_code }}"
+        data-axis-names="{{ section.settings.axis_names | escape }}"
+        data-saving-text="{{ section.settings.saving_text | default: 'Saving your design' | escape }}"
+        data-wait-text="{{ section.settings.wait_text | default: 'Tap the ring to start the designer, then save your design.' | escape }}"
+        data-fail-text="{{ section.settings.fail_text | default: 'We could not read the design just now. Contact support and we will pick it up with you.' | escape }}"
+        data-saved-text="{{ section.settings.saved_text | default: 'Design saved' | escape }}"
+        data-reopen-label="{{ section.settings.list_reopen_label | default: 'Reopen' | escape }}"
+        data-ask-label="{{ section.settings.ask_label | default: 'Contact support' | escape }}"
+        data-remove-label="{{ section.settings.remove_label | default: 'Remove' | escape }}"
+      >
+        <div class="ijd-actions">
+          {%- if save_label != blank -%}
+            <button class="eden-action eden-action--solid" type="button" data-design-save>
+              {{- save_label | escape -}}
+            </button>
+          {%- endif -%}
+          {%- comment -%}
+            A real link, so it works before the script has run, works if the
+            script never runs, and can be opened in a new tab. The element takes
+            the click only to get the design saved and its reference onto the
+            URL first; the support page takes an enquiry either way.
+          {%- endcomment -%}
+          {%- if support_label != blank -%}
+            <a class="eden-action eden-action--outline" href="{{ support_link }}" data-design-support>
+              {{- support_label | escape -}}
+            </a>
+          {%- endif -%}
+        </div>
+
+        <p class="ijd-status" data-design-status role="status" aria-live="polite" hidden></p>
+
+        <div class="ijd-panel" data-design-panel hidden>
+          {%- if section.settings.panel_title != blank -%}
+            <p class="ijd-panel__title">{{ section.settings.panel_title | escape }}</p>
+          {%- endif -%}
+          <p class="ijd-panel__reference">
+            {{ section.settings.reference_lead | default: 'Your reference is' | escape }}
+            <strong data-design-reference></strong>{{ section.settings.reference_tail | default: '. Quote it when you talk to us.' | escape }}
+          </p>
+          <dl class="ijd-specs" data-design-specs hidden></dl>
+          <p class="ijd-panel__links">
+            <a class="eden-link" data-design-reopen hidden>{{ section.settings.reopen_label | default: 'Reopen this design' | escape }}</a>
+            {%- if support_label != blank -%}
+              <a class="eden-link" href="{{ support_link }}" data-design-go>{{ section.settings.ask_label | default: 'Contact support' | escape }}</a>
+            {%- endif -%}
+          </p>
+          <p class="ijd-panel__unstored" data-design-unstored hidden>
+            {{ section.settings.unstored_text | default: 'This browser will not keep your design, so use the link above or send it to us now.' | escape }}
+          </p>
+        </div>
+
+        {%- if section.settings.show_saved -%}
+          <div class="ijd-saved" data-design-saved hidden>
+            {%- if section.settings.saved_title != blank -%}
+              <h3 class="ijd-saved__title">{{ section.settings.saved_title | escape }}</h3>
+            {%- endif -%}
+            <ul class="ijd-saved__list" data-design-list></ul>
+          </div>
+        {%- endif -%}
+      </ijewel-design>
+    {%- endif -%}
+
     {%- if notes.size > 0 -%}
       <ul class="ijw-notes">
         {%- for note in notes -%}
@@ -538,13 +626,33 @@
     { "type": "range", "id": "frame_height_mobile", "label": "Frame height (mobile)", "min": 320, "max": 1200, "step": 20, "unit": "px", "default": 560 },
     { "type": "text", "id": "loading_label", "label": "Line shown while it loads", "info": "Leave empty to hide it.", "default": "Loading the designer" },
 
-    { "type": "header", "content": "When the shopper presses Add to cart", "info": "The builder sits on its own domain, so its Add to cart button cannot reach our cart - it posts the finished design out to this page instead, and this decides what happens to it. Every choice, the design code, the builder's price and the key that reopens the design travel with it either way." },
-    { "type": "select", "id": "cart_action", "label": "What happens", "default": "none", "options": [
-      { "value": "none", "label": "Nothing - leave it to the builder" },
-      { "value": "cart", "label": "Add a product to the cart" },
-      { "value": "enquiry", "label": "Send them to the bespoke enquiry" }
+    { "type": "header", "content": "Saving a design", "info": "Nothing is added to a cart here: a configured ring has no variant and no price Shopify will take, so the studio saves the design and sends it to you to quote. Save design writes it to this browser and shows a reference; Contact support carries that reference to the support page, where the whole design sits above a contact form. The record holds every choice, the builder's price and the key that reopens the identical 3D ring." },
+    { "type": "url", "id": "support_link", "label": "Support page", "info": "The page with the \"Design support\" section on it. Leave empty and the Contact support button is not drawn and the builder's own button only saves." },
+    { "type": "text", "id": "save_label", "label": "Save button label", "default": "Save this design" },
+    { "type": "text", "id": "support_label", "label": "Support button label", "default": "Contact support" },
+    { "type": "select", "id": "builder_button", "label": "What their button does", "default": "support", "info": "The builder's own Add to cart is on iJewel's page inside the frame, so it cannot be relabelled or removed from here - but pressing it posts the design out to us and then waits, so what it means is still yours to set. It never adds anything to a cart. On a phone it is usually cropped out of the frame, which is why the mobile bar needs wiring too.", "options": [
+      { "value": "support", "label": "Save the design and go to support" },
+      { "value": "save", "label": "Save the design and stay here" },
+      { "value": "none", "label": "Nothing - leave it to the builder" }
     ] },
-    { "type": "product", "id": "cart_product", "label": "Product added to the cart", "info": "Shopify charges this product's own price. A cart add takes a variant and never a price, so a configured ring's own price cannot be sent with it - pick the product the shop means to charge (a bespoke deposit, a fixed design fee) and read the real figure off the line's properties. With nothing picked here the design goes to the enquiry instead." },
+    { "type": "text", "id": "reference_prefix", "label": "Reference prefix", "default": "ER", "info": "The front of the reference a shopper quotes - ER-K3F9T2. Letters and digits only." },
+    { "type": "checkbox", "id": "show_saved", "label": "List the designs saved on this device", "default": true, "info": "Under the buttons, so somebody returning to the studio finds the ring they made last visit instead of starting again. Saved designs live in this browser only - they do not follow anyone to another device, which is why the support email is the copy you work from." },
+    { "type": "text", "id": "saved_title", "label": "List heading", "default": "Your saved designs" },
+    { "type": "textarea", "id": "axis_names", "label": "Names for the builder's options", "info": "The builder names its own axes in slugs - shankMetal, headGem - and those go on the record unless they are named here. One per line, as slug = name, e.g. gem = Stone. Anything not listed is tidied up from the slug." },
+
+    { "type": "header", "content": "Saving a design: the wording", "info": "What the page says while it reads the design, once it has one, and when it cannot. A design is read by asking the builder across the frame, so there is a moment of waiting and there are ways for it to fail." },
+    { "type": "text", "id": "panel_title", "label": "Panel heading", "default": "Your design is saved" },
+    { "type": "text", "id": "reference_lead", "label": "Before the reference", "default": "Your reference is" },
+    { "type": "text", "id": "reference_tail", "label": "After the reference", "default": ". Quote it when you talk to us." },
+    { "type": "text", "id": "reopen_label", "label": "Reopen link label", "default": "Reopen this design" },
+    { "type": "text", "id": "ask_label", "label": "Support link label", "default": "Contact support" },
+    { "type": "text", "id": "remove_label", "label": "Remove link label", "default": "Remove" },
+    { "type": "text", "id": "list_reopen_label", "label": "Reopen label in the saved list", "default": "Reopen", "info": "Shorter than the one on the panel: in the list it sits beside two other links in a narrow card." },
+    { "type": "text", "id": "saving_text", "label": "While it is being read", "default": "Saving your design" },
+    { "type": "text", "id": "saved_text", "label": "Saved, with no panel", "default": "Design saved", "info": "Only used if the panel above is turned off by clearing its heading." },
+    { "type": "text", "id": "wait_text", "label": "Before the designer is running", "default": "Tap the ring to start the designer, then save your design.", "info": "The builder cannot be asked anything until its 3D scene is going, and the scene waits to be tapped. A press before that is answered with this." },
+    { "type": "text", "id": "fail_text", "label": "If the design cannot be read", "default": "We could not read the design just now. Contact support and we will pick it up with you." },
+    { "type": "text", "id": "unstored_text", "label": "If the browser will not keep it", "default": "This browser will not keep your design, so use the link above or send it to us now.", "info": "Private browsing and blocked site data both refuse the write. The design is still on screen and the reopen link still works." },
 
     { "type": "header", "content": "Cover the builder's loading screen", "info": "The builder shows its own splash while its scene downloads, inside the frame where our CSS cannot reach it. This holds our own cover over the stage - the part of the frame the piece is drawn in - for a moment after the frame has loaded, then fades it out. It deliberately leaves the builder's own panel showing, so the page never looks empty while it loads. Lengthen the hold if their splash flashes up at the end of it; widen the cover if it shows at the edges." },
     { "type": "checkbox", "id": "splash_cover", "label": "Cover the builder's loading screen", "default": true },

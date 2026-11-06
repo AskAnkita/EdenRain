@@ -1,0 +1,374 @@
+{% comment %}
+  Design support - where a saved design goes to be quoted.
+
+  The studio does not add anything to a cart: a configured ring has no variant
+  and no price Shopify will accept, so what a shopper leaves the studio with is
+  a saved design and a reference. This is the page that turns one into a
+  conversation. Put it on a page and point the studio section's "Support page"
+  setting at it.
+
+  Three things on it, in this order:
+
+    1. The design. Its reference, every choice as the builder named it, and -
+       when the setting is on - the ring itself, rebuilt in 3D from the saved
+       state key. Which design is read from ?design=<reference> on the URL,
+       against the records assets/eden-design-store.js keeps in this browser.
+    2. The contact form. Shopify's own, so it reaches the shop's contact email
+       with no app and no backend. The design travels with it as hidden fields,
+       which is the point of the page: the copy of the design you work from is
+       the one in the inbox, not the one on the shopper's device.
+    3. Every other design saved on this device, so somebody who made three can
+       ask about any of them without going back to the studio.
+
+  With no design to show - a fresh visit, a forwarded link, a browser that
+  keeps nothing - the page is still a working enquiry form with a line
+  explaining what is missing and a way back to the studio. It is never a dead
+  end.
+
+  Looks come from assets/design-support.css, behaviour from
+  assets/design-support.js; buttons from assets/eden-actions.css.
+
+  Every restylable setting is written onto the section element as a CSS custom
+  property, with the stylesheet's own value as the fallback, so a setting left
+  at "use the default" (a cleared colour, a size of 0) writes nothing at all.
+  Square corners throughout - this theme sets every radius to 0.
+{% endcomment %}
+
+{{ 'design-support.css' | asset_url | stylesheet_tag }}
+{{ 'eden-actions.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'eden-design-store.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'design-support.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign heading_size = section.settings.heading_size | plus: 0
+  assign eyebrow_size = section.settings.eyebrow_size | plus: 0
+  assign text_size = section.settings.text_size | plus: 0
+  assign label_size = section.settings.label_size | plus: 0
+  assign specs_size = section.settings.specs_size | plus: 0
+  assign content_width = section.settings.content_width | plus: 0
+  assign pad_top = section.settings.padding_top | plus: 0
+  assign pad_bottom = section.settings.padding_bottom | plus: 0
+  assign preview_height = section.settings.preview_height | plus: 0
+  assign preview_height_mobile = section.settings.preview_height_mobile | plus: 0
+
+  # The 3D preview is the saved design rebuilt, so it needs the same embed URL
+  # the studio uses. It is pasted here as well rather than read off the studio
+  # section, because the two pages are different templates and a section cannot
+  # read another section's settings. The whole <iframe> snippet is accepted, the
+  # same way the studio accepts it.
+  assign embed_src = section.settings.embed_url | strip
+  if embed_src contains 'src='
+    assign src_parts = embed_src | split: 'src=' | last | replace: "'", '"' | split: '"'
+    assign embed_src = src_parts[1] | default: ''
+  endif
+  unless embed_src contains 'https://'
+    assign embed_src = ''
+  endunless
+
+  assign show_preview = false
+  if section.settings.show_preview and embed_src != blank
+    assign show_preview = true
+  endif
+-%}
+
+<section
+  class="design-support{% if section.settings.full_width %} design-support--wide{% endif %}"
+  style="
+  {%- if section.settings.section_background != blank and section.settings.section_background != 'rgba(0,0,0,0)' -%}--dsp-section-bg: {{ section.settings.section_background }};{%- endif -%}
+  {%- if section.settings.heading_color != blank and section.settings.heading_color != 'rgba(0,0,0,0)' -%}--dsp-heading-color: {{ section.settings.heading_color }};{%- endif -%}
+  {%- if section.settings.eyebrow_color != blank and section.settings.eyebrow_color != 'rgba(0,0,0,0)' -%}--dsp-eyebrow-color: {{ section.settings.eyebrow_color }};{%- endif -%}
+  {%- if section.settings.text_color != blank and section.settings.text_color != 'rgba(0,0,0,0)' -%}--dsp-text-color: {{ section.settings.text_color }};{%- endif -%}
+  {%- if section.settings.panel_background != blank and section.settings.panel_background != 'rgba(0,0,0,0)' -%}--dsp-panel-bg: {{ section.settings.panel_background }};{%- endif -%}
+  {%- if section.settings.panel_border != blank and section.settings.panel_border != 'rgba(0,0,0,0)' -%}--dsp-panel-border: {{ section.settings.panel_border }};{%- endif -%}
+  {%- if section.settings.field_border != blank and section.settings.field_border != 'rgba(0,0,0,0)' -%}--dsp-field-border: {{ section.settings.field_border }};{%- endif -%}
+  {%- if section.settings.field_background != blank and section.settings.field_background != 'rgba(0,0,0,0)' -%}--dsp-field-bg: {{ section.settings.field_background }};{%- endif -%}
+  {%- if section.settings.button_background != blank and section.settings.button_background != 'rgba(0,0,0,0)' -%}--cta-fill: {{ section.settings.button_background }};--cta-edge: {{ section.settings.button_background }};--cta-ink-hover: {{ section.settings.button_background }};{%- endif -%}
+  {%- if section.settings.button_text_color != blank and section.settings.button_text_color != 'rgba(0,0,0,0)' -%}--cta-ink: {{ section.settings.button_text_color }};--cta-fill-hover: {{ section.settings.button_text_color }};--cta-edge-hover: {{ section.settings.button_text_color }};{%- endif -%}
+  {%- if heading_size > 0 -%}--dsp-heading-size: {{ heading_size }}px;{%- endif -%}
+  {%- if eyebrow_size > 0 -%}--dsp-eyebrow-size: {{ eyebrow_size }}px;{%- endif -%}
+  {%- if text_size > 0 -%}--dsp-text-size: {{ text_size }}px;{%- endif -%}
+  {%- if label_size > 0 -%}--dsp-label-size: {{ label_size }}px;{%- endif -%}
+  {%- if specs_size > 0 -%}--dsp-specs-size: {{ specs_size }}px;{%- endif -%}
+  {%- if content_width > 0 and section.settings.full_width == false -%}--dsp-shell-max: {{ content_width }}px;{%- endif -%}
+  {%- if preview_height > 0 -%}--dsp-preview-height: {{ preview_height }}px;{%- endif -%}
+  {%- if preview_height_mobile > 0 -%}--dsp-preview-height-mobile: {{ preview_height_mobile }}px;{%- endif -%}
+  {%- if section.settings.custom_padding -%}--dsp-pad-top: {{ pad_top }}px;--dsp-pad-bottom: {{ pad_bottom }}px;{%- endif -%}
+  "
+>
+  <div class="dsp-shell">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="dsp-eyebrow">{{ section.settings.eyebrow | escape }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.heading != blank -%}
+      <h1 class="dsp-heading">{{ section.settings.heading | escape }}</h1>
+    {%- endif -%}
+
+    {%- if section.settings.text != blank -%}
+      <div class="dsp-text">{{ section.settings.text }}</div>
+    {%- endif -%}
+
+    <design-support
+      data-studio="{{ section.settings.studio_link }}"
+      data-embed="{{ embed_src | escape }}"
+      data-preview="{% if show_preview %}true{% else %}false{% endif %}"
+      data-preview-title="{{ section.settings.preview_title | default: 'Your saved design in 3D' | escape }}"
+      data-empty-text="{{ section.settings.empty_text | default: 'We could not find a saved design on this device. Send us a message below, or go back to the studio and save a design first.' | escape }}"
+      data-price-note="{{ section.settings.price_note | default: 'Builder estimate, not a quote' | escape }}"
+      data-send-price="{% if section.settings.send_price %}true{% else %}false{% endif %}"
+      data-reopen-label="{{ section.settings.reopen_label | default: 'Reopen in the studio' | escape }}"
+      data-switch-label="{{ section.settings.switch_label | default: 'Ask about this one' | escape }}"
+    >
+      <div class="dsp-grid">
+        {%- comment -%}
+          The design. Hidden until the script has found one: an empty panel with
+          headings and no values in it reads as a fault, and on a forwarded link
+          there genuinely is nothing to put in it.
+        {%- endcomment -%}
+        <div class="dsp-design" data-support-design hidden>
+          {%- if section.settings.design_title != blank -%}
+            <h2 class="dsp-design__title">{{ section.settings.design_title | escape }}</h2>
+          {%- endif -%}
+
+          <p class="dsp-design__reference">
+            {{ section.settings.reference_lead | default: 'Reference' | escape }}
+            <strong data-support-reference></strong>
+          </p>
+
+          {%- if show_preview -%}
+            {%- comment -%}
+              The saved design, rebuilt. The state key goes back to the builder
+              as ?state= and it draws the identical ring - which is as close to
+              "the design is stored as a 3D model" as a cross-origin embed gets:
+              we hold the key, they hold the geometry. The frame is only built
+              once a design has actually been found, by the script.
+            {%- endcomment -%}
+            <div class="dsp-preview" data-support-preview>
+              <p class="dsp-preview__label">{{ section.settings.preview_loading | default: 'Rebuilding your design' | escape }}</p>
+            </div>
+          {%- endif -%}
+
+          <dl class="dsp-specs" data-support-specs hidden></dl>
+
+          <p class="dsp-design__links">
+            <a class="eden-link" data-support-reopen hidden>{{ section.settings.reopen_label | default: 'Reopen in the studio' | escape }}</a>
+          </p>
+        </div>
+
+        <div class="dsp-form-wrap">
+          {%- if section.settings.form_title != blank -%}
+            <h2 class="dsp-form__title">{{ section.settings.form_title | escape }}</h2>
+          {%- endif -%}
+
+          {%- if section.settings.form_text != blank -%}
+            <div class="dsp-text dsp-text--form">{{ section.settings.form_text }}</div>
+          {%- endif -%}
+
+          <p class="dsp-empty" data-support-empty hidden></p>
+
+          {%- comment -%}
+            Shopify's own contact form. It posts to /contact, not to this page,
+            and it is Shopify that sends the visitor back afterwards - which,
+            behind the storefront password gate or after a bot challenge, can
+            land anywhere but here. return_to names the page and the flag the
+            thank-you is keyed on, so the way back is ours.
+          {%- endcomment -%}
+          {%- assign form_id = 'DesignSupport-' | append: section.id -%}
+          {%- form 'contact', id: form_id, class: 'dsp-form' -%}
+            <input type="hidden" name="return_to" value="{{ request.path }}?contact_posted=true">
+
+            {%- if form.posted_successfully? -%}
+              <p class="dsp-form__message" data-support-posted>
+                {{ section.settings.success_text | default: 'Thank you - your design is with us. We will come back to you with a quote by email.' | escape }}
+              </p>
+            {%- endif -%}
+
+            {%- if form.errors -%}
+              <p class="dsp-form__message dsp-form__message--error">{{ form.errors | default_errors }}</p>
+            {%- endif -%}
+
+            {%- comment -%}
+              The design, as hidden fields. This is what makes the page worth
+              having: a saved design lives in one browser and nowhere else, so
+              the copy the shop can act on is the one that arrives by email.
+              The two links both rebuild the ring - ours opens it in the studio,
+              the builder's own URL still works if this page is ever renamed -
+              and the raw key is sent as well so the design survives both.
+            {%- endcomment -%}
+            <input type="hidden" name="contact[Design reference]" data-support-field="id" value="">
+            <input type="hidden" name="contact[Design]" data-support-field="summary" value="">
+            <input type="hidden" name="contact[Reopen in the studio]" data-support-field="reopen" value="">
+            <input type="hidden" name="contact[Reopen in the builder]" data-support-field="builder" value="">
+            <input type="hidden" name="contact[3D design key]" data-support-field="state" value="">
+            {%- if section.settings.send_price -%}
+              <input type="hidden" name="contact[Builder estimate]" data-support-field="price" value="">
+            {%- endif -%}
+
+            <div class="dsp-field">
+              <label for="dsp-name-{{ section.id }}">{{ section.settings.name_label | default: 'Name' | escape }}</label>
+              <input
+                id="dsp-name-{{ section.id }}"
+                type="text"
+                name="contact[name]"
+                autocomplete="name"
+                required
+                value="{% if form.name %}{{ form.name | escape }}{% elsif customer %}{{ customer.name | escape }}{% endif %}"
+              >
+            </div>
+
+            <div class="dsp-field">
+              <label for="dsp-email-{{ section.id }}">{{ section.settings.email_label | default: 'Email' | escape }}</label>
+              <input
+                id="dsp-email-{{ section.id }}"
+                type="email"
+                name="contact[email]"
+                autocomplete="email"
+                required
+                value="{% if form.email %}{{ form.email | escape }}{% elsif customer %}{{ customer.email | escape }}{% endif %}"
+              >
+            </div>
+
+            {%- if section.settings.show_phone -%}
+              <div class="dsp-field">
+                <label for="dsp-phone-{{ section.id }}">{{ section.settings.phone_label | default: 'Telephone (optional)' | escape }}</label>
+                <input
+                  id="dsp-phone-{{ section.id }}"
+                  type="tel"
+                  name="contact[phone]"
+                  autocomplete="tel"
+                  value="{% if form.phone %}{{ form.phone | escape }}{% elsif customer %}{{ customer.phone | escape }}{% endif %}"
+                >
+              </div>
+            {%- endif -%}
+
+            {%- if section.settings.ring_size_label != blank -%}
+              {%- comment -%}
+                The one thing the builder cannot be asked. Ring size is not an
+                axis in the configurator, so a saved design has no size on it -
+                and a bespoke ring cannot be made without one. Asked here rather
+                than guessed, and optional, because plenty of people do not know
+                it yet and we size them at the consultation.
+              {%- endcomment -%}
+              <div class="dsp-field">
+                <label for="dsp-size-{{ section.id }}">{{ section.settings.ring_size_label | escape }}</label>
+                <input id="dsp-size-{{ section.id }}" type="text" name="contact[Ring size]" value="">
+              </div>
+            {%- endif -%}
+
+            <div class="dsp-field">
+              <label for="dsp-body-{{ section.id }}">{{ section.settings.message_label | default: 'Anything else we should know' | escape }}</label>
+              <textarea id="dsp-body-{{ section.id }}" name="contact[body]" rows="5">{{ form.body }}</textarea>
+            </div>
+
+            <button class="eden-action eden-action--solid" type="submit">
+              {{- section.settings.submit_label | default: 'Send to our team' | escape -}}
+            </button>
+
+            {%- if section.settings.form_note != blank -%}
+              <p class="dsp-form__note">{{ section.settings.form_note | escape }}</p>
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+      </div>
+
+      {%- comment -%}
+        Everything else saved in this browser. Choosing one swaps the panel and
+        the hidden fields over to it without leaving the page, so three designs
+        are three enquiries from here rather than three trips to the studio.
+      {%- endcomment -%}
+      {%- if section.settings.show_other -%}
+        <div class="dsp-other" data-support-other hidden>
+          {%- if section.settings.other_title != blank -%}
+            <h2 class="dsp-other__title">{{ section.settings.other_title | escape }}</h2>
+          {%- endif -%}
+          <ul class="dsp-other__list" data-support-list></ul>
+        </div>
+      {%- endif -%}
+    </design-support>
+
+    {%- if section.settings.studio_link != blank and section.settings.studio_label != blank -%}
+      <p class="dsp-back">
+        <a class="eden-link" href="{{ section.settings.studio_link }}">{{ section.settings.studio_label | escape }}</a>
+      </p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Design support",
+  "tag": "section",
+  "class": "section-design-support",
+  "settings": [
+    { "type": "header", "content": "What this is", "info": "Where a design saved in the studio goes to be quoted. It shows the design, rebuilds it in 3D from the saved key, and sends it to the shop's contact email as hidden fields on Shopify's own contact form. Point the studio section's \"Support page\" setting at the page this is on. With no saved design to find it is still a working enquiry form." },
+
+    { "type": "header", "content": "Heading" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Bespoke" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Let's talk about your design" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Send us the design you saved and we will come back with a firm price, the stone options and how long it will take to make.</p>" },
+
+    { "type": "header", "content": "The design" },
+    { "type": "text", "id": "design_title", "label": "Panel heading", "default": "Your design" },
+    { "type": "text", "id": "reference_lead", "label": "Before the reference", "default": "Reference" },
+    { "type": "text", "id": "reopen_label", "label": "Reopen link label", "default": "Reopen in the studio" },
+    { "type": "url", "id": "studio_link", "label": "Studio page", "info": "Where the reopen link and the way back point. The saved design's key is added to it, so the studio opens on that exact ring." },
+    { "type": "text", "id": "studio_label", "label": "Way back label", "default": "Back to the design studio" },
+    { "type": "text", "id": "empty_text", "label": "If no design is found", "default": "We could not find a saved design on this device. Send us a message below, or go back to the studio and save a design first.", "info": "Saved designs live in one browser. A link opened on another device, or in private browsing, arrives with nothing to show - this says so instead of leaving a blank panel." },
+
+    { "type": "header", "content": "The design in 3D", "info": "The saved key is fed back to the builder as ?state= and it draws the identical ring - the same stone, head, metal and band. This is the nearest thing to a stored 3D model that a configurator in a cross-origin frame allows: we keep the key, they keep the geometry. The frame is only built once a design has been found." },
+    { "type": "checkbox", "id": "show_preview", "label": "Rebuild the design in 3D", "default": true },
+    { "type": "textarea", "id": "embed_url", "label": "Embed URL or iframe code", "info": "The same embed the studio section uses - paste either the bare URL or the whole <iframe> snippet. A section cannot read another section's settings, which is why it is pasted again here. Leave empty and the preview is skipped." },
+    { "type": "text", "id": "preview_title", "label": "Frame title", "default": "Your saved design in 3D", "info": "Read out by screen readers in place of the frame." },
+    { "type": "text", "id": "preview_loading", "label": "Line shown while it builds", "default": "Rebuilding your design" },
+    { "type": "range", "id": "preview_height", "label": "Preview height (desktop)", "min": 240, "max": 900, "step": 20, "unit": "px", "default": 480 },
+    { "type": "range", "id": "preview_height_mobile", "label": "Preview height (mobile)", "min": 200, "max": 700, "step": 20, "unit": "px", "default": 320 },
+
+    { "type": "header", "content": "The form", "info": "Shopify's own contact form, so it reaches the address set in Settings > Notifications with no app involved. The design rides along as hidden fields: a saved design lives in one browser, so the copy the shop works from is the one that arrives by email." },
+    { "type": "text", "id": "form_title", "label": "Form heading", "default": "Send it to our team" },
+    { "type": "richtext", "id": "form_text", "label": "Form text" },
+    { "type": "text", "id": "name_label", "label": "Name label", "default": "Name" },
+    { "type": "text", "id": "email_label", "label": "Email label", "default": "Email" },
+    { "type": "checkbox", "id": "show_phone", "label": "Ask for a telephone number", "default": true },
+    { "type": "text", "id": "phone_label", "label": "Telephone label", "default": "Telephone (optional)" },
+    { "type": "text", "id": "ring_size_label", "label": "Ring size label", "default": "Ring size, if you know it", "info": "Ring size is not an axis in the configurator, so a saved design has no size on it. Clear this to drop the field." },
+    { "type": "text", "id": "message_label", "label": "Message label", "default": "Anything else we should know" },
+    { "type": "text", "id": "submit_label", "label": "Submit label", "default": "Send to our team" },
+    { "type": "text", "id": "success_text", "label": "After it is sent", "default": "Thank you - your design is with us. We will come back to you with a quote by email." },
+    { "type": "text", "id": "form_note", "label": "Note under the button", "default": "We reply to every design within one working day." },
+    { "type": "checkbox", "id": "send_price", "label": "Include the builder's estimate", "default": true, "info": "The figure the builder had on screen when the design was saved. It is not a quote, and where the studio is covering that figure the shopper never saw it - so it is labelled as an estimate and only ever goes to you, never back onto the page." },
+    { "type": "text", "id": "price_note", "label": "How the estimate is labelled", "default": "Builder estimate, not a quote" },
+
+    { "type": "header", "content": "Other saved designs", "info": "Everything else saved in this browser, listed under the form. Choosing one swaps the panel and the hidden fields over to it without leaving the page." },
+    { "type": "checkbox", "id": "show_other", "label": "List the other saved designs", "default": true },
+    { "type": "text", "id": "other_title", "label": "List heading", "default": "Your other saved designs" },
+    { "type": "text", "id": "switch_label", "label": "Switch link label", "default": "Ask about this one" },
+
+    { "type": "header", "content": "Colours" },
+    { "type": "color", "id": "section_background", "label": "Section background" },
+    { "type": "color", "id": "heading_color", "label": "Heading" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "panel_background", "label": "Panel background" },
+    { "type": "color", "id": "panel_border", "label": "Panel border" },
+    { "type": "color", "id": "field_background", "label": "Field background" },
+    { "type": "color", "id": "field_border", "label": "Field border" },
+    { "type": "color", "id": "button_background", "label": "Button" },
+    { "type": "color", "id": "button_text_color", "label": "Button text" },
+
+    { "type": "header", "content": "Type", "info": "Each at 0 keeps the size the stylesheet sets, which follows the theme's own type scale." },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "eyebrow_size", "label": "Eyebrow size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "text_size", "label": "Text size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "label_size", "label": "Field label size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "specs_size", "label": "Design choices size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0 },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "checkbox", "id": "full_width", "label": "Full width", "default": false },
+    { "type": "range", "id": "content_width", "label": "Content width", "min": 0, "max": 1600, "step": 20, "unit": "px", "default": 1180, "info": "0 keeps the stylesheet's own width." },
+    { "type": "checkbox", "id": "custom_padding", "label": "Set the space above and below", "default": false },
+    { "type": "range", "id": "padding_top", "label": "Space above", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 80 }
+  ],
+  "presets": [{ "name": "Design support" }]
+}
+{% endschema %}

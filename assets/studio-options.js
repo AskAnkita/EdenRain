@@ -3,7 +3,7 @@
 
   The configurator is iJewel's page in a cross-origin frame: we cannot restyle
   a line of it. What we can do is talk to it. The live embed speaks an
-  undocumented v2 bridge - see assets/ijewel-cart.js for the envelope - and two
+  undocumented v2 bridge - see assets/ijewel-design.js for the envelope - and two
   of its methods are all this needs:
 
     getOptions({axis}) -> [{key, label, state: selected|available|no-file, icon}]
