@@ -26,12 +26,27 @@
 
   WHERE THE PICTURES COME FROM
 
-  Each card looks for a photograph in Content > Files named after its label with the spaces turned
-  into underscores - "Side Stone" takes `Side_Stone.png` - which is the naming the hand-built strip
-  used, so the engagement cards keep the photographs they already had. A label with no such file
-  falls back to 'menu-link-icon', which finds that set's menu picture or, failing that, the drawn
-  outline from 'icon-ring-style' / 'icon-band-style'. A card can therefore never show a broken
-  image, and the wedding bands - which have no strip photographs - draw their outlines instead.
+  Our own stock, never anyone else's. Until 2026-11-12 the engagement cards hotlinked eleven
+  photographs off miadonna.com, written into this file as URLs: they were the pictures the
+  hand-built blocks in templates/collection.json had carried, and they were another shop's
+  product photography served from another shop's CDN. They are gone. The chain is now, narrowest
+  first:
+
+  1. A photograph in Content > Files named for the card - see the three namings below.
+  2. The Image set on the card's own collection in Products > Collections.
+  3. The first piece in that collection, which is to say one of our products.
+  4. Nothing. The picture box stays, empty, and the name sits beside it.
+
+  So a card shows a ring we sell or it shows no ring at all. A category we have no stock in yet -
+  Vintage, Nature Inspired, Toi et Moi and Promise on Engagement - carries its name against an
+  empty box until a piece is published into it, at which point the card fills itself with no
+  change here.
+
+  The line drawings from 'menu-link-icon' are still available as step 4 instead of the empty box,
+  behind "Fall back to a line drawing" in the section's settings. It ships off: a drawn outline is
+  not a photograph of a ring, and on a strip where every other card is a real piece it reads as a
+  card that did not finish loading. Switch it on for a family whose categories are mostly empty -
+  the earring and necklace sub-ranges - where a row of empty boxes would look worse.
 
   Styles: assets/collection-style-strip.css. Arrows: assets/collection-style-strip.js, a custom
   element rather than an inline script so the row survives a section swap in the editor.
@@ -74,19 +89,6 @@
     inside a single-quoted string.
   endcomment
   assign families = "Engagement|By Style|engagement-rings|By Style|ring-styles,Engagement|By Shape|engagement-rings|By Style|ring-styles,Wedding|By Style|wedding-bands|By Style|band-styles,Jewellery|Earrings|earrings|Earrings|types,Jewellery|Necklaces|necklaces|Necklaces|types,Jewellery|Bracelets|bracelets|Bracelets|types,Jewellery|Rings|rings|Rings|,Jewellery|Men's|mens-rings|Men's|" | split: ','
-
-  comment
-    The pictures the strip has always carried, as `Label|url`, kept exactly as the hand-built
-    blocks in templates/collection.json had them so the engagement cards look as they always have.
-
-    These are hosted on miadonna.com, not here. The blocks named `shopify://shop_images/All.png`,
-    `Solitaire.png` and so on first and fell back to these; not one of those file names has ever
-    existed in this shop's Files, so these URLs are what was on screen. Upload a file of the same
-    name - "Side Stone" takes `Side_Stone.png` - and the card takes ours instead, with no change
-    here: Files is checked first, every time. Until then, leave these alone; dropping one takes
-    that card's photograph away.
-  endcomment
-  assign legacy_photos = 'All|https://www.miadonna.com/cdn/shop/files/Shop_All_Engagement_Rings_Filter.png?v=1737652482&width=300~Solitaire|https://www.miadonna.com/cdn/shop/files/Solitaire_Engagement_Rings_Filter.png?v=1737593298&width=300~Side Stone|https://www.miadonna.com/cdn/shop/files/Accented_Engagement_Ring_Style_Thumbnail_407e6ff9-4d4b-4c77-bb59-c6e4766c05e7.png?v=1737592685&width=300~Halo|https://www.miadonna.com/cdn/shop/files/Halo_Engagement_Rings_Filter.png?v=1737651680&width=300~Hidden Halo|https://www.miadonna.com/cdn/shop/files/hidden-halo-engagement-rings-thumbnail_f6fe77c3-fd2d-493a-b9c8-706e129c0a4f.png?v=1750292548&width=300~Three Stone|https://www.miadonna.com/cdn/shop/files/Three_Stone_Engagement_Rings_fce0a1bd-330f-4514-b808-3d0b4a2dd641.png?v=1737651441&width=300~Bridal Sets|https://www.miadonna.com/cdn/shop/files/bridal_sets_filter_image.png?v=1750368359&width=300~Vintage|https://www.miadonna.com/cdn/shop/files/Antique_Engagement_Rings_Filter.png?v=1737593297&width=300~Nature Inspired|https://www.miadonna.com/cdn/shop/files/Nature_Insppired_Thumb_b6bed990-d5f7-4645-90a5-f71cf9798fd3.png?v=1778258552&width=300~Promise|https://www.miadonna.com/cdn/shop/files/Promise_Rings.png?v=1770159314&width=300~Toi et Moi|https://www.miadonna.com/cdn/shop/files/6_92d6634f-4289-43fb-a512-50a8917ce1c6.png?v=1779464196&width=300' | split: '~'
 
   assign current_handle = collection.handle
   assign matched_parent = ''
@@ -321,11 +323,12 @@
         {%- if cs.show_all_card -%}
           {%- liquid
             comment
-              The "All" card has no name in any icon set to fall back on, so it works down a chain
-              instead: the picture the merchant chose, then All.png in Files - the name the
-              hand-built strip used - then the range's own collection image, then the first
-              product in it. With none of the four the box keeps its background rather than
-              showing a broken picture.
+              The "All" card has no name in any icon set to fall back on, so it works down the
+              same chain the cards below do: the picture the merchant chose, then All.png in
+              Files, then `category-<range>.png`, then the range's own collection image, then the
+              first piece in the range. The last of those is the one that answers in practice -
+              Engagement Rings holds stock and has no Image set - so "All" shows one of our rings.
+              With none of the five the box stays empty.
             endcomment
             assign all_photo = cs.all_image
             if all_photo == blank
@@ -340,33 +343,16 @@
               assign all_category_photo_name = matched_root | prepend: 'category-' | append: '.png'
               assign all_photo = images[all_category_photo_name]
             endif
-            assign all_photo_url = ''
             if all_photo == blank
-              for legacy_photo in legacy_photos
-                assign legacy_parts = legacy_photo | split: '|'
-                if legacy_parts[0] == 'All'
-                  assign all_photo_url = legacy_parts[1]
-                  break
-                endif
-              endfor
-            endif
-            comment
-              Only the engagement "All" card has a picture of its own; every other family's falls
-              through to its range's collection image, or the first piece in it.
-            endcomment
-            if matched_parent != 'Engagement'
-              assign all_photo_url = ''
-            endif
-            if all_photo == blank and all_photo_url == blank
               assign all_photo = root_collection.image
             endif
-            if all_photo == blank and all_photo_url == blank
+            if all_photo == blank
               assign all_photo = root_collection.products.first.featured_image
             endif
           -%}
           <li class="style-strip__item">
             <a
-              class="style-strip__card{% if current_handle == matched_root %} style-strip__card--active{% endif %}"
+              class="style-strip__card{% if current_handle == matched_root %} style-strip__card--active{% endif %}{% if all_photo == blank %} style-strip__card--empty{% endif %}"
               href="{{ all_url }}"
               {% if current_handle == matched_root %}aria-current="page"{% endif %}
             >
@@ -381,8 +367,6 @@
                     height="240"
                     loading="lazy"
                   >
-                {%- elsif all_photo_url != blank -%}
-                  <img src="{{ all_photo_url }}" alt="" width="240" height="240" loading="lazy">
                 {%- endif -%}
               </span>
               <span class="style-strip__label">{{ all_label }}</span>
@@ -468,52 +452,45 @@
             endif
 
             comment
-              The picture the card has always carried, looked up by its label. Files is checked
-              first above, so ours wins the moment one is uploaded under that name.
-            endcomment
-            assign item_photo_url = ''
-            if item_photo == blank
-              for legacy_photo in legacy_photos
-                assign legacy_parts = legacy_photo | split: '|'
-                if legacy_parts[0] == item_label
-                  assign item_photo_url = legacy_parts[1]
-                  break
-                endif
-              endfor
-            endif
-          -%}
+              No photograph filed for the card, so the collection it opens stands in for itself:
+              the Image set on it in Products > Collections first, then the first piece in it,
+              which is one of our own products. This is what carries the strip - none of the
+              style collections has an Image, so every card that has anything to show is showing
+              a ring we sell.
 
-          {%- capture item_icon -%}
-            {%- render 'menu-link-icon',
-              icons: icon_set,
-              key: item_key,
-              prefix: 'style-strip__icon',
-              source_width: 240
-            -%}
-          {%- endcapture -%}
-
-          {%- liquid
-            assign item_icon = item_icon | strip
-
-            comment
-              A real photograph beats a drawing. The collection the card opens stands in for
-              itself - the Image set on it in the admin first, then the first piece in it - and
-              only a category with neither falls back to the outline from 'menu-link-icon'.
-
-              Most of the jewellery categories have neither yet: Pendants, Chains, Charms and
-              every earring sub-range hold nothing and have no Image, so they draw. Set an Image
-              on the collection in Products > Collections, or put stock in it, and that card
-              turns into a photograph on its own with nothing to change here.
+              A category with no stock shows nothing: Vintage, Nature Inspired, Toi et Moi and
+              Promise under Engagement, Plain Metal and Ready to Ship under Wedding, and most of
+              the earring and necklace sub-ranges. Publish a piece into one - or set an Image on
+              it - and that card fills itself with nothing to change here.
 
               A card that is a filter URL rather than a collection is skipped: several of them
               point into one collection, so they would all come back carrying the same picture.
             endcomment
-            if item_photo == blank and item_photo_url == blank and item_is_url == false
+            if item_photo == blank and item_is_url == false
               assign item_photo = item_collection.image
               if item_photo == blank
                 assign item_photo = item_collection.products.first.featured_image
               endif
             endif
+          -%}
+
+          {%- comment -%}
+            The line drawing, which is only reached when the setting asks for it. Rendering it
+            unconditionally and then throwing it away would still cost the render.
+          {%- endcomment -%}
+          {%- capture item_icon -%}
+            {%- if cs.show_drawings and item_photo == blank -%}
+              {%- render 'menu-link-icon',
+                icons: icon_set,
+                key: item_key,
+                prefix: 'style-strip__icon',
+                source_width: 240
+              -%}
+            {%- endif -%}
+          {%- endcapture -%}
+
+          {%- liquid
+            assign item_icon = item_icon | strip
 
             assign is_current = false
             if item_is_url == false and item_handle == current_handle
@@ -533,15 +510,14 @@
 
           <li class="style-strip__item">
             <a
-              class="style-strip__card{% if is_current %} style-strip__card--active{% endif %}{% if item_photo == blank and item_photo_url == blank and item_icon != blank %} style-strip__card--drawn{% endif %}{% if item_photo == blank and item_photo_url == blank and item_icon == blank %} style-strip__card--wordmark{% endif %}"
+              class="style-strip__card{% if is_current %} style-strip__card--active{% endif %}{% if item_photo == blank and item_icon != blank %} style-strip__card--drawn{% endif %}{% if item_photo == blank and item_icon == blank %} style-strip__card--empty{% endif %}"
               href="{{ item_url }}"
               {% if is_current %}aria-current="page"{% endif %}
             >
               {%- comment -%}
-                Nothing to show in the picture box - a sub-range with no drawing and no collection
-                of its own to borrow from, such as Tennis - so the box goes and the name takes the
-                whole card. An empty tinted square beside the name reads as a picture that failed
-                to load.
+                Nothing to show: the box stays, so the names stay in a line down the row and the
+                card is the same shape as the one beside it, but it is left empty and untinted.
+                A tinted square with nothing in it reads as a photograph that failed to load.
               {%- endcomment -%}
               <span class="style-strip__media">
                 {%- if item_photo != blank -%}
@@ -554,8 +530,6 @@
                     height="240"
                     loading="lazy"
                   >
-                {%- elsif item_photo_url != blank -%}
-                  <img src="{{ item_photo_url }}" alt="" width="240" height="240" loading="lazy">
                 {%- else -%}
                   {{ item_icon }}
                 {%- endif -%}
@@ -610,15 +584,17 @@
     { "type": "checkbox", "id": "show_all_card", "label": "Show an \"All\" card first", "default": true },
     { "type": "text", "id": "all_label", "label": "\"All\" card label", "default": "All" },
     { "type": "url", "id": "all_link", "label": "\"All\" card link", "info": "Leave empty to open the range's own collection - Engagement Rings or Wedding Bands, whichever family the page belongs to." },
-    { "type": "image_picker", "id": "all_image", "label": "\"All\" card picture", "info": "Leave empty to use All.png from Content > Files." },
+    { "type": "image_picker", "id": "all_image", "label": "\"All\" card picture", "info": "Leave empty to use All.png from Content > Files, then the range's own collection image, then the first piece in the range." },
     { "type": "header", "content": "Cards" },
+    { "type": "paragraph", "content": "Each card shows a photograph filed for it in Content > Files, or the Image set on its collection, or the first piece in that collection. A category with no stock and no picture shows its name against an empty box - put a piece in it and the card fills itself." },
+    { "type": "checkbox", "id": "show_drawings", "label": "Fall back to a line drawing", "default": false, "info": "Puts the menu's outline drawing in the empty box instead. Off by default: on a row of real rings a drawing reads as a card that did not load. Worth switching on for Earrings and Necklaces, where most sub-ranges are empty." },
     { "type": "range", "id": "per_row", "label": "Cards across", "min": 2, "max": 9, "step": 0.1, "default": 6.4, "info": "A fraction shows part of the next card, which tells a shopper the row scrolls." },
     { "type": "range", "id": "per_row_mobile", "label": "Cards across on mobile", "min": 1, "max": 4, "step": 0.1, "default": 2.2 },
     { "type": "range", "id": "gap", "label": "Space between cards", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 20 },
     { "type": "range", "id": "card_height", "label": "Card height", "min": 60, "max": 200, "step": 2, "unit": "px", "default": 90 },
     { "type": "range", "id": "media_width", "label": "Picture width", "min": 40, "max": 180, "step": 2, "unit": "px", "default": 84 },
     { "type": "range", "id": "media_width_mobile", "label": "Picture width on mobile", "min": 32, "max": 140, "step": 2, "unit": "px", "default": 72 },
-    { "type": "range", "id": "icon_size", "label": "Drawing size", "min": 20, "max": 88, "step": 2, "unit": "px", "default": 40, "info": "Only the drawn categories - Pendants, Chains, the wedding bands. A photographed card fills its box, so this does not move it." },
+    { "type": "range", "id": "icon_size", "label": "Drawing size", "min": 20, "max": 88, "step": 2, "unit": "px", "default": 40, "info": "Only cards drawing an outline, which needs \"Fall back to a line drawing\" above. A photographed card fills its box, so this does not move it." },
     { "type": "color", "id": "card_background", "label": "Card background", "default": "#ffffff" },
     { "type": "color", "id": "media_background", "label": "Picture background", "default": "#f4f3ef" },
     { "type": "color", "id": "card_border_color", "label": "Card border", "default": "#e6e6e6" },

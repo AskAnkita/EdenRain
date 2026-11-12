@@ -1363,7 +1363,7 @@
 /*
   The banner sits on a photograph, so the hover fill has to be a colour of its
   own: dropping to the picture, which is what this used to do, gave the shared
-  sweep nothing to wipe across and left the label unreadable half way through.
+  hover layer nothing to paint and left the label unreadable on hover.
   The resting pair is swapped instead, which holds its contrast whatever the
   art behind it is doing.
 */

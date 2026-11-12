@@ -873,11 +873,43 @@
         "padding-inline-start": 0,
         "padding-inline-end": 0
       }
+    },
+    "saved_designs": {
+      "type": "saved-designs",
+      "settings": {
+        "heading": "Your saved designs",
+        "show_count": true,
+        "lead": "These are saved in this browser, not in your bag. Reopen one to keep designing, or send it to us for a price.",
+        "support_link": "/pages/design-support",
+        "saved_lead": "Saved",
+        "add_label": "Add to bag",
+        "reopen_label": "Reopen",
+        "ask_label": "Contact support",
+        "remove_label": "Remove",
+        "show_price": false,
+        "cart_price_visible": false,
+        "title_color": "rgba(0,0,0,0)",
+        "ink_color": "rgba(0,0,0,0)",
+        "muted_color": "rgba(0,0,0,0)",
+        "lead_color": "rgba(0,0,0,0)",
+        "rule_color": "rgba(0,0,0,0)",
+        "card_border_color": "rgba(0,0,0,0)",
+        "card_background": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "title_size": 0,
+        "lead_size": 0,
+        "card_min": 0,
+        "width": 0,
+        "padding_top": 48,
+        "padding_bottom": 8
+      }
     }
   },
   "order": [
     "breadcrumb_w3kGjz",
     "cart-section",
+    "saved_designs",
     "section_7Yzqfd",
     "featured_collection_ATEDND"
   ]

@@ -19,11 +19,13 @@
   when any part of the tile is hovered rather than only the button itself.
 
   HOVER IS WRITTEN ONCE HERE, FOR EVERY CALL TO ACTION IN THE SHOP - see "the
-  one hover animation" below. Add to cart, the homepage CTAs, the About page,
-  the editorial banners, the gifting and delivery panels, the buttons over the
-  desktop menu's pictures and the signature tiles all fill the same way. A button joins in by naming its colours as the
-  three --cta-* pairs; it must never write a :hover background of its own, or
-  it drops back out of step with the rest of the shop.
+  one hover change" below. Add to cart, the homepage CTAs, the About page, the
+  editorial banners, the gifting and delivery panels, the buttons over the
+  desktop menu's pictures and the signature tiles all change colour the same
+  way, over the same length of time. A button joins in by naming its colours
+  as the three --cta-* pairs; it must never write a :hover background or a
+  hover transition of its own, or it drops back out of step with the rest of
+  the shop.
 */
 
 :root {
@@ -36,72 +38,35 @@
   --eden-action-tracking: 0.12em;
 
   /*
-    The one hover animation. A link underlines by growing a colour layer out of
-    its left edge, from nothing to full width; a button fills the same way, so
-    the two read as one gesture. A button is far wider than a word, so the
-    sweep is given longer than the underline's --animation-values-slow while
-    keeping that same easing.
+    The one hover change. Every call to action in the shop answers the cursor
+    the same way: the fill, the label and the border cross to their hover
+    colours together, over one short duration, and nothing moves.
 
-    The fill, the label and the border all run on one duration and one curve,
-    so the button is never caught looking finished in one respect and not
-    another. They used to be staggered, with the label and the border landing
-    at 280ms and the fill at 400ms; on the theme's ease-in-out the fill then
-    crawled over its last stretch - 94% of the way across at 320ms - and that
-    left a bright unfilled sliver at the trailing edge of a button that
-    otherwise looked done. It read as a fault rather than as an animation.
+    It used to be a sweep - a fill that grew out of the button's left edge and
+    crossed it in half a second - and the gesture itself was the problem. A
+    hover is read in the company of the hover before it, and moving from one
+    button to its neighbour is what people do with the homepage hero's pair,
+    the two routes on the design banner, or add to cart and the button beside
+    it. That started two wipes at once: the button being left and the button
+    being arrived at performing the same move, in the same direction, at the
+    same time, with nothing in the pair to tell the eye which of the two it
+    had just chosen. Shortening the exit, or sending it the other way, only
+    changed which moving edge was competing with the one that mattered.
 
-    The curve matters as much as the timing: it has to carry real speed into
-    the finish, or the trailing edge hangs about at the end however long the
-    duration is. This one does, which is what lets the sweep take its time:
-    0.32s read as a flick rather than a gesture, so it is 0.5s here - long
-    enough to watch the fill cross the button, short enough that the button
-    never feels like it is catching up with the cursor.
+    A colour change cannot have that problem. There is no direction to read
+    and no edge to follow, so the only thing the pair says is which button is
+    lit now and which one no longer is.
 
-    Timing alone was not enough, though. Colour saturates far faster than
-    geometry: at seven eighths of the way through, a label that has travelled
-    the same seven eighths from black to white already reads as white, while
-    the eighth of the button still unfilled is plainly a white sliver. So the
-    fill is also given --cta-sweep-overshoot of extra width past the right
-    edge, clipped away by the button, and it covers the last of the button
-    before the transition formally ends. That is what removes the sliver; the
-    timing above is what stops anything else finishing early.
+    One duration, one curve, both ways. Arriving and leaving are the same
+    length, so a button handing over to its neighbour is a single crossfade
+    rather than a race, and the button is never caught looking finished in one
+    respect and not another.
+
+    0.2s is the length: long enough that the colour is not snapped on, short
+    enough that it has landed by the time the eye has.
   */
-  --cta-sweep-speed: 0.5s;
-  --cta-sweep-easing: cubic-bezier(0.2, 0.6, 0.35, 1);
-  --cta-sweep-overshoot: -15%;
-  --cta-ink-speed: var(--cta-sweep-speed);
-  --cta-ink-delay: 0s;
-  --cta-ink-easing: var(--cta-sweep-easing);
-
-  /*
-    Leaving is not the same gesture as arriving, and it must not take as long.
-
-    The half second above is what a button is worth when the cursor settles on
-    it. It is the wrong length for the button the cursor has just left, and
-    two buttons side by side are where that shows: the homepage hero's pair,
-    the two routes on the design banner, add to cart beside its neighbour.
-    Crossing from one to the other starts both animations at once, and for
-    half a second the fill retreating out of the right-hand side of the first
-    button is travelling towards the fill arriving from the left-hand side of
-    the second. Two dark masses converge in the gap between them and the pair
-    reads as a smear rather than as one button handing over to the next.
-
-    So the exit is given its own, much shorter duration. A button the cursor
-    has left clears itself and is done before the button it moved to is half
-    filled, which leaves one animation to watch instead of two competing ones.
-    Hover still arrives at its full length - the gesture the design is built
-    around is untouched.
-
-    It works by asymmetry in the cascade rather than by a rule of its own: the
-    resting declarations below carry the exit timing, and the :hover ones carry
-    the arrival timing. A transition reads its duration from the style the
-    element is moving TO, so hovering runs at --cta-sweep-speed and un-hovering
-    at --cta-sweep-exit-speed, with no extra selector in the way.
-  */
-  --cta-sweep-exit-speed: 0.24s;
-  --cta-sweep-exit-easing: cubic-bezier(0.4, 0, 0.7, 1);
-  --cta-ink-exit-speed: var(--cta-sweep-exit-speed);
-  --cta-ink-exit-easing: var(--cta-sweep-exit-easing);
+  --cta-fade-speed: 0.2s;
+  --cta-fade-easing: cubic-bezier(0.33, 0, 0.67, 1);
 }
 
 .eden-action,
@@ -137,7 +102,7 @@
 
 /*
   Each variant only names its colours. Whichever way round they start, hover
-  sweeps --cta-fill-hover across and lands the text on --cta-ink-hover; the
+  crosses the fill to --cta-fill-hover and the text to --cta-ink-hover; the
   shared rules below do the rest.
 */
 .eden-action--solid {
@@ -185,7 +150,7 @@
   page, the dynamic payment buttons, every form - are painted by base.css from
   the "Buttons" colour settings, and that paint is left alone here: a merchant
   may put a gradient behind them, which base.css handles and a flat colour
-  could not. They only hand the sweep the hover colours those same settings
+  could not. They only hand the hover layer the colours those same settings
   already carry.
 
   Ours - .eden-action and the handful of section buttons that borrow the shape
@@ -220,8 +185,8 @@ button.shopify-payment-button__button--unbranded {
 /*
   The accelerated checkout block can wear a secondary skin, and base.css gives
   it its own resting and hover colours at a specificity above the payment
-  button's own. The sweep follows it there rather than carrying the primary
-  colours over a button that is drawn as an outline.
+  button's own. The hover layer follows it there rather than carrying the
+  primary colours over a button that is drawn as an outline.
 */
 .accelerated-checkout-block.checkout--button-secondary button.shopify-payment-button__button--unbranded {
   --cta-fill-hover: var(--color-secondary-button-hover-background);
@@ -263,11 +228,10 @@ button.shopify-payment-button__button--unbranded,
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  /* The resting half of the asymmetry described at the top of the file: this is
-     the timing a button leaves hover on. Arrival is set on :hover below. */
-  transition: color var(--cta-ink-exit-speed) var(--cta-ink-exit-easing),
-    border-color var(--cta-ink-exit-speed) var(--cta-ink-exit-easing),
-    box-shadow var(--cta-sweep-exit-speed) var(--cta-sweep-exit-easing);
+  /* One timing, both ways - see the note at the top of the file. */
+  transition: color var(--cta-fade-speed) var(--cta-fade-easing),
+    border-color var(--cta-fade-speed) var(--cta-fade-easing),
+    box-shadow var(--cta-fade-speed) var(--cta-fade-easing);
 }
 
 /*
@@ -306,24 +270,21 @@ button.shopify-payment-button__button--unbranded,
 }
 
 /*
-  The sweep itself. A negative z-index paints the layer over the button's own
-  background and under its text, so the fill passes behind the words without
+  The hover fill. A negative z-index paints the layer over the button's own
+  background and under its text, so the fill arrives behind the words without
   needing a second copy of them. The layer stops at the padding box and the
-  border crosses on its own, which leaves a gradient or an image background
+  border changes on its own, which leaves a gradient or an image background
   intact underneath.
 
-  It runs wider than the button by --cta-sweep-overshoot and the button clips
-  it, so its trailing edge leaves the button before the transition ends and no
-  unfilled sliver is ever left standing at the far side.
+  That is why the hover fill is a layer at all rather than a background-color
+  on the button: the theme's own buttons may carry a gradient from the
+  merchant's colour settings, and a flat hover colour would throw it away.
+  Fading a layer over the top leaves whatever is underneath it untouched, so
+  one rule can serve both families.
 
-  It only ever travels one way: left to right, on the way in AND on the way
-  out. The layer rests anchored to its right edge at no width, so hovering
-  re-anchors it to the left and grows it across, and leaving hover drops that
-  anchor back to the right so the fill carries on out of the right-hand side
-  rather than reeling back to the corner it came from. The anchor is not
-  transitioned, and it only ever moves at a moment when the layer is either
-  full width (where the two anchors draw the same thing) or no width at all
-  (where there is nothing to see), so the swap itself is invisible.
+  It does not move: it covers the button from the first frame and only its
+  opacity changes, on the one duration, in and out. See the note at the top of
+  the file for why the fill no longer travels.
 
   cart-remove-button sets `content: none` on this pseudo-element in
   component-cart-items.css; that is a deliberate opt-out, not an oversight.
@@ -344,13 +305,11 @@ button.shopify-payment-button__button--unbranded::before,
 .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button)::before {
   content: '';
   position: absolute;
-  inset: 0 var(--cta-sweep-overshoot) 0 0;
+  inset: 0;
   z-index: -1;
   background: var(--cta-fill-hover, transparent);
-  transform: scaleX(0);
-  transform-origin: right center;
-  /* Leaving hover. Arriving is the slower one, set on :hover below. */
-  transition: transform var(--cta-sweep-exit-speed) var(--cta-sweep-exit-easing);
+  opacity: 0;
+  transition: opacity var(--cta-fade-speed) var(--cta-fade-easing);
   pointer-events: none;
 }
 
@@ -379,11 +338,7 @@ button.shopify-payment-button__button--unbranded::before,
   .shopify-challenge__button:hover:not([disabled])::before,
   button.shopify-payment-button__button--unbranded:hover:not([disabled])::before,
   .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button):hover:not([disabled])::before {
-    transform-origin: left center;
-    transform: scaleX(1);
-    /* Arriving: the full half second. Leaving runs on the shorter timing in the
-       resting rule above - see the note beside --cta-sweep-exit-speed. */
-    transition: transform var(--cta-sweep-speed) var(--cta-sweep-easing);
+    opacity: 1;
   }
 
   .eden-action:hover,
@@ -412,11 +367,7 @@ button.shopify-payment-button__button--unbranded::before,
   .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button):hover:not([disabled]) {
     color: var(--cta-ink-hover, var(--cta-ink, inherit));
     border-color: var(--cta-edge-hover, var(--cta-edge, transparent));
-    /* The label and the border keep pace with the fill arriving, as they always
-       have; the resting rule holds the quicker timing they leave on. */
-    transition: color var(--cta-ink-speed) var(--cta-ink-delay) var(--cta-ink-easing),
-      border-color var(--cta-ink-speed) var(--cta-ink-delay) var(--cta-ink-easing),
-      box-shadow var(--cta-sweep-speed) var(--cta-sweep-easing);
+    /* The timing is in the resting rule above: one duration, both ways. */
   }
 
   /*
@@ -443,10 +394,10 @@ button.shopify-payment-button__button--unbranded::before,
 
   /*
     base.css swaps --button-background-color to the hover fill on hover, which
-    would repaint the whole button at once and leave the sweep with nothing to
-    reveal. Pinning it back to the resting value hands the hover fill entirely
-    to the sweep. The text and border colours are left to base.css, which still
-    swaps them, now on this file's timing.
+    would repaint the whole button at once and leave the hover layer with
+    nothing to show. Pinning it back to the resting value hands the hover fill
+    entirely to that layer. The text and border colours are left to base.css,
+    which still swaps them, now on this file's timing.
   */
   .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block):hover:not([disabled]),
   .shopify-challenge__button:hover:not([disabled]),
@@ -458,13 +409,13 @@ button.shopify-payment-button__button--unbranded::before,
     --button-background-color: var(--color-secondary-button-background);
   }
 
-  /* This one rests on no fill at all, so that is what the sweep crosses. */
+  /* This one rests on no fill at all, so that is what the layer covers. */
   .accelerated-checkout-block.checkout--button-secondary button.shopify-payment-button__button--unbranded:hover {
     --button-background-color: transparent;
   }
 }
 
-/* Keyboard focus lands on the filled state without the sweep, which would
+/* Keyboard focus lands on the filled state without the fade, which would
    read as drift while tabbing down a page. */
 .eden-action:focus-visible::before,
 .eden-action-host:focus-visible .eden-action::before,
@@ -489,7 +440,7 @@ button.shopify-payment-button__button--unbranded::before,
 .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block):focus-visible::before,
 .shopify-challenge__button:focus-visible::before,
 button.shopify-payment-button__button--unbranded:focus-visible::before {
-  transform: scaleX(1);
+  opacity: 1;
   transition: none;
 }
 
@@ -519,43 +470,39 @@ button.shopify-payment-button__button--unbranded:focus-visible::before {
   border-color: var(--cta-edge-hover, var(--cta-edge, transparent));
 }
 
-/* ------------------------------------------------- the same sweep, reversed */
+/* ----------------------------------------------- the same change, inverted */
 
 /*
   For a button that rests filled and hovers to bare - the white button on the
   About hero's photograph, which empties out into the outline its neighbour
   wears at rest.
 
-  It cannot be done with the colour pairs alone: the sweep only shows what
-  --cta-fill-hover names, and "no fill" is not a colour it can carry across.
-  So the button itself is left transparent, its resting fill is painted by that
-  very layer held at full width, and hover retracts it to the left edge. Same
-  colours, same duration, same curve as every other call to action, and the
-  fill still only ever travels left to right: it leaves by the right edge on
-  hover and comes back in from the left. Only the order of the two states is
-  turned around, which is why it lives here with the rest of hover rather than
-  in a section's own file.
+  It cannot be done with the colour pairs alone: the layer only shows what
+  --cta-fill-hover names, and "no fill" is not a colour it can carry. So the
+  button itself is left transparent, its resting fill is painted by that very
+  layer held at full opacity, and hover fades the layer away. Same colours,
+  same duration, same curve as every other call to action; only the order of
+  the two states is turned around, which is why it lives here with the rest of
+  hover rather than in a section's own file.
 
   A button wearing this names --cta-fill-hover as its RESTING fill and
   --cta-ink-hover as the colour the label takes once that fill has gone.
 */
-.eden-action--sweep-out::before {
-  transform-origin: left center;
-  transform: scaleX(1);
+.eden-action--empties::before {
+  opacity: 1;
 }
 
 @media (hover: hover) {
-  .eden-action--sweep-out:hover::before,
-  .eden-action-host:hover .eden-action--sweep-out::before {
-    transform-origin: right center;
-    transform: scaleX(0);
+  .eden-action--empties:hover::before,
+  .eden-action-host:hover .eden-action--empties::before {
+    opacity: 0;
   }
 }
 
-/* Focus lands on the hovered state here too: the fill gone, no sweep. */
-.eden-action--sweep-out:focus-visible::before,
-.eden-action-host:focus-visible .eden-action--sweep-out::before {
-  transform: scaleX(0);
+/* Focus lands on the hovered state here too: the fill gone, no fade. */
+.eden-action--empties:focus-visible::before,
+.eden-action-host:focus-visible .eden-action--empties::before {
+  opacity: 0;
   transition: none;
 }
 
@@ -568,8 +515,8 @@ button.shopify-payment-button__button--unbranded:focus-visible::before {
   padding-bottom: 0.6rem;
   border-bottom: var(--style-border-width, 1px) solid var(--eden-action-rule);
   color: var(--eden-action-ink);
-  transition: border-color var(--cta-sweep-speed) var(--cta-sweep-easing),
-    color var(--cta-sweep-speed) var(--cta-sweep-easing);
+  transition: border-color var(--cta-fade-speed) var(--cta-fade-easing),
+    color var(--cta-fade-speed) var(--cta-fade-easing);
 }
 
 .eden-link--light {
@@ -633,13 +580,13 @@ button.shopify-payment-button__button--unbranded:focus-visible::before {
   <body>, and base.css answers it with a quite different gesture: a block of
   colour that rotates in diagonally from the bottom left while the label slides
   up and a duplicate label rises to take its place. Only the theme's own
-  .button wears it, so add to cart moved one way while every .eden-action in
-  the shop cross-faded - the mismatch this file exists to settle.
+  .button wears it, so add to cart moved while every .eden-action in the shop
+  only changed colour - the mismatch this file exists to settle.
 
   Rather than ask the merchant to find and switch off a setting, the effect is
   retired here: the pseudo-element it paints with is never generated, and the
   label is left where it is. The setting is inert either way now, and the one
-  sweep above is what every call to action does.
+  colour change above is what every call to action does.
 */
 body.button-hover--effect .button:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .button--prev, .button--next, .swiper-button, .quantity__button, .header__icon, .function-block)::after,
 body.button-hover--effect .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button)::after {

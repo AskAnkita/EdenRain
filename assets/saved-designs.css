@@ -1,0 +1,191 @@
+/*
+  The saved designs panel on the cart page. Behaviour: assets/saved-designs.js.
+
+  It sits under the bag and must never be mistaken for it, so it is built as a
+  panel of its own - a rule above it, a heading in the shop's small caps, a
+  line saying what these are - rather than as more cart lines. Square corners
+  throughout; this theme sets every radius to 0.
+
+  Every value a merchant can move is a --sdg-* custom property written onto the
+  element by the section, with the value this file always had as its fallback,
+  so a setting left alone renders exactly as shipped. Buttons come from
+  assets/eden-actions.css and there is no :hover written here.
+*/
+
+saved-designs {
+  --sdg-ink: #171714;
+  --sdg-muted: #69675f;
+  --sdg-line: rgba(23, 23, 20, 0.18);
+  --sdg-wash: #f4f2ef;
+  display: block;
+  color: var(--sdg-ink);
+}
+
+/* Nothing saved, nothing drawn - including the heading. display:block above
+   beats the browser's own [hidden] rule, so it has to be said here. */
+saved-designs[hidden] {
+  display: none;
+}
+
+.sdg-inner {
+  margin-inline: auto;
+  box-sizing: border-box;
+  max-width: var(--sdg-width, var(--page-width, 157rem));
+  padding: var(--sdg-pad-top, 48px) 1.5rem var(--sdg-pad-bottom, 8px);
+}
+
+.sdg-head {
+  padding-top: var(--sdg-head-pad, 28px);
+  border-top: 1px solid var(--sdg-rule, var(--sdg-line));
+}
+
+.sdg-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  color: var(--sdg-title-color, var(--sdg-ink));
+  font-size: var(--sdg-title-size, 1.6rem);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sdg-title__count {
+  color: var(--sdg-muted);
+  font-size: var(--sdg-count-size, 1.3rem);
+  letter-spacing: 0.08em;
+}
+
+/* The line that keeps the panel honest: these are not in the bag, and they are
+   on this device only. It is not a footnote - it is the whole difference
+   between this panel and the one above it. */
+.sdg-lead {
+  margin: var(--sdg-lead-top, 10px) 0 0;
+  max-width: 68ch;
+  color: var(--sdg-lead-color, var(--sdg-muted));
+  font-size: var(--sdg-lead-size, 1.35rem);
+  line-height: 1.6;
+}
+
+.sdg-status {
+  margin: var(--sdg-status-top, 14px) 0 0;
+  color: var(--sdg-muted);
+  font-size: var(--sdg-lead-size, 1.35rem);
+  line-height: 1.5;
+}
+
+.sdg-status[data-tone='error'] {
+  color: var(--sdg-error-color, #8c2f1f);
+}
+
+.sdg-status[hidden] {
+  display: none;
+}
+
+saved-designs[data-busy='true'] .sdg-list {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------- cards */
+
+.sdg-list {
+  display: grid;
+  gap: var(--sdg-card-gap, 16px);
+  margin: var(--sdg-list-top, 22px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media screen and (min-width: 750px) {
+  .sdg-list {
+    grid-template-columns: repeat(auto-fill, minmax(var(--sdg-card-min, 320px), 1fr));
+  }
+}
+
+.sdg-card {
+  box-sizing: border-box;
+  padding: var(--sdg-card-pad, 20px);
+  border: 1px solid var(--sdg-card-border, var(--sdg-line));
+  background: var(--sdg-card-bg, transparent);
+}
+
+.sdg-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sdg-card__ref {
+  margin: 0;
+  font-size: var(--sdg-ref-size, 1.5rem);
+  letter-spacing: 0.08em;
+}
+
+.sdg-card__price {
+  margin: 0;
+  color: var(--sdg-muted);
+  font-size: var(--sdg-price-size, 1.35rem);
+}
+
+.sdg-card__title {
+  margin: 6px 0 0;
+  color: var(--sdg-muted);
+  font-size: var(--sdg-lead-size, 1.35rem);
+}
+
+/* The choices, read as a list of pairs rather than run together in a sentence:
+   this is the panel somebody checks a ring against before they ring us up. */
+.sdg-card__specs {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  margin: var(--sdg-specs-top, 16px) 0 0;
+  font-size: var(--sdg-specs-size, 1.35rem);
+  line-height: 1.5;
+}
+
+.sdg-card__specs dt {
+  color: var(--sdg-specs-label-color, var(--sdg-muted));
+}
+
+.sdg-card__specs dd {
+  margin: 0;
+}
+
+.sdg-card__when {
+  margin: var(--sdg-when-top, 14px) 0 0;
+  color: var(--sdg-muted);
+  font-size: var(--sdg-when-size, 1.2rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sdg-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sdg-actions-gap, 14px);
+  margin-top: var(--sdg-actions-top, 18px);
+}
+
+.sdg-card__add {
+  flex: 0 0 auto;
+}
+
+/* Removing a design from your own browser is not an action worth a button:
+   it reads as the quietest thing in the card, under everything that keeps it. */
+.sdg-card__drop {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--sdg-drop-color, var(--sdg-muted));
+  font-family: inherit;
+  font-size: var(--sdg-drop-size, 1.25rem);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}

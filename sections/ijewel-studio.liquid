@@ -98,6 +98,34 @@
     assign design_flow = true
   endif
 
+  # The buttons on the price panel are the same two actions, so a page that
+  # carries them in the frame does not want the row repeated under it. The
+  # row is what a page without a panel still has, so it stays on by default.
+  assign show_actions = true
+  unless section.settings.show_actions
+    assign show_actions = false
+  endunless
+
+  # WHAT A SAVED DESIGN PUTS IN THE CART.
+  #
+  # A configured ring has no variant of its own: /cart/add.js takes a variant
+  # id and will not be told a price. So a line can only be charged against a
+  # product that already exists - a bespoke deposit, a design fee, a made to
+  # order placeholder - and everything the shopper chose rides on that line as
+  # properties, which is what the cart page and the order both read.
+  #
+  # With no product picked nothing is added and the studio behaves exactly as
+  # it did: the design is saved to this browser and sent to us. That is the
+  # safe default, because the wrong product here charges the wrong money.
+  assign cart_variant = ''
+  if section.settings.cart_product != blank
+    assign cart_variant = section.settings.cart_product.selected_or_first_available_variant.id
+  endif
+  assign cart_on_save = false
+  if cart_variant != blank and section.settings.cart_on_save
+    assign cart_on_save = true
+  endif
+
   assign app_blocks = 0
   for block in section.blocks
     if block.type == '@app'
@@ -201,9 +229,9 @@
   # inside a cross-origin frame, so it cannot be relabelled or deleted from out
   # here - but the panel already covering their price can be grown down over
   # it, and a panel that takes pointer events is a button nobody can press.
-  # Prices are not finished, so the line on the panel is all this page says
-  # about cost; Save this design and Contact support under the frame are what a
-  # shopper presses instead. The panel grows DOWNWARDS from the price line by
+  # Prices are not finished, so the panel's own two buttons - save the design,
+  # ask us what it costs - are what a shopper presses instead of their Add to
+  # cart. The panel grows DOWNWARDS from the price line by
   # the two numbers below, and the shipped pair reach the frame's foot - which
   # is where iJewel anchors the button on a desktop and on a phone alike.
   assign price_cart_height = section.settings.price_cart_height | plus: 0
@@ -222,6 +250,92 @@
       endif
     endunless
   endif
+
+  # The panel is no longer a line floating in white: it is the foot of the
+  # rail, built the way the rest of the shop builds one. A hairline across the
+  # top so it reads as a section of their card rather than a patch stuck on it,
+  # a line about price if the merchant wants one, and WHERE THEIR ADD TO CART
+  # WAS, the two things this page can actually do.
+  #
+  # It used to be one button - "Enquire about this design" - under a line
+  # reading "Contact us for price". That is a page telling somebody what it
+  # cannot do. The two buttons below are the same pair as the row under the
+  # frame, named by the same data attributes, so assets/ijewel-design.js wires
+  # all of them without knowing where any one of them sits: save the design,
+  # or ask us what it costs. Both are real eden-actions, so they fill on hover
+  # with every other CTA in the shop and take the theme's button shape, and
+  # the ones that are links are links underneath, so they still work with
+  # JavaScript off and when the bridge never answers.
+  #
+  # An action that cannot work here falls back rather than drawing a dead
+  # button: saving needs a builder in the frame, support needs a support page,
+  # and a link button with nowhere to go is not drawn at all.
+  assign price_saves = false
+  if design_flow and embed_src != blank
+    assign price_saves = true
+  endif
+
+  assign price_one_label = section.settings.price_cta_label | strip
+  assign price_one_style = section.settings.price_cta_style | default: 'solid'
+  assign price_one_action = section.settings.price_cta_action | default: 'save'
+  assign price_one_link = section.settings.price_cta_link | default: section.settings.price_link
+  if price_one_action == 'save' and price_saves == false
+    assign price_one_action = 'support'
+  endif
+  if price_one_action == 'support' and support_link == blank
+    assign price_one_action = 'link'
+  endif
+  if price_one_action == 'support'
+    assign price_one_link = support_link
+  endif
+  if price_one_action == 'link' and price_one_link == blank
+    assign price_one_label = ''
+  endif
+
+  assign price_two_label = section.settings.price_cta2_label | strip
+  assign price_two_style = section.settings.price_cta2_style | default: 'outline'
+  assign price_two_action = section.settings.price_cta2_action | default: 'support'
+  assign price_two_link = section.settings.price_cta2_link | default: section.settings.price_link
+  if price_two_action == 'save' and price_saves == false
+    assign price_two_action = 'support'
+  endif
+  if price_two_action == 'support' and support_link == blank
+    assign price_two_action = 'link'
+  endif
+  if price_two_action == 'support'
+    assign price_two_link = support_link
+  endif
+  if price_two_action == 'link' and price_two_link == blank
+    assign price_two_label = ''
+  endif
+
+  # Two buttons that would do the identical thing are one button twice. The
+  # second stands down rather than the first, so the merchant's primary action
+  # is the one that survives.
+  if price_two_label != blank and price_one_label != blank and price_two_action == price_one_action and price_two_link == price_one_link
+    assign price_two_label = ''
+  endif
+
+  assign price_buttons = 0
+  if price_one_label != blank
+    assign price_buttons = price_buttons | plus: 1
+  endif
+  if price_two_label != blank
+    assign price_buttons = price_buttons | plus: 1
+  endif
+  if price_buttons > 0
+    assign price_classes = price_classes | append: ' ijw-price--cta'
+  endif
+  if price_buttons > 1
+    assign price_classes = price_classes | append: ' ijw-price--duo'
+  endif
+  if section.settings.price_rule
+    assign price_classes = price_classes | append: ' ijw-price--ruled'
+  endif
+
+  assign price_pad_y = section.settings.price_pad_y | plus: 0
+  assign price_pad_y_mobile = section.settings.price_pad_y_mobile | plus: 0
+  assign price_label_size = section.settings.price_label_size | plus: 0
 
   # Where the lines sit in the panel. A panel grown over the button is tall
   # enough that the middle of it is a choice rather than the only place a line
@@ -353,6 +467,10 @@
     --ijw-price-justify: {{ price_justify }};
     --ijw-price-align: {{ price_align }};
     --ijw-price-valign: {{ price_valign }};
+    --ijw-price-pad-y: {{ price_pad_y }}px;
+    --ijw-price-pad-y-mobile: {{ price_pad_y_mobile }}px;
+    {%- if section.settings.price_rule_color != blank and section.settings.price_rule_color != transparent -%}--ijw-price-rule: {{ section.settings.price_rule_color }};{%- endif -%}
+    {%- if price_label_size > 0 -%}--ijw-price-label-size: {{ price_label_size }}px;{%- endif -%}
     {%- if price_text_size > 0 -%}--ijw-price-text-size: {{ price_text_size }}px;{%- endif -%}
     {%- if price_note_size > 0 -%}--ijw-price-note-size: {{ price_note_size }}px;{%- endif -%}
   {%- endif -%}
@@ -480,9 +598,9 @@
           With "Cover the builder's Add to cart" on - it ships on - the panel
           reaches on down over their button too, and because the panel takes
           pointer events the press never lands. That is deliberate: a price we
-          cannot stand behind has no add-to-cart under it. Save this design and
-          Contact support below the frame are the two things a shopper can do,
-          and both of them reach us.
+          cannot stand behind has no add-to-cart under it. The panel's own two
+          buttons are what is pressed instead - save the design, or ask us what
+          it costs - and both of them reach us.
 
           On a phone running the guided steps the price is replaced at its
           source instead - that document is ours - so this panel is hidden there
@@ -490,8 +608,14 @@
         {%- endcomment -%}
         {%- if section.settings.price_cover -%}
           <div class="ijw-price{{ price_classes }}">
+            {%- if section.settings.price_rule -%}
+              <span class="ijw-price__rule" aria-hidden="true"></span>
+            {%- endif -%}
+            {%- if section.settings.price_eyebrow != blank -%}
+              <span class="ijw-price__label">{{ section.settings.price_eyebrow | escape }}</span>
+            {%- endif -%}
             {%- if section.settings.price_text != blank -%}
-              {%- if section.settings.price_link != blank -%}
+              {%- if section.settings.price_link != blank and price_buttons == 0 -%}
                 <a class="ijw-price__text" href="{{ section.settings.price_link }}">{{ section.settings.price_text | escape }}</a>
               {%- else -%}
                 <span class="ijw-price__text">{{ section.settings.price_text | escape }}</span>
@@ -499,6 +623,46 @@
             {%- endif -%}
             {%- if section.settings.price_note != blank -%}
               <span class="ijw-price__note">{{ section.settings.price_note | escape }}</span>
+            {%- endif -%}
+            {%- comment -%}
+              The two actions, standing where iJewel's Add to cart is. A save
+              is a real <button> - it goes nowhere, it reads the ring off the
+              builder - and the other two kinds are real links, so they work
+              before the script has run and can be opened in a new tab.
+            {%- endcomment -%}
+            {%- if price_buttons > 0 -%}
+              <div class="ijw-price__actions">
+                {%- if price_one_label != blank -%}
+                  {%- if price_one_action == 'save' -%}
+                    <button class="ijw-price__cta eden-action eden-action--{{ price_one_style }}" type="button" data-design-save>
+                      {{- price_one_label | escape -}}
+                    </button>
+                  {%- elsif price_one_action == 'support' -%}
+                    <a class="ijw-price__cta eden-action eden-action--{{ price_one_style }}" href="{{ price_one_link }}" data-design-support>
+                      {{- price_one_label | escape -}}
+                    </a>
+                  {%- else -%}
+                    <a class="ijw-price__cta eden-action eden-action--{{ price_one_style }}" href="{{ price_one_link }}">
+                      {{- price_one_label | escape -}}
+                    </a>
+                  {%- endif -%}
+                {%- endif -%}
+                {%- if price_two_label != blank -%}
+                  {%- if price_two_action == 'save' -%}
+                    <button class="ijw-price__cta eden-action eden-action--{{ price_two_style }}" type="button" data-design-save>
+                      {{- price_two_label | escape -}}
+                    </button>
+                  {%- elsif price_two_action == 'support' -%}
+                    <a class="ijw-price__cta eden-action eden-action--{{ price_two_style }}" href="{{ price_two_link }}" data-design-support>
+                      {{- price_two_label | escape -}}
+                    </a>
+                  {%- else -%}
+                    <a class="ijw-price__cta eden-action eden-action--{{ price_two_style }}" href="{{ price_two_link }}">
+                      {{- price_two_label | escape -}}
+                    </a>
+                  {%- endif -%}
+                {%- endif -%}
+              </div>
             {%- endif -%}
           </div>
         {%- endif -%}
@@ -559,8 +723,16 @@
         data-reopen-label="{{ section.settings.list_reopen_label | default: 'Reopen' | escape }}"
         data-ask-label="{{ section.settings.ask_label | default: 'Contact support' | escape }}"
         data-remove-label="{{ section.settings.remove_label | default: 'Remove' | escape }}"
+        {% if cart_on_save %}data-cart-variant="{{ cart_variant }}"{% endif %}
+        data-cart-add="{{ routes.cart_add_url }}"
+        data-cart-url="{{ routes.cart_url }}"
+        data-cart-go="{% if section.settings.cart_go %}true{% else %}false{% endif %}"
+        data-cart-price="{% if section.settings.cart_price_visible %}shown{% else %}hidden{% endif %}"
+        data-cart-text="{{ section.settings.cart_text | default: 'Design saved and added to your bag' | escape }}"
+        data-cart-fail-text="{{ section.settings.cart_fail_text | default: 'Your design is saved. We could not put it in your bag just now - contact support and we will pick it up with you.' | escape }}"
+        data-cart-link-label="{{ section.settings.cart_link_label | default: 'View your saved designs' | escape }}"
       >
-        <div class="ijd-actions">
+        <div class="ijd-actions"{% unless show_actions %} hidden{% endunless %}>
           {%- if save_label != blank -%}
             <button class="eden-action eden-action--solid" type="button" data-design-save>
               {{- save_label | escape -}}
@@ -592,6 +764,11 @@
           <dl class="ijd-specs" data-design-specs hidden></dl>
           <p class="ijd-panel__links">
             <a class="eden-link" data-design-reopen hidden>{{ section.settings.reopen_label | default: 'Reopen this design' | escape }}</a>
+            {%- comment -%}
+              Only shown once the line is actually in the cart - a link to an
+              empty bag is worse than no link.
+            {%- endcomment -%}
+            <a class="eden-link" href="{{ routes.cart_url }}" data-design-cart hidden>{{ section.settings.cart_link_label | default: 'View your saved designs' | escape }}</a>
             {%- if support_label != blank -%}
               <a class="eden-link" href="{{ support_link }}" data-design-go>{{ section.settings.ask_label | default: 'Contact support' | escape }}</a>
             {%- endif -%}
@@ -671,19 +848,29 @@
     { "type": "range", "id": "frame_height_mobile", "label": "Frame height (mobile)", "min": 320, "max": 1200, "step": 20, "unit": "px", "default": 560 },
     { "type": "text", "id": "loading_label", "label": "Line shown while it loads", "info": "Leave empty to hide it.", "default": "Loading the designer" },
 
-    { "type": "header", "content": "Saving a design", "info": "Nothing is added to a cart here: a configured ring has no variant and no price Shopify will take, so the studio saves the design and sends it to you to quote. Save design writes it to this browser and shows a reference; Contact support carries that reference to the support page, where the whole design sits above a contact form. The record holds every choice, the builder's price and the key that reopens the identical 3D ring." },
+    { "type": "header", "content": "Saving a design", "info": "Save writes the design to this browser and shows a quotable reference; Contact support carries that reference to the support page, where the whole design sits above a contact form. The record holds every choice, the builder's price and the key that reopens the identical 3D ring. A saved design can also be put in the cart - see \"Add the design to the cart\" below, which needs a product to charge it against." },
     { "type": "url", "id": "support_link", "label": "Support page", "info": "The page with the \"Design support\" section on it. Leave empty and the Contact support button is not drawn and the builder's own button only saves." },
     { "type": "text", "id": "save_label", "label": "Save button label", "default": "Save this design" },
     { "type": "text", "id": "support_label", "label": "Support button label", "default": "Contact support" },
+    { "type": "checkbox", "id": "show_actions", "label": "Show the buttons under the frame", "default": true, "info": "Untick where the price panel inside the frame already carries the same two buttons, so the page does not offer them twice. The saved design's panel, its reference and the list of saved designs are unaffected - only the row of buttons is hidden." },
     { "type": "select", "id": "builder_button", "label": "What their button does", "default": "support", "info": "The builder's own Add to cart is on iJewel's page inside the frame, so it cannot be relabelled or removed from here - but pressing it posts the design out to us and then waits, so what it means is still yours to set. It never adds anything to a cart. While the price cover below reaches over that button, as it ships, it cannot be pressed on a desktop at all - this is then only the guided mobile steps, where the frame crops the button out anyway.", "options": [
       { "value": "support", "label": "Save the design and go to support" },
       { "value": "save", "label": "Save the design and stay here" },
       { "value": "none", "label": "Nothing - leave it to the builder" }
     ] },
     { "type": "text", "id": "reference_prefix", "label": "Reference prefix", "default": "ER", "info": "The front of the reference a shopper quotes - ER-K3F9T2. Letters and digits only." },
-    { "type": "checkbox", "id": "show_saved", "label": "List the designs saved on this device", "default": true, "info": "Under the buttons, so somebody returning to the studio finds the ring they made last visit instead of starting again. Saved designs live in this browser only - they do not follow anyone to another device, which is why the support email is the copy you work from." },
+    { "type": "checkbox", "id": "show_saved", "label": "List the designs saved on this device", "default": false, "info": "The list that used to sit at the foot of this page. It lives on the cart page now - add the \"Saved designs\" section there - because the bottom of the studio is the one place nobody looks once they have finished designing. Turning this back on puts the list in BOTH places. Saved designs live in this browser only; they do not follow anyone to another device, which is why the support email is the copy you work from." },
     { "type": "text", "id": "saved_title", "label": "List heading", "default": "Your saved designs" },
     { "type": "textarea", "id": "axis_names", "label": "Names for the builder's options", "info": "The builder names its own axes in slugs - shankMetal, headGem - and those go on the record unless they are named here. One per line, as slug = name, e.g. gem = Stone. Anything not listed is tidied up from the slug." },
+
+    { "type": "header", "content": "Add the design to the cart", "info": "A configured ring has no variant of its own and Shopify will not be told a price, so a line can only be charged against a product that already exists - a bespoke deposit, a design fee, a made-to-order placeholder. Pick that product and a saved design is added to the cart with every choice, the reference, the builder's figure and the key that reopens it written onto the line. Pick nothing and nothing is added: the design is only saved and sent to you." },
+    { "type": "product", "id": "cart_product", "label": "Product the line is charged against", "info": "Its own price is what the shopper pays, so it must be the amount you mean to take at this point - not the ring. Leave empty to add nothing to the cart." },
+    { "type": "checkbox", "id": "cart_on_save", "label": "Add the design to the cart when it is saved", "default": true, "info": "Only does anything once a product is picked above." },
+    { "type": "checkbox", "id": "cart_go", "label": "Go to the cart page after saving", "default": true, "info": "The saved designs are listed on the cart page, so that is where a save ends up: the design is written down, the cart is asked for its line, and the shopper lands on the list with it on. It goes there whether or not a line was added - a design with no stand-in product behind it is still saved and still listed. Off, they stay in the studio with the saved panel and a link to their bag. Nothing navigates in the theme editor either way." },
+    { "type": "checkbox", "id": "cart_price_visible", "label": "Show the builder's price on the line", "default": false, "info": "Off, iJewel's figure still travels on the order but underscored, so it is out of the shopper's sight in their cart - which is right while the panel above is covering that same figure in the frame. Turn it on only once the prices in the builder are yours." },
+    { "type": "text", "id": "cart_text", "label": "Said when it is added", "default": "Design saved and added to your bag" },
+    { "type": "text", "id": "cart_fail_text", "label": "Said when the cart refuses it", "default": "Your design is saved. We could not put it in your bag just now - contact support and we will pick it up with you.", "info": "A deleted, unpublished or sold-out product is the usual reason. The design itself is saved either way." },
+    { "type": "text", "id": "cart_link_label", "label": "Link to the cart page", "default": "View your saved designs", "info": "Shown on the saved panel after every save, not only when a line was added - the cart page is where the saved designs are listed. Add the \"Saved designs\" section there if it is not on it already." },
 
     { "type": "header", "content": "Saving a design: the wording", "info": "What the page says while it reads the design, once it has one, and when it cannot. A design is read by asking the builder across the frame, so there is a moment of waiting and there are ways for it to fail." },
     { "type": "text", "id": "panel_title", "label": "Panel heading", "default": "Your design is saved" },
@@ -750,8 +937,19 @@
     { "type": "header", "content": "Cover the builder's price and Add to cart", "info": "The builder costs the ring from its own rate card and prints the figure above its Add to cart. Until those rates are the shop's own, that number is not a quote we can stand behind - and neither it nor the button can be switched off from here, because the builder is the vendor's own page in a frame. This lays a panel over the price line and the button under it, and writes our own line on it. Nudge the offsets until both are gone, on a desktop and on a phone." },
     { "type": "checkbox", "id": "price_cover", "label": "Cover the builder's price", "default": true, "info": "The panel waits for the builder to say it is on screen before it fades up, so it never floats over the loading poster. A builder that does not speak iJewel's bridge never says it, and its price is then left showing." },
     { "type": "checkbox", "id": "price_cover_cart", "label": "Cover the builder's Add to cart too", "default": true, "info": "Grows the panel on down over their button, so the line above is the only thing the frame offers on price. The panel swallows the click, so the button cannot be pressed - but it is a cover, not a delete: a keyboard tab inside the frame can still reach it. Turn this off only once prices are real, and set \"What their button does\" below at the same time." },
-    { "type": "text", "id": "price_text", "label": "Line shown instead", "default": "Contact us for price", "info": "Leave empty to show nothing at all - the panel still covers the figure." },
+    { "type": "text", "id": "price_text", "label": "Line shown instead", "default": "Contact us for price", "info": "Stands where the builder prints its own figure, so the panel answers the question the covered number asked. Leave empty to show nothing at all - the panel still covers the figure." },
     { "type": "text", "id": "price_note", "label": "Second line", "info": "Smaller, under the first. Leave empty to hide it - it ships empty, because one plain line in place of a price and a button is enough." },
+    { "type": "text", "id": "price_eyebrow", "label": "Small line above", "default": "Your design", "info": "Sits where iJewel labels its total, in the shop's small caps. Leave empty to hide it." },
+    { "type": "checkbox", "id": "price_rule", "label": "Hairline across the top of the panel", "default": true, "info": "Draws the panel as the foot of their rail rather than a patch laid over it. Match their own dividers with the colour below." },
+    { "type": "text", "id": "price_cta_label", "label": "First button", "default": "Save this design", "info": "Stands where iJewel's Add to cart is - a real button in the shop's own style, filling on hover with every other CTA. The price line above answers the price; this answers what the shopper can do about it. Leave it empty for a line of text on its own, and the first line then carries the link instead." },
+    { "type": "select", "id": "price_cta_action", "label": "What the first button does", "options": [ { "value": "save", "label": "Save the design" }, { "value": "support", "label": "Carry the design to support" }, { "value": "link", "label": "Go to the link below" } ], "default": "save", "info": "Saving reads the live ring off the builder, writes down every choice with a quotable reference, and - when a product is picked under \"Add the design to the cart\" below - puts it in the cart with all of it on the line. Carrying it to support does the same read and then takes the shopper to the support page with the design above the enquiry form. Either one falls back to the link when it cannot work on this page." },
+    { "type": "url", "id": "price_cta_link", "label": "First button goes to", "info": "Used when the button is set to go to a link. Falls back to the link on the first line, and with neither set the button is not drawn." },
+    { "type": "select", "id": "price_cta_style", "label": "First button style", "options": [ { "value": "solid", "label": "Filled" }, { "value": "outline", "label": "Outlined" } ], "default": "solid" },
+    { "type": "text", "id": "price_cta2_label", "label": "Second button", "info": "Stands beside the first, sharing the panel's width. Ships empty: one button under the price line is what the panel is for, and two of them in a 460px rail crowd it." },
+    { "type": "select", "id": "price_cta2_action", "label": "What the second button does", "options": [ { "value": "support", "label": "Carry the design to support" }, { "value": "save", "label": "Save the design" }, { "value": "link", "label": "Go to the link below" } ], "default": "support" },
+    { "type": "url", "id": "price_cta2_link", "label": "Second button goes to", "info": "Used when the button is set to go to a link." },
+    { "type": "select", "id": "price_cta2_style", "label": "Second button style", "options": [ { "value": "outline", "label": "Outlined" }, { "value": "solid", "label": "Filled" } ], "default": "outline" },
+    { "type": "color", "id": "price_rule_color", "label": "Hairline colour" },
     { "type": "url", "id": "price_link", "label": "Link on the first line", "info": "Leave empty for plain text. A link makes the line clickable where the builder's price used to be - the contact page or the enquiry form." },
     { "type": "select", "id": "price_anchor", "label": "The price sits in the frame's", "options": [ { "value": "bottom-right", "label": "Bottom right" }, { "value": "bottom-left", "label": "Bottom left" }, { "value": "top-right", "label": "Top right" }, { "value": "top-left", "label": "Top left" } ], "default": "bottom-right", "info": "Which corner the offsets below are measured from. iJewel draws its price at the foot of the option rail, on the right." },
     { "type": "color", "id": "price_background", "label": "Panel colour", "default": "#ffffff", "info": "Match the builder's own panel. Clear it and the line floats on the builder's panel with the figure still showing behind." },
@@ -761,12 +959,14 @@
     { "type": "select", "id": "price_valign", "label": "Lines sit (up and down)", "options": [ { "value": "top", "label": "At the top of the panel" }, { "value": "center", "label": "In the middle" }, { "value": "bottom", "label": "At the foot" } ], "default": "center", "info": "A panel grown over Add to cart is tall, so this says whether the line stays up where the price was, sits in the middle of the block, or drops to where the button was." },
     { "type": "range", "id": "price_text_size", "label": "First line size", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
     { "type": "range", "id": "price_note_size", "label": "Second line size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
+    { "type": "range", "id": "price_label_size", "label": "Small line size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
     { "type": "range", "id": "price_bottom", "label": "Panel from the top or bottom (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 86, "info": "Measured from the corner chosen above. The shipped number puts the top of the panel over iJewel's price line on a full-screen desktop frame; what is below it down to the frame's foot is their Add to cart, which the reach below covers." },
-    { "type": "range", "id": "price_right", "label": "Panel from the side (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 22 },
-    { "type": "range", "id": "price_width", "label": "Panel width (desktop)", "min": 80, "max": 700, "step": 10, "unit": "px", "default": 450, "info": "iJewel's option rail is about 470px wide, inset 20px from the frame's right edge." },
+    { "type": "range", "id": "price_right", "label": "Panel from the side (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 30, "info": "The panel has to clear the inside of iJewel's card on both sides, or a sliver of their own price row shows down one edge of it. Measured at 1512px wide: their card is inset 29px and about 463px across." },
+    { "type": "range", "id": "price_width", "label": "Panel width (desktop)", "min": 80, "max": 700, "step": 10, "unit": "px", "default": 460, "info": "iJewel's option rail is about 463px wide, inset 29px from the frame's right edge, and the rail is anchored to that edge however wide the window is. Narrower than the rail leaves their own row showing beside ours." },
     { "type": "range", "id": "price_height", "label": "Panel height (desktop)", "min": 24, "max": 200, "step": 2, "unit": "px", "default": 56 },
     { "type": "range", "id": "price_cart_height", "label": "Reach on down over Add to cart (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 86, "info": "Only used when the box above is ticked. Added to the panel's height and taken off its distance from the foot, so the shipped 86px - the same as the offset above - takes the panel from the price line to the bottom edge of the frame, covering their button whole." },
-    { "type": "range", "id": "price_pad", "label": "Inset from the panel edge (desktop)", "min": 0, "max": 96, "step": 2, "unit": "px", "default": 0 },
+    { "type": "range", "id": "price_pad", "label": "Inset from the panel's sides (desktop)", "min": 0, "max": 96, "step": 2, "unit": "px", "default": 18, "info": "Line it up with the inner margin of iJewel's own rail, so our lines start where theirs do." },
+    { "type": "range", "id": "price_pad_y", "label": "Inset from the panel's top and foot (desktop)", "min": 0, "max": 96, "step": 2, "unit": "px", "default": 18 },
     { "type": "range", "id": "price_feather", "label": "Soften the panel edge (desktop)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 0, "info": "How far the leading edges fade out. 0 keeps a hard rectangle, which is what a panel sitting inside the builder's own white rail wants." },
     { "type": "checkbox", "id": "price_hide_mobile", "label": "Hide the panel on mobile", "default": false, "info": "The guided mobile steps replace the price at its source, so this panel is hidden there whatever this says." },
     { "type": "range", "id": "price_bottom_mobile", "label": "Panel from the top or bottom (mobile)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 64, "info": "Measured on an iPhone-width preview of iJewel's own rail. Check them on a real phone if the builder changes - a panel in the wrong place covers the wrong thing." },
@@ -774,7 +974,8 @@
     { "type": "range", "id": "price_width_mobile", "label": "Panel width (mobile)", "min": 60, "max": 600, "step": 10, "unit": "px", "default": 390, "info": "On a phone iJewel puts the price at the left of the rail's foot with Add to cart as a full-width bar under it, so the panel is the whole strip. It is capped at the frame's width, so a number wider than the phone is simply full width." },
     { "type": "range", "id": "price_height_mobile", "label": "Panel height (mobile)", "min": 24, "max": 200, "step": 2, "unit": "px", "default": 48 },
     { "type": "range", "id": "price_cart_height_mobile", "label": "Reach on down over Add to cart (mobile)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 64, "info": "On a phone iJewel puts Add to cart as a full-width bar under the price, so the panel has to be the whole strip down to the frame's foot. Unused where the frame is cropped to the 3D stage or the guided steps are running - the button is cut off or redrawn there." },
-    { "type": "range", "id": "price_pad_mobile", "label": "Inset from the panel edge (mobile)", "min": 0, "max": 64, "step": 2, "unit": "px", "default": 20 },
+    { "type": "range", "id": "price_pad_mobile", "label": "Inset from the panel's sides (mobile)", "min": 0, "max": 64, "step": 2, "unit": "px", "default": 20 },
+    { "type": "range", "id": "price_pad_y_mobile", "label": "Inset from the panel's top and foot (mobile)", "min": 0, "max": 64, "step": 2, "unit": "px", "default": 12 },
     { "type": "range", "id": "price_feather_mobile", "label": "Soften the panel edge (mobile)", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 0 },
 
     { "type": "header", "content": "Above the designer" },

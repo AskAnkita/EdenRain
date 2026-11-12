@@ -104,8 +104,7 @@
   {%- if section.settings.heading_color != blank and section.settings.heading_color != transparent -%}--ds-heading-color: {{ section.settings.heading_color }};{%- endif -%}
   {%- if section.settings.eyebrow_color != blank and section.settings.eyebrow_color != transparent -%}--ds-eyebrow-color: {{ section.settings.eyebrow_color }};{%- endif -%}
   {%- if section.settings.text_color != blank and section.settings.text_color != transparent -%}--ds-text-color: {{ section.settings.text_color }};{%- endif -%}
-  {%- if section.settings.note_background != blank and section.settings.note_background != transparent -%}--ds-note-bg: {{ section.settings.note_background }};{%- endif -%}
-  {%- if section.settings.note_border != blank and section.settings.note_border != transparent -%}--ds-note-border: {{ section.settings.note_border }};{%- endif -%}
+  {%- if section.settings.note_border != blank and section.settings.note_border != transparent -%}--ds-note-dot: {{ section.settings.note_border }};{%- endif -%}
   {%- if section.settings.note_color != blank and section.settings.note_color != transparent -%}--ds-note-ink: {{ section.settings.note_color }};{%- endif -%}
   {%- if section.settings.wash_background != blank and section.settings.wash_background != transparent -%}--ds-wash-bg: {{ section.settings.wash_background }};{%- endif -%}
   {%- if section.settings.frame_background != blank and section.settings.frame_background != transparent -%}--ds-frame-bg: {{ section.settings.frame_background }};{%- endif -%}
@@ -652,9 +651,8 @@
     { "type": "color", "id": "heading_color", "label": "Headings", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "eyebrow_color", "label": "Eyebrow", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "text_color", "label": "Body text", "default": "rgba(0,0,0,0)" },
-    { "type": "color", "id": "note_background", "label": "Claim chip background", "default": "rgba(0,0,0,0)" },
-    { "type": "color", "id": "note_border", "label": "Claim chip border", "default": "rgba(0,0,0,0)" },
-    { "type": "color", "id": "note_color", "label": "Claim chip text", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "note_border", "label": "Claim separator dot", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "note_color", "label": "Claim text", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "wash_background", "label": "Tinted band background", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "rule_color", "label": "Hairlines", "info": "The rule above each step and between the questions.", "default": "rgba(0,0,0,0)" },
     { "type": "color", "id": "step_num_color", "label": "Step number", "default": "rgba(0,0,0,0)" },
@@ -671,7 +669,7 @@
     { "type": "range", "id": "heading_size", "label": "Band heading size", "min": 0, "max": 72, "step": 1, "unit": "px", "default": 0 },
     { "type": "range", "id": "eyebrow_size", "label": "Eyebrow size", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 0 },
     { "type": "range", "id": "text_size", "label": "Body text size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0 },
-    { "type": "range", "id": "note_size", "label": "Claim chip size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "note_size", "label": "Claim text size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
     { "type": "range", "id": "step_num_size", "label": "Step number size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
     { "type": "range", "id": "step_heading_size", "label": "Step heading size", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0 },
     { "type": "range", "id": "caption_size", "label": "Tile caption size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },

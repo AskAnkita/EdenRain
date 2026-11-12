@@ -1,21 +1,34 @@
 /*
-  Save design / Contact support - what the studio does instead of adding to a
-  cart.
-
-  This replaces assets/ijewel-cart.js. The old element put a configured ring in
-  the Shopify cart by charging some other product's price and writing the real
-  figure onto the line as a property, which is a workaround for a thing the
-  shop does not actually want to do: a bespoke ring is quoted, not bought off a
-  shelf. So nothing is charged here. The design is saved and sent to us.
+  Save design / Contact support - the two things the studio does with a ring
+  somebody has just built.
 
   THE TWO ACTIONS
 
     Save design       asks the builder what is on screen, writes the record to
-                      assets/eden-design-store.js, and shows the reference and
-                      a link that reopens the ring.
+                      assets/eden-design-store.js, shows the reference and a
+                      link that reopens the ring, and - when the section names
+                      a product to charge it against - puts the design in the
+                      Shopify cart with every choice on the line.
     Contact support   saves the design if it is not saved already, then goes to
                       the support page carrying its reference, where the record
                       is shown above a contact form that sends it to us.
+
+  THE CART LINE
+
+  A configured ring is not a product: /cart/add.js takes a variant id and will
+  not be told a price, so there is no line to add unless something in the
+  catalogue is standing in for it - a bespoke deposit, a design fee, a
+  made-to-order placeholder. The section's "Add the design to the cart" names
+  that product, and only then does any of this run; with nothing named the
+  studio behaves as it did before, saving the design and sending it to us to
+  quote. That is deliberate: the wrong product here charges the wrong money.
+
+  What goes on the line is the whole record in the builder's own words, so the
+  cart page, the order and whoever makes the ring all read the same thing. The
+  machine-readable half - the state key that rebuilds the 3D scene, the link
+  that reopens it, and the builder's own figure while the studio is covering
+  that figure in the frame - is underscored, which keeps it off the shopper's
+  cart and on the order.
 
   Both end in the same record, and the record carries the builder's state key -
   the string that rebuilds the exact 3D scene. See eden-design-store.js for why
@@ -67,6 +80,10 @@ if (!customElements.get('ijewel-design')) {
         this.status = this.querySelector('[data-design-status]');
         this.panel = this.querySelector('[data-design-panel]');
         this.list = this.querySelector('[data-design-list]');
+
+        // Only set when the section names a product to charge the line
+        // against. Without it nothing below ever runs.
+        this.variant = Number(this.dataset.cartVariant || 0) || 0;
 
         this.handler = this.receive.bind(this);
         window.addEventListener('message', this.handler);
@@ -345,12 +362,105 @@ if (!customElements.get('ijewel-design')) {
             this.removeAttribute('data-busy');
             this.show(row);
             this.paintList();
-            return row;
+            // The panel is already up before the cart is asked anything, so a
+            // slow or refused cart never holds up the thing the shopper
+            // pressed the button for. cart() resolves either way.
+            return this.cart(row);
           })
+          .then((row) => this.leave(row))
           .catch((error) => {
             this.removeAttribute('data-busy');
             this.trouble(error);
           });
+      }
+
+      /* ------------------------------------------------------------- the cart */
+
+      // The line is written by the store, not here: the saved-designs panel on
+      // the cart page adds the same designs, and two surfaces writing the line
+      // two different ways would put one ring in the bag twice.
+      cartProperties(row) {
+        return window.edenDesignStore.properties(row, { price: this.dataset.cartPrice });
+      }
+
+      cart(row) {
+        if (!row || !this.variant) return Promise.resolve(row);
+
+        this.setAttribute('data-busy', 'true');
+
+        return fetch(this.dataset.cartAdd || '/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            items: [{ id: this.variant, quantity: 1, properties: this.cartProperties(row) }],
+            // Every design carries its own reference, so two rings never merge
+            // into one line of quantity two.
+            sections: 'cart-icon-bubble',
+            sections_url: window.location.pathname
+          })
+        })
+          .then((response) =>
+            response.json().then((data) => {
+              if (!response.ok) throw new Error((data && data.description) || 'cart refused');
+              return data;
+            })
+          )
+          .then((data) => {
+            this.removeAttribute('data-busy');
+            this.bubble(data);
+            this.added(row);
+            return row;
+          })
+          .catch(() => {
+            // A deleted, unpublished or sold-out stand-in product is the usual
+            // reason, and none of them is the shopper's problem: the design
+            // itself is saved and the panel above is showing it.
+            this.removeAttribute('data-busy');
+            this.say(
+              this.dataset.cartFailText ||
+                'Your design is saved. We could not put it in your bag just now - contact support and we will pick it up with you.',
+              'error'
+            );
+            return row;
+          });
+      }
+
+      added(row) {
+        this.say(this.dataset.cartText || 'Design saved and added to your bag', 'done');
+        return row;
+      }
+
+      // Where a save ends up. The saved designs are listed on the cart page,
+      // so unless the section says otherwise that is where the shopper is
+      // taken once the design is written down - after the cart has been
+      // asked, so the list they land on already carries the line. It runs
+      // whether or not a line was added: a design with no stand-in product
+      // behind it is still saved, and still shown on that page.
+      //
+      // Nothing navigates in the theme editor. A customiser that jumps to the
+      // cart every time the button is pressed cannot be worked in.
+      leave(row) {
+        if (this.dataset.cartGo !== 'true') return row;
+        if (window.Shopify && window.Shopify.designMode) return row;
+        window.location = this.dataset.cartUrl || '/cart';
+        return row;
+      }
+
+      // The header's count, from the section the cart add was asked for. The
+      // studio page can be running with the header hidden on a phone, so this
+      // is allowed to find nothing.
+      bubble(data) {
+        const html = data && data.sections && data.sections['cart-icon-bubble'];
+        if (!html) return;
+        try {
+          const parsed = new DOMParser().parseFromString(html, 'text/html');
+          const fresh = parsed.querySelector('#cart-icon-bubble');
+          document.querySelectorAll('#cart-icon-bubble').forEach((node) => {
+            if (fresh) node.innerHTML = fresh.innerHTML;
+          });
+        } catch (error) {
+          /* the cart page itself is still right - only the count is stale */
+        }
       }
 
       support(design) {
@@ -430,6 +540,16 @@ if (!customElements.get('ijewel-design')) {
           if (href) reopen.setAttribute('href', href);
         }
 
+        // The cart page is where the saved designs live now - the list used to
+        // sit at the foot of this page and nobody looked at it there - so the
+        // link is offered on every save, not only when a line was added. It is
+        // the same page either way: the bag above, the shelf below it.
+        const bag = this.panel.querySelector('[data-design-cart]');
+        if (bag) {
+          bag.setAttribute('href', this.dataset.cartUrl || '/cart');
+          bag.hidden = false;
+        }
+
         const support = this.panel.querySelector('[data-design-go]');
         if (support && this.dataset.support) {
           const url = new URL(this.dataset.support, window.location.origin);
@@ -444,6 +564,25 @@ if (!customElements.get('ijewel-design')) {
 
         this.panel.setAttribute('tabindex', '-1');
         this.panel.focus({ preventScroll: true });
+        this.reveal();
+      }
+
+      // The save button can be inside the frame's own price panel, and on a
+      // studio set to fill the screen that means the saved design, its
+      // reference and its links land below the fold - a button that looks like
+      // it did nothing. So the panel is brought to the shopper when it is not
+      // already in front of them, and left alone when it is.
+      reveal() {
+        if (!this.panel) return;
+        try {
+          const box = this.panel.getBoundingClientRect();
+          const height = window.innerHeight || document.documentElement.clientHeight;
+          if (box.top >= 0 && box.bottom <= height) return;
+          this.panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch (error) {
+          /* an old browser without scrollIntoView options - the panel is still
+             open where it always was */
+        }
       }
 
       // Everything saved on this device, so a shopper who comes back to the

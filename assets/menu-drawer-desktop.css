@@ -1261,13 +1261,13 @@ a.menu-drawer-desktop__group-heading:hover {
   opacity: 1;
 }
 
-/* The shape only. The paint and the hover come from eden-actions.css, which sweeps the fill
+/* The shape only. The paint and the hover come from eden-actions.css, which crosses the fill
    across from the left edge; this rule names the three --cta-* pairs and nothing else, the way
    every other call to action in the shop does. It used to carry a 0.2s background cross-fade of
    its own, which made the panel the one place where a button did not move with the rest.
 
    No border-color, color or background-color here: this file loads after eden-actions.css, so a
-   colour written at this specificity would win over the sweep's resting paint rather than hand
+   colour written at this specificity would win over the shared resting paint rather than hand
    it over. Width and style only, and the three pairs below do the painting. */
 .menu-drawer-desktop__button {
   display: inline-flex;

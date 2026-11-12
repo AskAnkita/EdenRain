@@ -38,6 +38,7 @@
     .find(id)              -> record or null
     .remove(id)            -> boolean
     .summary(record)        -> "Shape: Oval, Metal: 18k white gold, ..."
+    .properties(record, o) -> { Reference: ..., Shape: ... } for a cart line
     .fromBridge(data, ctx) -> record, built but not written
 */
 (function () {
@@ -248,6 +249,45 @@
       return (record.options || [])
         .map(function (row) { return row.name + ': ' + row.value; })
         .join(', ');
+    },
+
+    // The record as the properties of a Shopify cart line.
+    //
+    // It lives here rather than in whichever element is doing the adding,
+    // because two surfaces add the same design now - the studio when it saves
+    // one, and the saved-designs panel on the cart page - and a line written
+    // two different ways is two different designs as far as the cart is
+    // concerned: Shopify merges lines by variant AND properties, so the same
+    // ring added from each place has to produce the identical object or it
+    // sits in the bag twice.
+    //
+    // Underscored names are hidden from the shopper's cart by
+    // snippets/cart-products.liquid and still travel on the order, so that is
+    // where the machine-readable half goes: the key that rebuilds the scene,
+    // the link that reopens it, and - while the studio is covering iJewel's
+    // figure in the frame - the figure itself.
+    properties: function (record, options) {
+      var opts = options || {};
+      var props = {};
+      if (!record) return props;
+
+      props.Reference = record.id;
+      if (record.title) props.Design = String(record.title);
+
+      (record.options || []).forEach(function (option) {
+        if (!option || !option.name) return;
+        if (option.value === undefined || option.value === null || option.value === '') return;
+        props[String(option.name)] = String(option.value);
+      });
+
+      if (record.code) props.Code = String(record.code);
+      if (record.price) props[opts.price === 'shown' ? 'Design price' : '_Builder price'] = record.price;
+      if (record.state) props['_Design key'] = record.state;
+
+      var reopen = record.builder || record.reopen || '';
+      if (reopen) props['_Reopen'] = reopen;
+
+      return props;
     },
 
     money: money

@@ -478,9 +478,9 @@ ijewel-studio {
    stand behind. It keeps its clicks, so the price breakdown underneath cannot
    be opened - and with "Cover the builder's Add to cart too" on, which is how
    it ships, the panel is grown down over their button as well, so the press
-   lands on the panel and never reaches it. Nothing on this page sells a ring
-   while the prices in the frame are the vendor's own; Save this design and
-   Contact support under the frame are what the buttons do instead. Mobile
+   lands on the panel and never reaches it. Nothing in the frame sells a ring
+   while the prices in it are the vendor's own; the panel's own two buttons -
+   save the design, ask us what it costs - are what is pressed instead. Mobile
    values first, desktop in the query below, because a rail of a different
    width puts its price somewhere else. */
 .ijw-price {
@@ -492,14 +492,91 @@ ijewel-studio {
   flex-direction: column;
   justify-content: var(--ijw-price-valign, center);
   align-items: var(--ijw-price-justify, flex-start);
-  gap: 2px;
+  gap: var(--ijw-price-gap, 2px);
   box-sizing: border-box;
   width: var(--ijw-price-width-mobile, 200px);
-  height: var(--ijw-price-height-mobile, 44px);
+  /* The height is what the panel COVERS - their price line, and with the cart
+     reach their button too - so it is a floor, not a ceiling. Two buttons in a
+     narrow panel need more than the cover does, and a fixed height would spill
+     them over the edge of their own background. Growing upwards from a panel
+     anchored at the foot keeps everything it was covering covered. */
+  min-height: var(--ijw-price-height-mobile, 44px);
   max-width: 100%;
-  padding: 0 var(--ijw-price-pad-mobile, 0px);
+  padding: var(--ijw-price-pad-y-mobile, 0px) var(--ijw-price-pad-mobile, 0px);
   background: transparent;
   text-align: var(--ijw-price-align, left);
+}
+
+/* With a call to action on it the panel is a small block of its own - a line
+   and a button - so the lines need air between them rather than the 2px that
+   set a price above its footnote. */
+.ijw-price--cta {
+  --ijw-price-gap: 10px;
+}
+
+/* The hairline that makes the panel the foot of their rail instead of a patch
+   laid over it. On the panel's own leading edge, above the padding, so it
+   reads as the divider their card would have drawn there itself. */
+.ijw-price__rule {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--ijw-price-rule, rgba(23, 23, 20, 0.12));
+}
+
+.ijw-price--top .ijw-price__rule {
+  top: auto;
+  bottom: 0;
+}
+
+.ijw-price__label {
+  position: relative;
+  color: var(--ijw-price-note-ink, var(--ijw-muted));
+  font-size: var(--ijw-price-label-size, 1.1rem);
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* The two buttons where iJewel's Add to cart is. They share the panel's width
+   in one row - save the design, ask us what it costs - and take their colours
+   from eden-actions, never their own hover. */
+.ijw-price__actions {
+  position: relative;
+  display: flex;
+  align-self: stretch;
+  gap: var(--ijw-price-button-gap, 10px);
+  margin-top: 2px;
+}
+
+.ijw-price__cta {
+  position: relative;
+  flex: 1 1 0;
+  justify-content: center;
+  min-width: 0;
+  text-align: center;
+}
+
+/* eden-action's own padding is written for a button standing on a page, and
+   two of them inside a panel the width of the builder's rail have nothing like
+   that room. The label is what has to survive, so the air around it is what
+   gives - the type stays the shop's. */
+.ijw-price--duo .ijw-price__cta {
+  padding-right: var(--ijw-price-button-pad, 1.2rem);
+  padding-left: var(--ijw-price-button-pad, 1.2rem);
+}
+
+/* On a phone the panel is the width of the builder's own rail and there is no
+   air left to take, so the last of the room comes out of the type. A notch,
+   not a shrink: the buttons still read as the shop's. */
+@media screen and (max-width: 749px) {
+  .ijw-price--duo {
+    --eden-action-font-size: 1.1rem;
+    --ijw-price-button-gap: 8px;
+    --ijw-price-button-pad: 0.8rem;
+  }
 }
 
 /* Read from the opposite edge instead, for a builder that draws its price in
@@ -642,8 +719,8 @@ a.ijw-price__text:hover {
     right: var(--ijw-price-right, 0px);
     bottom: var(--ijw-price-bottom, 0px);
     width: var(--ijw-price-width, 450px);
-    height: var(--ijw-price-height, 56px);
-    padding: 0 var(--ijw-price-pad, 0px);
+    min-height: var(--ijw-price-height, 56px);
+    padding: var(--ijw-price-pad-y, 0px) var(--ijw-price-pad, 0px);
   }
 
   .ijw-price--left {

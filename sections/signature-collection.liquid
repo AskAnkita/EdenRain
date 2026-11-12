@@ -572,7 +572,7 @@
 
   /*
     Both halves still turn over on hover - the label takes the arrow's ink and the
-    arrow takes the label's ground - but the turn is now the one sweep every call
+    arrow takes the label's ground - but the turn is now the one hover change every
     to action in the shop uses, from assets/eden-actions.css, which names both
     halves in its family. Each half only says which two colours it crosses
     between; .eden-action-host on the link is what makes hovering either half
@@ -697,7 +697,7 @@
   {%- comment -%}
     This one is a line of text with a rule under it, not a block of colour, so it
     keeps the underline gesture and sits out the fill: clearing the hover colour
-    leaves the shared sweep with nothing to paint.
+    leaves the shared hover layer with nothing to paint.
   {%- endcomment -%}
   .{{ root_class }}.signature-editorial--cta-link .signature-editorial__button-label {
     display: inline-block;

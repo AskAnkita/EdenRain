@@ -117,24 +117,38 @@
 }
 
 /* The three short claims under the hero copy - lead time, minimum, design
-   fee. Each is a chip so a long one wraps as a unit instead of breaking. */
+   fee. They are statements, not controls, so they carry no box: a boxed claim
+   next to the two real buttons reads as a button and gets clicked. Plain
+   small-caps text with a dot between, the same run the iJewel band uses. */
 .ds-notes {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 26px 0 0;
+  gap: 8px 24px;
+  margin: 24px 0 0;
   padding: 0;
   list-style: none;
 }
 
 .ds-note {
-  padding: 9px 13px;
-  border: 1px solid var(--ds-note-border, var(--ds-line));
-  background: var(--ds-note-bg, transparent);
+  position: relative;
   color: var(--ds-note-ink, var(--ds-ink));
   font-size: var(--ds-note-size, 1.15rem);
+  font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+/* The separator hangs in the gap, so it never shows on a claim that has
+   wrapped to the start of a new line. */
+.ds-note + .ds-note::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -13px;
+  width: 3px;
+  height: 3px;
+  background: var(--ds-note-dot, currentColor);
+  transform: translateY(-50%);
 }
 
 .ds-actions {
@@ -261,7 +275,7 @@
 
 /* The solid button sits on a photograph here. It used to need its own hover,
    because the shared one dropped the fill and left white-on-light text; the
-   shared sweep now brings a white fill with ink text across, which is exactly
+   shared hover now brings a white fill with ink text, which is exactly
    what this rule was for, so there is nothing left to override. */
 
 .ds-builder__aside {

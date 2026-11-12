@@ -210,6 +210,17 @@
   outline-offset: 2px;
 }
 
+/* An option the builder cannot put on this ring right now - ruled out by the
+   rest of the design, or waiting on its 3D model. It stays in the list and
+   reads as a real choice that is not open at the moment, which is what the
+   builder's own panel does; dropping it would say the shop does not make it.
+   Dimmed rather than greyed: the tile is a photograph of a metal or a drawing
+   of a shape, and a colour laid over it would hide what it is. */
+.eso-pick[data-unavailable] {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
 /* A tile is the material itself, its name sitting on it. They lay out on a
    grid that fits as many even columns as the screen takes, so a wrapped last
    tile is the same width as the rest rather than stretched across the row. */
@@ -469,6 +480,33 @@
 
 .eso-bar .eden-action {
   flex: 0 0 auto;
+}
+
+/* Two buttons on a bar the width of a phone. They share whatever the price
+   column leaves - all of it, while there is no price to show - and the air
+   around their labels is what gives, never the type. */
+.eso-bar__actions {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
+.eso-bar__actions .eden-action {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  font-size: 1.1rem;
+}
+
+/* One button is a button, not half a bar. */
+.eso-bar__actions .eden-action:only-child {
+  flex: 0 0 auto;
+  padding-right: var(--button-padding-horizontal-mobile, 1.6rem);
+  padding-left: var(--button-padding-horizontal-mobile, 1.6rem);
+  font-size: var(--eden-action-font-size);
 }
 
 .eso-notes {

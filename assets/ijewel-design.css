@@ -34,6 +34,25 @@ ijewel-design {
   align-items: center;
 }
 
+/* display:flex above beats the browser's own [hidden] rule, so hiding the row
+   has to be said here - the section turns it off where the price panel inside
+   the frame already carries the same two buttons. The same goes for the links
+   on the panel below: an .eden-link is display:inline-flex, so a hidden one
+   would otherwise stay on screen. */
+.ijd-actions[hidden] {
+  display: none;
+}
+
+.ijd-panel__links .eden-link[hidden] {
+  display: none;
+}
+
+/* Same again: a display:grid of its own would keep an empty specs list on
+   screen on a design that came back with no readable choices. */
+.ijd-specs[hidden] {
+  display: none;
+}
+
 /* The primary action is the one that keeps the work; "contact support" is the
    second action, because most people save first and ask afterwards. */
 .ijd-actions .eden-action {

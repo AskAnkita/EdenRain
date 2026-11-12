@@ -417,9 +417,9 @@
 /*
   The paint and the hover both come from eden-actions.css, which .pc-button is
   named in: it only declares its colours as the shared --cta-* pairs so the one
-  sweep every call to action in the shop uses carries it too. The hover fill
-  used to default to `transparent`, which the sweep cannot wipe across, so it
-  now falls back to the resting ink - the same swap, with something to see.
+  hover change every call to action in the shop uses carries it too. The hover
+  fill used to default to `transparent`, which the hover layer cannot paint, so
+  it now falls back to the resting ink - the same swap, with something to see.
 */
 .pc-button {
   display: inline-block;

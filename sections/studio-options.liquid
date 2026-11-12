@@ -198,6 +198,8 @@
   data-show-price="{{ section.settings.show_live_price }}"
   data-currency="{{ section.settings.currency | escape }}"
   data-swatches="{{ section.settings.swatches | escape }}"
+  data-show-unavailable="{{ section.settings.show_unavailable }}"
+  data-unavailable-note="{{ section.settings.unavailable_note | escape }}"
 >
   <div class="eso-shell">
     {%- if section.settings.wake_text != blank -%}
@@ -268,12 +270,20 @@
 
   {%- if section.settings.show_bar -%}
     <div class="eso-bar{% unless section.settings.sticky_bar %} eso-bar--static{% endunless %}">
-      <span class="eso-bar__price">
-        {%- if section.settings.price_label != blank -%}
-          <span class="eso-bar__label">{{ section.settings.price_label | escape }}</span>
-        {%- endif -%}
-        <span class="eso-bar__total" data-total>{{ section.settings.price_text | escape }}</span>
-      </span>
+      {%- comment -%}
+        With no label, no line and the live price off there is nothing to put
+        here, and an empty column next to the buttons only takes the room they
+        need. The element still has to exist for the live price to be written
+        into when it is turned on, so it is the whole column that goes.
+      {%- endcomment -%}
+      {%- if section.settings.price_label != blank or section.settings.price_text != blank or section.settings.show_live_price -%}
+        <span class="eso-bar__price">
+          {%- if section.settings.price_label != blank -%}
+            <span class="eso-bar__label">{{ section.settings.price_label | escape }}</span>
+          {%- endif -%}
+          <span class="eso-bar__total" data-total>{{ section.settings.price_text | escape }}</span>
+        </span>
+      {%- endif -%}
 
       {%- comment -%}
         On a phone this is the only action surface there is. The frame above is
@@ -288,16 +298,37 @@
         The href stays a real link underneath either action, so the button still
         goes somewhere before the script has run and if it never runs.
       {%- endcomment -%}
-      {%- if section.settings.button_label != blank -%}
-        <a
-          class="eden-action eden-action--{{ section.settings.button_style }}"
-          href="{{ section.settings.button_link | default: '#' }}"
-          data-cta
-          {% if section.settings.button_action == 'save' %}data-design-save{% endif %}
-          {% if section.settings.button_action == 'support' %}data-design-support{% endif %}
-        >
-          {{- section.settings.button_label | escape -}}
-        </a>
+      {%- comment -%}
+        Two of them, the same pair the price panel carries inside the frame on
+        a desktop: save the ring, or ask us what it costs. A phone has no
+        other action surface at all, so dropping one here would mean a phone
+        could only do half of what a desktop can.
+      {%- endcomment -%}
+      {%- if section.settings.button_label != blank or section.settings.button2_label != blank -%}
+        <span class="eso-bar__actions">
+          {%- if section.settings.button_label != blank -%}
+            <a
+              class="eden-action eden-action--{{ section.settings.button_style }}"
+              href="{{ section.settings.button_link | default: '#' }}"
+              data-cta
+              {% if section.settings.button_action == 'save' %}data-design-save{% endif %}
+              {% if section.settings.button_action == 'support' %}data-design-support{% endif %}
+            >
+              {{- section.settings.button_label | escape -}}
+            </a>
+          {%- endif -%}
+          {%- if section.settings.button2_label != blank -%}
+            <a
+              class="eden-action eden-action--{{ section.settings.button2_style | default: 'outline' }}"
+              href="{{ section.settings.button2_link | default: section.settings.button_link | default: '#' }}"
+              data-cta
+              {% if section.settings.button2_action == 'save' %}data-design-save{% endif %}
+              {% if section.settings.button2_action != 'save' and section.settings.button2_action != 'link' %}data-design-support{% endif %}
+            >
+              {{- section.settings.button2_label | escape -}}
+            </a>
+          {%- endif -%}
+        </span>
       {%- endif -%}
     </div>
   {%- endif -%}
@@ -321,6 +352,8 @@
 
     { "type": "header", "content": "Parts" },
     { "type": "checkbox", "id": "one_open_at_a_time", "label": "Only one row open at a time", "default": true },
+    { "type": "checkbox", "id": "show_unavailable", "label": "Show choices that cannot be picked yet", "info": "The builder marks an option it cannot build right now - one the rest of the design rules out, or one whose 3D model has not been uploaded to iJewel Drive. On, they show dimmed and unpickable, the way iJewel's own panel shows them. Off, they are left out of the list entirely, which reads as choices the shop does not offer.", "default": true },
+    { "type": "text", "id": "unavailable_note", "label": "Wording on a choice that cannot be picked", "info": "Shown on hover and read out by a screen reader. Leave empty for no wording.", "default": "Not available with this design yet" },
     { "type": "checkbox", "id": "show_row_value", "label": "Show the chosen value in the closed row", "info": "Off keeps the list to names and ticks, with the choices gathered in the summary.", "default": false },
     { "type": "checkbox", "id": "show_summary", "label": "Show the summary", "default": true },
     { "type": "checkbox", "id": "summary_open", "label": "Open the summary by default", "default": true },
@@ -333,7 +366,7 @@
     { "type": "checkbox", "id": "sticky_bar", "label": "Pin the bar to the bottom of the screen", "default": true },
     { "type": "checkbox", "id": "show_live_price", "label": "Show the configurator's live price", "info": "Off by default. The builder prices in USD and those figures are covered on the frame, so leave this off until real prices land and untick the price cover on the studio section at the same time.", "default": false },
     { "type": "text", "id": "price_label", "label": "Label above the price", "default": "Your design" },
-    { "type": "text", "id": "price_text", "label": "Price text", "info": "Shown when the live price above is off.", "default": "Contact us for price" },
+    { "type": "text", "id": "price_text", "label": "Price text", "info": "Shown when the live price above is off. Ships empty: the buttons below say what the bar can do, and a line reading \"contact us for price\" only tells a shopper what it cannot." },
     { "type": "text", "id": "currency", "label": "Currency code for the live price", "default": "USD" },
     { "type": "text", "id": "button_label", "label": "Button label", "info": "Leave empty to hide the button.", "default": "Enquire" },
     { "type": "url", "id": "button_link", "label": "Button link", "info": "The design's state key is added to this link, so the page it opens can reopen this exact ring. With an action below other than \"just follow the link\", this is where the button goes before the script has run - point it at the support page." },
@@ -343,6 +376,14 @@
       { "value": "link", "label": "Just follow the link" }
     ] },
     { "type": "select", "id": "button_style", "label": "Button style", "options": [ { "value": "solid", "label": "Filled" }, { "value": "outline", "label": "Outlined" }, { "value": "light", "label": "Outlined, for a dark background" }, { "value": "invert", "label": "Filled white, for a dark background" } ], "default": "solid" },
+    { "type": "text", "id": "button2_label", "label": "Second button label", "info": "Stands beside the first and shares the bar with it. Leave empty for one button on its own.", "default": "Contact for price" },
+    { "type": "url", "id": "button2_link", "label": "Second button link", "info": "Falls back to the first button's link." },
+    { "type": "select", "id": "button2_action", "label": "What the second button does", "default": "support", "options": [
+      { "value": "support", "label": "Save the design and go to support" },
+      { "value": "save", "label": "Save the design and stay here" },
+      { "value": "link", "label": "Just follow the link" }
+    ] },
+    { "type": "select", "id": "button2_style", "label": "Second button style", "options": [ { "value": "outline", "label": "Outlined" }, { "value": "solid", "label": "Filled" }, { "value": "light", "label": "Outlined, for a dark background" }, { "value": "invert", "label": "Filled white, for a dark background" } ], "default": "outline" },
 
     { "type": "header", "content": "Swatch colours", "info": "The builder sends an icon for some options and nothing for others. Map an option to a colour and a tile with no icon is filled with it. One per line: the option key or its label, then a colour." },
     { "type": "textarea", "id": "swatches", "label": "Option colours, one per line", "default": "White Gold | #d8d8da\nYellow Gold | #e6c584\nRose Gold | #e0b09c\nPlatinum | #d9dadc" },
@@ -410,6 +451,7 @@
       "name": "Studio options (mobile)",
       "blocks": [
         { "type": "row", "settings": { "label": "Your Setting", "question": "Which setting do you have in mind?", "axis": "head", "style": "grid", "sub_axis": "none" } },
+        { "type": "row", "settings": { "label": "Band Style", "question": "What should the band look like?", "axis": "shank", "style": "grid", "sub_axis": "none" } },
         { "type": "row", "settings": { "label": "Metal Type", "question": "What metal is the band?", "axis": "shankMetal", "style": "tiles", "sub_label": "Metal of the setting", "sub_axis": "headMetal" } },
         { "type": "row", "settings": { "label": "Diamond Shape", "question": "Which shape should the centre stone be?", "axis": "shape", "style": "grid", "sub_axis": "none" } },
         { "type": "row", "settings": { "label": "Diamond Size", "question": "How big should it be?", "axis": "carat", "style": "tiles", "sub_axis": "none" } },

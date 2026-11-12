@@ -335,15 +335,15 @@
   # drawn from the same four colours, so a button only has to say which way
   # round it starts.
   #
-  # eden-action--sweep-out is the shared sweep from assets/eden-actions.css run
-  # backwards, and it is what lets a filled button empty at all: "no fill" is
-  # not a colour the forward sweep can carry across, so the fill is painted by
-  # that same layer held at full width and retracted instead. The About page's
-  # hero pair works exactly this way.
+  # eden-action--empties is the shared hover change from assets/eden-actions.css
+  # run backwards, and it is what lets a filled button empty at all: "no fill"
+  # is not a colour the hover layer can carry forwards, so the fill is painted
+  # by that same layer held at full opacity and faded away instead. The About
+  # page's hero pair works exactly this way.
   assign button_1_style = block.settings.button_1_style | default: 'solid'
   assign button_2_style = block.settings.button_2_style | default: 'outline'
 
-  assign cta_filled = 'ai-luxury-video-hero-cta-filled-' | append: ai_gen_id | append: ' eden-action--sweep-out'
+  assign cta_filled = 'ai-luxury-video-hero-cta-filled-' | append: ai_gen_id | append: ' eden-action--empties'
   assign cta_outlined = 'ai-luxury-video-hero-cta-outlined-' | append: ai_gen_id
 
   assign button_1_cta_class = cta_outlined
@@ -368,9 +368,14 @@
     position: relative;
     width: 100%;
     {% if block.settings.enable_full_height %}
-      /* Fill the screen below the header + announcement bar on every device */
-      height: calc({{ block.settings.desktop_height }}vh - var(--header-group-height, 0px));
-      height: calc({{ block.settings.desktop_height }}svh - var(--header-group-height, 0px));
+      /* The first screen holds the header, this hero and the row of services under it,
+         and nothing else - whatever comes after that row starts below the fold. So the
+         hero is what is left of the screen once the header group and that row are out
+         of it. --eden-fold-row is the row measured by the script at the foot of this
+         block; the fallback is what the row comes to at its present settings, so the
+         first paint already lands close and the measurement only trims it. */
+      height: calc({{ block.settings.desktop_height }}vh - var(--header-group-height, 0px) - var(--eden-fold-row, 7.2rem));
+      height: calc({{ block.settings.desktop_height }}svh - var(--header-group-height, 0px) - var(--eden-fold-row, 7.2rem));
     {% else %}
       height: {{ block.settings.desktop_height }}vh;
     {% endif %}
@@ -490,16 +495,16 @@
   {%- comment -%}
     The paint, the hover and the lift all come from assets/eden-actions.css,
     which matches these buttons on their class prefix and gives every call to
-    action in the shop the same fill: a colour that wipes in from the left.
-    This block only says how big the button is and which colours it crosses
-    between - it must not write a :hover of its own, or the hero falls back out
-    of step with add to cart and the rest of the homepage.
+    action in the shop the same fill: a colour that crosses in on its own, with
+    nothing moving. This block only says how big the button is and which colours
+    it crosses between - it must not write a :hover of its own, or the hero
+    falls back out of step with add to cart and the rest of the homepage.
 
     Both buttons rest on no fill of their own and name the same fill as the
-    colour the sweep carries. What tells them apart is one class: the filled
-    one wears eden-action--sweep-out, which holds that fill at full width and
-    retracts it, so the pair swap appearances on hover rather than both turning
-    into the same dark slab. The label colours are the only thing that has to
+    colour the hover layer carries. What tells them apart is one class: the
+    filled one wears eden-action--empties, which holds that fill at full opacity
+    and fades it away, so the pair swap appearances on hover rather than both
+    turning into the same dark slab. The label colours are the only thing that has to
     be stated per button, just below.
   {%- endcomment -%}
   .ai-luxury-video-hero-button-{{ ai_gen_id }} {
@@ -712,7 +717,17 @@
           assign desktop_image = mobile_image
         endif
       %}
-      {% if desktop_image != blank %}
+      {% if block.settings.christmas_hero %}
+        <img
+          class="ai-luxury-video-hero-image-{{ ai_gen_id }} ai-luxury-video-hero-desktop-image-{{ ai_gen_id }}"
+          src="{{ 'christmas-holding-hands-hero.png' | asset_url }}"
+          width="1536" height="1024"
+          alt="A couple holding hands at Christmas, wearing an oval diamond engagement ring and matching wedding band"
+          loading="eager" fetchpriority="high"
+          style="object-position: center center;"
+          data-desktop-image
+        >
+      {% elsif desktop_image != blank %}
         <img
           class="ai-luxury-video-hero-image-{{ ai_gen_id }} ai-luxury-video-hero-desktop-image-{{ ai_gen_id }}"
           src="{{ desktop_image | image_url: width: 3000 }}"
@@ -734,7 +749,17 @@
         >
       {% endif %}
 
-      {% if mobile_image != blank %}
+      {% if block.settings.christmas_hero %}
+        <img
+          class="ai-luxury-video-hero-image-{{ ai_gen_id }} ai-luxury-video-hero-mobile-image-{{ ai_gen_id }}"
+          src="{{ 'christmas-holding-hands-hero.png' | asset_url }}"
+          width="1536" height="1024"
+          alt="An engagement ring and wedding band on a hand held by a partner beside Christmas lights"
+          loading="eager" fetchpriority="high"
+          style="display: none; object-position: center center;"
+          data-mobile-image
+        >
+      {% elsif mobile_image != blank %}
         <img
           class="ai-luxury-video-hero-image-{{ ai_gen_id }} ai-luxury-video-hero-mobile-image-{{ ai_gen_id }}"
           src="{{ mobile_image | image_url: width: 1200 }}"
@@ -900,8 +925,8 @@
         const panel = this.querySelector('.ai-luxury-video-hero-mobile-content-{{ ai_gen_id }}');
 
         if (window.innerWidth > 749) {
-          box.style.removeProperty('height');
           if (panel) panel.style.removeProperty('height');
+          this.fitDesktopHeight(box);
           return;
         }
 
@@ -936,6 +961,46 @@
         if (panel) {
           panel.style.height = Math.round(Math.max(screen - film - row, words)) + 'px';
         }
+      }
+
+      /*
+        On a wide screen the first view is meant to hold three things and stop: the header,
+        this hero, and the row of services under it. Everything after that row begins below
+        the fold. The hero is handed what is left of the screen once the other two are out
+        of it, measured off the page rather than counted up from settings, so the header's
+        own settings, the row's padding and its labels wrapping when the webfont lands all
+        come out right without any of them being added up here. The CSS above gets the
+        first paint close; this is what makes it exact.
+      */
+      fitDesktopHeight(box) {
+        {%- if block.settings.enable_full_height %}
+        const section = this.closest('.shopify-section') || this.parentElement;
+        const next = section ? section.nextElementSibling : null;
+        const height = box.getBoundingClientRect().height;
+
+        // How far the foot of the services row sits from the foot of the screen, in page
+        // coordinates - the first view is the page unscrolled, so that is the comparison.
+        // Positive and the row is short of the fold, negative and it is over it. Taking
+        // it straight off the hero's own height is what makes every other space on the
+        // way down - the section's margins, the row's own border, the header, whatever
+        // the settings do to any of them - come out in the wash without being counted
+        // one by one. It settles in a single pass: once the hero has been resized the
+        // slack is nil, so a second run hands back the same number.
+        let film;
+        if (next) {
+          const row = next.getBoundingClientRect();
+          document.body.style.setProperty('--eden-fold-row', Math.round(row.height) + 'px');
+          film = height + (window.innerHeight - (row.bottom + window.scrollY));
+        } else {
+          film = window.innerHeight - (this.getBoundingClientRect().top + window.scrollY);
+        }
+
+        // A floor, the way the phone has one: if whatever follows the hero is ever
+        // swapped for something tall, the hero keeps the screen rather than collapsing.
+        box.style.height = Math.max(Math.round(film), 360) + 'px';
+        {%- else %}
+        box.style.removeProperty('height');
+        {%- endif %}
       }
 
       // The heading, the words and the buttons stacked up, with the gaps between them and
@@ -993,6 +1058,13 @@
         { "value": "image", "label": "Image" }
       ],
       "default": "video"
+    },
+    {
+      "type": "checkbox",
+      "id": "christmas_hero",
+      "label": "Use Christmas holding hands image",
+      "info": "Shows the seasonal engagement ring and wedding band photograph on desktop and mobile. Turn off to use the images below.",
+      "default": false
     },
     {
       "type": "image_picker",

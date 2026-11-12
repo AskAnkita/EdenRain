@@ -193,15 +193,13 @@
 }
 
 /*
-  A card with no picture at all: the box would otherwise be an empty tinted square, which reads as
-  a picture that failed. The name takes the whole card instead.
+  A card with no picture at all - a category we hold no stock in yet. The box keeps its place, so
+  the names stay in a line across the row and the card is the same shape as the photographed one
+  beside it, but the tint comes off it: a filled square with nothing in it reads as a photograph
+  that failed to load, while an empty one reads as a picture still to come.
 */
-.style-strip__card--wordmark {
-  grid-template-columns: 1fr;
-}
-
-.style-strip__card--wordmark .style-strip__media {
-  display: none;
+.style-strip__card--empty .style-strip__media {
+  background-color: transparent;
 }
 
 .style-strip__media {

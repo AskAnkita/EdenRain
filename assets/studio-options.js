@@ -6,8 +6,17 @@
   undocumented v2 bridge - see assets/ijewel-design.js for the envelope - and two
   of its methods are all this needs:
 
-    getOptions({axis}) -> [{key, label, state: selected|available|no-file, icon}]
+    getOptions({axis}) -> [{key, label, state, icon}]
     select({axis, option}) -> {applied, moved, deactivated}
+
+  An option's state is one of four, and only one of them means "do not print
+  it". `selected` and `available` can be picked. `blocked` is an option this
+  design rules out - an oval has no asscher head - and `no-file` is one whose
+  3D model has not been uploaded to iJewel Drive yet. Both of those are shown
+  dimmed and unpickable, the way the builder's own panel shows them: a shape
+  that is simply absent from our list reads as a shape the shop does not make,
+  which is a different and wrong message. Only `hidden` is dropped, because
+  that is the builder being told the option is not on offer at all.
 
   So every row below the ring is filled from the builder itself. Nothing here
   is typed into the theme editor except the row's name, its question and which
@@ -41,6 +50,7 @@ if (!customElements.get('studio-options')) {
 
         this.origin = this.dataset.origin || 'https://ijewel3d.com';
         this.single = this.dataset.single !== 'false';
+        this.showUnavailable = this.dataset.showUnavailable !== 'false';
         this.seq = 0;
         this.pending = new Map();
         this.rows = Array.from(this.querySelectorAll('.eso-row'));
@@ -165,7 +175,10 @@ if (!customElements.get('studio-options')) {
         if (!host) return;
         this.call('getOptions', { axis: axis })
           .then((options) => {
-            const list = Array.isArray(options) ? options.filter((o) => o && o.state !== 'no-file') : [];
+            const all = Array.isArray(options) ? options.filter(Boolean) : [];
+            const list = all.filter(
+              (option) => option.state !== 'hidden' && (this.showUnavailable || !unpickable(option))
+            );
             this.paint(row, host, axis, list);
             if (selector === '.eso-choices') this.mark(row, list);
           })
@@ -196,6 +209,20 @@ if (!customElements.get('studio-options')) {
           button.type = 'button';
           button.className = 'eso-pick';
           button.setAttribute('aria-pressed', option.state === 'selected' ? 'true' : 'false');
+
+          // Dimmed and inert, not missing. A disabled button is skipped by a
+          // screen reader's button list, so the state is also said in words on
+          // the label itself.
+          const off = unpickable(option);
+          if (off) {
+            button.disabled = true;
+            button.setAttribute('data-unavailable', '');
+            const note = this.dataset.unavailableNote || '';
+            if (note) {
+              button.title = note;
+              button.setAttribute('aria-label', (option.label || option.key) + ' - ' + note);
+            }
+          }
 
           // A tile is the material itself: its icon if the builder sends one,
           // otherwise a colour the merchant mapped to the option's key.
@@ -233,7 +260,7 @@ if (!customElements.get('studio-options')) {
             button.appendChild(tag);
           }
 
-          button.addEventListener('click', () => this.choose(axis, option));
+          if (!off) button.addEventListener('click', () => this.choose(axis, option));
           host.appendChild(button);
         });
       }
@@ -346,6 +373,13 @@ if (!customElements.get('studio-options')) {
 }
 
 function noop() {}
+
+// The two states the builder answers with for an option it cannot put on the
+// ring as things stand: `blocked` is ruled out by the rest of the design,
+// `no-file` has no 3D model uploaded for it yet. Everything else is pickable.
+function unpickable(option) {
+  return option.state === 'blocked' || option.state === 'no-file';
+}
 
 function reject_(slot, error) {
   slot.reject(new Error((error && error.code) || 'bridge error'));

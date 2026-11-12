@@ -246,7 +246,7 @@
             <div class="ab-actions">
               {%- if stts.hero_button_label != blank -%}
                 <a
-                  class="eden-action ab-hero__button--primary{% if hero_has_media %} eden-action--sweep-out{% endif %}"
+                  class="eden-action ab-hero__button--primary{% if hero_has_media %} eden-action--empties{% endif %}"
                   href="{{ stts.hero_button_link | default: '#' }}"
                 >
                   {{- stts.hero_button_label | escape -}}
@@ -611,7 +611,7 @@
             <div class="ab-cta__actions">
               {%- if stts.cta_button_label != blank -%}
                 <a
-                  class="eden-action ab-cta__button--primary eden-action--sweep-out"
+                  class="eden-action ab-cta__button--primary eden-action--empties"
                   href="{{ stts.cta_button_link | default: '#' }}"
                 >
                   {{- stts.cta_button_label | escape -}}

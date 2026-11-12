@@ -16,7 +16,7 @@
 
   Buttons come from assets/eden-actions.css, which names .gifting-banner__button in the one
   call-to-action family and owns the hover for all of them; this section only says which two
-  colours the shared sweep crosses between.
+  colours the shared hover crosses between.
 
   Every restylable setting is written onto the section element as a CSS custom property, with
   the stylesheet's own value as the fallback, so a setting left at "use the default" (a cleared
@@ -102,7 +102,7 @@
   {%- if section.settings.card_text_color != blank and section.settings.card_text_color != transparent -%}--gift-card-color: {{ section.settings.card_text_color }};{%- endif -%}
 
   {%- comment -%}
-    The three pairs the shared sweep in eden-actions.css crosses between: what the button looks
+    The three pairs the shared hover in eden-actions.css crosses between: what the button looks
     like at rest, and what it looks like hovered. Nothing here writes a :hover of its own.
   {%- endcomment -%}
   {%- if section.settings.button_background != blank and section.settings.button_background != transparent -%}--gift-button-fill: {{ section.settings.button_background }};{%- endif -%}
@@ -500,19 +500,34 @@
     display: none;
   }
 
+  /*
+    The track is a faded COLOUR, not a solid colour at a low opacity. Opacity
+    is inherited by what the element contains, so `opacity: 0.22` here took the
+    filled bar down with it: the bar and the groove it runs in came out at the
+    same value and the row showed one flat grey line, with no sign of how far
+    along it was. The rgba line is the fallback for a browser without
+    color-mix; it is the default ink at the same 22%.
+
+    2px rather than a hairline, which is what the theme's own .progress-bar
+    stands at (0.13rem) and what makes the filled part read as a position
+    rather than as a smudge.
+  */
   #eden-quote-{{ section.id }} .gifting-banner__progress {
     position: relative;
-    height: 1px;
+    height: 2px;
     flex: 1 1 auto;
     max-width: 220px;
-    background: var(--gift-text-color);
-    opacity: 0.22;
+    background: rgba(63, 57, 50, 0.22);
+    background: color-mix(in srgb, var(--gift-text-color) 22%, transparent);
   }
 
+  /* Full strength: this is the only thing on the line that says where the row
+     has got to. */
   #eden-quote-{{ section.id }} .gifting-banner__progress-bar {
     position: absolute;
     inset: 0;
     background: var(--gift-text-color);
+    opacity: 1;
     transform: scaleX(0);
     transform-origin: left center;
     transition: transform 0.4s ease;
@@ -587,7 +602,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transition: transform 0.5s var(--cta-sweep-easing, ease);
+    transition: transform 0.5s var(--cta-fade-easing, ease);
   }
 
   @media (hover: hover) {
@@ -619,7 +634,7 @@
   /*
     The paint and the hover both come from assets/eden-actions.css, which names
     .gifting-banner__button in the one call-to-action family. This only says which two
-    colours the shared sweep crosses between.
+    colours the shared hover crosses between.
   */
   #eden-quote-{{ section.id }} .gifting-banner__button {
     display: inline-flex;

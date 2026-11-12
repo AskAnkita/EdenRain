@@ -197,14 +197,14 @@
 /* ------------------------------------------------------- merchant CTA colours
 
    The section's button settings land here as the shared --cta-* pairs, so the
-   one hover sweep in eden-actions.css carries them; this file never writes a
+   one hover change in eden-actions.css carries them; this file never writes a
    :hover of its own. Every value falls back to the .eden-action token it would
    otherwise have used, so a colour left cleared in the panel keeps the theme's
    own button, hover included. The section selector is only here to out-specify
    .eden-action--solid.
 
    Where no hover colour is given the resting pair is simply swapped, which is
-   what the shared sweep needs: a fill that wipes in has to be an actual
+   what the shared hover needs: the fill it crosses to has to be an actual
    colour, and "no fill" would leave nothing to see. */
 .homepage-journey .hj-cta { font-size: var(--hj-btn-size, var(--eden-action-font-size)); }
 

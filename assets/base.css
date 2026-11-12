@@ -21616,9 +21616,14 @@ footer.section-footer .email-signup__input {
     padding-block: 0.6rem;
   }
 
+  /* The nav row is the one band the eye lands on before the hero, and at
+     0.7rem it read as a caption strip rather than a bar. 1.5rem puts the row
+     back at the ~56px it stood at before the header was tightened, without
+     touching the utility row above it: the links keep their size and tracking,
+     they just sit in a taller bed. */
   #header-component .header__row--bottom .list-menu--inline > li > .header__menu-item,
   #header-component .header__row--bottom .list-menu--inline > li > details > .header__menu-item {
-    padding-block: 0.7rem;
+    padding-block: 1.5rem;
   }
 
   /* The logo is 32px tall at its set width, but the account/wishlist/cart
@@ -21661,6 +21666,13 @@ footer.section-footer .email-signup__input {
      nav and leaves the 32px logo three pixels of air each side. */
   #header-component .header__columns {
     min-height: 3.8rem;
+  }
+
+  /* The nav row carries its own floor so the links' padding is what sets its
+     height and the floor only catches the collapse case — the centred nav is
+     absolutely positioned and contributes no height of its own. */
+  #header-component .header__row--bottom .header__columns {
+    min-height: 4.8rem;
   }
 }
 

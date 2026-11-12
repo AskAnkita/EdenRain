@@ -1,0 +1,169 @@
+{% comment %}
+  Saved designs - the rings somebody built in the 3D studio, shown on the cart
+  page as a panel of their own under the bag.
+
+  WHERE THEY COME FROM
+
+  localStorage, through assets/eden-design-store.js. A configured ring is not a
+  product: it has no variant, no price Shopify will accept and nothing in the
+  catalogue to point at, so saving one writes a record - every choice in the
+  builder's own words, a quotable reference, and the state key that rebuilds
+  the identical 3D scene - to this browser instead. Liquid cannot read any of
+  that, so this section ships as an empty shell and the panel is built in the
+  browser by assets/saved-designs.js. With nothing saved it draws nothing at
+  all, not an empty state, so a cart page belonging to somebody who has never
+  opened the studio says nothing about designs.
+
+  This list used to sit at the foot of the studio page, under the frame and the
+  buttons, which is the one place nobody looks once they have finished
+  designing. It is the "show the designs saved on this device" setting on the
+  3D design studio section; that setting still exists and now ships off, so
+  turning it back on puts the list in BOTH places.
+
+  IT IS NOT THE BAG
+
+  Nothing here is bought, reserved or priced, and the panel says so in its own
+  lead line. A design only joins the cart when somebody adds it, which needs a
+  product to charge the line against - Shopify charges a line the variant's own
+  price, so it has to be a stand-in the shop means to charge: a bespoke
+  deposit, a design fee. Name it below and each card grows an "Add to bag"
+  button; leave it empty and the panel is a shelf, which is the safe default.
+
+  The line is written by assets/eden-design-store.js, the same call the studio
+  uses when it saves one, so a ring added from here and the same ring added
+  from the studio are one line and not two.
+{% endcomment %}
+
+{%- liquid
+  # The sentinel a cleared colour comes back as. Without it the comparisons
+  # below test against nothing, every cleared colour is written out as
+  # rgba(0,0,0,0), and the whole panel renders in transparent ink - present in
+  # the page, legible to a screen reader, invisible on screen.
+  assign transparent = 'rgba(0,0,0,0)'
+
+  assign sd = section.settings
+
+  assign cart_variant = ''
+  if sd.cart_product != blank
+    assign cart_variant = sd.cart_product.selected_or_first_available_variant.id
+  endif
+
+  assign title_size = sd.title_size | plus: 0
+  assign lead_size = sd.lead_size | plus: 0
+  assign card_min = sd.card_min | plus: 0
+  assign width = sd.width | plus: 0
+-%}
+
+{%- comment -%}
+  eden-actions.css is in layout/theme.liquid already, on every page.
+{%- endcomment -%}
+{{ 'saved-designs.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'eden-design-store.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'saved-designs.js' | asset_url }}" defer="defer"></script>
+
+{%- comment -%}
+  Hidden from the start and shown by the script once it has rows. The other way
+  round - drawn, then hidden - flashes a heading on every cart page in the shop
+  for as long as the deferred script takes to run.
+{%- endcomment -%}
+<saved-designs
+  hidden
+  style="
+    {%- if sd.ink_color != blank and sd.ink_color != transparent -%}--sdg-ink: {{ sd.ink_color }};{%- endif -%}
+    {%- if sd.muted_color != blank and sd.muted_color != transparent -%}--sdg-muted: {{ sd.muted_color }};{%- endif -%}
+    {%- if sd.rule_color != blank and sd.rule_color != transparent -%}--sdg-rule: {{ sd.rule_color }};{%- endif -%}
+    {%- if sd.card_border_color != blank and sd.card_border_color != transparent -%}--sdg-card-border: {{ sd.card_border_color }};{%- endif -%}
+    {%- if sd.card_background != blank and sd.card_background != transparent -%}--sdg-card-bg: {{ sd.card_background }};{%- endif -%}
+    {%- if sd.title_color != blank and sd.title_color != transparent -%}--sdg-title-color: {{ sd.title_color }};{%- endif -%}
+    {%- if sd.lead_color != blank and sd.lead_color != transparent -%}--sdg-lead-color: {{ sd.lead_color }};{%- endif -%}
+    {%- if sd.button_background != blank and sd.button_background != transparent -%}--eden-action-ink: {{ sd.button_background }};{%- endif -%}
+    {%- if sd.button_text_color != blank and sd.button_text_color != transparent -%}--eden-action-on-ink: {{ sd.button_text_color }};{%- endif -%}
+    {%- if title_size > 0 -%}--sdg-title-size: {{ title_size }}px;{%- endif -%}
+    {%- if lead_size > 0 -%}--sdg-lead-size: {{ lead_size }}px;{%- endif -%}
+    {%- if card_min > 0 -%}--sdg-card-min: {{ card_min }}px;{%- endif -%}
+    {%- if width > 0 -%}--sdg-width: {{ width }}px;{%- endif -%}
+    --sdg-pad-top: {{ sd.padding_top | default: 48 }}px;
+    --sdg-pad-bottom: {{ sd.padding_bottom | default: 8 }}px;
+  "
+  {% if cart_variant != blank %}data-cart-variant="{{ cart_variant }}"{% endif %}
+  data-cart-add="{{ routes.cart_add_url }}"
+  data-cart-url="{{ routes.cart_url }}"
+  data-cart-price="{% if sd.cart_price_visible %}shown{% else %}hidden{% endif %}"
+  data-show-price="{% if sd.show_price %}true{% else %}false{% endif %}"
+  data-support="{{ sd.support_link }}"
+  data-add-label="{{ sd.add_label | default: 'Add to bag' | escape }}"
+  data-reopen-label="{{ sd.reopen_label | default: 'Reopen' | escape }}"
+  data-ask-label="{{ sd.ask_label | default: 'Contact support' | escape }}"
+  data-remove-label="{{ sd.remove_label | default: 'Remove' | escape }}"
+  data-saved-lead="{{ sd.saved_lead | default: 'Saved' | escape }}"
+  data-adding-text="{{ sd.adding_text | default: 'Adding your design to the bag' | escape }}"
+  data-add-fail-text="{{ sd.add_fail_text | default: 'We could not add that design to your bag just now. Your design is still saved - contact support and we will pick it up with you.' | escape }}"
+>
+  <div class="sdg-inner">
+    <div class="sdg-head">
+      {%- if sd.heading != blank -%}
+        <h2 class="sdg-title">
+          {{ sd.heading | escape }}
+          {%- if sd.show_count -%}
+            <span class="sdg-title__count">(<span data-saved-count>0</span>)</span>
+          {%- endif -%}
+        </h2>
+      {%- endif -%}
+      {%- if sd.lead != blank -%}
+        <p class="sdg-lead">{{ sd.lead | escape }}</p>
+      {%- endif -%}
+      <p class="sdg-status" data-saved-status role="status" aria-live="polite" hidden></p>
+    </div>
+
+    <ul class="sdg-list" data-saved-list></ul>
+  </div>
+</saved-designs>
+
+{% schema %}
+{
+  "name": "Saved designs",
+  "tag": "section",
+  "class": "section-saved-designs",
+  "settings": [
+    { "type": "paragraph", "content": "The rings somebody built in the 3D design studio and saved. They live in that shopper's own browser, not in the shop, so this panel is built in the browser and draws nothing at all when there is nothing saved - on a cart page, in the theme editor's preview, and for everyone who has never opened the studio." },
+
+    { "type": "header", "content": "Wording" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Your saved designs", "info": "Leave empty for no heading." },
+    { "type": "checkbox", "id": "show_count", "label": "Show how many", "default": true },
+    { "type": "textarea", "id": "lead", "label": "Line under the heading", "default": "These are saved in this browser, not in your bag. Reopen one to keep designing, or send it to us for a price.", "info": "What keeps this panel from being mistaken for the cart. Say that nothing here is bought or reserved and that the designs are on this device only - a saved design does not follow anyone to another phone." },
+    { "type": "url", "id": "support_link", "label": "Support page", "info": "Where \"Contact support\" goes, with the design's reference on the link so the page can show it above the enquiry form. The page with the \"Design support\" section on it. Leave empty to drop that link." },
+    { "type": "text", "id": "saved_lead", "label": "Before the date", "default": "Saved" },
+    { "type": "text", "id": "add_label", "label": "Add to bag label", "default": "Add to bag" },
+    { "type": "text", "id": "reopen_label", "label": "Reopen label", "default": "Reopen" },
+    { "type": "text", "id": "ask_label", "label": "Support label", "default": "Contact support" },
+    { "type": "text", "id": "remove_label", "label": "Remove label", "default": "Remove" },
+    { "type": "text", "id": "adding_text", "label": "While it is being added", "default": "Adding your design to the bag" },
+    { "type": "text", "id": "add_fail_text", "label": "When the bag refuses it", "default": "We could not add that design to your bag just now. Your design is still saved - contact support and we will pick it up with you.", "info": "A deleted, unpublished or sold-out stand-in product is the usual reason. The saved design itself is untouched." },
+
+    { "type": "header", "content": "Adding a design to the bag", "info": "A configured ring has no variant of its own and Shopify will not be told a price, so a line can only be charged against a product that already exists - a bespoke deposit, a design fee, a made-to-order placeholder. Its own price is what the shopper pays. Pick nothing and the cards carry no Add to bag button at all, which is the safe default: the wrong product here charges the wrong money." },
+    { "type": "product", "id": "cart_product", "label": "Product the line is charged against", "info": "Use the same one the 3D design studio section names, or a design added here and the same design added there will not be the same line." },
+    { "type": "checkbox", "id": "show_price", "label": "Show the builder's figure on the card", "default": false, "info": "Off while iJewel is pricing from its own rate card and the studio is covering that figure in the frame - a number on the card the page will not stand behind is worse than none." },
+    { "type": "checkbox", "id": "cart_price_visible", "label": "Show the builder's figure on the cart line", "default": false, "info": "Off, it still travels on the order but underscored, so it is out of the shopper's sight in their cart." },
+
+    { "type": "header", "content": "Colours", "info": "Leave a colour empty to use the one this panel ships with." },
+    { "type": "color", "id": "title_color", "label": "Heading colour" },
+    { "type": "color", "id": "ink_color", "label": "Text colour" },
+    { "type": "color", "id": "muted_color", "label": "Quiet text colour", "info": "The option labels, the date and the Remove link." },
+    { "type": "color", "id": "lead_color", "label": "Line under the heading" },
+    { "type": "color", "id": "rule_color", "label": "Rule above the panel" },
+    { "type": "color", "id": "card_border_color", "label": "Card border" },
+    { "type": "color", "id": "card_background", "label": "Card background" },
+    { "type": "color", "id": "button_background", "label": "Button fill" },
+    { "type": "color", "id": "button_text_color", "label": "Button text" },
+
+    { "type": "header", "content": "Sizes" },
+    { "type": "range", "id": "title_size", "label": "Heading size", "min": 0, "max": 32, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
+    { "type": "range", "id": "lead_size", "label": "Text size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
+    { "type": "range", "id": "card_min", "label": "Narrowest a card gets", "min": 0, "max": 520, "step": 20, "unit": "px", "default": 0, "info": "How wide a card has to be before two sit side by side. 0 keeps 320px. One column on a phone whatever this says." },
+    { "type": "range", "id": "width", "label": "Panel width", "min": 0, "max": 1800, "step": 20, "unit": "px", "default": 0, "info": "0 matches the page's own width, which is what lines the panel up with the cart above it." },
+    { "type": "range", "id": "padding_top", "label": "Space above", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Space below", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 8 }
+  ],
+  "presets": [{ "name": "Saved designs" }]
+}
+{% endschema %}
