@@ -72,6 +72,36 @@
   --cta-ink-speed: var(--cta-sweep-speed);
   --cta-ink-delay: 0s;
   --cta-ink-easing: var(--cta-sweep-easing);
+
+  /*
+    Leaving is not the same gesture as arriving, and it must not take as long.
+
+    The half second above is what a button is worth when the cursor settles on
+    it. It is the wrong length for the button the cursor has just left, and
+    two buttons side by side are where that shows: the homepage hero's pair,
+    the two routes on the design banner, add to cart beside its neighbour.
+    Crossing from one to the other starts both animations at once, and for
+    half a second the fill retreating out of the right-hand side of the first
+    button is travelling towards the fill arriving from the left-hand side of
+    the second. Two dark masses converge in the gap between them and the pair
+    reads as a smear rather than as one button handing over to the next.
+
+    So the exit is given its own, much shorter duration. A button the cursor
+    has left clears itself and is done before the button it moved to is half
+    filled, which leaves one animation to watch instead of two competing ones.
+    Hover still arrives at its full length - the gesture the design is built
+    around is untouched.
+
+    It works by asymmetry in the cascade rather than by a rule of its own: the
+    resting declarations below carry the exit timing, and the :hover ones carry
+    the arrival timing. A transition reads its duration from the style the
+    element is moving TO, so hovering runs at --cta-sweep-speed and un-hovering
+    at --cta-sweep-exit-speed, with no extra selector in the way.
+  */
+  --cta-sweep-exit-speed: 0.24s;
+  --cta-sweep-exit-easing: cubic-bezier(0.4, 0, 0.7, 1);
+  --cta-ink-exit-speed: var(--cta-sweep-exit-speed);
+  --cta-ink-exit-easing: var(--cta-sweep-exit-easing);
 }
 
 .eden-action,
@@ -233,9 +263,11 @@ button.shopify-payment-button__button--unbranded,
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  transition: color var(--cta-ink-speed) var(--cta-ink-delay) var(--cta-ink-easing),
-    border-color var(--cta-ink-speed) var(--cta-ink-delay) var(--cta-ink-easing),
-    box-shadow var(--cta-sweep-speed) var(--cta-sweep-easing);
+  /* The resting half of the asymmetry described at the top of the file: this is
+     the timing a button leaves hover on. Arrival is set on :hover below. */
+  transition: color var(--cta-ink-exit-speed) var(--cta-ink-exit-easing),
+    border-color var(--cta-ink-exit-speed) var(--cta-ink-exit-easing),
+    box-shadow var(--cta-sweep-exit-speed) var(--cta-sweep-exit-easing);
 }
 
 /*
@@ -317,7 +349,8 @@ button.shopify-payment-button__button--unbranded::before,
   background: var(--cta-fill-hover, transparent);
   transform: scaleX(0);
   transform-origin: right center;
-  transition: transform var(--cta-sweep-speed) var(--cta-sweep-easing);
+  /* Leaving hover. Arriving is the slower one, set on :hover below. */
+  transition: transform var(--cta-sweep-exit-speed) var(--cta-sweep-exit-easing);
   pointer-events: none;
 }
 
@@ -348,6 +381,9 @@ button.shopify-payment-button__button--unbranded::before,
   .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button):hover:not([disabled])::before {
     transform-origin: left center;
     transform: scaleX(1);
+    /* Arriving: the full half second. Leaving runs on the shorter timing in the
+       resting rule above - see the note beside --cta-sweep-exit-speed. */
+    transition: transform var(--cta-sweep-speed) var(--cta-sweep-easing);
   }
 
   .eden-action:hover,
@@ -376,6 +412,11 @@ button.shopify-payment-button__button--unbranded::before,
   .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button):hover:not([disabled]) {
     color: var(--cta-ink-hover, var(--cta-ink, inherit));
     border-color: var(--cta-edge-hover, var(--cta-edge, transparent));
+    /* The label and the border keep pace with the fill arriving, as they always
+       have; the resting rule holds the quicker timing they leave on. */
+    transition: color var(--cta-ink-speed) var(--cta-ink-delay) var(--cta-ink-easing),
+      border-color var(--cta-ink-speed) var(--cta-ink-delay) var(--cta-ink-easing),
+      box-shadow var(--cta-sweep-speed) var(--cta-sweep-easing);
   }
 
   /*

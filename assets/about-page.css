@@ -46,7 +46,9 @@
   */
   max-width: var(--ab-shell-max, 140rem);
   margin: 0 auto;
-  padding-inline: 2.4rem;
+  /* The theme page gutter on a wide screen (--page-margin is 4rem there), never
+     narrower than the 2.4rem this shell used before. */
+  padding-inline: max(2.4rem, var(--page-margin, 2.4rem));
 }
 
 /* A readable measure for anything that is only words. */
@@ -642,7 +644,9 @@
 */
 .about-page .ab-cta--full {
   border-radius: 0;
-  padding-inline: 2.4rem;
+  /* The theme page gutter on a wide screen (--page-margin is 4rem there), never
+     narrower than the 2.4rem this shell used before. */
+  padding-inline: max(2.4rem, var(--page-margin, 2.4rem));
 }
 
 .about-page .ab-cta__media,

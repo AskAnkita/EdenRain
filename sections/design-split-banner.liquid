@@ -59,7 +59,10 @@
     --dsp-shell-max: {{ content_width }}px;
   {%- endif -%}
   {%- if media_zoom > 0 -%}--dsp-media-zoom: {{ media_zoom | divided_by: 100.0 }};{%- endif -%}
-  {%- if pad_inline > 0 -%}--dsp-pad-inline: {{ pad_inline }}px;{%- endif -%}
+  {%- if pad_inline > 0 -%}--dsp-pad-inline: {{ pad_inline }}px;
+    {%- comment -%} Full width zeroes the stylesheet's own padding, so the side gap is fed in separately. {%- endcomment -%}
+    {%- if section.settings.full_width -%}--dsp-pad-inline-full: {{ pad_inline }}px;{%- endif -%}
+  {%- endif -%}
   {%- if section.settings.custom_padding -%}--dsp-pad-top: {{ pad_top }}px;--dsp-pad-bottom: {{ pad_bottom }}px;{%- endif -%}
 {%- endcapture -%}
 
@@ -213,7 +216,7 @@
     { "type": "header", "content": "Layout" },
     { "type": "checkbox", "id": "full_width", "label": "Full width", "default": false },
     { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "0 keeps the default of 1480px. Ignored when the box above is ticked." },
-    { "type": "range", "id": "padding_horizontal", "label": "Side padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's responsive padding." },
+    { "type": "range", "id": "padding_horizontal", "label": "Side padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "The gap between the banner and the edges of the screen. 0 keeps the stylesheet's responsive padding, which is none while Full width is ticked." },
     { "type": "checkbox", "id": "custom_padding", "label": "Set the top and bottom padding", "default": false },
     { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 80 },
     { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 80 }

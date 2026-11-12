@@ -196,6 +196,42 @@
   if section.settings.price_hide_mobile
     assign price_classes = price_classes | append: ' ijw-price--desktop'
   endif
+
+  # Covering the builder's Add to cart. The button is on iJewel's own page
+  # inside a cross-origin frame, so it cannot be relabelled or deleted from out
+  # here - but the panel already covering their price can be grown down over
+  # it, and a panel that takes pointer events is a button nobody can press.
+  # Prices are not finished, so the line on the panel is all this page says
+  # about cost; Save this design and Contact support under the frame are what a
+  # shopper presses instead. The panel grows DOWNWARDS from the price line by
+  # the two numbers below, and the shipped pair reach the frame's foot - which
+  # is where iJewel anchors the button on a desktop and on a phone alike.
+  assign price_cart_height = section.settings.price_cart_height | plus: 0
+  assign price_cart_height_mobile = section.settings.price_cart_height_mobile | plus: 0
+  if section.settings.price_cover_cart
+    assign price_height = price_height | plus: price_cart_height
+    assign price_height_mobile = price_height_mobile | plus: price_cart_height_mobile
+    unless price_anchor contains 'top'
+      assign price_bottom = price_bottom | minus: price_cart_height
+      assign price_bottom_mobile = price_bottom_mobile | minus: price_cart_height_mobile
+      if price_bottom < 0
+        assign price_bottom = 0
+      endif
+      if price_bottom_mobile < 0
+        assign price_bottom_mobile = 0
+      endif
+    endunless
+  endif
+
+  # Where the lines sit in the panel. A panel grown over the button is tall
+  # enough that the middle of it is a choice rather than the only place a line
+  # can go.
+  assign price_valign = 'center'
+  if section.settings.price_valign == 'top'
+    assign price_valign = 'flex-start'
+  elsif section.settings.price_valign == 'bottom'
+    assign price_valign = 'flex-end'
+  endif
 -%}
 
 {%- comment -%}
@@ -316,6 +352,7 @@
     --ijw-price-feather-mobile: {{ price_feather_mobile }}px;
     --ijw-price-justify: {{ price_justify }};
     --ijw-price-align: {{ price_align }};
+    --ijw-price-valign: {{ price_valign }};
     {%- if price_text_size > 0 -%}--ijw-price-text-size: {{ price_text_size }}px;{%- endif -%}
     {%- if price_note_size > 0 -%}--ijw-price-note-size: {{ price_note_size }}px;{%- endif -%}
   {%- endif -%}
@@ -438,10 +475,18 @@
         {%- comment -%}
           The same trick over the builder's price line. Their figures come from
           a rate card that is not ours, so the number is covered and the line we
-          stand behind is put in its place. The panel stops above Add to cart on
-          purpose: the button still works. On a phone running the guided steps
-          the price is replaced at its source instead - that document is ours -
-          so this panel is hidden there by the stylesheet.
+          stand behind is put in its place.
+
+          With "Cover the builder's Add to cart" on - it ships on - the panel
+          reaches on down over their button too, and because the panel takes
+          pointer events the press never lands. That is deliberate: a price we
+          cannot stand behind has no add-to-cart under it. Save this design and
+          Contact support below the frame are the two things a shopper can do,
+          and both of them reach us.
+
+          On a phone running the guided steps the price is replaced at its
+          source instead - that document is ours - so this panel is hidden there
+          by the stylesheet.
         {%- endcomment -%}
         {%- if section.settings.price_cover -%}
           <div class="ijw-price{{ price_classes }}">
@@ -630,7 +675,7 @@
     { "type": "url", "id": "support_link", "label": "Support page", "info": "The page with the \"Design support\" section on it. Leave empty and the Contact support button is not drawn and the builder's own button only saves." },
     { "type": "text", "id": "save_label", "label": "Save button label", "default": "Save this design" },
     { "type": "text", "id": "support_label", "label": "Support button label", "default": "Contact support" },
-    { "type": "select", "id": "builder_button", "label": "What their button does", "default": "support", "info": "The builder's own Add to cart is on iJewel's page inside the frame, so it cannot be relabelled or removed from here - but pressing it posts the design out to us and then waits, so what it means is still yours to set. It never adds anything to a cart. On a phone it is usually cropped out of the frame, which is why the mobile bar needs wiring too.", "options": [
+    { "type": "select", "id": "builder_button", "label": "What their button does", "default": "support", "info": "The builder's own Add to cart is on iJewel's page inside the frame, so it cannot be relabelled or removed from here - but pressing it posts the design out to us and then waits, so what it means is still yours to set. It never adds anything to a cart. While the price cover below reaches over that button, as it ships, it cannot be pressed on a desktop at all - this is then only the guided mobile steps, where the frame crops the button out anyway.", "options": [
       { "value": "support", "label": "Save the design and go to support" },
       { "value": "save", "label": "Save the design and stay here" },
       { "value": "none", "label": "Nothing - leave it to the builder" }
@@ -702,22 +747,25 @@
     { "type": "range", "id": "brand_height_mobile", "label": "Panel height (mobile)", "min": 40, "max": 280, "step": 4, "unit": "px", "default": 56 },
     { "type": "range", "id": "brand_logo_width_mobile", "label": "Logo width (mobile)", "min": 20, "max": 480, "step": 10, "unit": "px", "default": 40, "info": "The mark only has to read, not fill the panel - it sits where the builder's own logo was." },
 
-    { "type": "header", "content": "Cover the builder's price", "info": "The builder costs the ring from its own rate card and prints the figure above its Add to cart. Until those rates are the shop's own, that number is not a quote we can stand behind - and it cannot be switched off from here, because the builder is the vendor's own page in a frame. This lays a panel over the price line and writes our own line on it, stopping short of Add to cart. Nudge the offsets until the figure is gone, on a desktop and on a phone." },
+    { "type": "header", "content": "Cover the builder's price and Add to cart", "info": "The builder costs the ring from its own rate card and prints the figure above its Add to cart. Until those rates are the shop's own, that number is not a quote we can stand behind - and neither it nor the button can be switched off from here, because the builder is the vendor's own page in a frame. This lays a panel over the price line and the button under it, and writes our own line on it. Nudge the offsets until both are gone, on a desktop and on a phone." },
     { "type": "checkbox", "id": "price_cover", "label": "Cover the builder's price", "default": true, "info": "The panel waits for the builder to say it is on screen before it fades up, so it never floats over the loading poster. A builder that does not speak iJewel's bridge never says it, and its price is then left showing." },
+    { "type": "checkbox", "id": "price_cover_cart", "label": "Cover the builder's Add to cart too", "default": true, "info": "Grows the panel on down over their button, so the line above is the only thing the frame offers on price. The panel swallows the click, so the button cannot be pressed - but it is a cover, not a delete: a keyboard tab inside the frame can still reach it. Turn this off only once prices are real, and set \"What their button does\" below at the same time." },
     { "type": "text", "id": "price_text", "label": "Line shown instead", "default": "Contact us for price", "info": "Leave empty to show nothing at all - the panel still covers the figure." },
-    { "type": "text", "id": "price_note", "label": "Second line", "info": "Smaller, under the first. Leave empty to hide it - it ships empty, because one plain line next to Add to cart is enough." },
+    { "type": "text", "id": "price_note", "label": "Second line", "info": "Smaller, under the first. Leave empty to hide it - it ships empty, because one plain line in place of a price and a button is enough." },
     { "type": "url", "id": "price_link", "label": "Link on the first line", "info": "Leave empty for plain text. A link makes the line clickable where the builder's price used to be - the contact page or the enquiry form." },
     { "type": "select", "id": "price_anchor", "label": "The price sits in the frame's", "options": [ { "value": "bottom-right", "label": "Bottom right" }, { "value": "bottom-left", "label": "Bottom left" }, { "value": "top-right", "label": "Top right" }, { "value": "top-left", "label": "Top left" } ], "default": "bottom-right", "info": "Which corner the offsets below are measured from. iJewel draws its price at the foot of the option rail, on the right." },
     { "type": "color", "id": "price_background", "label": "Panel colour", "default": "#ffffff", "info": "Match the builder's own panel. Clear it and the line floats on the builder's panel with the figure still showing behind." },
     { "type": "color", "id": "price_text_color", "label": "First line colour" },
     { "type": "color", "id": "price_note_color", "label": "Second line colour" },
     { "type": "select", "id": "price_alignment", "label": "Lines sit", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centred" }, { "value": "right", "label": "Right" } ], "default": "left" },
+    { "type": "select", "id": "price_valign", "label": "Lines sit (up and down)", "options": [ { "value": "top", "label": "At the top of the panel" }, { "value": "center", "label": "In the middle" }, { "value": "bottom", "label": "At the foot" } ], "default": "center", "info": "A panel grown over Add to cart is tall, so this says whether the line stays up where the price was, sits in the middle of the block, or drops to where the button was." },
     { "type": "range", "id": "price_text_size", "label": "First line size", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
     { "type": "range", "id": "price_note_size", "label": "Second line size", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the stylesheet's size." },
-    { "type": "range", "id": "price_bottom", "label": "Panel from the top or bottom (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 86, "info": "Measured from the corner chosen above. The shipped numbers cover iJewel's price line on a full-screen desktop frame and stop 2px above its Add to cart." },
+    { "type": "range", "id": "price_bottom", "label": "Panel from the top or bottom (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 86, "info": "Measured from the corner chosen above. The shipped number puts the top of the panel over iJewel's price line on a full-screen desktop frame; what is below it down to the frame's foot is their Add to cart, which the reach below covers." },
     { "type": "range", "id": "price_right", "label": "Panel from the side (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 22 },
     { "type": "range", "id": "price_width", "label": "Panel width (desktop)", "min": 80, "max": 700, "step": 10, "unit": "px", "default": 450, "info": "iJewel's option rail is about 470px wide, inset 20px from the frame's right edge." },
     { "type": "range", "id": "price_height", "label": "Panel height (desktop)", "min": 24, "max": 200, "step": 2, "unit": "px", "default": 56 },
+    { "type": "range", "id": "price_cart_height", "label": "Reach on down over Add to cart (desktop)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 86, "info": "Only used when the box above is ticked. Added to the panel's height and taken off its distance from the foot, so the shipped 86px - the same as the offset above - takes the panel from the price line to the bottom edge of the frame, covering their button whole." },
     { "type": "range", "id": "price_pad", "label": "Inset from the panel edge (desktop)", "min": 0, "max": 96, "step": 2, "unit": "px", "default": 0 },
     { "type": "range", "id": "price_feather", "label": "Soften the panel edge (desktop)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 0, "info": "How far the leading edges fade out. 0 keeps a hard rectangle, which is what a panel sitting inside the builder's own white rail wants." },
     { "type": "checkbox", "id": "price_hide_mobile", "label": "Hide the panel on mobile", "default": false, "info": "The guided mobile steps replace the price at its source, so this panel is hidden there whatever this says." },
@@ -725,6 +773,7 @@
     { "type": "range", "id": "price_right_mobile", "label": "Panel from the side (mobile)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 0 },
     { "type": "range", "id": "price_width_mobile", "label": "Panel width (mobile)", "min": 60, "max": 600, "step": 10, "unit": "px", "default": 390, "info": "On a phone iJewel puts the price at the left of the rail's foot with Add to cart as a full-width bar under it, so the panel is the whole strip. It is capped at the frame's width, so a number wider than the phone is simply full width." },
     { "type": "range", "id": "price_height_mobile", "label": "Panel height (mobile)", "min": 24, "max": 200, "step": 2, "unit": "px", "default": 48 },
+    { "type": "range", "id": "price_cart_height_mobile", "label": "Reach on down over Add to cart (mobile)", "min": 0, "max": 200, "step": 2, "unit": "px", "default": 64, "info": "On a phone iJewel puts Add to cart as a full-width bar under the price, so the panel has to be the whole strip down to the frame's foot. Unused where the frame is cropped to the 3D stage or the guided steps are running - the button is cut off or redrawn there." },
     { "type": "range", "id": "price_pad_mobile", "label": "Inset from the panel edge (mobile)", "min": 0, "max": 64, "step": 2, "unit": "px", "default": 20 },
     { "type": "range", "id": "price_feather_mobile", "label": "Soften the panel edge (mobile)", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 0 },
 

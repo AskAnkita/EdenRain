@@ -20,7 +20,7 @@
             "mobile_image": "shopify://shop_images/ChatGPT_Image_4_Nov_2026_15_03_51.png",
             "placeholder_desktop_video_url": "https://cdn.shopify.com/videos/c/o/v/d104411d81c940fb996fc439f675d3c2.mp4",
             "enable_full_height": true,
-            "desktop_height": 100,
+            "desktop_height": 80,
             "placeholder_mobile_video_url": "https://cdn.shopify.com/videos/c/o/v/a44d0c0308f5486c9329c4ca6df1d823.mp4",
             "mobile_height": 54,
             "enable_autoplay": true,
@@ -266,6 +266,8 @@
         "tile_height": 380,
         "show_progress": true,
         "label_color": "#ffffff",
+        "label_scrim": 45,
+        "label_scrim_height": 55,
         "color_scheme": "scheme-1",
         "padding_top": 24,
         "padding_bottom": 24
@@ -323,7 +325,7 @@
         "show_button_arrow": true,
         "full_width": true,
         "content_width": 0,
-        "padding_horizontal": 0,
+        "padding_horizontal": 40,
         "custom_padding": false,
         "padding_top": 80,
         "padding_bottom": 80
@@ -499,7 +501,7 @@
         "price_tracking": 0,
         "price_color": "rgba(0,0,0,0)",
         "width": "full",
-        "page_padding": 0,
+        "page_padding": 40,
         "page_padding_mobile": 16,
         "padding_top": 32,
         "padding_bottom": 20,
@@ -510,7 +512,13 @@
     "eden_quote": {
       "type": "eden-quote",
       "settings": {
-        "collection": "best-sellers"
+        "collection": "best-sellers",
+        "product_count": 6,
+        "columns": 3,
+        "columns_mobile": 2,
+        "show_arrows": true,
+        "show_progress": true,
+        "button_alignment": "center"
       }
     },
     "featured_collection_QbxCWk": {

@@ -15,7 +15,7 @@
   #service-marquee-{{ section.id }} {
     /* The gutter the category tiles row uses, so the rule here lines up with the
        tiles' outer edges rather than stopping short of them. */
-    --sm-gutter: max(2.4rem, calc(var(--er-arrow-size, 40px) / 2 + 0.8rem));
+    --sm-gutter: max(var(--page-margin, 2.4rem), calc(var(--er-arrow-size, 40px) / 2 + 0.8rem));
     --sm-icon-size: {{ section.settings.icon_size }}px;
     --sm-icon-gap: {{ section.settings.icon_gap }}px;
     --sm-rule-color: {{ section.settings.divider_color }};

@@ -30,10 +30,14 @@
           "settings": {
             "title": "Lab-grown gemstones",
             "text": "Sapphires, rubies and emeralds with the same properties as mined stones.",
+            "body_image_1": "shopify://shop_images/gemstones-hero.jpg",
+            "body_image_2": "shopify://shop_images/gemstone-sapphire.jpg",
+            "body_image_3": "shopify://shop_images/gemstone-emerald.jpg",
+            "body_image_4": "shopify://shop_images/gemstone-ruby.jpg",
             "image": "shopify://shop_images/Unknown-12.png",
             "image_asset": "featured-diamonds-gemstones.jpg",
-            "hero_image_asset": "gemstones-hero.jpg",
-            "hero_use_page_image": false,
+            "hero_image_asset": "",
+            "hero_use_page_image": true,
             "link": "/pages/gemstones",
             "link_label": "Read the guide"
           }

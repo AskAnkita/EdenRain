@@ -55,6 +55,18 @@
   assign content_share = section.settings.content_share | plus: 0
   assign measure = section.settings.text_measure | plus: 0
 
+  comment
+    Two different numbers, which used to be one.
+
+    "columns" is how many cards the panel shows at a time - as many as fit
+    across it without becoming thumbnails, which on a panel this narrow is
+    three. "product_count" is how many are in the row altogether. The row used
+    to stop at the first of those, so the section could never offer more than
+    four gifts; now anything past the visible three scrolls.
+
+    A template saved before the second setting existed has no value for it, so
+    it falls back to the visible count and the row behaves exactly as it did.
+  endcomment
   assign columns = section.settings.columns | plus: 0
   if columns <= 0
     assign columns = 3
@@ -62,6 +74,11 @@
   assign columns_mobile = section.settings.columns_mobile | plus: 0
   if columns_mobile <= 0
     assign columns_mobile = 2
+  endif
+
+  assign product_count = section.settings.product_count | plus: 0
+  if product_count < columns
+    assign product_count = columns
   endif
 
   comment
@@ -108,8 +125,16 @@
   --gift-focal-x: {{ focal_x }}%;
   --gift-focal-y: {{ focal_y }}%;
   --gift-scrim: {{ section.settings.scrim_opacity | divided_by: 100.0 }};
-  --gift-grid: repeat({{ columns }}, minmax(0, 1fr));
-  --gift-grid-mobile: repeat({{ columns_mobile }}, minmax(0, 1fr));
+  {%- comment -%}
+    How many cards are on screen at once. The track sizes its own columns from
+    these, so the cards keep their width as the row scrolls instead of being
+    divided up between however many products the collection happens to hold.
+  {%- endcomment -%}
+  --gift-visible: {{ columns }};
+  --gift-visible-mobile: {{ columns_mobile }};
+
+  --gift-inset: {{ section.settings.side_spacing | default: 0 }}px;
+  --gift-inset-mobile: {{ section.settings.side_spacing_mobile | default: 0 }}px;
 
   {%- if section.settings.custom_padding -%}
     --gift-pad-top: {{ section.settings.padding_top }}px;
@@ -119,9 +144,17 @@
   {%- endif -%}
 {%- endcapture -%}
 
+{%- comment -%}
+  The row of gifts scrolls, and its arrows live in a custom element in assets/
+  rather than a script here: the theme editor swaps a section's HTML in by
+  assignment, which never runs an inline script, so the arrows would stop
+  working the moment a setting was changed.
+{%- endcomment -%}
+<script src="{{ 'gifting-scroller.js' | asset_url }}" defer="defer"></script>
+
 <section
   id="eden-quote-{{ section.id }}"
-  class="eden-quote force-full-width eden-quote--content-{{ section.settings.content_side }} eden-quote--{{ section.settings.text_alignment }}"
+  class="eden-quote force-full-width eden-quote--content-{{ section.settings.content_side }} eden-quote--{{ section.settings.text_alignment }} eden-quote--button-{{ section.settings.button_alignment | default: 'center' }}"
   style="{{ section_styles | strip_newlines | strip }}"
   {{ section.shopify_attributes }}
 >
@@ -195,8 +228,9 @@
     {%- endif -%}
 
     {%- if gifting_collection != blank and gifting_collection.products_count > 0 -%}
-      <ul class="gifting-banner__products" aria-label="Featured gifts">
-        {%- for product in gifting_collection.products limit: columns -%}
+      <gifting-scroller class="gifting-banner__scroller">
+      <ul class="gifting-banner__products" aria-label="Featured gifts" data-gift-track>
+        {%- for product in gifting_collection.products limit: product_count -%}
           <li class="gifting-banner__product">
             <a class="gifting-banner__product-link" href="{{ product.url }}">
               <span class="gifting-banner__product-image-wrap">
@@ -221,6 +255,37 @@
           </li>
         {%- endfor -%}
       </ul>
+
+      {%- comment -%}
+        The controls hide themselves when every product already fits, so a
+        collection of three gifts looks exactly as it did before the row could
+        scroll. The script sets the hidden attribute; nothing here assumes it.
+      {%- endcomment -%}
+      {%- if section.settings.show_arrows or section.settings.show_progress -%}
+      <div class="gifting-banner__controls">
+        {%- if section.settings.show_progress -%}
+          <div class="gifting-banner__progress" aria-hidden="true" data-gift-progress>
+            <span class="gifting-banner__progress-bar" data-gift-bar></span>
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.show_arrows -%}
+          <div class="gifting-banner__arrows" data-gift-arrows>
+            <button type="button" class="gifting-banner__arrow gifting-banner__arrow--prev" aria-label="Previous gifts" disabled>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path d="M15 4 7 12l8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
+              </svg>
+            </button>
+            <button type="button" class="gifting-banner__arrow gifting-banner__arrow--next" aria-label="More gifts">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <path d="M9 4l8 8-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
+              </svg>
+            </button>
+          </div>
+        {%- endif -%}
+      </div>
+      {%- endif -%}
+      </gifting-scroller>
     {%- endif -%}
 
     {%- if button_label != blank and button_link != blank -%}
@@ -255,8 +320,9 @@
     --gift-focal-x: 0%;
     --gift-focal-y: 50%;
     --gift-scrim: 0;
-    --gift-grid: repeat(3, minmax(0, 1fr));
-    --gift-grid-mobile: repeat(2, minmax(0, 1fr));
+    --gift-visible: 3;
+    --gift-visible-mobile: 2;
+    --gift-card-gap: clamp(10px, 1.1vw, 18px);
     --gift-pad-top: 54px;
     --gift-pad-bottom: 54px;
     --gift-pad-top-mobile: 22px;
@@ -267,9 +333,12 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    width: 100%;
+    /* The band is held off the glass by --gift-inset ("Side spacing"), which is 0
+       until it is set, so the width has to come off with it or the row overflows. */
+    width: calc(100% - var(--gift-inset, 0px) * 2);
     min-height: var(--gift-band-height);
     margin-block: 0 !important;
+    margin-inline: var(--gift-inset, 0px);
     padding: var(--gift-pad-top) clamp(28px, 6vw, 96px) var(--gift-pad-bottom);
     overflow: hidden;
     background: var(--gift-section-bg);
@@ -368,14 +437,44 @@
   #eden-quote-{{ section.id }} .gifting-banner__text > :first-child { margin-top: 0; }
   #eden-quote-{{ section.id }} .gifting-banner__text > :last-child { margin-bottom: 0; }
 
+  #eden-quote-{{ section.id }} .gifting-banner__scroller {
+    display: block;
+    width: 100%;
+    margin-top: clamp(18px, 2.2vw, 30px);
+  }
+
+  /*
+    A scrolling row rather than a fixed grid.
+
+    grid-auto-flow: column with a fixed auto-column means the cards keep the
+    width "Products shown at once" gives them and the rest of the collection
+    runs off the right-hand edge of the panel, where the arrows and a swipe
+    both reach it. A template-columns grid would have divided the panel
+    between every product instead, and six gifts in a panel this narrow would
+    be thumbnails.
+  */
   #eden-quote-{{ section.id }} .gifting-banner__products {
     display: grid;
     width: 100%;
-    grid-template-columns: var(--gift-grid);
-    gap: clamp(10px, 1.1vw, 18px);
-    margin: clamp(18px, 2.2vw, 30px) 0 0;
+    grid-auto-flow: column;
+    grid-auto-columns: calc(
+      (100% - (var(--gift-visible) - 1) * var(--gift-card-gap)) / var(--gift-visible)
+    );
+    gap: var(--gift-card-gap);
+    margin: 0;
     padding: 0;
     list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  /* The row is driven by the arrows and by swiping; the bar below says where it
+     has got to, so the browser's own scrollbar is not needed under the cards. */
+  #eden-quote-{{ section.id }} .gifting-banner__products::-webkit-scrollbar {
+    display: none;
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__product {
@@ -383,6 +482,84 @@
     background: var(--gift-card-bg);
     color: var(--gift-card-color);
     text-align: center;
+    scroll-snap-align: start;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__controls {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+  }
+
+  /* The script hides the whole row when there is nothing to scroll to; the
+     flex above would otherwise win over the hidden attribute. */
+  #eden-quote-{{ section.id }} .gifting-banner__controls:empty,
+  #eden-quote-{{ section.id }} .gifting-banner__controls[hidden] {
+    display: none;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__progress {
+    position: relative;
+    height: 1px;
+    flex: 1 1 auto;
+    max-width: 220px;
+    background: var(--gift-text-color);
+    opacity: 0.22;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__progress-bar {
+    position: absolute;
+    inset: 0;
+    background: var(--gift-text-color);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.4s ease;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__arrows {
+    display: flex;
+    margin-left: auto;
+    gap: 14px;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__arrows[hidden] {
+    display: none;
+  }
+
+  /* Bare chevrons, the same pair the tennis row uses: there is nothing behind
+     them here for a white disc to lift them off. */
+  #eden-quote-{{ section.id }} .gifting-banner__arrow {
+    display: grid;
+    width: 26px;
+    height: 26px;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--gift-text-color);
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__arrow svg {
+    width: 62%;
+    height: 62%;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__arrow:hover:not(:disabled) {
+    transform: scale(1.12);
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__arrow:disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__arrow:focus-visible {
+    outline: 2px solid currentcolor;
+    outline-offset: 2px;
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__product-link {
@@ -467,6 +644,27 @@
     --cta-edge-hover: var(--gift-button-fill-hover);
   }
 
+  /*
+    Where the button sits under the row.
+
+    The panel is a left-aligned column, so the button used to hang off the
+    left edge under three cards that fill the width - it read as an orphan
+    rather than as the end of the panel. "Button alignment" moves it on its
+    own, without disturbing the heading and the copy above it, which is why it
+    is align-self here and not a change to the column's own alignment.
+  */
+  #eden-quote-{{ section.id }}.eden-quote--button-center .gifting-banner__button {
+    align-self: center;
+  }
+
+  #eden-quote-{{ section.id }}.eden-quote--button-right .gifting-banner__button {
+    align-self: flex-end;
+  }
+
+  #eden-quote-{{ section.id }}.eden-quote--button-left .gifting-banner__button {
+    align-self: flex-start;
+  }
+
   #eden-quote-{{ section.id }} + .section { margin-block-start: 0 !important; }
 
   /*
@@ -496,6 +694,8 @@
     #eden-quote-{{ section.id }} {
       display: block;
       min-height: 0;
+      width: calc(100% - var(--gift-inset-mobile, 0px) * 2);
+      margin-inline: var(--gift-inset-mobile, 0px);
       padding: 0 var(--gift-pad-inline-mobile) var(--gift-pad-bottom-mobile);
     }
 
@@ -535,23 +735,26 @@
     #eden-quote-{{ section.id }} .gifting-banner__eyebrow { margin-bottom: 10px; font-size: 9px; }
     #eden-quote-{{ section.id }} .gifting-banner__text { margin-top: 10px; font-size: 13px; }
 
+    #eden-quote-{{ section.id }} .gifting-banner__scroller { margin-top: 16px; }
+
     #eden-quote-{{ section.id }} .gifting-banner__products {
-      grid-template-columns: var(--gift-grid-mobile);
-      gap: 10px;
-      margin-top: 16px;
+      --gift-card-gap: 10px;
+      grid-auto-columns: calc(
+        (100% - (var(--gift-visible-mobile) - 1) * var(--gift-card-gap)) / var(--gift-visible-mobile)
+      );
     }
 
-    {%- if columns_mobile == 2 and columns == 3 -%}
-      /*
-        Three cards in a two-up grid leave one on its own on the second row; it is centred
-        rather than left hanging under the first column.
-      */
-      #eden-quote-{{ section.id }} .gifting-banner__product:last-child:nth-child(odd) {
-        width: calc(50% - 5px);
-        grid-column: 1 / -1;
-        justify-self: center;
-      }
-    {%- endif -%}
+    /* A phone scrolls the row with a finger, so the arrows are a pair of
+       targets in the way of the swipe rather than a help. The bar stays: it is
+       the only thing saying there is more of the row to come. */
+    #eden-quote-{{ section.id }} .gifting-banner__arrows { display: none; }
+
+    #eden-quote-{{ section.id }} .gifting-banner__controls {
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    #eden-quote-{{ section.id }} .gifting-banner__progress { flex: 0 1 160px; }
 
     #eden-quote-{{ section.id }} .gifting-banner__product-link { padding: 8px; }
     #eden-quote-{{ section.id }} .gifting-banner__product-title,
@@ -646,21 +849,46 @@
     },
     {
       "type": "range",
+      "id": "product_count",
+      "label": "Products in the row",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 6,
+      "info": "How many products the row holds altogether. Anything past the number shown at once scrolls, with arrows under the cards on a computer and a swipe on a phone."
+    },
+    {
+      "type": "range",
       "id": "columns",
-      "label": "Products shown",
+      "label": "Products shown at once",
       "min": 2,
       "max": 4,
       "step": 1,
-      "default": 3
+      "default": 3,
+      "info": "How many cards are on screen before the row scrolls. The panel is narrow, so more than three turns the cards into thumbnails."
     },
     {
       "type": "range",
       "id": "columns_mobile",
-      "label": "Products per row on mobile",
+      "label": "Products shown at once on mobile",
       "min": 1,
       "max": 3,
       "step": 1,
       "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show the arrows",
+      "default": true,
+      "info": "The pair under the cards that moves the row on. They hide themselves when every product already fits, and a phone scrolls with a finger instead."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress",
+      "label": "Show the scroll progress bar",
+      "default": true,
+      "info": "The line under the cards that fills as the row scrolls. It hides itself when there is nothing to scroll to."
     },
     {
       "type": "checkbox",
@@ -705,6 +933,18 @@
       "default": "left"
     },
     {
+      "type": "select",
+      "id": "button_alignment",
+      "label": "Button alignment",
+      "info": "Where the button sits under the row of gifts. It moves on its own, so the heading and the copy above it stay where they are. Everything centres on a phone whatever is chosen here.",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Centred" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
       "type": "range",
       "id": "content_share",
       "label": "Panel width",
@@ -724,6 +964,27 @@
       "unit": "px",
       "default": 0,
       "info": "0 lets the band follow the shape of the photograph."
+    },
+    {
+      "type": "range",
+      "id": "side_spacing",
+      "label": "Side spacing",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40,
+      "info": "The gap between the band and the edges of the screen. 0 runs it edge to edge."
+    },
+    {
+      "type": "range",
+      "id": "side_spacing_mobile",
+      "label": "Side spacing on mobile",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 16
     },
     {
       "type": "checkbox",

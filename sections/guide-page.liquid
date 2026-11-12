@@ -597,6 +597,10 @@
   "class": "section-wrapper",
   "settings": [
     {
+      "type": "paragraph",
+      "content": "One template serves every guide, so the settings here apply to all of them. Anything belonging to a single guide - its photos, its banner, its card - lives on that guide's own Guide block below. To change the photos on the page you are looking at, open the Guide block whose Title matches it."
+    },
+    {
       "type": "header",
       "content": "Hero"
     },
@@ -1066,15 +1070,19 @@
       "settings": [
         { "type": "text", "id": "title", "label": "Title" },
         { "type": "textarea", "id": "text", "label": "Description" },
+        { "type": "header", "content": "Photos on this guide's page" },
+        {
+          "type": "paragraph",
+          "content": "The photos themselves are written into the page in Content > Pages, so they cannot be clicked in the preview. Pick a photo here instead and it replaces the one in that position, counting from the top of the page. Leave a slot empty to keep the photo the page already has."
+        },
+        { "type": "image_picker", "id": "body_image_1", "label": "Photo 1 - the one at the top", "info": "The first photo on the page. When \"Use the first photo as the banner\" is ticked below, this is the banner photo too." },
+        { "type": "image_picker", "id": "body_image_2", "label": "Photo 2", "info": "The second photo down the page. On the lab-grown gemstones guide this is the sapphire." },
+        { "type": "image_picker", "id": "body_image_3", "label": "Photo 3", "info": "The third photo down the page. On the lab-grown gemstones guide this is the emerald." },
+        { "type": "image_picker", "id": "body_image_4", "label": "Photo 4", "info": "The fourth photo down the page. On the lab-grown gemstones guide this is the ruby." },
+        { "type": "image_picker", "id": "body_image_5", "label": "Photo 5", "info": "The fifth photo down the page, if the guide has one." },
         { "type": "header", "content": "Printable sizer" },
         { "type": "image_picker", "id": "sizer_image", "label": "Sizer download file", "info": "Only for the ring and wrist sizer guides. The download button saves this file instead of the sizer shown on the page - use it for a print-resolution copy. Leave empty and the button saves the sizer in the page content." },
         { "type": "url", "id": "sizer_file", "label": "Printable sizer PDF", "info": "Only for the ring and wrist sizer guides. Paste the link to the printable PDF from Content > Files. The download button hands the reader this file. Leave empty and the ring and wrist guides fall back to the store's own sizer PDFs, then to the sizer picture on the page." },
-        { "type": "header", "content": "Guide body photos" },
-        { "type": "image_picker", "id": "body_image_1", "label": "First body photo", "info": "Replaces the first photo in this guide's page content." },
-        { "type": "image_picker", "id": "body_image_2", "label": "Second body photo", "info": "Replaces the second photo in this guide's page content." },
-        { "type": "image_picker", "id": "body_image_3", "label": "Third body photo", "info": "Replaces the third photo in this guide's page content." },
-        { "type": "image_picker", "id": "body_image_4", "label": "Fourth body photo", "info": "Replaces the fourth photo in this guide's page content." },
-        { "type": "image_picker", "id": "body_image_5", "label": "Fifth body photo", "info": "Replaces the fifth photo in this guide's page content." },
         { "type": "header", "content": "Guide cards and banner" },
         { "type": "image_picker", "id": "image", "label": "Fallback card image", "info": "Used only when the shared image in Theme settings > Education guide images is empty." },
         {
@@ -1083,10 +1091,10 @@
           "label": "Fallback image file name",
           "info": "Used only when the shared image is empty and no fallback image is chosen above."
         },
-        { "type": "image_picker", "id": "hero_image", "label": "Banner image", "info": "Optional wide image for this guide's top banner. Falls back to its card image." },
-        { "type": "text", "id": "hero_image_asset", "label": "Banner image file name", "info": "A file name in Content > Files (or assets/), used only when no banner image is selected." },
-        { "type": "checkbox", "id": "hero_use_page_image", "label": "Use the first image from this guide's page content", "default": false, "info": "Useful when the guide already has a topic-specific image in its content." },
-        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "checkbox", "id": "hero_use_page_image", "label": "Use the first photo as the banner", "default": false, "info": "The banner shows Photo 1 and the page stops repeating it underneath. Untick it to set a separate banner photo below." },
+        { "type": "image_picker", "id": "hero_image", "label": "Banner photo", "info": "A separate wide photo for the top of this guide. Ignored while the box above is ticked. Falls back to the card image." },
+        { "type": "text", "id": "hero_image_asset", "label": "Banner photo file name", "info": "A file name in Content > Files (or assets/), used only when no banner photo is picked above. The picker always wins, so clear this field if a typed name is getting in the way." },
+        { "type": "url", "id": "link", "label": "Link", "info": "The page this guide block belongs to. The photo slots above apply to whichever guide page this link points at." },
         { "type": "text", "id": "link_label", "label": "Link text", "default": "Read the guide" }
       ]
     }

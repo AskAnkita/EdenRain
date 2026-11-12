@@ -206,9 +206,12 @@ ijewel-studio {
    and made bigger by the same amount, so a strip of the builder's own chrome -
    their logo down one side, their bar across the top - falls outside the frame
    rather than being covered over. Cropping beats covering wherever the strip
-   holds buttons: a Sign in under a white panel is still a Sign in. The crop is
-   read into --ijw-crop-y on the iframe itself so every height below can add it
-   without naming the breakpoint twice. */
+   holds buttons: a Sign in under a white panel is still a Sign in - unless the
+   panel takes the clicks itself, which is how the price patch below disarms
+   their Add to cart, because cropping the frame's foot on a desktop would cut
+   into the 3D stage as well. The crop is read into --ijw-crop-y on the iframe
+   itself so every height below can add it without naming the breakpoint
+   twice. */
 .ijw-frame iframe {
   --ijw-crop-y: var(--ijw-crop-top-mobile, 0px);
   display: block;
@@ -473,9 +476,13 @@ ijewel-studio {
    than their logo can be restyled. So it is covered the way the logo is: a
    panel in the rail's own colour over the price line, carrying the line we do
    stand behind. It keeps its clicks, so the price breakdown underneath cannot
-   be opened, and it is sized to stop above the builder's Add to cart - that
-   button still has to work. Mobile values first, desktop in the query below,
-   because a rail of a different width puts its price somewhere else. */
+   be opened - and with "Cover the builder's Add to cart too" on, which is how
+   it ships, the panel is grown down over their button as well, so the press
+   lands on the panel and never reaches it. Nothing on this page sells a ring
+   while the prices in the frame are the vendor's own; Save this design and
+   Contact support under the frame are what the buttons do instead. Mobile
+   values first, desktop in the query below, because a rail of a different
+   width puts its price somewhere else. */
 .ijw-price {
   position: absolute;
   right: var(--ijw-price-right-mobile, 0px);
@@ -483,7 +490,7 @@ ijewel-studio {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: var(--ijw-price-valign, center);
   align-items: var(--ijw-price-justify, flex-start);
   gap: 2px;
   box-sizing: border-box;

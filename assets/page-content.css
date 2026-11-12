@@ -80,7 +80,9 @@
 .pc-shell {
   max-width: var(--pc-shell-max, 112rem);
   margin-inline: auto;
-  padding-inline: 2.4rem;
+  /* The theme page gutter on a wide screen (--page-margin is 4rem there), never
+     narrower than the 2.4rem this shell used before. */
+  padding-inline: max(2.4rem, var(--page-margin, 2.4rem));
 }
 
 /*

@@ -23,7 +23,9 @@
 }
 
 .ds-split--full-width {
-  padding: 0;
+  /* Full width means the banner spans the screen, but it can still be held off the
+     glass: "Side padding" feeds --dsp-pad-inline-full, which is 0 until it is set. */
+  padding: 0 var(--dsp-pad-inline-full, 0px);
 }
 
 .dsp-shell {

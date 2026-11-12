@@ -89,6 +89,40 @@
   else
     assign label_glow = 'rgb(255 255 255 / 0.65)'
   endif
+
+  # ------------------------------------------------------------------
+  # The shade under the title.
+  #
+  # The glow above is enough over a photograph that has something in it.
+  # Several of these category pictures are cut out on white - the wedding
+  # bands and the earrings especially - and white lettering on white with a
+  # soft dark halo behind it is not legible however wide the halo is spread.
+  #
+  # So the foot of every tile carries a wash of the opposite tone to the
+  # title, fading out before it reaches the middle of the picture. It is a
+  # gradient rather than a bar so there is no edge to see against a plain
+  # background, and it is strongest exactly where the words are.
+  #
+  # "Shade behind the title" turns it off at 0, for a shop whose pictures are
+  # all dark enough not to need it.
+  assign scrim_strength = section.settings.label_scrim | plus: 0
+  assign scrim_height = section.settings.label_scrim_height | plus: 0
+  if scrim_height <= 0
+    assign scrim_height = 55
+  endif
+
+  # The wash is the opposite tone to the title, so a shop that switches to a
+  # dark title gets a light wash without having to find a second setting.
+  assign scrim_color = '#000000'
+  if label_brightness <= 127
+    assign scrim_color = '#ffffff'
+  endif
+
+  assign scrim_alpha = scrim_strength | divided_by: 100.0
+  assign scrim_alpha_mid = scrim_alpha | times: 0.45
+  assign scrim_bottom = scrim_color | color_modify: 'alpha', scrim_alpha
+  assign scrim_mid = scrim_color | color_modify: 'alpha', scrim_alpha_mid
+  assign scrim_top = scrim_color | color_modify: 'alpha', 0
 -%}
 
 {%- style -%}
@@ -103,7 +137,9 @@
   #category-tiles-{{ section.id }} .ct-inner {
     max-width: {% if section.settings.width == 'page' %}var(--page-width, 160rem){% else %}none{% endif %};
     margin: 0 auto;
-    padding-inline: max(2.4rem, calc(var(--ct-arrow-size) / 2 + 0.8rem));
+    /* The theme's page gutter, with a floor of half an arrow because the arrows sit
+       half outside the row. --page-margin is 4rem on desktop and 1rem on a phone. */
+    padding-inline: max(var(--page-margin, 2.4rem), calc(var(--ct-arrow-size) / 2 + 0.8rem));
   }
 
   #category-tiles-{{ section.id }} .ct-heading {
@@ -189,6 +225,34 @@
   #category-tiles-{{ section.id }} .ct-link:focus-visible img {
     transform: scale(1.06);
   }
+
+  {%- if scrim_strength > 0 -%}
+    /*
+      The wash under the title. It sits above the picture and below the words:
+      the picture is positioned with no z-index of its own and this comes after
+      it, so tree order puts it on top, and the label's z-index: 1 clears both.
+
+      It is pinned to the foot of the tile and fades out upwards, so on a
+      cut-out photograph on white it darkens only the band the lettering
+      crosses and leaves the product itself alone.
+    */
+    #category-tiles-{{ section.id }} .ct-link::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 0;
+      height: {{ scrim_height }}%;
+      background: linear-gradient(
+        to top,
+        {{ scrim_bottom }} 0%,
+        {{ scrim_mid }} 45%,
+        {{ scrim_top }} 100%
+      );
+      content: "";
+      pointer-events: none;
+    }
+  {%- endif -%}
 
   /* A permanent text label keeps the tile simple; its full underline closes
      into the centre while the tile is hovered. */
@@ -637,6 +701,28 @@
       "label": "Tile title colour",
       "info": "The words over each picture. The glow behind them flips to suit, so a pale title stays readable on a pale photograph.",
       "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "label_scrim",
+      "label": "Shade behind the title",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 45,
+      "info": "A wash across the foot of each tile so a pale title stays readable on a picture cut out on white. It takes the opposite tone to the title colour. 0 turns it off."
+    },
+    {
+      "type": "range",
+      "id": "label_scrim_height",
+      "label": "How far the shade reaches",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 55,
+      "info": "The share of the tile the wash covers, measured from the bottom. It fades out at the top of that band."
     },
     {
       "type": "color_scheme",
