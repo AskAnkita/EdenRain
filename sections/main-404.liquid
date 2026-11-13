@@ -608,6 +608,58 @@
       "label": "Button text colour",
       "default": "#ffffff",
       "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "header",
+      "content": "Coming soon categories",
+      "info": "A category the shop is about to stock says this instead of saying it is empty. Today that is the loose diamonds: every collection whose handle ends in \"diamonds\", which is what the Diamonds menu opens. Leave the two links empty for the booking page and the engagement rings."
+    },
+    {
+      "type": "text",
+      "id": "empty_category_soon_badge",
+      "label": "Tag above the message",
+      "default": "Coming soon",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "empty_category_soon_message",
+      "label": "Coming soon message",
+      "default": "Loose diamonds are coming soon.",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "empty_category_soon_note",
+      "label": "Coming soon supporting line",
+      "default": "We are certifying and photographing every stone before it goes on sale. Tell a consultant the shape, carat and budget you have in mind and we will send you the ones that match - or choose a setting and we will set your stone in it.",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "empty_category_soon_button_label",
+      "label": "Coming soon button label",
+      "default": "Talk to a consultant",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "url",
+      "id": "empty_category_soon_button_link",
+      "label": "Coming soon button link",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "text",
+      "id": "empty_category_soon_link_label",
+      "label": "Second button label",
+      "default": "Shop engagement rings",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
+    },
+    {
+      "type": "url",
+      "id": "empty_category_soon_link_url",
+      "label": "Second button link",
+      "visible_if": "{{ section.settings.empty_category_enabled }}"
     }
   ]
 }

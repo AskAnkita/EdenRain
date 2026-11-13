@@ -25,6 +25,17 @@
 
 const SKIP_HANDLES = ['all', 'types', 'vendors'];
 
+/*
+  A category the shop is about to stock rather than one it has nothing in: the loose diamonds,
+  whose handles are "lab-grown-diamonds" and the ten "<shape>-diamonds". The same rule is in
+  snippets/empty-category.liquid for a collection that is real but empty, which is what every
+  one of those is today; this copy is here for the handle that is only in the URL. The singular
+  "stone-lab-grown-diamond" - jewellery, not a loose stone - is not one of them.
+*/
+function isComingSoon(handle) {
+  return handle.split('-').pop() === 'diamonds';
+}
+
 function handleFromPath(pathname) {
   const match = /\/collections\/([^/?#]+)/.exec(pathname || '');
   if (!match) return '';
@@ -59,12 +70,15 @@ class EmptyCategoryPage extends HTMLElement {
   connectedCallback() {
     this.handle = handleFromPath(window.location.pathname);
     this.categoryTitle = this.handle ? titleFromHandle(this.handle) : '';
+    this.comingSoon = Boolean(this.handle) && isComingSoon(this.handle);
     // No handle, or nothing that can be made into a heading: leave the 404 showing rather than
     // put up a category page with no category on it.
     if (!this.categoryTitle) return;
 
-    // Before anything is painted, so the 404 never flashes up behind this.
+    // Before anything is painted, so the 404 never flashes up behind this, and so the
+    // coming-soon page is never first drawn as an empty one.
     document.documentElement.classList.add('is-empty-category');
+    if (this.comingSoon) this.classList.add('empty-category--soon');
     this.measure();
     window.addEventListener('resize', this.measure, { passive: true });
 
@@ -102,7 +116,47 @@ class EmptyCategoryPage extends HTMLElement {
 
     document.title = [title, document.title.split(/\s[–|-]\s/).pop()].filter(Boolean).join(' – ');
 
-    this.fillParent(title);
+    if (this.comingSoon) {
+      this.fillComingSoon();
+    } else {
+      this.fillParent(title);
+    }
+  }
+
+  /*
+    Swaps the copy and the two buttons for the coming-soon ones Liquid left on the element. The
+    nearest-family button is not offered here: every diamond collection is empty, so it would
+    have nothing to point at, and its place goes to the rings that carry the same stones.
+  */
+  fillComingSoon() {
+    const data = this.dataset;
+
+    const badge = this.querySelector('[data-empty-category-badge]');
+    if (badge && data.soonBadge) {
+      badge.textContent = data.soonBadge;
+      badge.removeAttribute('hidden');
+    }
+
+    const message = this.querySelector('[data-empty-category-message]');
+    if (message && data.soonMessage) message.textContent = data.soonMessage;
+
+    const note = this.querySelector('[data-empty-category-note]');
+    if (note && data.soonNote) note.textContent = data.soonNote;
+
+    const button = this.querySelector('[data-empty-category-button]');
+    if (button && data.soonButtonLabel && data.soonButtonLink) {
+      button.textContent = data.soonButtonLabel;
+      button.href = data.soonButtonLink;
+    }
+
+    const link = this.querySelector('[data-empty-category-parent]');
+    if (link && data.soonLinkLabel && data.soonLinkUrl) {
+      const label = link.querySelector('[data-empty-category-parent-label]');
+      if (label) label.textContent = data.soonLinkLabel;
+      link.href = data.soonLinkUrl;
+      link.setAttribute('aria-label', data.soonLinkLabel);
+      link.removeAttribute('hidden');
+    }
   }
 
   // The nearest family collection that is in the store and has something in it. Liquid wrote the

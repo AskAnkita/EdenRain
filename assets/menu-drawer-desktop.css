@@ -1413,7 +1413,9 @@ a.menu-drawer-desktop__group-heading:hover {
   gap: 1.6rem;
 }
 
-.menu-drawer-desktop__button--on-image {
+/* The class is doubled so this still outscores the shared shape in eden-actions.css, which
+   carries the same single-class weight and, on some pages, loads after this file. */
+.menu-drawer-desktop__button.menu-drawer-desktop__button--on-image {
   /* Tighter than the panel's other buttons: at the shared tracking "Start with a setting" wrapped
      onto two lines in half of the picture's width. */
   padding: 1.2rem 0.8rem;

@@ -435,17 +435,43 @@
     }
 
     #category-tiles-{{ section.id }} .ct-track {
-      grid-auto-columns: 100%;
-      gap: 1.2rem;
-      -webkit-overflow-scrolling: touch;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
+      gap: 2rem 1.2rem;
+      overflow: visible;
+      scroll-snap-type: none;
     }
 
     #category-tiles-{{ section.id }} .ct-tile {
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
+      scroll-snap-align: none;
+    }
+
+    /* Give the first category a full-width feature image; the remaining tiles stay in two columns. */
+    #category-tiles-{{ section.id }} .ct-tile:first-child {
+      grid-column: 1 / -1;
+    }
+
+    #category-tiles-{{ section.id }} .ct-link {
+      aspect-ratio: {{ section.settings.ratio }};
+    }
+
+    #category-tiles-{{ section.id }} .ct-tile:first-child .ct-link {
+      aspect-ratio: 16 / 9;
+    }
+
+    #category-tiles-{{ section.id }} .ct-label {
+      bottom: 1.6rem;
+      max-width: calc(100% - 2rem);
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
     }
 
     #category-tiles-{{ section.id }} .ct-arrow {
+      display: none;
+    }
+
+    #category-tiles-{{ section.id }} .ct-progress {
       display: none;
     }
   }

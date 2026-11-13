@@ -9712,7 +9712,7 @@ sold-in-last-component.loading {
   }
 
   @media screen and (max-width: 991px) {
-    bottom: calc(var(--toolbar-mobile-height) + 5px);
+    bottom: calc(var(--toolbar-mobile-height, 0px) + 5px);
   }
 
   @media screen and (max-width: 749px) {
@@ -9778,7 +9778,7 @@ sold-in-last-component.loading {
 @media screen and (max-width: 991px) {
   .sticky-atc.style-custom {
     max-width: 100%;
-    bottom: calc(var(--toolbar-mobile-height) + 5px);
+    bottom: calc(var(--toolbar-mobile-height, 0px) + 5px);
   }
 }
 
@@ -9900,7 +9900,7 @@ sold-in-last-component.loading {
 
 @media screen and (max-width: 991px) {
   .sticky-atc {
-    bottom: calc(var(--toolbar-mobile-height) + 5px);
+    bottom: calc(var(--toolbar-mobile-height, 0px) + 5px);
   }
 }
 
@@ -12182,6 +12182,34 @@ form.payment-terms {
 bottom: 10%;
 }
 }
+
+/*
+  The product page's sticky add-to-cart bar is pinned to the same corner, so this stack sat on top
+  of its button. While that bar is showing the stack rides above it (product-info.js keeps
+  --sticky-atc-height in step with the bar) and drops back once it has gone.
+*/
+.multitasking-bar {
+  transition: opacity var(--duration-long) ease, visibility var(--duration-long) ease,
+    transform var(--duration-long) ease, bottom 0.3s ease;
+}
+
+.sticky-cart-visible .multitasking-bar {
+  bottom: var(--sticky-atc-height, 0px);
+}
+
+/* Below 992px the sticky bar is itself raised, to sit 5px clear of the mobile toolbar. */
+@media screen and (max-width: 991px) {
+  .sticky-cart-visible .multitasking-bar {
+    bottom: calc(var(--sticky-atc-height, 0px) + var(--toolbar-mobile-height, 0px) + 5px);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .sticky-cart-visible .multitasking-bar {
+    bottom: max(10%, calc(var(--sticky-atc-height, 0px) + var(--toolbar-mobile-height, 0px) + 5px));
+  }
+}
+
 .multi-t__button {
   width: var(--size-40);
   height: var(--size-40);

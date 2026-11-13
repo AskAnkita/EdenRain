@@ -32,6 +32,9 @@
     no `settings` still sees that object, so there is no telling whether a section passed its own.
   - image: {Image} optional picture above the heading
 
+  A category the shop is about to stock says so instead of saying it is empty. The only ones
+  today are the loose diamonds - see `coming_soon` below.
+
   Styles: assets/empty-category.css. Buttons: assets/eden-actions.css, which owns their hover.
 {% endcomment %}
 
@@ -62,6 +65,26 @@
   assign title = category.title
   if title == blank and from_path != true
     assign title = 'Collection'
+  endif
+
+  comment
+    Coming soon. The eleven loose-diamond collections - lab-grown-diamonds and the ten
+    <shape>-diamonds the Diamonds menu opens - are all in the store and all empty: not one loose
+    stone has been listed yet. "No products found in this category" reads as a dead end on a
+    range that is on its way, so those pages say it is coming and offer a consultant and the
+    rings that already carry the stones.
+
+    A handle whose last word is "diamonds" is one of them. "stone-lab-grown-diamond" - jewellery
+    set with lab-grown stones, not a loose stone - ends in the singular and is left alone. The
+    same rule is in assets/empty-category.js, which has to repeat it for the 404 case: there the
+    handle is only in the URL, so Liquid cannot see it (`request.path` is "/404" by then).
+  endcomment
+  assign coming_soon = false
+  if category.handle != blank
+    assign handle_tail = category.handle | split: '-' | last
+    if handle_tail == 'diamonds'
+      assign coming_soon = true
+    endif
   endif
 
   comment
@@ -153,6 +176,27 @@
   assign text_size = ec.empty_category_text_size | default: 0
   assign picture = image | default: ec.empty_category_image
 
+  comment
+    The coming-soon wording, and the two things to do instead of buying a stone today. These are
+    also handed to the script as data attributes below, because on the 404 the handle is only
+    known in the browser. The nearest-family button has nothing to offer here - every diamond
+    collection is empty, so it would be dropped anyway - and its place goes to the rings.
+  endcomment
+  assign soon_badge = ec.empty_category_soon_badge | default: 'Coming soon'
+  assign soon_message = ec.empty_category_soon_message | default: 'Loose diamonds are coming soon.'
+  assign soon_note = ec.empty_category_soon_note | default: 'We are certifying and photographing every stone before it goes on sale. Tell a consultant the shape, carat and budget you have in mind and we will send you the ones that match - or choose a setting and we will set your stone in it.'
+  assign soon_button_label = ec.empty_category_soon_button_label | default: 'Talk to a consultant'
+  assign soon_button_link = ec.empty_category_soon_button_link | default: '/pages/book-a-consultation'
+  assign soon_link_label = ec.empty_category_soon_link_label | default: 'Shop engagement rings'
+  assign soon_link_url = ec.empty_category_soon_link_url | default: '/collections/engagement-rings'
+
+  if coming_soon
+    assign message = soon_message
+    assign note = soon_note
+    assign button_label = soon_button_label
+    assign button_link = soon_button_link
+    assign show_parent = false
+  endif
 -%}
 
 {%- capture ec_style -%}
@@ -167,12 +211,19 @@
 {%- endcapture -%}
 
 <empty-category-page
-  class="empty-category{% if from_path %} empty-category--path{% endif %}{% if compact %} empty-category--compact{% endif %}"
+  class="empty-category{% if from_path %} empty-category--path{% endif %}{% if compact %} empty-category--compact{% endif %}{% if coming_soon %} empty-category--soon{% endif %}"
   style="{{ ec_style }}"
   {% if from_path %}
     data-families="{{ family_json | escape }}"
     data-parent-prefix="{{ parent_prefix | escape }}"
     data-show-parent="{% if show_parent %}true{% else %}false{% endif %}"
+    data-soon-badge="{{ soon_badge | escape }}"
+    data-soon-message="{{ soon_message | escape }}"
+    data-soon-note="{{ soon_note | escape }}"
+    data-soon-button-label="{{ soon_button_label | escape }}"
+    data-soon-button-link="{{ soon_button_link | escape }}"
+    data-soon-link-label="{{ soon_link_label | escape }}"
+    data-soon-link-url="{{ soon_link_url | escape }}"
   {% endif %}
 >
   {%- unless compact -%}
@@ -208,14 +259,32 @@
       >
     {%- endif -%}
 
-    <p class="empty-category__message">{{ message }}</p>
+    {%- comment -%}
+      The badge is rendered on the 404 whatever the handle turns out to be, hidden, because the
+      script is the only thing there that knows which category it is; it shows it if the handle
+      is a diamond one. On a real collection Liquid has already decided.
+    {%- endcomment -%}
+    {%- if coming_soon or from_path -%}
+      <p
+        class="empty-category__badge"
+        data-empty-category-badge
+        {% unless coming_soon %}hidden{% endunless %}
+      >{{ soon_badge }}</p>
+    {%- endif -%}
+
+    <p class="empty-category__message" data-empty-category-message>{{ message }}</p>
 
     {%- if note != blank -%}
-      <p class="empty-category__note">{{ note }}</p>
+      <p class="empty-category__note" data-empty-category-note>{{ note }}</p>
     {%- endif -%}
 
     <div class="empty-category__actions">
-      {%- if show_parent -%}
+      {%- if coming_soon and soon_link_label != blank and soon_link_url != blank -%}
+        <a
+          class="eden-action eden-action--{{ second_style }} empty-category__parent"
+          href="{{ soon_link_url }}"
+        >{{ soon_link_label }}</a>
+      {%- elsif show_parent -%}
         <a
           class="eden-action eden-action--{{ second_style }} empty-category__parent"
           href="{{ parent_url | default: routes.all_products_collection_url }}"
@@ -224,7 +293,11 @@
         ><span data-empty-category-parent-label>{{ parent_prefix }} {{ parent_label }}</span></a>
       {%- endif -%}
       {%- if button_label != blank and button_link != blank -%}
-        <a class="eden-action eden-action--{{ button_style }}" href="{{ button_link }}">{{ button_label }}</a>
+        <a
+          class="eden-action eden-action--{{ button_style }}"
+          href="{{ button_link }}"
+          data-empty-category-button
+        >{{ button_label }}</a>
       {%- endif -%}
     </div>
   </div>

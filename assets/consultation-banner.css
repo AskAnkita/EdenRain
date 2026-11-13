@@ -182,6 +182,14 @@
   margin-top: 0.8rem;
 }
 
+/* The filled booking button opens to the white panel on hover, leaving its
+   ink border visible as an outline. */
+.eden-consult .eden-action--solid {
+  --cta-fill-hover: var(--ecb-panel-bg);
+  --cta-ink-hover: var(--eden-action-ink);
+  --cta-edge-hover: var(--eden-action-ink);
+}
+
 /* ----------------------------------------------------------------- desktop */
 
 @media screen and (min-width: 750px) {

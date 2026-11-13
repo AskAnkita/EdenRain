@@ -1,18 +1,8 @@
 {% comment %}
-  Gifting banner - the photograph on one side, the invitation to shop it on the other.
+  Gifting banner - a full-bleed photograph behind a centred heading and a row of gifts.
 
-  The band is one full-bleed photograph with a panel of content held over its empty half: a
-  small heading, the heading proper, a line of copy, up to four products from a collection and
-  one button. The photography (assets/gifting-perfect-gift.jpg) carries the gift box and the
-  rings across its left-hand side and leaves the marble clear on the right, so the content sits
-  on the right by default and "Content side" flips it for a picture shot the other way round.
-
-  Below 990px the picture stops being a background and goes on top at its own height, with the
-  content underneath it on the section's background colour. The band stacks there rather than at
-  the theme's usual 750px because the empty half of a 3:1 photograph is not wide enough to hold
-  a row of product cards on a tablet: the text ends up over the gift box. The smaller picture is
-  its own file (a left-hand crop of the same shot), so the box and the rings fill the frame once
-  the empty half is no longer needed.
+  The title and supporting copy sit on the section background. The product row sits over the
+  gifting photograph, and the call to action sits on the photograph under it.
 
   Buttons come from assets/eden-actions.css, which names .gifting-banner__button in the one
   call-to-action family and owns the hover for all of them; this section only says which two
@@ -112,6 +102,7 @@
   {%- if section.settings.button_text_color_hover != blank and section.settings.button_text_color_hover != transparent -%}--gift-button-ink-hover: {{ section.settings.button_text_color_hover }};{%- endif -%}
 
   {%- if heading_size > 0 -%}--gift-heading-size: {{ heading_size }}px;{%- endif -%}
+  {%- unless section.settings.show_arrows -%}--gift-arrow-room: 0px;{%- endunless -%}
   {%- if heading_size_mobile > 0 -%}--gift-heading-size-mobile: {{ heading_size_mobile }}px;{%- endif -%}
   {%- if heading_tracking > 0 -%}--gift-heading-tracking: {{ heading_tracking | divided_by: 100.0 }}em;{%- endif -%}
   {%- unless section.settings.uppercase_heading -%}--gift-heading-case: none;{%- endunless -%}
@@ -131,7 +122,7 @@
     divided up between however many products the collection happens to hold.
   {%- endcomment -%}
   --gift-visible: {{ columns }};
-  --gift-visible-mobile: {{ columns_mobile }};
+  --gift-visible-mobile: {% if section.settings.mobile_card_peek %}calc({{ columns_mobile }} + 0.2){% else %}{{ columns_mobile }}{% endif %};
 
   --gift-inset: {{ section.settings.side_spacing | default: 0 }}px;
   --gift-inset-mobile: {{ section.settings.side_spacing_mobile | default: 0 }}px;
@@ -155,79 +146,111 @@
 <section
   id="eden-quote-{{ section.id }}"
   class="eden-quote force-full-width eden-quote--content-{{ section.settings.content_side }} eden-quote--{{ section.settings.text_alignment }} eden-quote--button-{{ section.settings.button_alignment | default: 'center' }}"
+  data-mobile-autoplay="{% if section.settings.mobile_autoplay %}true{% else %}false{% endif %}"
   style="{{ section_styles | strip_newlines | strip }}"
   {{ section.shopify_attributes }}
 >
-  <div class="gifting-banner__media">
-    <picture>
-      {%- if mobile_image != blank -%}
-        <source
-          media="(max-width: 989px)"
-          srcset="
-            {{ mobile_image | image_url: width: 750 }} 750w,
-            {{ mobile_image | image_url: width: 1100 }} 1100w,
-            {{ mobile_image | image_url: width: 1400 }} 1400w
-          "
-          sizes="100vw"
-        >
-      {%- else -%}
-        <source
-          media="(max-width: 989px)"
-          srcset="
-            {% render 'image-source', file: mobile_asset, width: 750 %} 750w,
-            {% render 'image-source', file: mobile_asset, width: 1100 %} 1100w,
-            {% render 'image-source', file: mobile_asset, width: 1400 %} 1400w
-          "
-          sizes="100vw"
-        >
-      {%- endif -%}
-
-      {%- if image != blank -%}
-        {{
-          image
-          | image_url: width: 2400
-          | image_tag:
-            loading: 'lazy',
-            widths: '750, 1100, 1500, 1800, 2200, 2400',
-            sizes: '100vw',
-            alt: '',
-            class: 'gifting-banner__background'
-        }}
-      {%- else -%}
-        <img
-          class="gifting-banner__background"
-          src="{% render 'image-source', file: desktop_asset, width: 2172 %}"
-          srcset="
-            {% render 'image-source', file: desktop_asset, width: 750 %} 750w,
-            {% render 'image-source', file: desktop_asset, width: 1100 %} 1100w,
-            {% render 'image-source', file: desktop_asset, width: 1500 %} 1500w,
-            {% render 'image-source', file: desktop_asset, width: 1800 %} 1800w,
-            {% render 'image-source', file: desktop_asset, width: 2172 %} 2172w
-          "
-          sizes="100vw"
-          alt=""
-          loading="lazy"
-          width="2172"
-          height="724"
-        >
-      {%- endif -%}
-    </picture>
-  </div>
-
   <div class="gifting-banner__content">
     {%- if section.settings.eyebrow != blank -%}
       <p class="gifting-banner__eyebrow">{{ section.settings.eyebrow | escape }}</p>
     {%- endif -%}
 
-    {%- if section.settings.heading != blank -%}
-      <h2 class="gifting-banner__heading">{{ section.settings.heading | escape }}</h2>
-    {%- endif -%}
+    <div class="gifting-banner__heading-row">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="gifting-banner__heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.show_arrows -%}
+        <div class="gifting-banner__arrows gifting-banner__arrows--heading" data-gift-arrows>
+          <button type="button" class="gifting-banner__arrow gifting-banner__arrow--prev" aria-label="Previous gifts" disabled>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M15 4 7 12l8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
+            </svg>
+          </button>
+          <button type="button" class="gifting-banner__arrow gifting-banner__arrow--next" aria-label="More gifts">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+              <path d="M9 4l8 8-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
+            </svg>
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
 
     {%- if section.settings.text != blank -%}
       <div class="gifting-banner__text rte">{{ section.settings.text }}</div>
     {%- endif -%}
 
+    {%- comment -%}
+      The button is a white outline, drawn to be read against the photograph,
+      so it goes inside the stage with the cards. On a computer the photograph
+      is behind the whole band and it made no difference where the button was;
+      on a phone the photograph is only as big as the stage, and a button left
+      outside it was white on the white of the section - there, taking up its
+      48px, and invisible.
+    {%- endcomment -%}
+    {%- capture gift_button -%}
+      {%- if button_label != blank and button_link != blank -%}
+        <a class="gifting-banner__button eden-action--light" href="{{ button_link }}">{{ button_label | escape }}</a>
+      {%- endif -%}
+    {%- endcapture -%}
+
     {%- if gifting_collection != blank and gifting_collection.products_count > 0 -%}
+      <div class="gifting-banner__product-stage">
+        <div class="gifting-banner__media" aria-hidden="true">
+          <picture>
+            {%- if mobile_image != blank -%}
+              <source
+                media="(max-width: 989px)"
+                srcset="
+                  {{ mobile_image | image_url: width: 750 }} 750w,
+                  {{ mobile_image | image_url: width: 1100 }} 1100w,
+                  {{ mobile_image | image_url: width: 1400 }} 1400w
+                "
+                sizes="100vw"
+              >
+            {%- else -%}
+              <source
+                media="(max-width: 989px)"
+                srcset="
+                  {% render 'image-source', file: mobile_asset, width: 750 %} 750w,
+                  {% render 'image-source', file: mobile_asset, width: 1100 %} 1100w,
+                  {% render 'image-source', file: mobile_asset, width: 1400 %} 1400w
+                "
+                sizes="100vw"
+              >
+            {%- endif -%}
+
+            {%- if image != blank -%}
+              {{
+                image
+                | image_url: width: 2400
+                | image_tag:
+                  loading: 'lazy',
+                  widths: '750, 1100, 1500, 1800, 2200, 2400',
+                  sizes: '100vw',
+                  alt: '',
+                  class: 'gifting-banner__background'
+              }}
+            {%- else -%}
+              <img
+                class="gifting-banner__background"
+                src="{% render 'image-source', file: desktop_asset, width: 2172 %}"
+                srcset="
+                  {% render 'image-source', file: desktop_asset, width: 750 %} 750w,
+                  {% render 'image-source', file: desktop_asset, width: 1100 %} 1100w,
+                  {% render 'image-source', file: desktop_asset, width: 1500 %} 1500w,
+                  {% render 'image-source', file: desktop_asset, width: 1800 %} 1800w,
+                  {% render 'image-source', file: desktop_asset, width: 2172 %} 2172w
+                "
+                sizes="100vw"
+                alt=""
+                loading="lazy"
+                width="2172"
+                height="724"
+              >
+            {%- endif -%}
+          </picture>
+        </div>
       <gifting-scroller class="gifting-banner__scroller">
       <ul class="gifting-banner__products" aria-label="Featured gifts" data-gift-track>
         {%- for product in gifting_collection.products limit: product_count -%}
@@ -257,39 +280,21 @@
       </ul>
 
       {%- comment -%}
-        The controls hide themselves when every product already fits, so a
-        collection of three gifts looks exactly as it did before the row could
-        scroll. The script sets the hidden attribute; nothing here assumes it.
+        The progress bar hides itself when every product already fits. The
+        arrows sit beside the heading above, and the script hides them too.
       {%- endcomment -%}
-      {%- if section.settings.show_arrows or section.settings.show_progress -%}
+      {%- if section.settings.show_progress -%}
       <div class="gifting-banner__controls">
-        {%- if section.settings.show_progress -%}
-          <div class="gifting-banner__progress" aria-hidden="true" data-gift-progress>
-            <span class="gifting-banner__progress-bar" data-gift-bar></span>
-          </div>
-        {%- endif -%}
-
-        {%- if section.settings.show_arrows -%}
-          <div class="gifting-banner__arrows" data-gift-arrows>
-            <button type="button" class="gifting-banner__arrow gifting-banner__arrow--prev" aria-label="Previous gifts" disabled>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-                <path d="M15 4 7 12l8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
-              </svg>
-            </button>
-            <button type="button" class="gifting-banner__arrow gifting-banner__arrow--next" aria-label="More gifts">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-                <path d="M9 4l8 8-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
-              </svg>
-            </button>
-          </div>
-        {%- endif -%}
+        <div class="gifting-banner__progress" aria-hidden="true" data-gift-progress>
+          <span class="gifting-banner__progress-bar" data-gift-bar></span>
+        </div>
       </div>
       {%- endif -%}
       </gifting-scroller>
-    {%- endif -%}
-
-    {%- if button_label != blank and button_link != blank -%}
-      <a class="gifting-banner__button" href="{{ button_link }}">{{ button_label | escape }}</a>
+      {{ gift_button }}
+      </div>
+    {%- else -%}
+      {{ gift_button }}
     {%- endif -%}
   </div>
 </section>
@@ -309,6 +314,9 @@
     --gift-button-ink-hover: #ffffff;
     --gift-heading-size: clamp(25px, 2.5vw, 40px);
     --gift-heading-size-mobile: clamp(22px, 6vw, 30px);
+    /* What the arrows take out of the heading's line: the pair (26 + 14 + 26)
+       and the 16px that holds them off the last letter. 0 with the arrows off. */
+    --gift-arrow-room: 82px;
     --gift-heading-tracking: 0.045em;
     --gift-heading-case: uppercase;
     --gift-eyebrow-size: 11px;
@@ -330,26 +338,66 @@
     --gift-pad-inline-mobile: clamp(16px, 3vw, 28px);
 
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    display: block;
     /* The band is held off the glass by --gift-inset ("Side spacing"), which is 0
        until it is set, so the width has to come off with it or the row overflows. */
     width: calc(100% - var(--gift-inset, 0px) * 2);
-    min-height: var(--gift-band-height);
     margin-block: 0 !important;
     margin-inline: var(--gift-inset, 0px);
-    padding: var(--gift-pad-top) clamp(28px, 6vw, 96px) var(--gift-pad-bottom);
+    padding: var(--gift-pad-top) clamp(20px, 4vw, 64px) var(--gift-pad-bottom);
     overflow: hidden;
     background: var(--gift-section-bg);
+  }
+
+  /*
+    Left to itself ("Heading size" at 0) the heading is also held to what fits
+    on one line beside the arrows. The screen-width size above takes no
+    account of the panel, and the panel is the narrow thing here: at 1500px the
+    default heading alone is 457px of a 521px row, which leaves the arrows
+    nowhere to go but over the last word.
+
+    100cqi is the width of the heading's row (the row is the container). 12.4
+    is how many times its own font size a heading the length of the default
+    one runs to, in capitals at the default spacing - it measures 12.2, and the
+    rest is margin. A longer heading, or a size set in the editor, wraps onto a
+    second line instead; either way nothing ends up under the arrows.
+
+    Behind @supports because a browser without container units would throw the
+    whole value away and fall back to body-size type, not to the line above.
+  */
+  @supports (width: 1cqi) {
+    #eden-quote-{{ section.id }} {
+      --gift-heading-size: clamp(
+        18px,
+        (100cqi - var(--gift-arrow-room)) / 12.4,
+        clamp(25px, 2.5vw, 40px)
+      );
+    }
+  }
+
+  /*
+    A column, because the button is in here under the cards and "Button
+    alignment" places it with align-self. Centred top to bottom: the stage has
+    a minimum height, and when the cards and the button come to less than it
+    the spare picture is shared above and below rather than left as a blank
+    strip under the button.
+  */
+  #eden-quote-{{ section.id }} .gifting-banner__product-stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: min(100%, 1320px);
+    min-height: var(--gift-band-height, 0px);
+    margin: clamp(22px, 3vw, 40px) auto 0;
+    padding: clamp(16px, 2vw, 28px) 0;
+    overflow: hidden;
     isolation: isolate;
   }
 
-  #eden-quote-{{ section.id }}.eden-quote--content-left { justify-content: flex-start; }
-
   #eden-quote-{{ section.id }} .gifting-banner__media {
     position: absolute;
-    z-index: -2;
+    z-index: -1;
     inset: 0;
   }
 
@@ -357,6 +405,15 @@
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  #eden-quote-{{ section.id }} .gifting-banner__product-stage::after {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    background: rgba(255, 255, 255, var(--gift-scrim));
+    content: '';
+    pointer-events: none;
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__background {
@@ -367,35 +424,10 @@
     object-position: var(--gift-focal-x) var(--gift-focal-y);
   }
 
-  /*
-    A wash under the content only, for a photograph whose empty half is busier than this one's.
-    It is transparent at 0, which is the default, so it costs nothing until it is asked for.
-  */
-  #eden-quote-{{ section.id }}::after {
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-    background: linear-gradient(
-      to left,
-      rgba(255, 255, 255, var(--gift-scrim)) 0%,
-      rgba(255, 255, 255, var(--gift-scrim)) 30%,
-      transparent 72%
-    );
-    content: '';
-    pointer-events: none;
-  }
-
-  #eden-quote-{{ section.id }}.eden-quote--content-left::after { transform: scaleX(-1); }
-
   #eden-quote-{{ section.id }} .gifting-banner__content {
     display: flex;
-    width: clamp(300px, var(--gift-content-share), 100%);
+    width: 100%;
     flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  #eden-quote-{{ section.id }}.eden-quote--center .gifting-banner__content {
     align-items: center;
     text-align: center;
   }
@@ -412,6 +444,7 @@
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__heading {
+    grid-column: 2;
     max-width: 100%;
     margin: 0;
     color: var(--gift-heading-color);
@@ -422,6 +455,31 @@
     letter-spacing: var(--gift-heading-tracking);
     text-transform: var(--gift-heading-case);
     text-wrap: balance;
+  }
+
+  /*
+    The heading and the arrows share a line, and the arrows are IN the line.
+
+    They used to be laid over the right-hand end of it (position: absolute),
+    which only holds while the heading stops short of them, and in a panel
+    this narrow it never did: the heading ran under the pair at every width
+    below about 1800px.
+
+    Three columns instead. The outer two are equal shares of whatever the
+    heading leaves, so the heading stays centred over the cards while there is
+    room for that. The last one can never be narrower than the arrows, so when
+    there is not room it is the heading that gives way: it slides left first,
+    and wraps if that is still not enough.
+
+    The row is a size container so that the heading can be sized by the width
+    of the panel - see --gift-heading-size.
+  */
+  #eden-quote-{{ section.id }} .gifting-banner__heading-row {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) auto minmax(max-content, 1fr);
+    align-items: center;
+    container-type: inline-size;
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__text {
@@ -438,9 +496,11 @@
   #eden-quote-{{ section.id }} .gifting-banner__text > :last-child { margin-bottom: 0; }
 
   #eden-quote-{{ section.id }} .gifting-banner__scroller {
+    position: relative;
+    z-index: 1;
     display: block;
     width: 100%;
-    margin-top: clamp(18px, 2.2vw, 30px);
+    margin-top: 0;
   }
 
   /*
@@ -535,8 +595,17 @@
 
   #eden-quote-{{ section.id }} .gifting-banner__arrows {
     display: flex;
-    margin-left: auto;
+    flex: 0 0 auto;
     gap: 14px;
+  }
+
+  /* The margin is part of what the last column measures, so it is the gap the
+     heading can never close. It and the pair add up to --gift-arrow-room. */
+  #eden-quote-{{ section.id }} .gifting-banner__arrows--heading {
+    grid-column: 3;
+    justify-self: end;
+    margin: 0;
+    margin-inline-start: 16px;
   }
 
   #eden-quote-{{ section.id }} .gifting-banner__arrows[hidden] {
@@ -631,32 +700,18 @@
     line-height: 1.3;
   }
 
-  /*
-    The paint and the hover both come from assets/eden-actions.css, which names
-    .gifting-banner__button in the one call-to-action family. This only says which two
-    colours the shared hover crosses between.
-  */
+  /* Shared white-outline action styling, with no section-specific button paint.
+     Raised to the cards' level so "Wash over the product photo" lightens the
+     photograph and not the button on top of it. */
   #eden-quote-{{ section.id }} .gifting-banner__button {
+    position: relative;
+    z-index: 1;
     display: inline-flex;
     min-width: 190px;
     align-items: center;
     justify-content: center;
     margin-top: clamp(18px, 2vw, 26px);
-    padding: 12px 28px;
-    border-width: 1px;
-    border-style: solid;
-    font-family: var(--font-body--family, sans-serif);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.16em;
     text-decoration: none;
-    text-transform: uppercase;
-    --cta-fill: var(--gift-button-fill);
-    --cta-ink: var(--gift-button-ink);
-    --cta-edge: var(--gift-button-edge);
-    --cta-fill-hover: var(--gift-button-fill-hover);
-    --cta-ink-hover: var(--gift-button-ink-hover);
-    --cta-edge-hover: var(--gift-button-fill-hover);
   }
 
   /*
@@ -682,20 +737,63 @@
 
   #eden-quote-{{ section.id }} + .section { margin-block-start: 0 !important; }
 
-  /*
-    Just above the stacking width the panel has to give ground: the photograph's subject takes
-    the same share of the frame however wide the screen is, so a panel held at its full width
-    starts to sit over the rings. It takes its own width back above 1365px.
-  */
+  @media screen and (min-width: 990px) {
+    #eden-quote-{{ section.id }} {
+      display: flex;
+      min-height: var(--gift-band-height);
+      align-items: center;
+      justify-content: flex-end;
+      padding: var(--gift-pad-top) clamp(28px, 6vw, 96px) var(--gift-pad-bottom);
+      isolation: isolate;
+    }
+
+    #eden-quote-{{ section.id }}.eden-quote--content-left { justify-content: flex-start; }
+
+    #eden-quote-{{ section.id }} .gifting-banner__content {
+      width: clamp(300px, var(--gift-content-share), 100%);
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    #eden-quote-{{ section.id }}.eden-quote--center .gifting-banner__content {
+      align-items: center;
+      text-align: center;
+    }
+
+    /* "Right" sets the heading against the arrows instead of centring it: the
+       first column takes all the spare room and the last is only the pair. */
+    #eden-quote-{{ section.id }}.eden-quote--right .gifting-banner__heading-row {
+      grid-template-columns: minmax(0, 1fr) auto max-content;
+    }
+
+    #eden-quote-{{ section.id }} .gifting-banner__product-stage {
+      position: static;
+      width: 100%;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+      isolation: auto;
+    }
+
+    #eden-quote-{{ section.id }} .gifting-banner__media {
+      z-index: -2;
+      inset: 0;
+    }
+
+    #eden-quote-{{ section.id }} .gifting-banner__product-stage::after { content: none; }
+
+    #eden-quote-{{ section.id }} .gifting-banner__scroller {
+      margin-top: clamp(18px, 2.2vw, 30px);
+    }
+  }
+
+  /* Keep the desktop section spacing compact as the viewport narrows. */
   @media screen and (min-width: 990px) and (max-width: 1365px) {
     #eden-quote-{{ section.id }} {
       padding-right: clamp(20px, 3.5vw, 44px);
 
-      /*
-        The crop grows with the band, and the band grows with the panel, so deep spacing here
-        zooms the photograph until the rings reach under the cards. The spacing is capped
-        rather than replaced, so a tighter setting is still honoured.
-      */
+      /* Keep the white title area compact as the viewport narrows. */
       padding-top: min(var(--gift-pad-top), 24px);
       padding-bottom: min(var(--gift-pad-bottom), 24px);
     }
@@ -707,50 +805,47 @@
 
   @media screen and (max-width: 989px) {
     #eden-quote-{{ section.id }} {
-      display: block;
-      min-height: 0;
       width: calc(100% - var(--gift-inset-mobile, 0px) * 2);
       margin-inline: var(--gift-inset-mobile, 0px);
-      padding: 0 var(--gift-pad-inline-mobile) var(--gift-pad-bottom-mobile);
+      padding: var(--gift-pad-top-mobile) var(--gift-pad-inline-mobile) var(--gift-pad-bottom-mobile);
     }
-
-    #eden-quote-{{ section.id }} .gifting-banner__media {
-      position: relative;
-      inset: auto;
-      width: calc(100% + (2 * var(--gift-pad-inline-mobile)));
-      margin-inline: calc(var(--gift-pad-inline-mobile) * -1);
-    }
-
-    #eden-quote-{{ section.id }} .gifting-banner__background {
-      height: auto;
-      object-fit: cover;
-    }
-
-    #eden-quote-{{ section.id }}::after { content: none; }
 
     #eden-quote-{{ section.id }} .gifting-banner__content {
       width: 100%;
       max-width: 820px;
-      align-items: center;
       margin-inline: auto;
-      padding-top: var(--gift-pad-top-mobile);
-      text-align: center;
     }
 
     #eden-quote-{{ section.id }} .gifting-banner__text { max-width: 52ch; }
   }
 
-  /*
-    A tablet gets the stacked shape above but keeps the desktop row of cards and the desktop
-    type: "products per row on mobile" is for a phone, where three cards across would be
-    thumbnails.
-  */
+  /* Phones use the mobile card count; larger screens keep the desktop row sizing. */
   @media screen and (max-width: 749px) {
+    #eden-quote-{{ section.id }} {
+      overflow: visible;
+    }
+
+    #eden-quote-{{ section.id }} .gifting-banner__product-stage {
+      overflow: visible;
+    }
+
+    #eden-quote-{{ section.id }} .gifting-banner__media {
+      inset-inline-start: calc(0px - var(--gift-pad-inline-mobile) - var(--gift-inset-mobile, 0px));
+      inset-inline-end: auto;
+      width: calc(
+        100% + var(--gift-pad-inline-mobile) + var(--gift-pad-inline-mobile) +
+        var(--gift-inset-mobile, 0px) + var(--gift-inset-mobile, 0px)
+      );
+    }
+
     #eden-quote-{{ section.id }} .gifting-banner__heading { font-size: var(--gift-heading-size-mobile); }
     #eden-quote-{{ section.id }} .gifting-banner__eyebrow { margin-bottom: 10px; font-size: 9px; }
     #eden-quote-{{ section.id }} .gifting-banner__text { margin-top: 10px; font-size: 13px; }
 
-    #eden-quote-{{ section.id }} .gifting-banner__scroller { margin-top: 16px; }
+    #eden-quote-{{ section.id }} .gifting-banner__product-stage {
+      margin-top: 20px;
+      padding-block: 12px;
+    }
 
     #eden-quote-{{ section.id }} .gifting-banner__products {
       --gift-card-gap: 10px;
@@ -823,13 +918,13 @@
     {
       "type": "range",
       "id": "scrim_opacity",
-      "label": "Wash behind the text",
+      "label": "Wash over the product photo",
       "min": 0,
       "max": 80,
       "step": 5,
       "unit": "%",
       "default": 0,
-      "info": "Lightens the photograph under the panel when the text is hard to read."
+      "info": "Lightens the photograph behind the products."
     },
     {
       "type": "header",
@@ -893,10 +988,22 @@
     },
     {
       "type": "checkbox",
+      "id": "mobile_card_peek",
+      "label": "Show part of the next card on mobile",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_autoplay",
+      "label": "Auto-advance on mobile",
+      "default": false
+    },
+    {
+      "type": "checkbox",
       "id": "show_arrows",
       "label": "Show the arrows",
       "default": true,
-      "info": "The pair under the cards that moves the row on. They hide themselves when every product already fits, and a phone scrolls with a finger instead."
+      "info": "The pair beside the heading moves the row on. They hide themselves when every product already fits, and a phone scrolls with a finger instead."
     },
     {
       "type": "checkbox",
@@ -972,13 +1079,13 @@
     {
       "type": "range",
       "id": "band_height",
-      "label": "Desktop height",
+      "label": "Product photo area height",
       "min": 0,
       "max": 760,
       "step": 20,
       "unit": "px",
       "default": 0,
-      "info": "0 lets the band follow the shape of the photograph."
+      "info": "0 lets the photo area follow the product row."
     },
     {
       "type": "range",

@@ -37,6 +37,12 @@
   --ec-measure: 46ch;
   --ec-image-width: 220px;
 
+  /* The coming-soon tag. Square, like everything else in the theme. */
+  --ec-badge-bg: #f4f4f0;
+  --ec-badge-color: #171714;
+  --ec-badge-border: rgba(23, 23, 20, 0.18);
+  --ec-badge-size: 12px;
+
   /*
     The band runs the full width of the window, and this element sits inside the 404 section's
     page-width column. assets/empty-category.js measures the window - documentElement.clientWidth,
@@ -158,6 +164,38 @@
   color: var(--ec-heading-color);
 }
 
+/*
+  Coming soon: a category the shop is about to stock rather than one with nothing in it. The tag
+  above the message carries it, and the "0 products" line goes - a count of a range that is not
+  on sale yet says nothing, and reads as a fault under a heading that has just promised stones.
+  snippets/empty-category.liquid decides which categories these are.
+*/
+.empty-category__badge {
+  margin: 0;
+  padding: 0.7rem 1.4rem;
+  border: 1px solid var(--ec-badge-border);
+  background: var(--ec-badge-bg);
+  color: var(--ec-badge-color);
+  font-size: var(--ec-badge-size);
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.empty-category__badge[hidden] {
+  display: none;
+}
+
+.empty-category--soon .empty-category__count {
+  display: none;
+}
+
+.empty-category--soon .empty-category__message {
+  font-family: var(--font-heading--family, var(--font-subheading--family, inherit));
+  font-size: calc(var(--ec-text-size) + 5px);
+  line-height: 1.4;
+}
+
 .empty-category__actions {
   display: flex;
   flex-wrap: wrap;
@@ -238,4 +276,16 @@
 
 .main-404__standard {
   width: 100%;
+}
+
+/*
+  The filter and sort bar above a coming-soon collection. There is nothing to filter, and the
+  "0 products" it carries argues with the panel under it. It is hidden rather than left out of
+  the collection section: the filters block is what declares the grid column the whole collection
+  page is laid out in ('filters', --grid-column--desktop), so a page rendered without it collapses
+  to a sliver. `:has` is in every browser the shop is seen in; anywhere it is not, the bar stands
+  and the page still reads.
+*/
+.collection-wrapper:has(.empty-category--soon) .facets-block-wrapper {
+  display: none;
 }

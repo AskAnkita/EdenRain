@@ -978,6 +978,31 @@
           </span>
         </p>
       {%- endif -%}
+      {%- if filter_type == 'drawer' -%}
+        {%- liquid
+          # Shape and Metal filter through collection tags (static-filter-group), which
+          # results.filters knows nothing about, so the tags count as active filters too
+          assign has_active_filters = false
+          if current_tags.size > 0
+            assign has_active_filters = true
+          endif
+          for filter in results.filters
+            if filter.active_values.size > 0 or filter.min_value.value != nil or filter.max_value.value != nil
+              assign has_active_filters = true
+            endif
+          endfor
+        -%}
+        {%- comment -%} Refreshed by facets.js renderAdditionalElements after every filter change {%- endcomment -%}
+        <div id="FacetsToolbarClear" class="collection-filter-toolbar__clear">
+          {%- if has_active_filters -%}
+            <facet-remove>
+              <a href="{{ results_url }}" class="collection-filter-toolbar__clear-link underlined-link">
+                {{- 'products.facets.clear_all' | t -}}
+              </a>
+            </facet-remove>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
       <details class="mobile-facets__disclosure{% if filter_type == 'drawer' %} facets__disclosure-drawer{% endif %} disclosure-has-popup relative flex justify-end">
         <summary class="mobile-facets__open-wrapper focus-offset">
           <side-drawer-opener
@@ -1554,7 +1579,14 @@
                                         {%- if is_shape_filter -%}
                                           {%- assign shape_icon = value.label | downcase | remove: 'shape:' | strip | handle -%}
                                           <span class="mobile-facets__shape-image">
-                                            {%- render 'icon-diamond-filter-shape', shape: shape_icon -%}
+                                            {%- assign shape_asset = 'shape-outline-' | append: shape_icon | append: '.png' -%}
+                                            <img
+                                              src="{% render 'image-source', file: shape_asset, width: 400 %}"
+                                              alt="{{ value.label | escape }}"
+                                              width="200"
+                                              height="200"
+                                              loading="lazy"
+                                            >
                                           </span>
                                         {%- elsif presentation == 'image' -%}
                                           <div class="facets__image-wrapper">

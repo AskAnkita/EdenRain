@@ -516,7 +516,7 @@
     width: {{ block.settings.button_width }}px;
     height: {{ block.settings.button_height }}px;
     padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
-    border-width: 2px;
+    border-width: var(--eden-action-border-width, 1px);
     border-style: solid;
     border-radius: {{ block.settings.button_border_radius }}px;
     font-size: {{ block.settings.button_font_size }}px;
@@ -653,7 +653,7 @@
         padding: {{ block.settings.mobile_button_padding_vertical }}px {{ block.settings.mobile_button_padding_horizontal }}px;
       {% endif %}
       min-height: max(48px, {{ block.settings.mobile_button_height }}px);
-      border-width: 2px;
+      border-width: var(--eden-action-border-width, 1px);
       border-style: solid;
       border-radius: {{ block.settings.button_border_radius }}px;
       {% if block.settings.mobile_button_layout == 'row' %}
@@ -678,6 +678,7 @@
       --cta-ink: {{ block.settings.mobile_button_outline_text_color }};
       --cta-ink-hover: {{ block.settings.mobile_button_text_color }};
     }
+
   }
 {% endstyle %}
 
@@ -1710,7 +1711,7 @@
           "label": "Outline, fills on hover"
         }
       ],
-      "default": "solid"
+      "default": "outline"
     },
     {
       "type": "select",
@@ -1850,9 +1851,9 @@
       "label": "Font size",
       "min": 12,
       "max": 24,
-      "step": 1,
+      "step": 0.5,
       "unit": "px",
-      "default": 16
+      "default": 12.5
     },
     {
       "type": "range",
@@ -1871,7 +1872,7 @@
       "max": 5,
       "step": 0.5,
       "unit": "px",
-      "default": 1
+      "default": 1.5
     },
     {
       "type": "header",
@@ -1906,7 +1907,7 @@
       "max": 70,
       "step": 2,
       "unit": "px",
-      "default": 44
+      "default": 48
     },
     {
       "type": "range",
@@ -1938,9 +1939,9 @@
       "label": "Font size",
       "min": 12,
       "max": 20,
-      "step": 1,
+      "step": 0.5,
       "unit": "px",
-      "default": 14
+      "default": 12.5
     },
     {
       "type": "range",
@@ -1959,7 +1960,7 @@
       "max": 3,
       "step": 0.5,
       "unit": "px",
-      "default": 0.5
+      "default": 1.5
     }
   ],
   "presets": [

@@ -18,11 +18,14 @@ if (!customElements.get('gifting-scroller')) {
       if (!this.track) return;
 
       this.controls = this.querySelector('.gifting-banner__controls');
-      this.arrows = this.querySelector('[data-gift-arrows]');
+      // The arrow pair sits beside the heading, outside this scroller, while
+      // the progress bar stays under the product row.
+      this.arrows = this.closest('.eden-quote')?.querySelector('[data-gift-arrows]');
       this.progress = this.querySelector('[data-gift-progress]');
       this.bar = this.querySelector('[data-gift-bar]');
-      this.prev = this.querySelector('.gifting-banner__arrow--prev');
-      this.next = this.querySelector('.gifting-banner__arrow--next');
+      this.prev = this.arrows?.querySelector('.gifting-banner__arrow--prev');
+      this.next = this.arrows?.querySelector('.gifting-banner__arrow--next');
+      this.mobileAutoplay = this.closest('.eden-quote')?.dataset.mobileAutoplay === 'true';
 
       this.boundUpdate = this.update.bind(this);
 
@@ -30,6 +33,22 @@ if (!customElements.get('gifting-scroller')) {
       this.next?.addEventListener('click', () => this.go(1));
       this.track.addEventListener('scroll', this.boundUpdate, { passive: true });
       window.addEventListener('resize', this.boundUpdate);
+
+      this.autoVisible = false;
+      this.autoMedia = window.matchMedia('(max-width: 989px)');
+      this.boundAutoState = this.syncAutoAdvance.bind(this);
+      this.autoMedia.addEventListener('change', this.boundAutoState);
+      document.addEventListener('visibilitychange', this.boundAutoState);
+      this.autoObserver = new IntersectionObserver(([entry]) => {
+        this.autoVisible = entry.isIntersecting;
+        this.syncAutoAdvance();
+      });
+      this.autoObserver.observe(this);
+      this.pauseAutoAdvance = () => {
+        this.autoPausedByUser = true;
+        clearInterval(this.autoTimer);
+      };
+      this.track.addEventListener('pointerdown', this.pauseAutoAdvance, { passive: true });
 
       // The cards are lazy-loaded, so the row is usually measured before the
       // pictures have arrived and settled its own width. Each one re-checks.
@@ -44,7 +63,27 @@ if (!customElements.get('gifting-scroller')) {
 
     disconnectedCallback() {
       clearTimeout(this.settleTimer);
+      clearInterval(this.autoTimer);
+      this.autoObserver?.disconnect();
+      this.autoMedia?.removeEventListener('change', this.boundAutoState);
+      document.removeEventListener('visibilitychange', this.boundAutoState);
+      this.track?.removeEventListener('pointerdown', this.pauseAutoAdvance);
       window.removeEventListener('resize', this.boundUpdate);
+    }
+
+    syncAutoAdvance() {
+      clearInterval(this.autoTimer);
+      if (!this.mobileAutoplay || this.autoPausedByUser || !this.autoVisible || !this.autoMedia?.matches || document.hidden) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      this.autoTimer = setInterval(() => {
+        const max = this.maxScroll;
+        if (max <= 2) return;
+        if (this.track.scrollLeft >= max - 2) {
+          this.track.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          this.go(1);
+        }
+      }, 5000);
     }
 
     get maxScroll() {

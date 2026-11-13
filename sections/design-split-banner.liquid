@@ -27,6 +27,7 @@
   assign pad_top = section.settings.padding_top | plus: 0
   assign pad_bottom = section.settings.padding_bottom | plus: 0
   assign media_zoom = section.settings.media_zoom | plus: 0
+  assign media_height = section.settings.media_height | plus: 0
 
   assign column_blocks = section.blocks | where: 'type', 'column'
 
@@ -59,6 +60,7 @@
     --dsp-shell-max: {{ content_width }}px;
   {%- endif -%}
   {%- if media_zoom > 0 -%}--dsp-media-zoom: {{ media_zoom | divided_by: 100.0 }};{%- endif -%}
+  {%- if media_height > 0 -%}--dsp-media-max: {{ media_height }}px;{%- endif -%}
   {%- if pad_inline > 0 -%}--dsp-pad-inline: {{ pad_inline }}px;
     {%- comment -%} Full width zeroes the stylesheet's own padding, so the side gap is fed in separately. {%- endcomment -%}
     {%- if section.settings.full_width -%}--dsp-pad-inline-full: {{ pad_inline }}px;{%- endif -%}
@@ -189,6 +191,7 @@
     { "type": "text", "id": "media_video_asset", "label": "Video file in assets/" },
     { "type": "text", "id": "media_video_poster_asset", "label": "Still image file in assets/", "default": "design-split-ring-poster.jpg" },
     { "type": "range", "id": "media_zoom", "label": "Zoom", "min": 100, "max": 150, "step": 5, "unit": "%", "default": 110, "info": "Scales the image or video inside its frame; the frame crops what spills past it." },
+    { "type": "range", "id": "media_height", "label": "Height on desktop", "min": 0, "max": 900, "step": 20, "unit": "px", "default": 0, "info": "How tall the picture is allowed to be, and with it the banner. 0 keeps the stylesheet's 600px. The frame is never taller than it is wide, so on a narrow window the width still decides. Below about 570px a video starts to lose the shadow under the ring." },
 
     { "type": "header", "content": "Footnote" },
     { "type": "richtext", "id": "footnote", "label": "Line under the band", "default": "<p>Can't decide? Talk to one of our designers and we will help you find it.</p>" },

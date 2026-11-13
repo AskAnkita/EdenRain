@@ -1,0 +1,84 @@
+/*
+  The saved ring, shown above the contact form. Markup is built by
+  assets/contact-design.js, which only draws it when a design arrives on the
+  URL - so nothing in this file applies to an ordinary visit to the page.
+
+  It is a panel, not a card that competes with the form beside it: a wash, a
+  hairline, and the choices in two columns the way the studio's own rail names
+  them. Square corners - this theme sets every radius to 0 - and no :hover of
+  its own; the link inside takes the shop's shared one from
+  assets/eden-actions.css.
+*/
+
+.contact-design {
+  --cdg-ink: #171714;
+  --cdg-muted: #69675f;
+  --cdg-line: rgba(23, 23, 20, 0.18);
+  --cdg-wash: #f4f2ef;
+  color: var(--cdg-ink);
+  background: var(--cdg-wash);
+  border: 1px solid var(--cdg-line);
+  padding: clamp(18px, 3vw, 28px);
+  margin: 0 0 clamp(20px, 3vw, 32px);
+}
+
+.contact-design__eyebrow {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cdg-muted);
+}
+
+.contact-design__reference {
+  margin: 0 0 14px;
+  font-size: 1.6rem;
+  line-height: 1.3;
+}
+
+.contact-design__specs {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--cdg-line);
+  font-size: 1.4rem;
+  line-height: 1.4;
+}
+
+.contact-design__name {
+  margin: 0;
+  color: var(--cdg-muted);
+}
+
+.contact-design__value {
+  margin: 0;
+}
+
+.contact-design__note {
+  margin: 14px 0 0;
+  font-size: 1.3rem;
+  line-height: 1.5;
+  color: var(--cdg-muted);
+}
+
+.contact-design__reopen {
+  display: inline-block;
+  margin: 16px 0 0;
+  font-size: 1.4rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+
+@media screen and (max-width: 749px) {
+  .contact-design__specs {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .contact-design__name {
+    margin-top: 8px;
+  }
+}

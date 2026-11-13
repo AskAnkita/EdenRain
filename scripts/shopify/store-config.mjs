@@ -20,15 +20,32 @@ const tag = (value) => ({ column: 'TAG', relation: 'EQUALS', condition: value })
 export const collections = [
   // Engagement: by style (most already exist in the store; they are only created if missing)
   { handle: 'engagement-rings', title: 'Engagement Rings' },
-  // These three exist as manual collections holding almost nothing, while the catalogue has 16
-  // solitaires, 7 three-stone and 6 halo pieces. The rules below fill them from the `style:` tags,
-  // but turning a manual collection into an automated one throws away whatever was added to it by
-  // hand, so setup-store.mjs will not do it unless you pass --convert-manual.
-  { handle: 'solitaire', title: 'Solitaire Engagement Rings', rule: tag('style:solitaire') },
-  { handle: 'side-stone', title: 'Side Stone Engagement Rings' },
-  { handle: 'halo', title: 'Halo Engagement Rings', rule: tag('style:halo') },
-  { handle: 'hidden-halo', title: 'Hidden Halo Engagement Rings' },
-  { handle: 'three-stone', title: 'Three Stone Engagement Rings', rule: tag('style:three-stone') },
+  // Every one of these was created as a MANUAL collection, which is why they each showed a
+  // handful of hand-added pieces - or one - while the catalogue held far more. Side Stone was the
+  // plainest case: eight rings say "Side Stone Engagement Ring" in the title and the collection
+  // showed one, a C&B halo somebody had dropped in by hand.
+  //
+  // Two tags apiece, not one. `style:solitaire` is shop-wide - a solitaire bracelet and a
+  // solitaire necklace carry it too - so these need the engagement-ring type tag as well, the
+  // same pairing the shape collections below use. Without it "Solitaire Engagement Rings" would
+  // have held 29 pieces, 17 of them not rings.
+  //
+  // Turning a manual collection into an automated one throws away whatever was added to it by
+  // hand, so setup-store.mjs will not do it unless you pass --convert-manual. The four with
+  // rules were converted on 2026-11-13 after checking that every hand-added piece carried the
+  // tag, so nothing was lost.
+  { handle: 'solitaire', title: 'Solitaire Engagement Rings', rules: [tag('style:solitaire'), tag('type:engagement-ring')] },
+  { handle: 'side-stone', title: 'Side Stone Engagement Rings', rules: [tag('style:side-stone'), tag('type:engagement-ring')] },
+  { handle: 'halo', title: 'Halo Engagement Rings', rules: [tag('style:halo'), tag('type:engagement-ring')] },
+  { handle: 'three-stone', title: 'Three Stone Engagement Rings', rules: [tag('style:three-stone'), tag('type:engagement-ring')] },
+  // Still manual, each for its own reason. Hidden Halo and Bridal Sets hold one hand-added ring
+  // apiece that does not belong there - a twist ring and a three-stone ring - and there is no
+  // tag to put in their place: the shop stocks neither style and tag-rules.mjs has no rule for
+  // them. Vintage, Nature Inspired and Toi et Moi have tags (3, 2 and 5 pieces) but not one of
+  // those pieces is an engagement ring - they are bands, necklaces and a pair of studs - so an
+  // automated collection under these titles would stand empty. Promise has nothing at all.
+  // Leave them manual until the range catches up with the menu.
+  { handle: 'hidden-halo', title: 'Hidden Halo Engagement Rings', rules: [tag('style:hidden-halo'), tag('type:engagement-ring')] },
   { handle: 'bridal-sets', title: 'Bridal Sets' },
   { handle: 'vintage', title: 'Vintage Engagement Rings' },
   { handle: 'nature-inspired', title: 'Nature Inspired Engagement Rings' },
@@ -115,6 +132,26 @@ export const collections = [
   { handle: 'tennis-bracelets', title: 'Tennis Bracelets', rules: [tag('style:tennis'), tag('category:bracelet')] },
   { handle: 'tennis-necklaces', title: 'Tennis Necklaces', rules: [tag('style:tennis'), tag('category:necklace')] },
 
+  // The rest of the bracelet styles the Bracelets column browses by. They were `filter.p.tag`
+  // URLs on the bracelet collection until 2026-11-13, which never filtered anything - Shopify
+  // drops that parameter unless a product-tag filter is switched on in Search & Discovery - so
+  // all three handed back every bracelet. A collection apiece is the fix, the same one the
+  // shape tiles and Tennis got. Paired with `category:bracelet` for the reason above: chain and
+  // station describe a necklace just as well as a bracelet.
+  //
+  // All four exist, Charm and Station included, and all four stay in the menu even while they
+  // hold next to nothing: the bracelet range is being filled a kind at a time, and a category
+  // that drops out of the menu the week before its stock lands has to be put back by hand the
+  // week after. An empty collection page is the lesser fault here.
+  //
+  // `category:bracelet` is what tells these apart from the charm and station NECKLACES, which
+  // carry the same `style:` tag. `category:charm` is a third thing again - the necklace sense of
+  // the word, a piece whose stones are set into the chain itself at a joint or a station rather
+  // than hanging as a pendant - and the Charms collection under Necklaces is built on that.
+  { handle: 'chain-bracelets', title: 'Chain Bracelets', rules: [tag('style:chain'), tag('category:bracelet')] },
+  { handle: 'charm-bracelets', title: 'Charm Bracelets', rules: [tag('style:charm'), tag('category:bracelet')] },
+  { handle: 'station-bracelets', title: 'Station Bracelets', rules: [tag('style:station'), tag('category:bracelet')] },
+
   // Shop by shape, across the whole catalogue: every piece whose stone or outline is that shape,
   // not just engagement rings. `shape:<x>` is the same tag the Shape group in the collection
   // filter drawer builds its URLs from (snippets/static-filters.liquid), so the two agree.
@@ -193,8 +230,10 @@ const metalItems = (base) =>
 // The nine cuts, in the order the trade lists them - the same nine, in the same order, as the
 // By Shape column in the mega menu (snippets/menu-static-items.liquid) and as Engagement's own
 // Shop by Shape. Heart, triangle, baguette and square are off the list: there is no drawing for
-// the last three and no stock behind any of them. Radiant goes through the tag filter until its
-// collection is created, which is why it is the one with a url rather than a collection.
+// the last three and no stock behind any of them. Radiant used to go through the tag filter
+// because shape-radiant did not exist; it was created on 2026-11-05 and holds eight pieces, and
+// the filter URL never worked anyway (no product-tag filter in Search & Discovery), so it names
+// the collection like the other eight. The theme's own list has done so since that date.
 const shapeItems = [
   { title: 'Round', collection: 'shape-round' },
   { title: 'Oval', collection: 'shape-oval' },
@@ -202,7 +241,7 @@ const shapeItems = [
   { title: 'Emerald', collection: 'shape-emerald' },
   { title: 'Pear', collection: 'shape-pear' },
   { title: 'Princess', collection: 'shape-princess' },
-  { title: 'Radiant', url: '/collections/all?filter.p.tag=shape:radiant' },
+  { title: 'Radiant', collection: 'shape-radiant' },
   { title: 'Marquise', collection: 'shape-marquise' },
   { title: 'Asscher', collection: 'shape-asscher' },
 ];
@@ -311,33 +350,36 @@ export const menu = {
           collection: 'necklaces',
           items: [
             { title: 'All Necklaces', collection: 'necklaces' },
-            // Tennis leads: the range's best known piece, and no collection of its own yet, so
-            // it filters the necklace collection on the tag tag-rules.mjs derives.
-            { title: 'Tennis', url: '/collections/necklaces?filter.p.tag=style:tennis' },
+            // Tennis leads: the range's best known piece. It used to filter the necklace
+            // collection on the tag tag-rules.mjs derives, which never filtered anything - no
+            // product-tag filter is switched on in Search & Discovery, so Shopify drops the
+            // parameter - and tennis-necklaces exists now, so the row names the collection.
+            { title: 'Tennis', collection: 'tennis-necklaces' },
             { title: 'Pendants', collection: 'pendants' },
             { title: 'Chains', collection: 'chains' },
             { title: 'Charms', collection: 'charms' },
           ],
         },
-        // Bracelets breaks down by the four kinds the range comes in - tennis, chain link, charm
-        // and station - not by metal, which said nothing about the piece and repeated the Metal
-        // group in the filter drawer. None of the four is a collection (a category the shop does
-        // not stock yet is left uncreated rather than empty), so each one filters the bracelet
-        // collection on the `style:` tag tag-rules.mjs derives. Keep in step with
-        // snippets/menu-static-items.liquid, which builds the same four links.
+        // Bracelets breaks down by the kind of piece - tennis, chain link - not by metal, which
+        // said nothing about the piece and repeated the Metal group in the filter drawer.
+        //
+        // All four are collections. They were `filter.p.tag` URLs on the bracelet collection
+        // until 2026-11-13 and none of them filtered: Shopify drops that parameter unless a
+        // product-tag filter is switched on in Search & Discovery, which it is not here, so
+        // every row handed back all 28 bracelets. Charm and Station hold next to nothing yet
+        // and stay in the column regardless - the range is being filled a kind at a time. Keep
+        // in step with snippets/menu-static-items.liquid, which builds the same links.
         {
           title: 'Bracelets',
           collection: 'bracelets',
           items: [
             { title: 'All Bracelets', collection: 'bracelets' },
-            ...[
-              // No "Bracelet" on the labels: the heading over the column already says it, and
-              // no other column repeats its category in its rows.
-              ['Tennis', 'tennis'],
-              ['Chain Link', 'chain'],
-              ['Charm', 'charm'],
-              ['Station', 'station'],
-            ].map(([title, slug]) => ({ title, url: `/collections/bracelets?filter.p.tag=style:${slug}` })),
+            // No "Bracelet" on the labels: the heading over the column already says it, and
+            // no other column repeats its category in its rows.
+            { title: 'Tennis', collection: 'tennis-bracelets' },
+            { title: 'Chain Link', collection: 'chain-bracelets' },
+            { title: 'Charm', collection: 'charm-bracelets' },
+            { title: 'Station', collection: 'station-bracelets' },
           ],
         },
         {

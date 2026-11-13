@@ -3387,3 +3387,10 @@ body:not(.firefox) .facets-price__range:before {
     gap: 1.8rem 1.2rem !important;
   }
 }
+
+/* A Shape or Metal tile is fetching its results (facets.js onTagLinkClick) */
+.mobile-facets__list[aria-busy="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity var(--duration-short) ease;
+}

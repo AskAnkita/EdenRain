@@ -1,13 +1,31 @@
 {% liquid
+  # The list is built as handles, not collection objects, so empty or excluded ones can be
+  # dropped before the cards are counted. Every loop below turns the handle back into a
+  # collection with collections[handle].
+  assign hide_empty = section.settings.hide_empty_collections
+  assign excluded_handles = section.settings.excluded_handles | replace: ' ', '' | split: ','
+
   if section.settings.render_type == 'custom'
-    assign section_collections = section.settings.collection_list
-    for collection in section_collections
-      assign section_collections_length = forloop.length
-    endfor
+    assign source_collections = section.settings.collection_list
   else
-    assign section_collections = collections
-    assign section_collections_length = section_collections.size
+    assign source_collections = collections
   endif
+
+  assign handle_list = ''
+  for source_collection in source_collections
+    assign skip_collection = false
+    if excluded_handles contains source_collection.handle
+      assign skip_collection = true
+    endif
+    if hide_empty and source_collection.all_products_count == 0
+      assign skip_collection = true
+    endif
+    unless skip_collection
+      assign handle_list = handle_list | append: source_collection.handle | append: ','
+    endunless
+  endfor
+  assign section_collections = handle_list | split: ','
+  assign section_collections_length = section_collections.size
   assign max_items = section.settings.collections_to_show
   assign show_more = section.settings.show_more | default: 'Show more'
 
@@ -50,7 +68,8 @@
 {% capture template_showmore %}
   <template data-collection-card-template-showmore>
     {% if section.settings.layout_type == 'grid' %}
-      {%- for collection in section_collections offset: max_items -%}
+      {%- for collection_handle in section_collections offset: max_items -%}
+        {%- assign collection = collections[collection_handle] -%}
         <div class="resource-list__item{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}"
           {% if scroll_reveal %}
             style="--animation-order: {{ forloop.index | plus: max_items }};"
@@ -60,7 +79,8 @@
         </div>
       {%- endfor -%}
     {% else %}
-      {%- for collection in section_collections offset: max_items -%}
+      {%- for collection_handle in section_collections offset: max_items -%}
+        {%- assign collection = collections[collection_handle] -%}
         {% liquid
           assign current_grid_index = forloop.index0 | plus: max_items | divided_by: 10
           assign current_item_index = forloop.index0 | plus: max_items | modulo: 10
@@ -134,16 +154,18 @@
   </show-more-grid>
 {% endcapture %}
 
-{% if section_collections == null %}
+{% if section_collections_length == 0 %}
+  {% assign placeholder_list = '' %}
   {% for i in (1..max_items) %}
-    {% assign section_collections = section_collections | append: ', ' %}
+    {% assign placeholder_list = placeholder_list | append: ', ' %}
   {% endfor %}
 
-  {% assign section_collections = section_collections | split: ',' %}
+  {% assign section_collections = placeholder_list | split: ',' %}
 {% endif %}
 
 {% capture list_items %}
-  {% for collection in section_collections limit: max_items %}
+  {% for collection_handle in section_collections limit: max_items %}
+    {% assign collection = collections[collection_handle] %}
     <div class="resource-list__item{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}"
       {% if scroll_reveal %}
         style="--animation-order: {{ forloop.index }};"
@@ -235,6 +257,20 @@
       "id": "collection_list",
       "label": "Collections",
       "info": "Apply to 'All collections' option"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_empty_collections",
+      "label": "Hide empty collections",
+      "info": "Leaves out any collection with no products on the storefront, so it cannot show the placeholder image.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "excluded_handles",
+      "label": "Collections to leave out",
+      "info": "Comma-separated handles, e.g. all-collection, frontpage. Useful for duplicates of the full catalogue.",
+      "default": "all-collection, frontpage"
     },
     {
       "type": "header",

@@ -26,6 +26,23 @@
   width: auto;
 }
 
+/* "Clear all" beside the Filter trigger, only while a filter is applied */
+.collection-filter-toolbar__clear {
+  margin-inline-start: auto;
+  padding-inline-end: 2rem;
+  white-space: nowrap;
+}
+
+.collection-filter-toolbar__clear:empty {
+  display: none;
+}
+
+.collection-filter-toolbar__clear-link {
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  color: rgb(var(--color-foreground-rgb));
+}
+
 .collection-filter-toolbar .mobile-facets__open .svg-wrapper {
   width: 1.8rem;
   height: 1.8rem;
@@ -95,6 +112,23 @@
   font-weight: 400;
   cursor: pointer;
   list-style: none;
+}
+
+/* The values chosen in a group, beside its heading, so a closed group still shows it */
+.collection-filter-toolbar .mobile-facets__summary .mobile-facets__selected {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-inline: 1.6rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: end;
+  font-size: 1.4rem;
+  color: rgb(var(--color-foreground-rgb) / 0.6);
+}
+
+.collection-filter-toolbar .mobile-facets__summary .mobile-facets__selected:empty {
+  display: none;
 }
 
 .collection-filter-toolbar .mobile-facets__summary::-webkit-details-marker {
@@ -381,7 +415,8 @@
 }
 
 /* "Clear all" only once something is selected */
-.collection-filter-toolbar .mobile-facets__inner:not(:has(.mobile-facets__checkbox:checked, .mobile-facets__active-count)) .mobile-facets__clear-wrapper {
+/* a.active: a selected Shape or Metal tile, which is a tag link rather than a checkbox */
+.collection-filter-toolbar .mobile-facets__inner:not(:has(.mobile-facets__checkbox:checked, .mobile-facets__active-count, .mobile-facets__label.active)) .mobile-facets__clear-wrapper {
   display: none;
 }
 

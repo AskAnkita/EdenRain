@@ -131,6 +131,31 @@ function cleanBody(html) {
 }
 
 // ---------- the store's own tags ----------
+
+// The store spells a namespace tag lowercase and hyphenated - `shape:round`, `style:three-stone`,
+// `style:pave`. C&B spells its facet tags `Shape:Round`, `Style:Three Stone`, `Style:Pave\u0301`,
+// and a storefront tag filter is case-sensitive, so keeping both spellings puts two of every
+// option in the filter drawer, each holding half the pieces, and leaves every lowercase
+// `filter.p.tag` link in the theme missing the products that only carry the capitalised one.
+// Everything imported before 2026-11-13 was folded down by 'normalise-tags.mjs'; this keeps the
+// next import from putting the capitalised spelling back. A tag outside our namespaces - a
+// merchandising tag, `needs-price` - is passed through untouched.
+const namespaceNames = new Set(Object.keys(namespaces));
+function normaliseTag(tag) {
+  const i = tag.indexOf(':');
+  if (i < 1) return tag;
+  const ns = tag.slice(0, i).toLowerCase();
+  if (!namespaceNames.has(ns)) return tag;
+  const value = tag
+    .slice(i + 1)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return `${ns}:${value}`;
+}
+
 // Same two haystacks tag-products.mjs reads: a rule marked `title` sees only the title, so a
 // category is never read off an option value that happens to contain the word "ring".
 function storeTags(title, productType, tags, optionValues) {
@@ -221,10 +246,15 @@ function buildPlan(rows) {
       media.push({ url, file: f, alt: (r['Image Alt Text'] || '').trim() || null });
     }
 
-    // C&B's facet tags are "Shape:Round" / "Style:Pave\u0301" and the store's other C&B products carry
-    // exactly those. Its bare words ("bracelet", "bracelets") are not a namespace this store reads
-    // and nothing browses by them, so they stay behind.
-    const sourceTags = (head.Tags || '').split(',').map((s) => s.trim()).filter((t) => t.includes(':'));
+    // C&B's facet tags are "Shape:Round" / "Style:Pave\u0301". The namespace is one this store
+    // reads, so the tag is kept - folded down to the store's own spelling by `normaliseTag`,
+    // which is what makes it filterable. C&B's bare words ("bracelet", "bracelets") are not a
+    // namespace this store reads and nothing browses by them, so they stay behind.
+    const sourceTags = (head.Tags || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter((t) => t.includes(':'))
+      .map(normaliseTag);
     const everyPriced = variants.length > 0 && variants.every((v) => v.price > 0);
     const keep = everyPriced ? sourceTags : [...sourceTags, 'needs-price'];
     const derived = storeTags(title, 'Jewellery', keep, [

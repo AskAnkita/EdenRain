@@ -8,6 +8,13 @@
     3. "Picture URL" - e.g. a Shopify Files link.
   A panel with none of the three keeps its background and caption rather than
   showing a broken picture.
+
+  A panel that names a product can also carry the product card's two swatch rows under
+  its price - the diamond shape icons and the metal dots. They are the same rows the
+  product cards draw ('card-shape-swatches', 'card-metal-swatches'), and
+  card-option-swatches.js swaps the panel's picture when a metal is tapped, the same way
+  it does on a card. They live inside the title-and-price block, so "Mobile only" there
+  keeps them off the desktop row as well.
 {% endcomment %}
 
 {%- liquid
@@ -21,6 +28,34 @@
     assign mobile_justify = 'start'
   elsif section.settings.panel_alignment_mobile == 'right'
     assign mobile_justify = 'end'
+  endif
+
+  # The swatch rows are flex rows, so text-align does not move them; they take the same
+  # left/centre/right choice as the title and price above them.
+  assign info_justify = 'center'
+  if section.settings.info_alignment == 'left'
+    assign info_justify = 'flex-start'
+  elsif section.settings.info_alignment == 'right'
+    assign info_justify = 'flex-end'
+  endif
+
+  assign show_shapes = section.settings.show_shapes
+  assign show_metals = section.settings.show_metals
+
+  # The heart and eye a product card carries in its corner, behind the same two theme
+  # settings the cards obey.
+  assign show_card_buttons = false
+  if section.settings.show_card_buttons
+    if settings.enable_wishlist or settings.enable_quick_view
+      assign show_card_buttons = true
+    endif
+  endif
+
+  # The progress line is drawn in the arrow colour, or in the section's text colour when
+  # that is left empty - an empty colour used to paint the line itself transparent.
+  assign progress_color = 'currentColor'
+  if section.settings.arrow_color != blank and section.settings.arrow_color != 'rgba(0,0,0,0)'
+    assign progress_color = section.settings.arrow_color
   endif
 -%}
 
@@ -69,6 +104,7 @@
     font-style: {% if section.settings.heading_italic %}italic{% else %}normal{% endif %};
     line-height: 1.15;
     letter-spacing: {{ section.settings.heading_tracking | divided_by: 100.0 }}em;
+    text-transform: {{ section.settings.heading_case | default: 'none' }};
     {%- if section.settings.heading_color != blank and section.settings.heading_color != 'rgba(0,0,0,0)' %}
     color: {{ section.settings.heading_color }};
     {%- endif %}
@@ -165,9 +201,31 @@
   }
 
   #fav-{{ section.id }} .fav-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     scroll-snap-align: start;
+  }
+
+  /* The product card's heart and eye, in the same corner and at the same inset. They sit
+     beside the picture's link rather than inside it, since a button cannot live in a link.
+     component-card.css hides them until hover above 1024px; a card here is not a
+     .card-wrapper, so this panel gives the hover itself. */
+  #fav-{{ section.id }} .fav-card-buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+  }
+
+  #fav-{{ section.id }} .fav-card-buttons .card-product__group {
+    row-gap: 5px;
+    padding: 8px;
+  }
+
+  #fav-{{ section.id }} .fav-card:is(:hover, :focus-within) .fav-card-buttons .card-product__group {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   #fav-{{ section.id }} .fav-media {
@@ -232,10 +290,11 @@
   /* Title and price sit under the picture rather than over it, so the jewellery is never
      covered by words. A panel with neither filled in renders nothing at all. */
   #fav-{{ section.id }} .fav-info {
+    --options-align: {{ info_justify }};
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
-    padding: {{ section.settings.info_gap }}px 1.2rem 0;
+    gap: {{ section.settings.info_row_gap | default: 4 }}px;
+    padding: {{ section.settings.info_gap }}px {{ section.settings.info_inset | default: 12 }}px 0;
     text-align: {{ section.settings.info_alignment }};
   }
 
@@ -251,6 +310,15 @@
     color: {{ section.settings.title_color }};
     {%- else %}
     color: inherit;
+    {%- endif %}
+    {%- if section.settings.title_lines > 0 %}
+    /* Cut off with an ellipsis after this many lines, the way the product cards do, so a
+       long name cannot push one panel's price below its neighbour's. */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: {{ section.settings.title_lines }};
+    line-clamp: {{ section.settings.title_lines }};
+    overflow: hidden;
     {%- endif %}
   }
 
@@ -270,6 +338,12 @@
     {%- endif %}
   }
 
+  /* The rows themselves are styled by card-product-options.css, as on a product card;
+     this is only the little extra air a card gives each row above it. */
+  #fav-{{ section.id }} .fav-swatches {
+    padding-top: 0.4rem;
+  }
+
   {%- if section.settings.info_display == 'mobile' %}
   /* Mobile only: the desktop row keeps its bare pictures. */
   @media screen and (min-width: 990px) {
@@ -277,22 +351,29 @@
   }
   {%- endif %}
 
-  /* Optional progress line under the arrows (off by default, so the live row is unchanged). */
+  /*
+    Optional progress line under the arrows, drawn to match the product carousels'
+    (base.css .swiper-pagination-progressbar): 3px, at most 280px, a full-strength fill in a
+    25% groove. The groove is a faded colour rather than an opacity on the box - opacity is
+    inherited, and it took the fill down with it so the line never showed a position.
+  */
   #fav-{{ section.id }} .fav-progress {
     position: relative;
     width: 100%;
-    max-width: 32rem;
-    height: 1px;
+    max-width: min(280px, calc(100% - 40px));
+    height: 3px;
     margin-top: 1.6rem;
-    background-color: {{ section.settings.arrow_color }};
-    opacity: 0.2;
+    overflow: hidden;
+    border-radius: 999px;
+    background-color: rgba(0, 0, 0, 0.25);
+    background-color: color-mix(in srgb, {{ progress_color }} 25%, transparent);
   }
 
   #fav-{{ section.id }} .fav-progress-bar {
     position: absolute;
     inset: 0;
-    background-color: {{ section.settings.arrow_color }};
-    opacity: 1;
+    border-radius: 999px;
+    background-color: {{ progress_color }};
     transform-origin: left;
     transition: transform 0.4s ease;
   }
@@ -355,9 +436,12 @@
       height: {{ section.settings.arrow_size_mobile }}px;
     }
 
+    /* Under the first panel, 16px below the row, where the product carousels put theirs.
+       The grid's own row gap is already part of that distance. */
     #fav-{{ section.id }} .fav-progress {
       order: 50;
-      justify-self: center;
+      justify-self: start;
+      margin-top: max(0px, calc(16px - {{ section.settings.mobile_link_gap }}px));
     }
 
     #fav-{{ section.id }} .fav-badge {
@@ -387,6 +471,7 @@
     #fav-{{ section.id }} .fav-card {
       scroll-snap-stop: always;
     }
+
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -402,6 +487,7 @@
   id="fav-{{ section.id }}"
   class="favourites-carousel color-{{ section.settings.color_scheme }}"
   data-loop="{% if section.settings.loop_arrows %}true{% else %}false{% endif %}"
+  data-mobile-autoplay="{% if section.settings.mobile_autoplay %}true{% else %}false{% endif %}"
 >
   <div class="fav-inner">
     <div class="fav-panel">
@@ -437,6 +523,7 @@
 
     <ul class="fav-track" role="list">
       {%- for block in slides -%}
+        {%- unless block.type == 'slide' -%}{%- continue -%}{%- endunless -%}
         {%- liquid
           assign slide_image = block.settings.image
           assign slide_asset = block.settings.image_asset | strip
@@ -502,7 +589,33 @@
             endif
           endcapture
         -%}
-        <li class="fav-card" {{ block.shopify_attributes }}>
+        {%- liquid
+          # Swatches only make sense for a panel that names a product, and only where the
+          # block they sit in is drawn at all.
+          assign slide_swatches = false
+          if slide_product != blank and section.settings.info_display != 'hidden'
+            if show_shapes or show_metals
+              assign slide_swatches = true
+            endif
+          endif
+        -%}
+        <li class="fav-card" {% if slide_swatches %}data-swatch-card{% endif %} {{ block.shopify_attributes }}>
+          {%- if slide_swatches -%}
+            {%- comment -%}
+              What card-option-swatches.js reads to find the variant behind a tapped swatch.
+              Only the photographed variants and only the three fields it uses: the whole
+              variant list of five 50-variant products would add a quarter of a megabyte.
+            {%- endcomment -%}
+            {%- capture slide_variants -%}
+              {%- for slide_variant in slide_product.variants -%}
+                {%- if slide_variant.featured_image != blank -%}
+                  ,{"id":{{ slide_variant.id }},"options":{{ slide_variant.options | json }},"featured_image":{"src":{{ slide_variant.featured_image.src | json }},"width":{{ slide_variant.featured_image.width | default: 0 }},"alt":{{ slide_variant.featured_image.alt | json }}}}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endcapture -%}
+            {%- assign slide_variants = slide_variants | strip | remove_first: ',' | prepend: '{"variants":[' | append: ']}' -%}
+            <template><div data-json-product="{{ slide_variants | escape }}"></div></template>
+          {%- endif -%}
           {%- capture slide_body -%}
             {%- if block.settings.badge != blank -%}
               <span
@@ -567,9 +680,27 @@
           {%- endcapture -%}
 
           {%- if slide_link != blank -%}
-            <a class="fav-media" href="{{ slide_link }}" style="{{ card_style }}">{{ slide_body }}</a>
+            <a class="fav-media" href="{{ slide_link }}" style="{{ card_style }}" data-swatch-media>{{ slide_body }}</a>
           {%- else -%}
-            <div class="fav-media" style="{{ card_style }}">{{ slide_body }}</div>
+            <div class="fav-media" style="{{ card_style }}" data-swatch-media>{{ slide_body }}</div>
+          {%- endif -%}
+
+          {%- if show_card_buttons and slide_product != blank -%}
+            {%- liquid
+              assign class_button = 'card-product__group-btn rounded-full bor-none center cursor-pointer flex items-center justify-center relative leading-none'
+              assign class_text = 'text whitespace-nowrap overflow-hidden pointer-events-none absolute-c-y z--1 opacity-0'
+              assign class_text_inner = 'text-inner text-sm inline-block'
+            -%}
+            <div class="card-product__group-wrapper fav-card-buttons">
+              <div class="card--block-group card-product__group flex flex-column">
+                {%- if settings.enable_wishlist -%}
+                  {% render 'product-wishlist-button', card_product: slide_product, class_button: class_button, class_text: class_text, class_text_inner: class_text_inner %}
+                {%- endif -%}
+                {%- if settings.enable_quick_view -%}
+                  {% render 'quick-view-button', card_product: slide_product, class_button: class_button, class_text: class_text, class_text_inner: class_text_inner %}
+                {%- endif -%}
+              </div>
+            </div>
           {%- endif -%}
 
           {%- if section.settings.info_display != 'hidden' -%}
@@ -585,6 +716,29 @@
 
                 {%- if slide_price != blank -%}
                   <p class="fav-price">{{ slide_price }}</p>
+                {%- endif -%}
+
+                {%- if slide_swatches -%}
+                  {%- comment -%}
+                    own_photo: the panel shows the product's featured picture, not the metal
+                    a product card would rotate to, so the rows underline what is on show.
+                  {%- endcomment -%}
+                  {%- if show_shapes -%}
+                    {%- capture shape_row -%}
+                      {%- render 'card-shape-swatches', card_product: slide_product, own_photo: true -%}
+                    {%- endcapture -%}
+                    {%- if shape_row contains '<li' -%}
+                      <div class="fav-swatches fav-swatches--shapes">{{ shape_row }}</div>
+                    {%- endif -%}
+                  {%- endif -%}
+                  {%- if show_metals -%}
+                    {%- capture metal_row -%}
+                      {%- render 'card-metal-swatches', card_product: slide_product, own_photo: true -%}
+                    {%- endcapture -%}
+                    {%- if metal_row contains '<li' -%}
+                      <div class="fav-swatches fav-swatches--metals">{{ metal_row }}</div>
+                    {%- endif -%}
+                  {%- endif -%}
                 {%- endif -%}
               </div>
             {%- endif -%}
@@ -609,6 +763,7 @@
     { "type": "select", "id": "heading_weight", "label": "Heading weight", "default": "400", "options": [ { "value": "300", "label": "Light" }, { "value": "400", "label": "Regular" }, { "value": "500", "label": "Medium" }, { "value": "600", "label": "Semi bold" }, { "value": "700", "label": "Bold" } ] },
     { "type": "checkbox", "id": "heading_italic", "label": "Italic heading", "default": false },
     { "type": "range", "id": "heading_tracking", "label": "Heading letter spacing", "min": -4, "max": 20, "step": 1, "unit": "%", "default": 0 },
+    { "type": "select", "id": "heading_case", "label": "Heading case", "default": "none", "options": [ { "value": "none", "label": "As typed" }, { "value": "uppercase", "label": "UPPERCASE" } ], "info": "UPPERCASE matches the Trending Styles heading." },
     { "type": "color", "id": "heading_color", "label": "Heading colour", "default": "rgba(0,0,0,0)", "info": "Leave empty to use the colour scheme." },
     { "type": "select", "id": "panel_alignment", "label": "Panel alignment", "default": "center", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centre" }, { "value": "right", "label": "Right" } ] },
     { "type": "select", "id": "panel_alignment_mobile", "label": "Panel alignment on mobile", "default": "center", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centre" }, { "value": "right", "label": "Right" } ] },
@@ -626,6 +781,7 @@
     { "type": "color", "id": "link_color", "label": "Link colour", "default": "rgba(0,0,0,0)" },
 
     { "type": "header", "content": "Arrows" },
+    { "type": "checkbox", "id": "mobile_autoplay", "label": "Auto-advance on mobile", "default": false },
     { "type": "checkbox", "id": "show_arrows", "label": "Show the arrows", "default": true, "info": "The arrows hide themselves when there are too few panels to fill the row - there is nothing to scroll." },
     { "type": "checkbox", "id": "show_arrows_mobile", "label": "Show the arrows on mobile", "default": true, "info": "Off: the row is swiped on a phone and the arrows are hidden below 990px." },
     { "type": "checkbox", "id": "loop_arrows", "label": "Loop at the ends", "default": false, "info": "On: the next arrow at the end of the row goes back to the first panel. Off: the row stops at the last panel and the arrow greys out." },
@@ -647,6 +803,7 @@
     { "type": "range", "id": "gap", "label": "Gap between panels", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 8 },
     { "type": "range", "id": "gap_mobile", "label": "Gap between panels on mobile", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 4 },
     { "type": "checkbox", "id": "mobile_full_bleed", "label": "Run the pictures to the screen edge on mobile", "default": true, "info": "The heading keeps the side padding; only the row of pictures pulls out through it." },
+    { "type": "checkbox", "id": "show_card_buttons", "label": "Show the wishlist and quick view buttons", "default": false, "info": "The heart and eye from the product cards, on any panel that names a product. They follow the theme's own wishlist and quick view settings." },
 
     { "type": "header", "content": "Badges and captions" },
     { "type": "range", "id": "badge_size", "label": "Badge text size", "min": 8, "max": 20, "step": 1, "unit": "px", "default": 11 },
@@ -659,16 +816,23 @@
     { "type": "select", "id": "info_display", "label": "Show the title and price", "default": "everywhere", "options": [ { "value": "everywhere", "label": "Everywhere" }, { "value": "mobile", "label": "Mobile only" }, { "value": "hidden", "label": "Hidden" } ], "info": "Each panel's own title and price are filled in on the panel." },
     { "type": "select", "id": "info_alignment", "label": "Alignment", "default": "center", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Centre" }, { "value": "right", "label": "Right" } ] },
     { "type": "range", "id": "info_gap", "label": "Space between the picture and the title", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 16 },
+    { "type": "range", "id": "info_row_gap", "label": "Space between the title, price and swatches", "min": 0, "max": 24, "step": 2, "unit": "px", "default": 4 },
+    { "type": "range", "id": "info_inset", "label": "Side padding of the text", "min": 0, "max": 32, "step": 2, "unit": "px", "default": 12, "info": "How far the title, price and swatches sit in from the edges of the picture above them." },
     { "type": "select", "id": "title_font", "label": "Title typeface", "default": "body", "options": [ { "value": "body", "label": "Body font" }, { "value": "heading", "label": "Heading font" } ] },
     { "type": "range", "id": "title_size", "label": "Title size", "min": 10, "max": 32, "step": 1, "unit": "px", "default": 16 },
     { "type": "range", "id": "title_size_mobile", "label": "Title size on mobile", "min": 10, "max": 32, "step": 1, "unit": "px", "default": 15 },
     { "type": "select", "id": "title_weight", "label": "Title weight", "default": "400", "options": [ { "value": "300", "label": "Light" }, { "value": "400", "label": "Regular" }, { "value": "500", "label": "Medium" }, { "value": "600", "label": "Semi bold" } ] },
     { "type": "range", "id": "title_tracking", "label": "Title letter spacing", "min": 0, "max": 20, "step": 1, "unit": "%", "default": 0 },
+    { "type": "range", "id": "title_lines", "label": "Title lines", "min": 0, "max": 4, "step": 1, "default": 0, "info": "A longer title is cut off with an ellipsis after this many lines, as on a product card. 0 shows the whole title." },
     { "type": "color", "id": "title_color", "label": "Title colour", "default": "rgba(0,0,0,0)", "info": "Leave empty to use the colour scheme." },
     { "type": "range", "id": "price_size", "label": "Price size", "min": 10, "max": 28, "step": 1, "unit": "px", "default": 15 },
     { "type": "range", "id": "price_size_mobile", "label": "Price size on mobile", "min": 10, "max": 28, "step": 1, "unit": "px", "default": 14 },
     { "type": "range", "id": "price_tracking", "label": "Price letter spacing", "min": 0, "max": 20, "step": 1, "unit": "%", "default": 0 },
     { "type": "color", "id": "price_color", "label": "Price colour", "default": "rgba(0,0,0,0)" },
+
+    { "type": "header", "content": "Swatches under the price", "info": "The same rows a product card carries, for any panel that names a product. They sit in the title and price block, so they show wherever that shows - set it to Mobile only to keep them off desktop." },
+    { "type": "checkbox", "id": "show_shapes", "label": "Show the diamond shape icons", "default": false, "info": "The cuts the product comes in. The one in the picture is underlined." },
+    { "type": "checkbox", "id": "show_metals", "label": "Show the metal swatches", "default": false, "info": "Tapping a metal changes the panel's picture to that metal and points the panel's link at it." },
 
     { "type": "header", "content": "Section layout" },
     { "type": "select", "id": "width", "label": "Section width", "default": "full", "options": [ { "value": "page", "label": "Page width" }, { "value": "full", "label": "Full width" } ] },

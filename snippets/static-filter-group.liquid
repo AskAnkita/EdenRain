@@ -5,7 +5,11 @@
   result set, which is why these are needed alongside them.
 
   Markup mirrors the live (Shopify) list filters in `facets.liquid` so the two are
-  indistinguishable in the drawer.
+  indistinguishable in the drawer. On collection pages, Shape and Metal tiles use Shopify's
+  native collection tag URLs (/collections/<handle>/<tag>); those work even when the Search &
+  Discovery Tags filter is disabled, which it is, so a `filter.p.tag` checkbox does nothing.
+  Search results keep the storefront filter parameter because legacy tag URLs only filter
+  collections.
 
   @param {string} label - Group heading, e.g. "Shape"
   @param {string} values - Comma-separated options. Each is either "Label" or
@@ -31,6 +35,49 @@
   {%- assign is_metal_group = false -%}
   {%- if group_handle == 'shape' -%}{%- assign is_shape_group = true -%}{%- endif -%}
   {%- if group_handle == 'metal' -%}{%- assign is_metal_group = true -%}{%- endif -%}
+  {%- assign is_tag_link_group = false -%}
+  {%- if collection != blank -%}
+    {%- if is_shape_group or is_metal_group -%}{%- assign is_tag_link_group = true -%}{%- endif -%}
+  {%- endif -%}
+  {%- liquid
+    # What is chosen in this group, shown beside the heading so a collapsed group still says
+    # it is filtering. 14K and 18K of one colour share a tag, so a metal reads as its colour
+    # ("White Gold"), named from the tag, and is listed once.
+    assign selected_labels = ''
+    if is_tag_link_group
+      for entry in entries
+        assign entry_parts = entry | strip | split: '|'
+        assign entry_label = entry_parts[0] | strip
+        assign entry_value = entry_parts[1] | strip
+        if entry_value == blank
+          assign entry_value = entry_label | handle | prepend: value_prefix
+        endif
+        unless current_tags contains entry_value
+          continue
+        endunless
+
+        assign selected_label = entry_label
+        if is_metal_group
+          assign selected_label = ''
+          assign tag_words = entry_value | split: ':' | last | split: '-'
+          for tag_word in tag_words
+            assign tag_word_title = tag_word | capitalize
+            assign selected_label = selected_label | append: ' ' | append: tag_word_title
+          endfor
+          assign selected_label = selected_label | strip
+        endif
+
+        assign selected_check = selected_labels | prepend: '|' | append: '|'
+        assign selected_needle = selected_label | prepend: '|' | append: '|'
+        unless selected_check contains selected_needle
+          if selected_labels != ''
+            assign selected_labels = selected_labels | append: '|'
+          endif
+          assign selected_labels = selected_labels | append: selected_label
+        endunless
+      endfor
+    endif
+  -%}
   <details
     id="Details-Mobile-static-{{ group_handle }}-{{ section_id }}"
     class="mobile-facets__details js-filter{% if is_shape_group %} mobile-facets__details--shape{% endif %}"
@@ -47,6 +94,10 @@
         "
       >
         <span>{{ label | escape }}</span>
+        {%- comment -%} Refreshed by facets.js renderFilters, which swaps only the panel otherwise {%- endcomment -%}
+        <span class="mobile-facets__selected" data-facet-selected>
+          {{- selected_labels | split: '|' | join: ', ' | escape -}}
+        </span>
         <span class="mobile-facets__arrow svg-wrapper">
           {{- 'icon-caret.svg' | inline_asset_content -}}
         </span>
@@ -75,6 +126,36 @@
 
             assign input_id = 'Filter-static-' | append: group_handle | append: '-' | append: forloop.index
             assign shape_icon = option_label | handle
+            assign tag_active = false
+            assign tag_href = blank
+            if is_tag_link_group
+              if current_tags contains option_value
+                assign tag_active = true
+                capture tag_link
+                  echo option_label | link_to_remove_tag: option_value
+                endcapture
+              else
+                capture tag_link
+                  echo option_label | link_to_add_tag: option_value
+                endcapture
+              endif
+              assign tag_href = tag_link | split: 'href="' | last | split: '"' | first
+
+              # A product has one metal, so picking a metal swaps out the one already chosen
+              # instead of ANDing the two (link_to_add_tag would give rose-gold+white-gold).
+              # Same URL shape Shopify builds: tag handles, sorted, joined with "+".
+              if is_metal_group and tag_active == false
+                assign kept_tags = option_value | handle
+                for current_tag in current_tags
+                  assign current_tag_handle = current_tag | handle
+                  unless current_tag_handle contains 'metal-'
+                    assign kept_tags = kept_tags | append: ',' | append: current_tag_handle
+                  endunless
+                endfor
+                assign kept_tags = kept_tags | split: ',' | sort | join: '+'
+                assign tag_href = collection.url | append: '/' | append: kept_tags
+              endif
+            endif
             assign metal_type = blank
             assign metal_code = blank
             if is_metal_group
@@ -108,41 +189,71 @@
             endif
           -%}
           <li class="mobile-facets__item list-menu__item{% if is_shape_group %} mobile-facets__item--shape{% endif %}{% if is_metal_group %} mobile-facets__item--metal{% endif %}">
-            <label for="{{ input_id }}" class="facets__label mobile-facets__label{% if is_shape_group %} mobile-facets__label--shape{% endif %}{% if is_metal_group %} mobile-facets__label--metal{% endif %}" style="--font-size: {{ text_label_font_size }};">
-              <input
-                class="mobile-facets__checkbox"
-                type="checkbox"
-                name="{{ param_name }}"
-                value="{{ option_value | escape }}"
-                id="{{ input_id }}"
+            {%- if is_tag_link_group -%}
+              <a
+                href="{{ tag_href }}"
+                class="facets__label mobile-facets__label mobile-facets__label--{{ group_handle }}{% if tag_active %} active{% endif %}"
+                style="--font-size: {{ text_label_font_size }};"
+                aria-pressed="{{ tag_active }}"
               >
-
-              {%- if is_metal_group and metal_type != blank -%}
-                <span class="mobile-facets__shape-image mobile-facets__metal-tile">
-                  <span class="mobile-facets__metal-circle mobile-facets__metal-circle--{{ metal_type }}" aria-hidden="true"></span>
+                {%- if is_metal_group -%}
+                  <span class="mobile-facets__shape-image mobile-facets__metal-tile">
+                    <span class="mobile-facets__metal-circle mobile-facets__metal-circle--{{ metal_type }}" aria-hidden="true"></span>
+                  </span>
+                {%- else -%}
+                  {%- assign shape_asset = 'shape-outline-' | append: shape_icon | append: '.png' -%}
+                  <span class="mobile-facets__shape-image">
+                    <img
+                      src="{% render 'image-source', file: shape_asset, width: 400 %}"
+                      alt="{{ option_label | escape }}"
+                      width="200"
+                      height="200"
+                      loading="lazy"
+                    >
+                  </span>
+                {%- endif -%}
+                <span class="facet-checkbox__text" aria-hidden="true">
+                  <span class="facet-checkbox__text-label {{ text_label_case }}">{{- option_label | escape -}}</span>
                 </span>
-              {%- elsif is_shape_group -%}
-                {%- assign shape_asset = 'diamond-shape-' | append: shape_icon | append: '.png' -%}
-                <span class="mobile-facets__shape-image">
-                  <img
-                    src="{% render 'image-source', file: shape_asset, width: 400 %}"
-                    alt="{{ option_label | escape }}"
-                    width="200"
-                    height="200"
-                    loading="lazy"
-                  >
-                </span>
-              {%- else -%}
-                <span class="mobile-facets__highlight"></span>
-                {{- 'square.svg' | inline_asset_content -}}
-                {{- 'icon-checkmark.svg' | inline_asset_content -}}
-              {%- endif -%}
+                <span class="visually-hidden">{{ option_label | escape }}</span>
+              </a>
+            {%- else -%}
+              <label for="{{ input_id }}" class="facets__label mobile-facets__label{% if is_shape_group %} mobile-facets__label--shape{% endif %}{% if is_metal_group %} mobile-facets__label--metal{% endif %}" style="--font-size: {{ text_label_font_size }};">
+                <input
+                  class="mobile-facets__checkbox"
+                  type="checkbox"
+                  name="{{ param_name }}"
+                  value="{{ option_value | escape }}"
+                  id="{{ input_id }}"
+                >
 
-              <span class="facet-checkbox__text" aria-hidden="true">
-                <span class="facet-checkbox__text-label {{ text_label_case }}">{{- option_label | escape -}}</span>
-              </span>
-              <span class="visually-hidden">{{ option_label | escape }}</span>
-            </label>
+                {%- if is_metal_group and metal_type != blank -%}
+                  <span class="mobile-facets__shape-image mobile-facets__metal-tile">
+                    <span class="mobile-facets__metal-circle mobile-facets__metal-circle--{{ metal_type }}" aria-hidden="true"></span>
+                  </span>
+                {%- elsif is_shape_group -%}
+                  {%- assign shape_asset = 'shape-outline-' | append: shape_icon | append: '.png' -%}
+                  <span class="mobile-facets__shape-image">
+                    <img
+                      src="{% render 'image-source', file: shape_asset, width: 400 %}"
+                      alt="{{ option_label | escape }}"
+                      width="200"
+                      height="200"
+                      loading="lazy"
+                    >
+                  </span>
+                {%- else -%}
+                  <span class="mobile-facets__highlight"></span>
+                  {{- 'square.svg' | inline_asset_content -}}
+                  {{- 'icon-checkmark.svg' | inline_asset_content -}}
+                {%- endif -%}
+
+                <span class="facet-checkbox__text" aria-hidden="true">
+                  <span class="facet-checkbox__text-label {{ text_label_case }}">{{- option_label | escape -}}</span>
+                </span>
+                <span class="visually-hidden">{{ option_label | escape }}</span>
+              </label>
+            {%- endif -%}
           </li>
         {%- endfor -%}
       </ul>

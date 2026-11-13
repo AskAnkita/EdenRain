@@ -158,8 +158,11 @@ dsp-video { display: contents; }
   align-items: center;
   gap: 14px;
   color: var(--dsp-heading-color);
-  font-size: 11px;
-  letter-spacing: 0.12em;
+  /* The route links read as calls to action in the same column as the shop's
+     boxed ones, so they take their lettering from assets/eden-actions.css
+     rather than their own. */
+  font-size: var(--eden-action-font-size, 1.25rem);
+  letter-spacing: var(--eden-action-tracking, 0.12em);
   line-height: 1.3;
   text-decoration: none;
   text-transform: uppercase;
@@ -223,10 +226,33 @@ dsp-video { display: contents; }
     align-items: center;
   }
 
+  /* The picture is square and half the window wide, so on a wide screen it alone decided how
+     tall the banner was - past a full screen's worth on a laptop. The cap holds it to a band
+     the routes beside it can be read against; "Height on desktop" in the section feeds it. The
+     frame stays square until the cap bites, so a narrow desktop is unchanged. */
   .ds-split--full-width .dsp-media {
     width: 100%;
+    /* 4:3 rather than square: the frame keeps one shape at every window width, so the crop
+       below is the same everywhere. The width is capped with it, at 4/3 of the height, so a
+       very wide screen gets air either side of the frame instead of a band that grows until
+       it crops into the ring. */
+    max-width: calc(var(--dsp-media-max, 600px) * 4 / 3);
     height: auto;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 3;
+    max-height: var(--dsp-media-max, 600px);
+    margin-inline: auto;
+  }
+
+  /* The frame is no longer square, and a video fitted inside it (object-fit: contain, which is
+     what a square frame wants) would be shrunk to the frame's HEIGHT - the ring reads a quarter
+     smaller for no reason. Cropped instead, it is drawn at the frame's width, the size it was
+     when the frame was square, and what goes is the empty studio floor above and below it: the
+     ring sits between 16% and 86% of the square, and 4:3 takes 12.5% off each end. That is why
+     Zoom is left at 100% here - it scales the video inside the frame, so every 10% of it eats
+     another 5% at each end and starts on the stone. */
+  .ds-split--full-width .dsp-media--video .dsp-media__video,
+  .ds-split--full-width .dsp-media--video .dsp-media__poster {
+    object-fit: cover;
   }
 }
 

@@ -316,6 +316,35 @@
     assign price_two_label = ''
   endif
 
+  # THE PRICE LINE ITSELF. "Contact us for price" is a sentence that asks to be
+  # pressed, and until now it only became a link when the panel had no buttons
+  # under it - so on the shipped panel, which has one, it was dead text telling
+  # somebody to contact us without saying how.
+  #
+  # "support" is not an ordinary link. assets/ijewel-design.js catches the click
+  # on anything carrying data-design-support, reads the ring off the builder
+  # over the bridge, saves it, and only then goes to the support page with the
+  # reference, the summary and the state key on the URL - so the page that
+  # opens already knows which ring was being asked about and can draw it. The
+  # href is the support page either way, so the line still works as a plain
+  # link with the script dead, the bridge silent or the design unreadable: the
+  # enquiry form on that page takes an enquiry with no design attached.
+  #
+  # The same fallback chain as the buttons above: no support page set means
+  # there is nowhere to carry the ring to, so it stands down to the plain link,
+  # and a plain link with nowhere to go is not a link at all.
+  assign price_text_action = section.settings.price_text_action | default: 'support'
+  assign price_text_link = section.settings.price_link
+  if price_text_action == 'support' and support_link == blank
+    assign price_text_action = 'link'
+  endif
+  if price_text_action == 'support'
+    assign price_text_link = support_link
+  endif
+  if price_text_link == blank
+    assign price_text_action = 'none'
+  endif
+
   assign price_buttons = 0
   if price_one_label != blank
     assign price_buttons = price_buttons | plus: 1
@@ -615,8 +644,10 @@
               <span class="ijw-price__label">{{ section.settings.price_eyebrow | escape }}</span>
             {%- endif -%}
             {%- if section.settings.price_text != blank -%}
-              {%- if section.settings.price_link != blank and price_buttons == 0 -%}
-                <a class="ijw-price__text" href="{{ section.settings.price_link }}">{{ section.settings.price_text | escape }}</a>
+              {%- if price_text_action == 'support' -%}
+                <a class="ijw-price__text" href="{{ price_text_link }}" data-design-support>{{ section.settings.price_text | escape }}</a>
+              {%- elsif price_text_action == 'link' -%}
+                <a class="ijw-price__text" href="{{ price_text_link }}">{{ section.settings.price_text | escape }}</a>
               {%- else -%}
                 <span class="ijw-price__text">{{ section.settings.price_text | escape }}</span>
               {%- endif -%}
@@ -951,6 +982,7 @@
     { "type": "select", "id": "price_cta2_style", "label": "Second button style", "options": [ { "value": "outline", "label": "Outlined" }, { "value": "solid", "label": "Filled" } ], "default": "outline" },
     { "type": "color", "id": "price_rule_color", "label": "Hairline colour" },
     { "type": "url", "id": "price_link", "label": "Link on the first line", "info": "Leave empty for plain text. A link makes the line clickable where the builder's price used to be - the contact page or the enquiry form." },
+    { "type": "select", "id": "price_text_action", "label": "What the first line does", "options": [ { "value": "support", "label": "Ask us about this design" }, { "value": "link", "label": "Go to the link above" }, { "value": "none", "label": "Nothing - plain text" } ], "default": "support", "info": "\"Ask us about this design\" saves the ring first and opens the Support page below with it attached, so the enquiry arrives knowing what was on screen. It ignores the link above and falls back to it when no support page is set." },
     { "type": "select", "id": "price_anchor", "label": "The price sits in the frame's", "options": [ { "value": "bottom-right", "label": "Bottom right" }, { "value": "bottom-left", "label": "Bottom left" }, { "value": "top-right", "label": "Top right" }, { "value": "top-left", "label": "Top left" } ], "default": "bottom-right", "info": "Which corner the offsets below are measured from. iJewel draws its price at the foot of the option rail, on the right." },
     { "type": "color", "id": "price_background", "label": "Panel colour", "default": "#ffffff", "info": "Match the builder's own panel. Clear it and the line floats on the builder's panel with the figure still showing behind." },
     { "type": "color", "id": "price_text_color", "label": "First line colour" },

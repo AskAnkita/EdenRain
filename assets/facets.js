@@ -16,6 +16,9 @@ class FacetFiltersForm extends HTMLElement {
     // Add event listener for price range apply button
     this.addEventListener('click', this.onPriceRangeApply.bind(this));
 
+    // Shape and Metal tiles are links to collection tag URLs (static-filter-group.liquid)
+    this.addEventListener('click', this.onTagLinkClick.bind(this));
+
     // Add event listener for drawer overlay click to close drawer
     this.setupDrawerOverlayClose();
   }
@@ -23,7 +26,8 @@ class FacetFiltersForm extends HTMLElement {
   static setListeners() {
     const onHistoryChange = (event) => {
       const searchParams = event.state ? event.state.searchParams : FacetFiltersForm.searchParamsInitial;
-      if (searchParams === FacetFiltersForm.searchParamsPrev) return;
+      // Tag filters live in the path, so the path counts as much as the query does
+      if (`${window.location.pathname}?${searchParams}` === FacetFiltersForm.pagePrev) return;
       FacetFiltersForm.renderPage(searchParams, null, false);
     };
     FacetFiltersForm.renderProductPerPage();
@@ -36,8 +40,11 @@ class FacetFiltersForm extends HTMLElement {
     });
   }
 
-  static renderPage(searchParams, event, updateURLHash = true) {
+  // `pathname` differs from the current one for collection tag URLs
+  // (/collections/rings/shape-oval), which carry the filter in the path rather than the query.
+  static renderPage(searchParams, event, updateURLHash = true, pathname = window.location.pathname) {
     FacetFiltersForm.searchParamsPrev = searchParams;
+    FacetFiltersForm.pagePrev = `${pathname}?${searchParams}`;
     const sections = FacetFiltersForm.getSections();
     const countContainer = document.getElementById('ProductCount');
     const countContainerMobile = document.getElementById('ProductCountMobile');
@@ -54,7 +61,7 @@ class FacetFiltersForm extends HTMLElement {
     }
 
     sections.forEach((section) => {
-      const url = `${window.location.pathname}?section_id=${section.section}&${searchParams}`;
+      const url = `${pathname}?section_id=${section.section}&${searchParams}`;
       const filterDataUrl = (element) => element.url === url;
 
       FacetFiltersForm.filterData.some(filterDataUrl)
@@ -62,7 +69,7 @@ class FacetFiltersForm extends HTMLElement {
         : FacetFiltersForm.renderSectionFromFetch(url, event);
     });
 
-    if (updateURLHash) FacetFiltersForm.updateURLHash(searchParams);
+    if (updateURLHash) FacetFiltersForm.updateURLHash(searchParams, pathname);
   }
 
   static renderSectionFromFetch(url, event) {
@@ -223,7 +230,19 @@ class FacetFiltersForm extends HTMLElement {
       const currentElement = document.getElementById(elementToRender.id);
       // Element already rendered in the DOM so just update the innerHTML
       if (currentElement) {
-        document.getElementById(elementToRender.id).innerHTML = elementToRender.innerHTML;
+        // Inside <accordion-custom> only the panel is swapped: replacing the whole <details>
+        // would drop the click listener the accordion bound to its <summary>, and the open
+        // panel's inline height, so the group would stop toggling or collapse mid-filter.
+        const currentContent = currentElement.closest('accordion-custom') && currentElement.querySelector('.details-content');
+        const fetchedContent = elementToRender.querySelector('.details-content');
+        if (currentContent && fetchedContent) {
+          currentContent.innerHTML = fetchedContent.innerHTML;
+          const currentSelected = currentElement.querySelector('[data-facet-selected]');
+          const fetchedSelected = elementToRender.querySelector('[data-facet-selected]');
+          if (currentSelected && fetchedSelected) currentSelected.innerHTML = fetchedSelected.innerHTML;
+        } else {
+          currentElement.innerHTML = elementToRender.innerHTML;
+        }
       } else {
         if (index > 0) {
           const { className: previousElementClassName, id: previousElementId } = facetsToRender[index - 1];
@@ -276,7 +295,7 @@ class FacetFiltersForm extends HTMLElement {
   }
 
   static renderAdditionalElements(html) {
-    const mobileElementSelectors = ['.mobile-facets__open', '.mobile-facets__count', '.sorting'];
+    const mobileElementSelectors = ['.mobile-facets__open', '.mobile-facets__count', '.sorting', '#FacetsToolbarClear'];
 
     mobileElementSelectors.forEach((selector) => {
       if (!html.querySelector(selector)) return;
@@ -330,8 +349,8 @@ class FacetFiltersForm extends HTMLElement {
     }
   }
 
-  static updateURLHash(searchParams) {
-    history.pushState({ searchParams }, '', `${window.location.pathname}${searchParams && '?'.concat(searchParams)}`);
+  static updateURLHash(searchParams, pathname = window.location.pathname) {
+    history.pushState({ searchParams }, '', `${pathname}${searchParams && '?'.concat(searchParams)}`);
   }
 
   static getSections() {
@@ -399,15 +418,33 @@ class FacetFiltersForm extends HTMLElement {
     }
   }
 
+  // A Shape or Metal tile: filter in place, like a checkbox, instead of loading the tag URL.
+  // The drawer stays open so several can be picked; Apply just closes it.
+  onTagLinkClick(event) {
+    const link = event.target.closest('a.mobile-facets__label--shape[href], a.mobile-facets__label--metal[href]');
+    if (!link || event.defaultPrevented) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button > 0) return;
+
+    const target = new URL(link.href, window.location.origin);
+    if (target.origin !== window.location.origin) return;
+    event.preventDefault();
+
+    // Keep sort order and price from the current page; tag links carry neither, and a new
+    // filter always starts back on page 1
+    const params = new URLSearchParams(window.location.search);
+    target.searchParams.forEach((value, key) => params.set(key, value));
+    params.delete('page');
+
+    link.closest('.mobile-facets__list')?.setAttribute('aria-busy', 'true');
+    FacetFiltersForm.renderPage(params.toString(), null, true, target.pathname);
+  }
+
   onActiveFilterClick(event) {
     event.preventDefault();
     FacetFiltersForm.toggleActiveFacets();
-    const url =
-      event.currentTarget.href.indexOf('?') == -1
-        ? ''
-        : event.currentTarget.href.slice(event.currentTarget.href.indexOf('?') + 1);
-    FacetFiltersForm.renderPage(url);
-    FacetFiltersForm.renderPage(url);
+    const href = new URL(event.currentTarget.href, window.location.origin);
+    // "Clear all" and a removed tag pill change the path, not just the query
+    FacetFiltersForm.renderPage(href.search.slice(1), null, true, href.pathname);
 
     if(window.innerWidth <= 1024) {
       document.querySelectorAll('.mobile-facets__details').forEach(item => {
@@ -448,6 +485,7 @@ class FacetFiltersForm extends HTMLElement {
 FacetFiltersForm.filterData = [];
 FacetFiltersForm.searchParamsInitial = window.location.search.slice(1);
 FacetFiltersForm.searchParamsPrev = window.location.search.slice(1);
+FacetFiltersForm.pagePrev = `${window.location.pathname}?${FacetFiltersForm.searchParamsPrev}`;
 if (!customElements.get('facet-filters-form')) customElements.define('facet-filters-form', FacetFiltersForm);
 FacetFiltersForm.setListeners();
 

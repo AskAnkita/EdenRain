@@ -138,6 +138,20 @@
       <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
 
+    {%- comment -%}
+      The studio's "Contact us for price" line, and its Contact support button,
+      send a saved ring here on the URL - ?design=&summary=&state=. This reads
+      it back, shows it above the shop's own enquiry form and attaches it to
+      the fields that are mailed, so the enquiry arrives knowing which ring it
+      is about. Both files do nothing at all without those parameters, so an
+      ordinary visit to the contact page is untouched.
+    {%- endcomment -%}
+    {%- if request.page_type == 'page' and page.handle == 'contact' -%}
+      {{ 'contact-design.css' | asset_url | stylesheet_tag }}
+      <script src="{{ 'eden-design-store.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'contact-design.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
     {% render 'halo-popup' %}
 
     {% render 'halo-global' %}

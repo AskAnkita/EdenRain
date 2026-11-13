@@ -395,6 +395,16 @@
   list-style: none;
 }
 
+/*
+  The admin types these lines however they come - "free shipping on all orders" next to "Royal Mail
+  24 tracked shipping" - so the column opened on a capital in one row and not in the next. Only the
+  first letter is raised: "capitalize" would turn every word into a title, and the rest of the line
+  is left exactly as written ("1st class", "4pm").
+*/
+.section-page .rte table li::first-letter {
+  text-transform: uppercase;
+}
+
 .section-page .rte table li::before {
   content: "";
   position: absolute;
@@ -422,13 +432,10 @@
   it now falls back to the resting ink - the same swap, with something to see.
 */
 .pc-button {
-  display: inline-block;
-  padding: 1.5rem 3.2rem;
-  border: 1px solid transparent;
-  font-size: 1.2rem;
-  letter-spacing: 0.18em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
-  text-transform: uppercase;
   --cta-fill: var(--pc-button-bg, var(--color-foreground));
   --cta-ink: var(--pc-button-color, var(--color-background));
   --cta-edge: var(--pc-button-bg, var(--color-foreground));

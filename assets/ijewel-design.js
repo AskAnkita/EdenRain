@@ -333,10 +333,35 @@ if (!customElements.get('ijewel-design')) {
 
         if (design) return Promise.resolve(window.edenDesignStore.save(design, context));
 
-        if (!this.frame) return Promise.reject(new Error('no frame'));
-        if (!this.live) return Promise.reject(new Error('not ready'));
+        // Not "is it live this instant" but "is it live in time". The press can
+        // legitimately land before this element has heard its first word from
+        // the builder, because what makes our buttons pressable is a DIFFERENT
+        // element going live: the price panel takes pointer events off
+        // ijewel-studio[data-live] in assets/ijewel-studio.css, and that is the
+        // frame reporting its scene, not this bridge completing a handshake.
+        // The two settle a moment apart, and rejecting in that gap is what sent
+        // somebody to the contact page with no ring attached. So it waits.
+        return this.ready(5000).then(() => this.collect()).then((data) => window.edenDesignStore.save(data, context));
+      }
 
-        return this.collect().then((data) => window.edenDesignStore.save(data, context));
+      // Resolves once the frame is found AND the builder has spoken, rejecting
+      // with the same two reasons trouble() knows how to word if it never does.
+      ready(within) {
+        if (this.frame && this.live) return Promise.resolve();
+
+        return new Promise((resolve, reject) => {
+          const started = Date.now();
+          const tick = setInterval(() => {
+            if (this.frame && this.live) {
+              clearInterval(tick);
+              resolve();
+              return;
+            }
+            if (Date.now() - started < within) return;
+            clearInterval(tick);
+            reject(new Error(this.frame ? 'not ready' : 'no frame'));
+          }, 150);
+        });
       }
 
       trouble(error) {
@@ -487,9 +512,26 @@ if (!customElements.get('ijewel-design')) {
             // Still sent, with nothing attached: somebody who pressed "contact
             // support" asked to talk to a person, and a failed read of the
             // builder is not a reason to refuse them.
+            //
+            // Before settling for nothing, though, the last ring saved on this
+            // device is tried. A shopper who pressed Save and then asked about
+            // the price is the ordinary way here, and that record IS the ring
+            // on screen - so an enquiry that would have arrived empty arrives
+            // describing it instead.
             this.removeAttribute('data-busy');
-            this.go(null);
+            this.go(this.latest());
           });
+      }
+
+      // The most recent record this browser holds. store.save() unshifts, so
+      // the newest is first.
+      latest() {
+        try {
+          const rows = window.edenDesignStore.list();
+          return (rows && rows[0]) || null;
+        } catch (error) {
+          return null;
+        }
       }
 
       // The support page reads the record out of local storage by reference.

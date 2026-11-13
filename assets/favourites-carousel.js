@@ -20,6 +20,7 @@ if (!customElements.get('favourites-carousel')) {
       // Off by default: the row stops at the last panel rather than jumping back to
       // the first one.
       this.loop = this.dataset.loop === 'true';
+      this.mobileAutoplay = this.dataset.mobileAutoplay === 'true';
 
       this.boundUpdate = this.update.bind(this);
 
@@ -27,6 +28,22 @@ if (!customElements.get('favourites-carousel')) {
       this.next?.addEventListener('click', () => this.go(1));
       this.track.addEventListener('scroll', this.boundUpdate, { passive: true });
       window.addEventListener('resize', this.boundUpdate);
+
+      this.autoVisible = false;
+      this.autoMedia = window.matchMedia('(max-width: 989px)');
+      this.boundAutoState = this.syncAutoAdvance.bind(this);
+      this.autoMedia.addEventListener('change', this.boundAutoState);
+      document.addEventListener('visibilitychange', this.boundAutoState);
+      this.autoObserver = new IntersectionObserver(([entry]) => {
+        this.autoVisible = entry.isIntersecting;
+        this.syncAutoAdvance();
+      });
+      this.autoObserver.observe(this);
+      this.pauseAutoAdvance = () => {
+        this.autoPausedByUser = true;
+        clearInterval(this.autoTimer);
+      };
+      this.track.addEventListener('pointerdown', this.pauseAutoAdvance, { passive: true });
 
       // A picture asked for by file name or URL may not be there yet; the panel keeps
       // its background and caption instead of showing a broken image.
@@ -42,7 +59,27 @@ if (!customElements.get('favourites-carousel')) {
 
     disconnectedCallback() {
       clearTimeout(this.settleTimer);
+      clearInterval(this.autoTimer);
+      this.autoObserver?.disconnect();
+      this.autoMedia?.removeEventListener('change', this.boundAutoState);
+      document.removeEventListener('visibilitychange', this.boundAutoState);
+      this.track?.removeEventListener('pointerdown', this.pauseAutoAdvance);
       window.removeEventListener('resize', this.boundUpdate);
+    }
+
+    syncAutoAdvance() {
+      clearInterval(this.autoTimer);
+      if (!this.mobileAutoplay || this.autoPausedByUser || !this.autoVisible || !this.autoMedia?.matches || document.hidden) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      this.autoTimer = setInterval(() => {
+        const max = this.maxScroll;
+        if (max <= 2) return;
+        if (this.track.scrollLeft >= max - 2) {
+          this.track.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          this.go(1);
+        }
+      }, 5000);
     }
 
     get maxScroll() {

@@ -486,6 +486,7 @@
         "heading_size_mobile": 15,
         "heading_color": "rgba(0,0,0,0)",
         "show_all_card": true,
+        "hide_empty": true,
         "all_label": "All",
         "all_link": "",
         "per_row": 6.4,

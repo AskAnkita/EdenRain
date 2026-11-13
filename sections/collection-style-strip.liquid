@@ -419,6 +419,33 @@
             endif
 
             comment
+              A card for a range the shop cannot sell yet can be made to stand down until it can.
+              Engagement asks for this: its Shop by Style list runs to ten and five of them -
+              Vintage, Nature Inspired, Toi et Moi, Promise - hold nothing, so the row ended in a
+              line of empty boxes that read as a strip which failed to load, each one sending a
+              shopper who pressed it to "No products found".
+
+              OFF BY DEFAULT, and switched on per template rather than per theme. Everywhere else
+              the empty cards are the point: the Jewellery ranges are being filled a category at a
+              time, and a card that disappears the moment its collection empties takes the
+              merchant's own place-holder with it. Only turn it on where the list is finished and
+              the gaps are not going to be filled soon.
+
+              A row whose collection holds nothing, or whose collection does not exist at all, is
+              skipped. Nothing has to be edited when the stock lands: publish a piece carrying the
+              tag and the card comes back on its own. `all_products_count` rather than
+              `products_count`, which on a filtered collection page counts only what the filter
+              let through and would drop every other card the moment a shopper ticked a filter.
+
+              A filter URL is never skipped - it has no collection of its own to count.
+            endcomment
+            if cs.hide_empty and item_is_url == false
+              if item_collection.handle != item_target or item_collection.all_products_count == 0
+                continue
+              endif
+            endif
+
+            comment
               The drawing is keyed on the item's own name, never on its collection: "Round" is
               `round` under both Engagement and Diamonds, where the collections are
               'round-engagement-rings' and 'round-diamonds'.
@@ -471,6 +498,16 @@
               if item_photo == blank
                 assign item_photo = item_collection.products.first.featured_image
               endif
+            endif
+
+            comment
+              Engagement's row should only show options with a photograph. The collection may have
+              no photo file, collection image, or product image yet; keep those incomplete cards
+              out of this one range until the image is available. Other families still show their
+              empty cards so the merchant can see which categories are being filled.
+            endcomment
+            if matched_parent == 'Engagement' and item_photo == blank
+              continue
             endif
           -%}
 
@@ -587,6 +624,7 @@
     { "type": "image_picker", "id": "all_image", "label": "\"All\" card picture", "info": "Leave empty to use All.png from Content > Files, then the range's own collection image, then the first piece in the range." },
     { "type": "header", "content": "Cards" },
     { "type": "paragraph", "content": "Each card shows a photograph filed for it in Content > Files, or the Image set on its collection, or the first piece in that collection. A category with no stock and no picture shows its name against an empty box - put a piece in it and the card fills itself." },
+    { "type": "checkbox", "id": "hide_empty", "label": "Hide cards with nothing in them", "default": false, "info": "A style the shop has no stock for is left out of the row, and comes back on its own once a piece is published into it. Off everywhere but Engagement: elsewhere the empty cards show which ranges are still being filled." },
     { "type": "checkbox", "id": "show_drawings", "label": "Fall back to a line drawing", "default": false, "info": "Puts the menu's outline drawing in the empty box instead. Off by default: on a row of real rings a drawing reads as a card that did not load. Worth switching on for Earrings and Necklaces, where most sub-ranges are empty." },
     { "type": "range", "id": "per_row", "label": "Cards across", "min": 2, "max": 9, "step": 0.1, "default": 6.4, "info": "A fraction shows part of the next card, which tells a shopper the row scrolls." },
     { "type": "range", "id": "per_row_mobile", "label": "Cards across on mobile", "min": 1, "max": 4, "step": 0.1, "default": 2.2 },

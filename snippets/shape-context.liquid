@@ -8,11 +8,11 @@
   the icon underlined in the shape row, and the variant the card links to.
   'card-default-variant' is what turns this into that variant.
 
-  Two sources, the filter first because it is the later thing the shopper did:
+  Three sources, in priority order:
 
-  - A Shape filter applied from the filter drawer. Liquid cannot read the query string,
-    so this comes from the filters Shopify reports as applied, the same way
-    'card-default-metal' reads the metal the grid is filtered to.
+  - A Search & Discovery Shape filter comes from the filters Shopify reports as applied,
+    the same way 'card-default-metal' reads the metal the grid is filtered to.
+  - A native collection tag filter comes from 'current_tags'.
   - The collection handle. Read off the handle rather than kept in a list here, so a new
     shape collection needs nothing adding. Matching is on whole hyphen segments, which
     is what keeps "pearl-..." from reading as Pear.
@@ -62,6 +62,29 @@
       break
     endif
   endfor
+
+  # Native collection tag filters use `/collections/<handle>/<tag-handle>` rather than a
+  # `filter.p.tag` query parameter. The Shape tiles use that route so they still filter when
+  # Shopify's Search & Discovery Tags filter is not enabled. Read the current tag here too,
+  # so product cards open on the cut the shopper selected.
+  if page_shape == blank
+    for current_tag in current_tags
+      assign filter_text = current_tag | downcase
+      unless filter_text contains 'shape:'
+        continue
+      endunless
+      for shape in shape_keys
+        assign shape_tag = 'shape:' | append: shape
+        if filter_text == shape_tag
+          assign page_shape = shape
+          break
+        endif
+      endfor
+      if page_shape != blank
+        break
+      endif
+    endfor
+  endif
 
   if page_shape == blank and collection != blank and collection.handle != blank
     assign handle_segments = collection.handle | split: '-'

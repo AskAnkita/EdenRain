@@ -9,9 +9,13 @@
  * that matches both, and the card's photo, links and both rows' active states are
  * moved onto it. Delegated from the document so cards that arrive later — filtering,
  * pagination, quick view — work without rebinding.
+ *
+ * A card that is not built from the theme's card blocks joins by marking itself: the
+ * favourites carousel's panels carry `data-swatch-card` on the panel and
+ * `data-swatch-media` on the box its photo sits in, plus the same variant JSON.
  */
 (function () {
-  const CARD_SELECTOR = '[data-product-card-id], .card-wrapper';
+  const CARD_SELECTOR = '[data-product-card-id], .card-wrapper, [data-swatch-card]';
   const SRCSET_WIDTHS = [240, 352, 650, 832, 1200];
   const DISPLAY_WIDTH = 832;
   const SHAPES = [
@@ -58,6 +62,8 @@
   }
 
   function primaryImage(card) {
+    const own = card.querySelector('[data-swatch-media] > img');
+    if (own) return own;
     const media = card.querySelector('.card__media .media');
     return media ? media.querySelector(':scope > img') : null;
   }

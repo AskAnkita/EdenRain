@@ -209,33 +209,14 @@
   justify-content: flex-start;
 }
 
-/*
-  The hero's own two buttons, coloured from the schema and handed to the one
-  hover change in eden-actions.css as the --cta-* pairs; nothing here writes a
-  :hover.
-
-  The pair trade places on hover: the filled one empties into the outline its
-  neighbour wears at rest, and the outline one fills. Over a photograph the
-  filled one does that with .eden-action--empties - the shared hover change
-  run backwards, because "no fill" is not a colour the hover layer can carry
-  forwards, so the white is painted by that layer and faded away. The section
-  only adds that class when there is a picture to empty onto; without one the
-  button keeps the straight swap below, which stays legible on the fallback
-  colour.
-*/
+/* Both hero buttons rest as outlines and fill white on hover. */
 .about-page .ab-hero__button--primary {
-  --cta-fill: var(--ab-hero-btn-bg, #ffffff);
-  --cta-ink: var(--ab-hero-btn-ink, #171714);
-  --cta-edge: var(--ab-hero-btn-bg, #ffffff);
-  --cta-fill-hover: var(--ab-hero-btn-ink, #171714);
-  --cta-ink-hover: var(--ab-hero-btn-bg, #ffffff);
-  --cta-edge-hover: var(--ab-hero-btn-bg, #ffffff);
-}
-
-.about-page .ab-hero__button--primary.eden-action--empties {
   --cta-fill: transparent;
+  --cta-ink: var(--ab-hero-btn-bg, #ffffff);
+  --cta-edge: var(--ab-hero-btn-bg, #ffffff);
   --cta-fill-hover: var(--ab-hero-btn-bg, #ffffff);
-  --cta-ink-hover: var(--ab-hero-btn-bg, #ffffff);
+  --cta-ink-hover: var(--ab-hero-btn-ink, #171714);
+  --cta-edge-hover: var(--ab-hero-btn-bg, #ffffff);
 }
 
 .about-page .ab-hero__button--secondary {
@@ -755,24 +736,13 @@
   gap: 1.6rem;
 }
 
-/*
-  The same trade as the hero's pair, for the same reason: the primary rests
-  filled and empties out on hover, so it becomes the outline its neighbour
-  wears at rest rather than swapping to a second filled button beside one.
-
-  It wears .eden-action--empties, which runs the shop's one hover change
-  backwards (see eden-actions.css), and that is why the colours below read
-  oddly: the button itself is transparent, --cta-fill-hover is its RESTING
-  fill, painted by the hover layer held at full opacity, and --cta-ink-hover
-  is the colour the label takes once that fill has gone. Both of those are the button's own
-  background colour, because what is left on hover is an outline of it.
-*/
+/* Both buttons in the closing panel rest outlined; the primary fills on hover. */
 .about-page .ab-cta__button--primary {
   --cta-fill: transparent;
-  --cta-ink: var(--ab-btn-ink, #ffffff);
+  --cta-ink: var(--ab-btn-bg, var(--ab-ink));
   --cta-edge: var(--ab-btn-bg, var(--ab-ink));
   --cta-fill-hover: var(--ab-btn-bg, var(--ab-ink));
-  --cta-ink-hover: var(--ab-btn-bg, var(--ab-ink));
+  --cta-ink-hover: var(--ab-btn-ink, #ffffff);
   --cta-edge-hover: var(--ab-btn-bg, var(--ab-ink));
 }
 

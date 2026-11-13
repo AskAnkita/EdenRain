@@ -29,7 +29,12 @@
 
 {%- liquid
   assign shape_values = 'Round,Oval,Emerald,Cushion,Marquise,Pear,Radiant,Princess,Asscher,Heart'
-  assign metal_values = '14K Rose Gold,18K Rose Gold,14K White Gold,18K White Gold,14K Yellow Gold,18K Yellow Gold,925 Sterling Silver'
+  # Metal tags carry the colour only (metal:rose-gold, scripts/shopify/tag-rules.mjs); the
+  # karat lives in the "Jewelry material" variant option, and every product with a gold tag is
+  # offered in 10k, 14k and 18k. So 14K and 18K of one colour point at the same tag and light up
+  # together - that is accurate, not a bug. A true karat filter needs the variant-option filter
+  # switched on in Search & Discovery, at which point the live Metal filter replaces this group.
+  assign metal_values = '14K Rose Gold|metal:rose-gold,18K Rose Gold|metal:rose-gold,14K White Gold|metal:white-gold,18K White Gold|metal:white-gold,14K Yellow Gold|metal:yellow-gold,18K Yellow Gold|metal:yellow-gold,925 Sterling Silver|metal:sterling-silver'
 
   # Ceiling for the static price slider, in the shop's currency. Only used until a real
   # price filter exists, which brings its own range from the products.

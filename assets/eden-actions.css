@@ -34,8 +34,42 @@
   --eden-action-rule: rgba(23, 23, 20, 0.22);
   --eden-action-rule-light: rgba(255, 255, 255, 0.45);
   --eden-action-border-light: rgba(255, 255, 255, 0.8);
+  /*
+    THE ONE SHAPE. Hover was already written once here; the size was not, and
+    every call to action had grown its own. Side by side down the homepage the
+    hero read 15px with almost no tracking inside a 2px border, the gifting
+    band 11px inside a 1px one, the booking panel 12.5px, the page buttons
+    12px at 0.18em, and the editorial banner 15px bold inside a pill - five
+    different buttons for what is one gesture, which is what made the column
+    look unfinished however carefully each section had been set.
+
+    The booking panel's button is the one that was right, so its measurements
+    are the ones written here: small caps at 1.25rem, tracked out to 0.12em so
+    the label reads as lettering rather than a word, inside a hairline border,
+    with a generous 3.2rem of room either side and nothing bolder than the
+    body weight. The desktop menu's button is the same idea a notch down,
+    sized to fit two across half a picture, and it keeps that notch. A section
+    that needs its own paint still names the --cta-* pairs; it must not name a
+    size, a tracking or a border width again, or it falls back out of step.
+  */
   --eden-action-font-size: 1.25rem;
   --eden-action-tracking: 0.12em;
+  --eden-action-line-height: 1.2;
+  --eden-action-weight: var(--button-font-weight-primary, 500);
+  --eden-action-border-width: 1px;
+  --eden-action-padding-block: 1.2rem;
+  --eden-action-padding-inline: 3.2rem;
+  /* Narrower on a phone: these labels do not wrap, and two of them have to sit
+     side by side inside 320px in the hero. */
+  --eden-action-padding-inline-mobile: 1.6rem;
+
+  /*
+    Height. 48px on a phone is the touch-target minimum, 50px on a pointer -
+    comfortably above what the type and padding alone would give, which is
+    what makes the button read as a panel rather than a label in a box.
+  */
+  --eden-action-min-height: 48px;
+  --eden-action-min-height-desktop: 50px;
 
   /*
     The one hover change. Every call to action in the shop answers the cursor
@@ -73,9 +107,9 @@
 .eden-link {
   font-family: var(--button-font-family-primary, var(--font-body--family));
   font-size: var(--eden-action-font-size);
-  font-weight: var(--button-font-weight-primary, 500);
+  font-weight: var(--eden-action-weight);
   letter-spacing: var(--eden-action-tracking);
-  line-height: 1;
+  line-height: var(--eden-action-line-height);
   text-decoration: none;
   text-transform: var(--button-text-case-primary, uppercase);
   cursor: pointer;
@@ -88,16 +122,47 @@
   align-items: center;
   justify-content: center;
   gap: 1.4rem;
-  border: var(--style-border-width-primary, 0.1rem) solid transparent;
+  border: var(--eden-action-border-width) solid transparent;
   border-radius: var(--style-border-radius-buttons-primary, 0);
-  padding: var(--button-padding-vertical-mobile, 1.2rem) var(--button-padding-horizontal-mobile, 1.6rem);
+  padding: var(--eden-action-padding-block) var(--eden-action-padding-inline-mobile);
   white-space: nowrap;
 }
 
 @media screen and (min-width: 750px) {
   .eden-action {
-    padding: var(--button-padding-vertical, 1.2rem) var(--button-padding-horizontal, 3.2rem);
+    padding: var(--eden-action-padding-block) var(--eden-action-padding-inline);
   }
+}
+
+/* ------------------------------------------------------- the shape, shared */
+
+/*
+  The handful of section buttons that borrow the look without the class take
+  the measurements from here too, so there is one place to change them. Their
+  own files still carry layout that is theirs alone - where the button sits,
+  how wide it is allowed to grow - and the --cta-* pairs, and nothing else.
+
+  The homepage hero is the one exception and is deliberately not in this list.
+  Its size is a row of settings in the editor, and a shared rule of the same
+  weight loading after the block's own <style> would quietly make every one of
+  those settings do nothing at all. It carries these measurements as its
+  defaults instead: change them here and change them there.
+*/
+.pc-button,
+.gifting-banner__button,
+.editorial-image-cta__button,
+.product-delivery__button,
+.menu-drawer-desktop__button {
+  padding: var(--eden-action-padding-block) var(--eden-action-padding-inline);
+  border-width: var(--eden-action-border-width);
+  border-style: solid;
+  border-radius: var(--style-border-radius-buttons-primary, 0);
+  font-family: var(--button-font-family-primary, var(--font-body--family));
+  font-size: var(--eden-action-font-size);
+  font-weight: var(--eden-action-weight);
+  letter-spacing: var(--eden-action-tracking);
+  line-height: var(--eden-action-line-height);
+  text-transform: var(--button-text-case-primary, uppercase);
 }
 
 /*
@@ -250,7 +315,7 @@ button.shopify-payment-button__button--unbranded,
 .shopify-challenge__button,
 button.shopify-payment-button__button--unbranded,
 .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button) {
-  min-height: 48px;
+  min-height: var(--eden-action-min-height);
 }
 
 @media screen and (min-width: 750px) {
@@ -265,7 +330,7 @@ button.shopify-payment-button__button--unbranded,
   .shopify-challenge__button,
   button.shopify-payment-button__button--unbranded,
   .button-secondary:not(.button-unstyled, .button--tertiary, .button--icon, .button--drawer, .swiper-button, .quantity__button) {
-    min-height: 50px;
+    min-height: var(--eden-action-min-height-desktop);
   }
 }
 

@@ -608,10 +608,14 @@
               {%- assign slides_per_view = 2 -%}
             {%- else -%}
               {%- assign slides_per_view = columns_mobile -%}
+              {%- if section.settings.mobile_card_peek -%}
+                {%- assign slides_per_view = columns_mobile | plus: 0.2 -%}
+              {%- endif -%}
             {%- endif -%}
             {%- capture breakpoints -%}
               {
                 "768": { "slidesPerView": {% if is_widget %}1{% else %}{{ columns_tablet }}{% endif %} },
+                "990": { "slidesPerView": {% if is_widget %}1{% else %}{{ columns_tablet }}{% endif %}, "autoplay": false, "rewind": false },
                 "1024": { "slidesPerView": {% if is_widget %}{{ columns_desktop }}{% else %}{{ columns_tablet }}{% endif %} },
                 "1400": { "slidesPerView": {{ columns_desktop }} }
               }
@@ -625,9 +629,11 @@
                 watch_slides_progress: true,
                 breakpoints: breakpoints
               -%}
+              data-mobile-slide-autoplay="{% if section.settings.mobile_autoplay %}true{% else %}false{% endif %}"
+              data-swiper-autoplay="5"
               style="
                 {% render 'swiper-style',
-                  columns_mobile: columns_mobile,
+                  columns_mobile: slides_per_view,
                   columns_tablet: columns_tablet,
                   columns_desktop: columns_desktop,
                   columns_gap: columns_gap,
@@ -2375,6 +2381,20 @@
           "label": "t:options.two_columns"
         }
       ]
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_card_peek",
+      "default": false,
+      "label": "Show part of the next card on mobile",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_autoplay",
+      "default": false,
+      "label": "Auto-advance on mobile",
+      "visible_if": "{{ section.settings.layout_type == 'carousel' }}"
     },
     {
       "type": "checkbox",
