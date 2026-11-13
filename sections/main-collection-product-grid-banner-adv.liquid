@@ -328,80 +328,114 @@
             </div>
 
             {% liquid
-              assign img_banner1 = section.settings.img_banner1
-              assign img_banner2 = section.settings.img_banner2
-              assign img_banner3 = section.settings.img_banner3
+              # Banners cross-sell. The page's category is the one category:* tag its products
+              # share (wedding and engagement types count as rings); a mixed collection such
+              # as All has none. Banners 1-4 are a priority list: any that promotes the page's
+              # own category is dropped and the rest fill the slots in order.
+              assign page_category = ''
+              assign category_hits = 0
+              assign ring_tags = 'category:ring,type:engagement-ring,type:wedding-band' | split: ','
+              for ring_tag in ring_tags
+                if collection.all_tags contains ring_tag
+                  assign page_category = 'ring'
+                  assign category_hits = 1
+                  break
+                endif
+              endfor
+              assign other_categories = 'earring,bracelet,necklace' | split: ','
+              for other_category in other_categories
+                assign other_tag = 'category:' | append: other_category
+                if collection.all_tags contains other_tag
+                  assign page_category = other_category
+                  assign category_hits = category_hits | plus: 1
+                endif
+              endfor
+              if category_hits != 1
+                assign page_category = ''
+              endif
 
-              # A banner is inserted *before* the product at its position and spans 2 of the 4
-              # columns, so these defaults give: [2 products + banner] / 4 / 4 / [banner + 2
-              # products] / 4 per row from there on.
-              assign banner_position_1 = section.settings.banner_position_1 | round | default: 3
-              assign banner_position_2 = section.settings.banner_position_2 | round | default: 11
-              assign banner_position_3 = section.settings.banner_position_3 | round | default: 12
+              assign banner_queue = ''
+              for n in (1..4)
+                assign show_key = 'show_banner_' | append: n
+                assign category_key = 'banner_category_' | append: n
+                assign banner_category = section.settings[category_key] | default: 'general'
+                if section.settings[show_key] and banner_category != page_category
+                  assign banner_queue = banner_queue | append: n | append: ','
+                endif
+              endfor
+              assign banner_queue = banner_queue | split: ','
 
               # Banners belong to the first page only: later pages are appended to the same grid
               # by infinite scroll, and re-inserting at the same index would repeat them.
-              assign banners_allowed = false
-              if paginate.current_page == 1
-                assign banners_allowed = true
+              assign banner_count = section.settings.banner_count
+              if paginate.current_page != 1
+                assign banner_count = 0
+              endif
+              if banner_queue.size < banner_count
+                assign banner_count = banner_queue.size
               endif
 
-              # No image picked is fine: the snippet falls back to a theme asset, so an
-              # enabled banner always fills its two cells and the rows stay aligned.
-              assign render_banner_1 = false
-              if banners_allowed and section.settings.show_banner_1
-                assign render_banner_1 = true
-              endif
-
-              assign render_banner_2 = false
-              if banners_allowed and section.settings.show_banner_2
-                assign render_banner_2 = true
-              endif
-
-              assign render_banner_3 = false
-              if banners_allowed and section.settings.show_banner_3
-                assign render_banner_3 = true
-              endif
+              # A banner is inserted *before* the product at its slot and spans 2 of the 4
+              # columns, so the defaults give: [2 products + banner] / 4 / 4 / [banner + 2
+              # products] / 4 / [2 products + banner].
+              assign slot_positions = ''
+              for slot in (1..3)
+                assign position_key = 'banner_position_' | append: slot
+                case slot
+                  when 1
+                    assign slot_default = 3
+                  when 2
+                    assign slot_default = 11
+                  else
+                    assign slot_default = 23
+                endcase
+                assign slot_position = section.settings[position_key] | round | default: slot_default
+                if slot_position < 1
+                  assign slot_position = slot_default
+                endif
+                assign slot_positions = slot_positions | append: slot_position | append: ','
+              endfor
+              assign slot_positions = slot_positions | split: ','
             %}
 
             {% capture children %}
               {% for product in collection.products %}
-                {% if forloop.index == banner_position_1 and render_banner_1 %}
-                  {% render 'collection-grid-banner',
-                    index: 1,
-                    image: img_banner1,
-                    fallback: 'lifestyle-earring.jpg',
-                    url: section.settings.link_banner_1,
-                    heading: section.settings.banner_heading_1,
-                    subheading: section.settings.banner_text_1,
-                    video: section.settings.video_banner_1,
-                    text_color: section.settings.banner_text_color_1
-                  %}
-                {% endif %}
-                {% if forloop.index == banner_position_2 and render_banner_2 %}
-                  {% render 'collection-grid-banner',
-                    index: 2,
-                    image: img_banner2,
-                    fallback: 'lifestyle-necklace.jpg',
-                    url: section.settings.link_banner_2,
-                    heading: section.settings.banner_heading_2,
-                    subheading: section.settings.banner_text_2,
-                    video: section.settings.video_banner_2,
-                    text_color: section.settings.banner_text_color_2
-                  %}
-                {% endif %}
-                {% if forloop.index == banner_position_3 and render_banner_3 %}
-                  {% render 'collection-grid-banner',
-                    index: 3,
-                    image: img_banner3,
-                    fallback: 'lifestyle-bracelet.jpg',
-                    url: section.settings.link_banner_3,
-                    heading: section.settings.banner_heading_3,
-                    subheading: section.settings.banner_text_3,
-                    video: section.settings.video_banner_3,
-                    text_color: section.settings.banner_text_color_3
-                  %}
-                {% endif %}
+                {%- assign product_index = forloop.index -%}
+                {%- for slot_position in slot_positions limit: banner_count -%}
+                  {%- assign slot_at = slot_position | plus: 0 -%}
+                  {%- if slot_at == product_index -%}
+                    {%- liquid
+                      assign n = banner_queue[forloop.index0]
+                      assign key_image = 'img_banner' | append: n
+                      assign key_video = 'video_banner_' | append: n
+                      assign key_link = 'link_banner_' | append: n
+                      assign key_heading = 'banner_heading_' | append: n
+                      assign key_text = 'banner_text_' | append: n
+                      assign key_color = 'banner_text_color_' | append: n
+                      assign key_category = 'banner_category_' | append: n
+                      case section.settings[key_category]
+                        when 'ring'
+                          assign banner_fallback = 'lifestyle-princess-ring.jpg'
+                        when 'bracelet'
+                          assign banner_fallback = 'lifestyle-bracelet.jpg'
+                        when 'necklace'
+                          assign banner_fallback = 'lifestyle-necklace.jpg'
+                        else
+                          assign banner_fallback = 'lifestyle-earring.jpg'
+                      endcase
+                    -%}
+                    {% render 'collection-grid-banner',
+                      index: n,
+                      image: section.settings[key_image],
+                      fallback: banner_fallback,
+                      url: section.settings[key_link],
+                      heading: section.settings[key_heading],
+                      subheading: section.settings[key_text],
+                      video: section.settings[key_video],
+                      text_color: section.settings[key_color]
+                    %}
+                  {%- endif -%}
+                {%- endfor -%}
                 <li
                   id="{{ section.id }}-{{ product.id }}"
                   class="product-grid__item product-grid__item--{{ forloop.index0 }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
@@ -595,165 +629,370 @@
     },
     {
       "type": "header",
-      "content": "t:content.product_banner_in_collection",
-      "info": "t:info.product_banner_in_collection_info"
+      "content": "Banners in the grid",
+      "info": "Each page cross-sells: a banner that promotes the page's own category is skipped, so Rings never shows the rings banner. The next banner in the list moves up into its slot."
     },
     {
-      "type": "checkbox",
-      "id": "show_banner_1",
-      "label": "t:settings.enable_banner_1",
-      "default": true
+      "type": "range",
+      "id": "banner_count",
+      "label": "Banners per page",
+      "min": 0,
+      "max": 3,
+      "step": 1,
+      "default": 2
     },
     {
       "type": "text",
       "id": "banner_position_1",
-      "label": "t:settings.banner_position_1",
+      "label": "Slot 1 position",
       "default": "3",
-      "info": "t:info.banner_position_default_1"
+      "info": "The banner goes in before this product. It spans two cards."
+    },
+    {
+      "type": "text",
+      "id": "banner_position_2",
+      "label": "Slot 2 position",
+      "default": "11"
+    },
+    {
+      "type": "text",
+      "id": "banner_position_3",
+      "label": "Slot 3 position",
+      "default": "23"
+    },
+    {
+      "type": "header",
+      "content": "Banner 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_1",
+      "label": "Show",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "banner_category_1",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "earring"
     },
     {
       "type": "image_picker",
       "id": "img_banner1",
-      "label": "t:settings.image"
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
     },
     {
       "type": "video",
       "id": "video_banner_1",
-      "label": "Banner 1 video",
-      "info": "Plays muted on a loop in place of the image. The image is still used as the poster while it loads."
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
     },
     {
       "type": "url",
       "id": "link_banner_1",
-      "label": "t:settings.link"
+      "label": "Link"
     },
     {
       "type": "text",
       "id": "banner_heading_1",
-      "label": "Banner 1 heading",
-      "info": "Shown over the image. Leave blank for an image-only banner.",
+      "label": "Heading",
       "default": "Confidence—Guaranteed"
     },
     {
       "type": "text",
       "id": "banner_text_1",
-      "label": "Banner 1 text",
+      "label": "Text",
       "default": "FREE SHIPPING & 30-DAY RETURNS"
     },
     {
       "type": "select",
       "id": "banner_text_color_1",
-      "label": "Banner 1 text color",
-      "info": "Dark for light product shots, light for photos and videos.",
+      "label": "Text color",
       "options": [
-        { "value": "light", "label": "Light" },
-        { "value": "dark", "label": "Dark" }
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
       ],
       "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 2"
     },
     {
       "type": "checkbox",
       "id": "show_banner_2",
-      "label": "t:settings.enable_banner_2",
+      "label": "Show",
       "default": true
     },
     {
-      "type": "text",
-      "id": "banner_position_2",
-      "label": "t:settings.banner_position_2",
-      "default": "11",
-      "info": "t:info.banner_position_default_2"
+      "type": "select",
+      "id": "banner_category_2",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "bracelet"
     },
     {
       "type": "image_picker",
       "id": "img_banner2",
-      "label": "t:settings.image"
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
     },
     {
       "type": "video",
       "id": "video_banner_2",
-      "label": "Banner 2 video",
-      "info": "Plays muted on a loop in place of the image. The image is still used as the poster while it loads."
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
     },
     {
       "type": "url",
       "id": "link_banner_2",
-      "label": "t:settings.link"
+      "label": "Link"
     },
     {
       "type": "text",
       "id": "banner_heading_2",
-      "label": "Banner 2 heading",
-      "info": "Shown over the image. Leave blank for an image-only banner.",
-      "default": "Where Your Moment Begins"
-    },
-    {
-      "type": "text",
-      "id": "banner_text_2",
-      "label": "Banner 2 text",
-      "default": "START YOUR CUSTOM DESIGN"
-    },
-    {
-      "type": "select",
-      "id": "banner_text_color_2",
-      "label": "Banner 2 text color",
-      "info": "Dark for light product shots, light for photos and videos.",
-      "options": [
-        { "value": "light", "label": "Light" },
-        { "value": "dark", "label": "Dark" }
-      ],
-      "default": "light"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_banner_3",
-      "label": "t:settings.enable_banner_3",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "banner_position_3",
-      "label": "t:settings.banner_position_3",
-      "default": "12",
-      "info": "t:info.banner_position_default_3"
-    },
-    {
-      "type": "image_picker",
-      "id": "img_banner3",
-      "label": "t:settings.image"
-    },
-    {
-      "type": "video",
-      "id": "video_banner_3",
-      "label": "Banner 3 video",
-      "info": "Plays muted on a loop in place of the image. The image is still used as the poster while it loads."
-    },
-    {
-      "type": "url",
-      "id": "link_banner_3",
-      "label": "t:settings.link"
-    },
-    {
-      "type": "text",
-      "id": "banner_heading_3",
-      "label": "Banner 3 heading",
-      "info": "Shown over the image. Leave blank for an image-only banner.",
+      "label": "Heading",
       "default": "Crafted to Last"
     },
     {
       "type": "text",
+      "id": "banner_text_2",
+      "label": "Text",
+      "default": "SHOP BRACELETS"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_2",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_3",
+      "label": "Show",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "banner_category_3",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "ring"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner3",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_3",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_3",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_3",
+      "label": "Heading",
+      "default": "Made for Forever"
+    },
+    {
+      "type": "text",
       "id": "banner_text_3",
-      "label": "Banner 3 text",
-      "default": "SHOP BEST SELLERS"
+      "label": "Text",
+      "default": "SHOP RINGS"
     },
     {
       "type": "select",
       "id": "banner_text_color_3",
-      "label": "Banner 3 text color",
-      "info": "Dark for light product shots, light for photos and videos.",
+      "label": "Text color",
       "options": [
-        { "value": "light", "label": "Light" },
-        { "value": "dark", "label": "Dark" }
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_4",
+      "label": "Show",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "banner_category_4",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "necklace"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner4",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_4",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_4",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_4",
+      "label": "Heading",
+      "default": "Where Your Moment Begins"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_4",
+      "label": "Text",
+      "default": "START YOUR CUSTOM DESIGN"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_4",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
       ],
       "default": "light"
     },
