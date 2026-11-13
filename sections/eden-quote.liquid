@@ -307,9 +307,9 @@
     --gift-text-color: #3f3932;
     --gift-card-bg: rgba(255, 255, 255, 0.92);
     --gift-card-color: #171310;
-    --gift-button-fill: transparent;
+    --gift-button-fill: #ffffff;
     --gift-button-ink: #171310;
-    --gift-button-edge: #171310;
+    --gift-button-edge: #ffffff;
     --gift-button-fill-hover: #171310;
     --gift-button-ink-hover: #ffffff;
     --gift-heading-size: clamp(25px, 2.5vw, 40px);
@@ -700,10 +700,17 @@
     line-height: 1.3;
   }
 
-  /* Shared white-outline action styling, with no section-specific button paint.
+  /* Shared action sizing; the colours come from the section's button settings.
      Raised to the cards' level so "Wash over the product photo" lightens the
      photograph and not the button on top of it. */
   #eden-quote-{{ section.id }} .gifting-banner__button {
+    /* The editor's button colours, handed to the shared hover in eden-actions.css. */
+    --cta-fill: var(--gift-button-fill);
+    --cta-ink: var(--gift-button-ink);
+    --cta-edge: var(--gift-button-edge);
+    --cta-fill-hover: var(--gift-button-fill-hover);
+    --cta-ink-hover: var(--gift-button-ink-hover);
+    --cta-edge-hover: var(--gift-button-fill-hover);
     position: relative;
     z-index: 1;
     display: inline-flex;
@@ -995,7 +1002,7 @@
     {
       "type": "checkbox",
       "id": "mobile_autoplay",
-      "label": "Auto-advance on mobile",
+      "label": "Scroll hint on mobile", "info": "The first time the row comes into view on a phone it slides on by one card and back, once, to show it can be swiped.",
       "default": false
     },
     {
@@ -1289,7 +1296,7 @@
       "type": "color",
       "id": "button_border_color",
       "label": "Border",
-      "default": "#171310"
+      "default": "#ffffff"
     },
     {
       "type": "color",

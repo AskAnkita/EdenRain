@@ -139,6 +139,11 @@
   border: 0;
 }
 
+/* The last option leads straight into the buy buttons, which bring their own spacing. */
+.template-product variant-selects > .variant-option:not(:has(~ .variant-option)) {
+  margin-bottom: 0;
+}
+
 /* "Metal:" in bold, then the chosen value in grey on the same line */
 .template-product .variant-option .form__label {
   display: flex;
@@ -502,7 +507,8 @@
    setting, which is 0 across this theme. */
 .template-product .product-details span.add-to-cart-button-container {
   display: block;
-  margin-top: 2.4rem;
+  /* The options, the empty delivery row and the column gap above already add ~36px. */
+  margin-top: 0.8rem;
 }
 
 /* base.css carries a hand-written `.add-to-cart-button-container
@@ -525,7 +531,7 @@
 
 /* ---------- "Order now to ship by: ..." ---------- */
 .template-product .product-details .delivery-time .group-block-content {
-  align-items: center;
+  align-items: center !important;
   gap: 0.9rem;
 }
 
@@ -542,6 +548,7 @@
   height: 1.8rem;
   flex: none;
   color: var(--pdp-ink);
+  transform: translateY(3px);
 }
 
 .template-product .product-details .delivery-time strong {
@@ -610,8 +617,10 @@
 
 /* ---------- Mobile: the column is the page, so give it page margins ---------- */
 @media screen and (max-width: 749px) {
+  /* Margin alone spaces the rows; the extra padding here used to stack ~70px between them. */
   .template-product .variant-option {
-    padding: 1.6rem 0 1.4rem;
+    padding: 0;
+    margin-bottom: 2.4rem;
   }
 
   .template-product .product-details .multicolumn .grid-layout {

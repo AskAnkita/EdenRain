@@ -225,6 +225,15 @@
     transition: color 0.25s ease;
   }
 
+  /* The theme's global focus ring (3px rule + glow) would sit inside the card
+     and make the field look inset and shorter than the arrow cell; the card
+     turning white is the focus signal here. */
+  #{{ footer_id }} .fc-input:focus,
+  #{{ footer_id }} .fc-input:focus-visible {
+    box-shadow: none;
+    outline: none;
+  }
+
   #{{ footer_id }} .fc-input::placeholder {
     color: var(--fc-field-fg);
     opacity: 0.5;

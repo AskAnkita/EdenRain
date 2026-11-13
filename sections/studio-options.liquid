@@ -50,6 +50,8 @@
   assign tile_height = section.settings.tile_height | plus: 0
   assign tile_gap = section.settings.tile_gap | plus: 0
   assign icon_size = section.settings.icon_size | plus: 0
+  assign step_size = section.settings.step_size | plus: 0
+  assign step_number_size = section.settings.step_number_size | plus: 0
 
   assign content_width = section.settings.content_width | plus: 0
   assign pad_inline = section.settings.padding_horizontal | plus: 0
@@ -103,6 +105,14 @@
   {%- if icon_size > 0 -%}--eso-icon-size: {{ icon_size }}px;{%- endif -%}
   --eso-grid-columns: {{ section.settings.grid_columns }};
 
+  {%- if section.settings.step_active_color != blank and section.settings.step_active_color != transparent -%}--eso-step-active: {{ section.settings.step_active_color }};{%- endif -%}
+  {%- if section.settings.step_active_text != blank and section.settings.step_active_text != transparent -%}--eso-step-on-active: {{ section.settings.step_active_text }};{%- endif -%}
+  {%- if section.settings.step_idle_color != blank and section.settings.step_idle_color != transparent -%}--eso-step-idle: {{ section.settings.step_idle_color }};{%- endif -%}
+  {%- if section.settings.step_line_color != blank and section.settings.step_line_color != transparent -%}--eso-step-line: {{ section.settings.step_line_color }};{%- endif -%}
+  {%- if step_size > 0 -%}--eso-step-size: {{ step_size }}px;{%- endif -%}
+  {%- if step_number_size > 0 -%}--eso-step-font: {{ step_number_size }}px;{%- endif -%}
+  {%- if section.settings.step_shape == 'square' -%}--eso-step-radius: 0;{%- endif -%}
+
   {%- if section.settings.full_width -%}
     --eso-shell-max: none;
   {%- elsif content_width > 0 -%}
@@ -147,9 +157,19 @@
 {%- if section.settings.crop_viewer -%}
   {%- assign viewer_height = section.settings.viewer_height | plus: 0 -%}
   {%- assign viewer_share = section.settings.viewer_height_share | plus: 0 -%}
+  {%- assign viewer_width_share = section.settings.viewer_height_width | plus: 0 -%}
   {%- if section.settings.viewer_height_unit == 'share' -%}
     {%- assign stage = viewer_share | append: 'svh' -%}
     {%- assign stage_fallback = viewer_share | append: 'vh' -%}
+  {%- elsif section.settings.viewer_height_unit == 'width' -%}
+    {%- comment -%}
+      The builder frames the ring to the HEIGHT of its stage, so a stage taller
+      than the phone is wide crops the ring at the sides and it opens zoomed
+      right into the stone. Tying the height to the width keeps the stage a
+      landscape box on every phone, and the whole ring in it.
+    {%- endcomment -%}
+    {%- assign stage = viewer_width_share | append: 'vw' -%}
+    {%- assign stage_fallback = stage -%}
   {%- else -%}
     {%- assign stage = viewer_height | append: 'px' -%}
     {%- assign stage_fallback = stage -%}
@@ -189,8 +209,57 @@
   </style>
 {%- endif -%}
 
+{%- comment -%}
+  The desktop studio, when this list is told to show there.
+
+  iJewel's own panel runs down the right of their frame at a fixed width, and
+  like the phone's crop the only way to be rid of it is to show less frame: the
+  iframe is made wider than its window by the panel's width, so the panel falls
+  off the right edge. This list then stands where it stood - a card beside the
+  3D view, as tall as the frame, scrolling on its own - laid out the way
+  iJewel's panel was, so the page looks as it did with our tiles in it.
+
+  The two sections are siblings in <main>, so the side-by-side is a grid on
+  <main> that exists only while this section is on the page and set to show.
+  Every rule carries the same :has() prefix, so none of them out-ranks another.
+  Below 990px the frame keeps iJewel's own panel and this list stays hidden.
+{%- endcomment -%}
+{%- if section.settings.show_on_desktop -%}
+  {%- assign desk_width = section.settings.desktop_width | plus: 0 -%}
+  {%- assign desk_crop = section.settings.desktop_crop_right | plus: 0 -%}
+  {%- capture desk -%}#MainContent:has(> #shopify-section-{{ section.id }}){%- endcapture -%}
+  <style>
+    @media screen and (min-width: 990px) {
+      {{ desk }} {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) {{ desk_width }}px;
+      }
+      {{ desk }} > * {
+        grid-column: 1 / -1;
+      }
+      {{ desk }} > .shopify-section:has(.ijewel-studio) {
+        grid-column: 1;
+        grid-row: 1;
+        min-width: 0;
+      }
+      {{ desk }} > #shopify-section-{{ section.id }} {
+        grid-column: 2;
+        grid-row: 1;
+        position: relative;
+        min-width: 0;
+      }
+      {{ desk }} .ijw-frame iframe {
+        width: calc(100% + var(--ijw-crop-left, 0px) + {{ desk_crop }}px) !important;
+      }
+      {%- if section.settings.hide_frame_price -%}
+        {{ desk }} .ijw-price { display: none !important; }
+      {%- endif -%}
+    }
+  </style>
+{%- endif -%}
+
 <studio-options
-  class="er-studio-options{% if section.settings.show_on_desktop %} er-studio-options--desktop{% endif %}{% if section.settings.show_row_value %} er-studio-options--values{% endif %}"
+  class="er-studio-options{% if section.settings.show_on_desktop %} er-studio-options--desktop{% endif %}{% if section.settings.show_row_value %} er-studio-options--values{% endif %}{% if section.settings.mobile_steps %} er-studio-options--steps{% endif %}"
   style="{{ section_styles | strip_newlines | strip }}"
   data-origin="{{ origin }}"
   data-frame="{{ section.settings.frame_selector | escape }}"
@@ -200,8 +269,30 @@
   data-swatches="{{ section.settings.swatches | escape }}"
   data-show-unavailable="{{ section.settings.show_unavailable }}"
   data-unavailable-note="{{ section.settings.unavailable_note | escape }}"
+  data-hide="{{ section.settings.hide_options | escape }}"
 >
+  {%- comment -%}
+    The numbered steps on a phone. Filled by the script, one number per row
+    that has choices to show, and moved up above the 3D viewer when it is told
+    to sit there - it takes this section's colours with it on its own style
+    attribute, since it is no longer inside it to inherit them.
+  {%- endcomment -%}
+  {%- if section.settings.mobile_steps -%}
+    <nav
+      class="eso-steps"
+      data-steps
+      data-place="{{ section.settings.steps_position }}"
+      aria-label="{{ section.settings.steps_label | default: 'Design steps' | escape }}"
+      style="{{ section_styles | strip_newlines | strip }}"
+    >
+      <ol class="eso-steps__list"></ol>
+    </nav>
+  {%- endif -%}
+
   <div class="eso-shell">
+    {%- if section.settings.show_on_desktop and section.settings.desktop_heading != blank -%}
+      <p class="eso-desk-title">{{ section.settings.desktop_heading | escape }}</p>
+    {%- endif -%}
     {%- if section.settings.wake_text != blank -%}
       <p class="eso-wake">{{ section.settings.wake_text | escape }}</p>
     {%- endif -%}
@@ -248,6 +339,28 @@
         </div>
       {%- endfor -%}
     </div>
+
+    {%- if section.settings.mobile_steps -%}
+      <div class="eso-stepnav">
+        <button type="button" class="eden-action eden-action--outline eso-stepnav__back" data-step-back>
+          <span aria-hidden="true">&larr;</span>
+          {%- if section.settings.back_label != blank -%}
+            <span>{{ section.settings.back_label | escape }}</span>
+          {%- else -%}
+            <span class="visually-hidden">Back</span>
+          {%- endif -%}
+        </button>
+        <span class="eso-stepnav__count" data-step-count aria-live="polite"></span>
+        <button type="button" class="eden-action eden-action--solid eso-stepnav__next" data-step-next>
+          {%- if section.settings.next_label != blank -%}
+            <span>{{ section.settings.next_label | escape }}</span>
+          {%- else -%}
+            <span class="visually-hidden">Next</span>
+          {%- endif -%}
+          <span aria-hidden="true">&rarr;</span>
+        </button>
+      </div>
+    {%- endif -%}
 
     {%- if section.settings.show_summary -%}
       <details class="eso-summary" {% if section.settings.summary_open %}open{% endif %}>
@@ -344,15 +457,31 @@
 
     { "type": "header", "content": "The viewer above", "info": "iJewel's own option panel sits inside the frame and cannot be restyled from outside it, so this section replaces it: the frame is cut to its 3D stage on phones and their title, panel and add-to-cart fall below the cut. Turn this off to leave the frame alone and show both." },
     { "type": "checkbox", "id": "crop_viewer", "label": "Cut the viewer down to its 3D stage on mobile", "default": true },
-    { "type": "select", "id": "viewer_height_unit", "label": "Measure the 3D stage", "default": "share", "options": [{ "value": "share", "label": "As a share of the screen" }, { "value": "px", "label": "In pixels" }], "info": "A share keeps the same proportion on every phone. Pixels pin it to one height." },
+    { "type": "select", "id": "viewer_height_unit", "label": "Measure the 3D stage", "default": "width", "options": [{ "value": "width", "label": "As a share of the screen width" }, { "value": "share", "label": "As a share of the screen height" }, { "value": "px", "label": "In pixels" }], "info": "The builder sizes the ring to the stage's height, so a stage taller than it is wide opens zoomed in. Width keeps the whole ring in view on every phone." },
+    { "type": "range", "id": "viewer_height_width", "label": "Stage height as a share of the screen width", "min": 40, "max": 150, "step": 2, "unit": "%", "default": 72, "info": "Lower zooms the ring out, higher zooms it in." },
     { "type": "range", "id": "viewer_height_share", "label": "Share of the screen the 3D stage takes", "min": 20, "max": 90, "step": 5, "unit": "%", "default": 60, "info": "Measured against the screen with the browser's bars showing, so the list below always starts where you see it start." },
     { "type": "range", "id": "viewer_height", "label": "Height of the 3D stage on mobile", "min": 200, "max": 800, "step": 10, "unit": "px", "default": 340, "info": "Used only when the stage is measured in pixels. Raise it until the ring is as big as you want and lower it until their title and options are out of sight." },
     { "type": "range", "id": "viewer_stage_ratio", "label": "Share of the frame the builder gives its 3D stage", "min": 10, "max": 100, "step": 1, "unit": "%", "default": 34, "info": "Measured at 34% on iJewel at phone widths. The frame is made tall enough that this share covers the height above, so only the ring shows. Lower it if their title creeps in, raise it if the ring is cut off." },
-    { "type": "checkbox", "id": "hide_frame_price", "label": "Hide the studio's own price panel on mobile", "info": "The bar below carries the price instead. That panel is anchored to the bottom of the frame, so a shorter frame leaves it over the ring.", "default": true },
+    { "type": "checkbox", "id": "hide_frame_price", "label": "Hide the studio's own price panel", "info": "On mobile, and on desktop when the list shows there. The bar carries the price and actions instead; that panel sits where iJewel's own panel was, so with it cropped away it would float over the ring.", "default": true },
+
+    { "type": "header", "content": "Steps (mobile)", "info": "On a phone the rows become numbered steps: one row's choices at a time, Back and Next under them, and the numbers tappable to jump to any step. The summary and the small print show on the last step. Desktop is unchanged." },
+    { "type": "checkbox", "id": "mobile_steps", "label": "Show the rows as steps on mobile", "default": true },
+    { "type": "select", "id": "steps_position", "label": "Where the step numbers sit", "default": "viewer", "options": [{ "value": "viewer", "label": "Above the 3D viewer" }, { "value": "options", "label": "Above the choices, under the viewer" }] },
+    { "type": "select", "id": "step_shape", "label": "Step number shape", "default": "circle", "options": [{ "value": "circle", "label": "Circle" }, { "value": "square", "label": "Square, like the rest of the theme" }] },
+    { "type": "text", "id": "back_label", "label": "Back button label", "info": "Leave empty for the arrow alone.", "default": "Back" },
+    { "type": "text", "id": "next_label", "label": "Next button label", "info": "Leave empty for the arrow alone.", "default": "Next" },
+    { "type": "text", "id": "steps_label", "label": "Name of the steps for screen readers", "default": "Design steps" },
+    { "type": "range", "id": "step_size", "label": "Step number size", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 30px." },
+    { "type": "range", "id": "step_number_size", "label": "Step number text size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the default of 13px." },
+    { "type": "color", "id": "step_active_color", "label": "Current and finished steps", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "step_active_text", "label": "Number on the current step", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "step_idle_color", "label": "Steps not reached yet", "default": "rgba(0,0,0,0)" },
+    { "type": "color", "id": "step_line_color", "label": "Line between steps", "default": "rgba(0,0,0,0)" },
 
     { "type": "header", "content": "Parts" },
     { "type": "checkbox", "id": "one_open_at_a_time", "label": "Only one row open at a time", "default": true },
     { "type": "checkbox", "id": "show_unavailable", "label": "Show choices that cannot be picked yet", "info": "The builder marks an option it cannot build right now - one the rest of the design rules out, or one whose 3D model has not been uploaded to iJewel Drive. On, they show dimmed and unpickable, the way iJewel's own panel shows them. Off, they are left out of the list entirely, which reads as choices the shop does not offer.", "default": true },
+    { "type": "textarea", "id": "hide_options", "label": "Choices to leave out, one per line", "info": "Written exactly as the builder names them, e.g. Platinum. Removed from this list only: the 3D builder and the desktop studio still offer them until they are taken out in iJewel." },
     { "type": "text", "id": "unavailable_note", "label": "Wording on a choice that cannot be picked", "info": "Shown on hover and read out by a screen reader. Leave empty for no wording.", "default": "Not available with this design yet" },
     { "type": "checkbox", "id": "show_row_value", "label": "Show the chosen value in the closed row", "info": "Off keeps the list to names and ticks, with the choices gathered in the summary.", "default": false },
     { "type": "checkbox", "id": "show_summary", "label": "Show the summary", "default": true },
@@ -386,13 +515,13 @@
     { "type": "select", "id": "button2_style", "label": "Second button style", "options": [ { "value": "outline", "label": "Outlined" }, { "value": "solid", "label": "Filled" }, { "value": "light", "label": "Outlined, for a dark background" }, { "value": "invert", "label": "Filled white, for a dark background" } ], "default": "outline" },
 
     { "type": "header", "content": "Swatch colours", "info": "The builder sends an icon for some options and nothing for others. Map an option to a colour and a tile with no icon is filled with it. One per line: the option key or its label, then a colour." },
-    { "type": "textarea", "id": "swatches", "label": "Option colours, one per line", "default": "White Gold | #d8d8da\nYellow Gold | #e6c584\nRose Gold | #e0b09c\nPlatinum | #d9dadc" },
+    { "type": "textarea", "id": "swatches", "label": "Option colours, one per line", "default": "White Gold | #e7e5df\nYellow Gold | #e6c584\nRose Gold | #e0b09c\nPlatinum | #c6cad0\nSilver | #cfd3d8" },
 
     { "type": "header", "content": "Sizes" },
     { "type": "range", "id": "row_height", "label": "Row height", "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0, "info": "0 keeps the default of 53px." },
     { "type": "range", "id": "tick_size", "label": "Tick size", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 16px." },
-    { "type": "range", "id": "tile_width", "label": "Tile minimum width", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the default of 87px. Tiles share the row evenly." },
-    { "type": "range", "id": "tile_height", "label": "Tile height", "min": 0, "max": 120, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 46px." },
+    { "type": "range", "id": "tile_width", "label": "Tile minimum width", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the default of 64px. Tiles share the row evenly." },
+    { "type": "range", "id": "tile_height", "label": "Metal swatch size", "min": 0, "max": 120, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 44px." },
     { "type": "range", "id": "tile_gap", "label": "Gap between tiles", "min": 0, "max": 24, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 4px." },
     { "type": "select", "id": "grid_columns", "label": "Icons per row, for icon grid rows", "options": [ { "value": "3", "label": "3" }, { "value": "4", "label": "4" }, { "value": "5", "label": "5" }, { "value": "6", "label": "6" } ], "default": "4" },
     { "type": "range", "id": "icon_size", "label": "Icon size, for icon grid rows", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 0, "info": "0 keeps the default of 40px." },
@@ -420,7 +549,10 @@
     { "type": "range", "id": "note_size", "label": "Small print size", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 0 },
 
     { "type": "header", "content": "Where it shows" },
-    { "type": "checkbox", "id": "show_on_desktop", "label": "Show on desktop as well", "info": "Off by default: on a laptop the studio is the full frame and the builder's own panel.", "default": false },
+    { "type": "checkbox", "id": "show_on_desktop", "label": "Show on desktop as well", "info": "On, the list replaces iJewel's own panel beside the 3D view on screens 990px and wider, laid out the way theirs is. Off, desktop shows iJewel's panel.", "default": false },
+    { "type": "text", "id": "desktop_heading", "label": "Heading of the desktop panel", "default": "Engagement ring", "info": "Leave empty to hide it." },
+    { "type": "range", "id": "desktop_width", "label": "Width of the desktop panel", "min": 320, "max": 620, "step": 6, "unit": "px", "default": 476 },
+    { "type": "range", "id": "desktop_crop_right", "label": "Crop iJewel's own panel off the right (desktop)", "min": 0, "max": 700, "step": 10, "unit": "px", "default": 500, "info": "Their panel is about 494px wide with its margin; 500 takes it off. Raise it if an edge of theirs shows." },
     { "type": "checkbox", "id": "full_width", "label": "Stretch content to the screen edge", "default": false },
     { "type": "range", "id": "content_width", "label": "Maximum content width", "min": 0, "max": 2400, "step": 40, "unit": "px", "default": 0, "info": "0 keeps the default 1480px. Ignored when the box above is ticked." },
     { "type": "range", "id": "padding_horizontal", "label": "Side padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the default of 16px." },

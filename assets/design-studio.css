@@ -127,6 +127,9 @@
   margin: 24px 0 0;
   padding: 0;
   list-style: none;
+  /* Clips the separator of a claim that wrapped to a new line: it hangs left
+     of the list's edge there, and nothing else in the list reaches outside. */
+  overflow: hidden;
 }
 
 .ds-note {
@@ -642,5 +645,18 @@
 
   .ds-progress__link {
     white-space: nowrap;
+  }
+
+  /* Two buttons never fit side by side on a phone, and each one sizes to its
+     own label, so the stacked pair came out at two different widths. A
+     one-column grid as wide as its widest button gives both that width. */
+  .ds-actions {
+    display: grid;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .ds-cta .ds-actions {
+    margin-inline: auto;
   }
 }

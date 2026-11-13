@@ -39,6 +39,182 @@
   }
 }
 
+/* Between a phone and a laptop the frame is too narrow to share, so the
+   builder's own panel stays and this list waits for 990px. */
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  .er-studio-options--desktop {
+    display: none;
+  }
+}
+
+.eso-desk-title {
+  display: none;
+}
+
+/*
+  Desktop: the list takes the place of iJewel's own panel, so it is laid out
+  the way theirs was - a bordered card down the right of the 3D view, a
+  heading, every part open at once under "Name: chosen value", choices
+  underlined when picked, and the actions pinned to the foot of the card.
+  Square corners, as the rest of the theme has.
+*/
+@media screen and (min-width: 990px) {
+  .er-studio-options--desktop {
+    position: absolute;
+    inset: 16px 20px 16px 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--eso-rule, #e4e4e4);
+    background: var(--eso-section-bg, #fff);
+    padding: 0;
+  }
+
+  .er-studio-options--desktop .eso-shell {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: none;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  .er-studio-options--desktop .eso-desk-title {
+    display: block;
+    margin: 0;
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid var(--eso-rule, #e4e4e4);
+    color: var(--eso-label-color, var(--eso-ink));
+    font-size: 2.6rem;
+    line-height: 1.2;
+  }
+
+  .er-studio-options--desktop .eso-wake {
+    padding: 16px 20px 0;
+    text-align: left;
+  }
+
+  .er-studio-options--desktop .eso-rows {
+    padding: 8px 20px 0;
+  }
+
+  .er-studio-options--desktop .eso-row,
+  .er-studio-options--desktop .eso-row:last-of-type {
+    border: 0;
+  }
+
+  /* Every part is open, so the head is a caption, not a button. */
+  .er-studio-options--desktop .eso-row__head {
+    min-height: 0;
+    padding: 22px 0 14px;
+    pointer-events: none;
+  }
+
+  .er-studio-options--desktop .eso-row__label {
+    font-family: inherit;
+    font-size: var(--eso-label-size, 1.6rem);
+    font-weight: 400;
+  }
+
+  .er-studio-options--desktop .eso-row__label::after {
+    content: ":";
+  }
+
+  /* Written out at this weight to beat the closed-row rule further down that
+     hides the value everywhere else. */
+  studio-options.er-studio-options.er-studio-options--desktop .eso-row__value {
+    display: block;
+    flex: 0 1 auto;
+    margin-left: -4px;
+    color: var(--eso-ink);
+    font-size: var(--eso-label-size, 1.6rem);
+    text-align: left;
+  }
+
+  .er-studio-options--desktop .eso-row__tick,
+  .er-studio-options--desktop .eso-row__chev,
+  .er-studio-options--desktop .eso-row__ask,
+  .er-studio-options--desktop .eso-summary {
+    display: none;
+  }
+
+  .er-studio-options--desktop .eso-row__panel {
+    display: block;
+    padding-bottom: 6px;
+  }
+
+  /* Tiles and icons on one even grid, five across, the chosen one underlined. */
+  .er-studio-options--desktop .eso-choices--tiles,
+  .er-studio-options--desktop .eso-choices--grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px 8px;
+  }
+
+  .er-studio-options--desktop .eso-choices--tiles .eso-pick,
+  .er-studio-options--desktop .eso-choices--grid .eso-pick {
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    padding: 0 0 8px;
+  }
+
+  .er-studio-options--desktop .eso-choices--tiles .eso-pick[aria-pressed="true"],
+  .er-studio-options--desktop .eso-choices--grid .eso-pick[aria-pressed="true"] {
+    border-bottom-color: var(--eso-chosen-color, var(--eso-ink));
+  }
+
+  .er-studio-options--desktop .eso-choices--tiles .eso-pick__swatch {
+    width: var(--eso-tile-height, 34px);
+    height: var(--eso-tile-height, 34px);
+  }
+
+  .er-studio-options--desktop .eso-pick--stone .eso-pick__swatch {
+    width: 50px;
+    height: 50px;
+  }
+
+  /* iJewel's outline fills only half its own canvas, so it is drawn larger
+     here for the heaviest stone to near the width of the tile. */
+  .er-studio-options--desktop .eso-choices--tiles .eso-pick--stone .eso-pick__swatch img {
+    width: calc(var(--eso-stone-scale, 1) * 170%);
+    height: calc(var(--eso-stone-scale, 1) * 170%);
+    max-width: none;
+    flex: 0 0 auto;
+  }
+
+  /* The underline marks the choice, as iJewel's panel does - no box as well. */
+  .er-studio-options--desktop .eso-choices--tiles .eso-pick[aria-pressed="true"] .eso-pick__swatch {
+    outline-color: transparent;
+  }
+
+  .er-studio-options--desktop .eso-choices--grid .eso-pick__swatch {
+    width: var(--eso-icon-size, 44px);
+    height: var(--eso-icon-size, 44px);
+  }
+
+  .er-studio-options--desktop .eso-choices .eso-pick__label {
+    color: var(--eso-ink);
+    font-size: var(--eso-tile-label-size, 1.2rem);
+  }
+
+  .er-studio-options--desktop .eso-pick[data-unavailable] .eso-pick__label {
+    color: var(--eso-muted);
+  }
+
+  .er-studio-options--desktop .eso-sublabel {
+    margin: 18px 0 10px;
+  }
+
+  .er-studio-options--desktop .eso-notes {
+    padding: 18px 20px;
+  }
+
+  .er-studio-options--desktop .eso-bar {
+    position: static;
+    padding: 18px 20px;
+  }
+}
+
 .eso-shell {
   max-width: var(--eso-shell-max, 1480px);
   margin: 0 auto;
@@ -221,24 +397,53 @@
   opacity: 0.35;
 }
 
-/* A tile is the material itself, its name sitting on it. They lay out on a
-   grid that fits as many even columns as the screen takes, so a wrapped last
-   tile is the same width as the rest rather than stretched across the row. */
+/* A tile is a square of the material with its name under it. The squares sit
+   on an even grid and every tile is top-aligned, so a name that wraps to two
+   lines does not push its swatch out of line with its neighbours. */
 .eso-choices--tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--eso-tile-width, 87px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--eso-tile-width, 64px), 1fr));
+  align-items: start;
+  gap: 12px 8px;
 }
 
 .eso-choices--tiles .eso-pick {
-  position: relative;
-  min-height: var(--eso-tile-height, 46px);
-  background: var(--eso-tile-fill, var(--eso-wash));
-  padding: 8px 10px;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  border: 0;
+  padding: 0;
 }
 
+/* Metals come in three colours, each in 9K, 14K and 18K. Three to a line
+   keeps every carat of a colour stacked in the same column instead of the
+   nine tiles wrapping five and four. */
+.eso-row[data-axis$="Metal"] .eso-choices--tiles {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* A metal is shown as a round swatch - a coin of the metal - in both the band
+   and the setting rows. The one exception to the theme's square corners; the
+   chosen ring's outline follows the curve. */
+.eso-row[data-axis$="Metal"] .eso-pick__swatch {
+  border-radius: 50%;
+}
+
+/* Flat colour reads as paint, so a soft light falls across it from the top
+   left - enough to say metal without pretending to be a render. */
 .eso-choices--tiles .eso-pick__swatch {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  display: block;
+  width: var(--eso-tile-height, 44px);
+  height: var(--eso-tile-height, 44px);
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.14) 100%),
+    var(--eso-tile-fill, var(--eso-wash));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  outline: 1px solid transparent;
+  outline-offset: 3px;
+  transition: outline-color 0.2s ease;
 }
 
 .eso-choices--tiles .eso-pick__swatch img {
@@ -249,13 +454,61 @@
 }
 
 .eso-choices--tiles .eso-pick__label {
-  position: relative;
-  font-size: var(--eso-tile-label-size, 1.5rem);
+  max-width: 9em;
+  color: var(--eso-muted);
+  font-size: var(--eso-tile-label-size, 1.3rem);
+  line-height: 1.3;
   text-align: center;
+  transition: color 0.2s ease;
 }
 
-.eso-choices--tiles .eso-pick[aria-pressed="true"] {
+.eso-choices--tiles .eso-pick[aria-pressed="true"] .eso-pick__swatch {
+  outline-color: var(--eso-chosen-color, var(--eso-ink));
+}
+
+.eso-choices--tiles .eso-pick[aria-pressed="true"] .eso-pick__label {
+  color: var(--eso-chosen-color, var(--eso-ink));
+}
+
+/* A tile with nothing to picture - a carat weight - is its name in a box. */
+.eso-choices--tiles .eso-pick--text {
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 4px;
+  border: 1px solid var(--eso-rule, var(--eso-line));
+  transition: border-color 0.2s ease;
+}
+
+.eso-choices--tiles .eso-pick--text[aria-pressed="true"] {
   border-color: var(--eso-chosen-color, var(--eso-ink));
+}
+
+/* A carat tile: the chosen shape drawn at that weight, centred on a plain
+   ground so the size difference is the only thing that changes. */
+.eso-choices--tiles .eso-pick--stone .eso-pick__swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* A carat drawing and a stone photograph stand on nothing: no wash, no light
+   across them, no hairline box - the picture alone. */
+.eso-choices--tiles .eso-pick--stone .eso-pick__swatch,
+.eso-choices--tiles .eso-pick--image .eso-pick__swatch {
+  background: none;
+  box-shadow: none;
+}
+
+.eso-choices--tiles .eso-pick--stone .eso-pick__swatch img {
+  width: calc(var(--eso-stone-scale, 1) * 80%);
+  height: calc(var(--eso-stone-scale, 1) * 80%);
+  object-fit: contain;
+}
+
+/* Two tile rows in one panel (band, then setting) sit as a pair. */
+.eso-sublist.eso-choices--tiles {
+  display: grid;
+  margin-top: 10px;
 }
 
 /* a grid cell: the icon over its name, for shapes and settings */
@@ -293,28 +546,6 @@
   border-color: var(--eso-chosen-color, var(--eso-ink));
 }
 
-/* A tile whose material the builder sent as a picture: the picture is the
-   tile and the name sits under it, because a name laid over a photographed
-   metal cannot be read. */
-.eso-choices--tiles .eso-pick--image {
-  flex-direction: column;
-  gap: 6px;
-  background: none;
-  padding: 0 0 6px;
-}
-
-.eso-choices--tiles .eso-pick--image .eso-pick__swatch {
-  position: relative;
-  inset: auto;
-  display: block;
-  width: 100%;
-  height: var(--eso-tile-height, 46px);
-}
-
-.eso-choices--tiles .eso-pick--image .eso-pick__label {
-  padding: 0 6px;
-}
-
 /* the second axis: a plain radio list, the thing inside the thing */
 .eso-sublist {
   display: flex;
@@ -330,7 +561,7 @@
   font-size: var(--eso-text-size, 1.4rem);
 }
 
-.eso-sublist .eso-pick {
+.eso-sublist:not(.eso-choices--tiles) .eso-pick {
   justify-content: flex-start;
   gap: 12px;
   padding: 7px 0;
@@ -339,7 +570,7 @@
   text-align: left;
 }
 
-.eso-sublist .eso-pick::before {
+.eso-sublist:not(.eso-choices--tiles) .eso-pick::before {
   content: "";
   flex: 0 0 auto;
   width: 18px;
@@ -348,11 +579,11 @@
   border-radius: 50%;
 }
 
-.eso-sublist .eso-pick[aria-pressed="true"] {
+.eso-sublist:not(.eso-choices--tiles) .eso-pick[aria-pressed="true"] {
   color: var(--eso-chosen-color, var(--eso-ink));
 }
 
-.eso-sublist .eso-pick[aria-pressed="true"]::before {
+.eso-sublist:not(.eso-choices--tiles) .eso-pick[aria-pressed="true"]::before {
   border-color: currentColor;
   box-shadow: inset 0 0 0 3.5px var(--eso-section-bg, #fff), inset 0 0 0 18px currentColor;
 }
@@ -408,7 +639,7 @@
 }
 
 .eso-summary__body {
-  padding-bottom: 18px;
+  padding-bottom: 14px;
 }
 
 .eso-specs {
@@ -449,7 +680,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px var(--eso-pad-inline, 16px);
+  padding: 14px var(--eso-pad-inline, 16px) calc(14px + env(safe-area-inset-bottom, 0px));
   background: var(--eso-section-bg, #fff);
   box-shadow: 0 -1px 0 var(--eso-rule, var(--eso-line));
 }
@@ -489,7 +720,7 @@
   display: flex;
   flex: 1 1 auto;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 12px;
   min-width: 0;
 }
 
@@ -509,11 +740,196 @@
   font-size: var(--eden-action-font-size);
 }
 
+/* Three short claims between two hairlines - the summary's rule above and the
+   bar's below. Set tight to both they read as one crowded block, so they get
+   the same air as a row and sit centred under the list rather than ragged
+   against its left edge. */
 .eso-notes {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 18px;
-  padding: 14px var(--eso-pad-inline, 16px) 0;
+  justify-content: center;
+  gap: 6px 20px;
+  padding: 16px 0 18px;
   color: var(--eso-text-color, var(--eso-muted));
   font-size: var(--eso-note-size, 1.2rem);
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* -------------------------------------------------------------------- steps */
+
+/*
+  On a phone the rows can run as steps: a numbered strip, one row's choices at
+  a time, and Back and Next under them. The numbers jump straight to any step,
+  forwards or back. The rows and their tiles are exactly the list above - a
+  step is only which row is showing. Desktop never sees any of it.
+
+  The strip may have been moved above the 3D viewer, out of this section, so
+  its rules stand on their own class rather than hanging off the section's.
+*/
+.eso-steps,
+.eso-stepnav {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .eso-steps {
+    --eso-step-active-ink: var(--eso-step-active, #171714);
+    display: block;
+    padding: 12px var(--eso-pad-inline, 16px);
+    background: var(--eso-section-bg, #fff);
+  }
+
+  .eso-steps__list {
+    display: flex;
+    align-items: center;
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+
+  .eso-steps__item {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    margin: 0;
+  }
+
+  .eso-steps__item:last-child {
+    flex: 0 0 auto;
+  }
+
+  /* The line runs from each number to the next. */
+  .eso-steps__item:not(:last-child)::after {
+    content: '';
+    flex: 1 1 auto;
+    height: 1px;
+    margin: 0 6px;
+    background: var(--eso-step-line, rgba(23, 23, 20, 0.22));
+  }
+
+  .eso-steps__dot {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: var(--eso-step-size, 30px);
+    height: var(--eso-step-size, 30px);
+    padding: 0;
+    border: 1px solid var(--eso-step-line, rgba(23, 23, 20, 0.22));
+    border-radius: var(--eso-step-radius, 50%);
+    background: var(--eso-section-bg, #fff);
+    color: var(--eso-step-idle, #69675f);
+    font-family: inherit;
+    font-size: var(--eso-step-font, 1.3rem);
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  /* A step the shopper has chosen in reads as done: drawn in ink, not grey. */
+  .eso-steps__dot[data-done] {
+    border-color: var(--eso-step-active-ink);
+    color: var(--eso-step-active-ink);
+  }
+
+  .eso-steps__dot[aria-current='step'] {
+    border-color: var(--eso-step-active-ink);
+    background: var(--eso-step-active-ink);
+    color: var(--eso-step-on-active, #fff);
+  }
+
+  .eso-steps__dot:focus-visible {
+    outline: 2px solid var(--eso-step-active-ink);
+    outline-offset: 2px;
+  }
+
+  /* One row at a time, always open, its name standing as the step's title. */
+  .er-studio-options--steps .eso-row,
+  .er-studio-options--steps .eso-row:last-of-type {
+    display: none;
+    border: 0;
+  }
+
+  .er-studio-options--steps .eso-row[data-step-active] {
+    display: block;
+  }
+
+  .er-studio-options--steps .eso-row[data-empty] {
+    display: none;
+  }
+
+  .er-studio-options--steps .eso-row__panel {
+    display: block;
+    padding-bottom: 8px;
+  }
+
+  .er-studio-options--steps .eso-row__head {
+    cursor: default;
+  }
+
+  .er-studio-options--steps .eso-row__chev {
+    display: none;
+  }
+
+  /* The recap and the small print are the end of the walk, not its start. */
+  .er-studio-options--steps:not([data-step-last]) .eso-summary,
+  .er-studio-options--steps:not([data-step-last]) .eso-notes {
+    display: none;
+  }
+
+  /* A quiet row, not a second pair of CTAs: the save and contact buttons in
+     the bar below are the calls to action, these only move between steps.
+     Back is a plain text link, Next a compact filled button, and the step
+     count sits between them. */
+  .er-studio-options--steps .eso-stepnav {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 14px 0 20px;
+    border-top: 1px solid var(--eso-rule, var(--eso-line));
+  }
+
+  .eso-stepnav .eden-action {
+    --eden-action-min-height: 40px;
+    gap: 8px;
+    min-width: 0;
+    padding: 9px 18px;
+    font-size: 1.15rem;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+  }
+
+  .eso-stepnav__back {
+    justify-self: start;
+    --cta-fill: transparent;
+    --cta-edge: transparent;
+    --cta-ink: var(--eso-text-color, var(--eso-muted));
+    --cta-fill-hover: transparent;
+    --cta-edge-hover: transparent;
+    --cta-ink-hover: var(--eso-ink);
+  }
+
+  .eso-stepnav .eso-stepnav__back {
+    padding-left: 0;
+  }
+
+  .eso-stepnav__count {
+    color: var(--eso-text-color, var(--eso-muted));
+    font-size: var(--eso-note-size, 1.2rem);
+    letter-spacing: 0.1em;
+  }
+
+  .eso-stepnav__next {
+    justify-self: end;
+    grid-column: 3;
+  }
+
+  .er-studio-options--steps[data-step-first] .eso-stepnav__back,
+  .er-studio-options--steps[data-step-last] .eso-stepnav__next {
+    visibility: hidden;
+  }
 }

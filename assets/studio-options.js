@@ -53,6 +53,12 @@ if (!customElements.get('studio-options')) {
         this.showUnavailable = this.dataset.showUnavailable !== 'false';
         this.seq = 0;
         this.pending = new Map();
+        // The builder opens on a finished default ring, so every axis has a
+        // selection from the first frame. A tick means the visitor chose it:
+        // rows they have picked in, or every row when ?state= reopened a ring
+        // they designed before.
+        this.touched = new Set();
+        this.restored = /[?&]state=/.test(window.location.search);
         this.rows = Array.from(this.querySelectorAll('.eso-row'));
         this.summary = this.querySelector('.eso-summary__body');
         this.total = this.querySelector('[data-total]');
@@ -67,12 +73,103 @@ if (!customElements.get('studio-options')) {
           if (head) head.addEventListener('click', () => this.toggle(row));
         });
 
+        if (this.classList.contains('er-studio-options--steps')) this.setupSteps();
+
         this.findFrame();
       }
 
       disconnectedCallback() {
         window.removeEventListener('message', this.handler);
         clearInterval(this.hunt);
+        // Moved up above the viewer it is no longer ours to lose with the
+        // section, so a re-render in the theme editor would leave it behind.
+        if (this.stepNav && !this.contains(this.stepNav)) this.stepNav.remove();
+      }
+
+      /* --------------------------------------------------------------- steps */
+
+      // On a phone the rows become steps: one row on show at a time, Back and
+      // Next under it, and a numbered strip that jumps straight to any row in
+      // either direction. Rows are the same rows, with the same tiles - a step
+      // is only which of them is showing. Wider screens keep the list as it was.
+      setupSteps() {
+        this.stepped = true;
+        this.phone = window.matchMedia('(max-width: 749px)');
+        this.stepNav = this.querySelector('[data-steps]');
+        this.stepList = this.stepNav ? this.stepNav.querySelector('.eso-steps__list') : null;
+
+        if (this.stepNav && this.stepNav.dataset.place === 'viewer') {
+          const studio = document.querySelector('ijewel-studio');
+          const section = studio ? studio.closest('.shopify-section') || studio : null;
+          if (section && section.parentNode) section.parentNode.insertBefore(this.stepNav, section);
+        }
+
+        const back = this.querySelector('[data-step-back]');
+        const next = this.querySelector('[data-step-next]');
+        if (back) back.addEventListener('click', () => this.go(this.stepIndex() - 1, true));
+        if (next) next.addEventListener('click', () => this.go(this.stepIndex() + 1, true));
+
+        this.go(0, false);
+      }
+
+      // Rows the builder has nothing to offer for are hidden, so they are not
+      // steps either; the numbering closes up around them.
+      steps() {
+        return this.rows.filter((row) => !row.hasAttribute('data-empty'));
+      }
+
+      stepIndex() {
+        return Math.max(0, this.steps().indexOf(this.current));
+      }
+
+      go(index, user) {
+        if (!this.stepped) return;
+        const steps = this.steps();
+        if (!steps.length) return;
+        const i = Math.min(Math.max(index, 0), steps.length - 1);
+        this.current = steps[i];
+        this.rows.forEach((row) => row.toggleAttribute('data-step-active', row === this.current));
+        this.toggleAttribute('data-step-first', i === 0);
+        this.toggleAttribute('data-step-last', i === steps.length - 1);
+        this.drawSteps();
+        const count = this.querySelector('[data-step-count]');
+        if (count) count.textContent = i + 1 + ' / ' + steps.length;
+
+        // The ring stays where it is; only when the shopper has scrolled past
+        // the top of the choices is the page brought back to the new step.
+        if (user && this.phone.matches) {
+          const top = this.getBoundingClientRect().top;
+          if (top < 0) window.scrollBy({ top: top - 8, behavior: 'smooth' });
+        }
+      }
+
+      drawSteps() {
+        if (!this.stepList) return;
+        const steps = this.steps();
+        // The current row may have just emptied out under a new choice.
+        if (this.current && steps.indexOf(this.current) === -1) {
+          this.go(Math.min(this.rows.indexOf(this.current), steps.length - 1), false);
+          return;
+        }
+        this.stepList.innerHTML = '';
+        steps.forEach((row, i) => {
+          const item = document.createElement('li');
+          item.className = 'eso-steps__item';
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'eso-steps__dot';
+          dot.textContent = String(i + 1);
+          const label = row.querySelector('.eso-row__label');
+          dot.setAttribute('aria-label', (i + 1) + '. ' + (label ? label.textContent.trim() : ''));
+          if (row === this.current) dot.setAttribute('aria-current', 'step');
+          if (row.getAttribute('data-chosen') === 'true') dot.setAttribute('data-done', '');
+          dot.addEventListener('click', () => this.go(i, true));
+          item.appendChild(dot);
+          this.stepList.appendChild(item);
+        });
+        const count = this.querySelector('[data-step-count]');
+        const at = steps.indexOf(this.current);
+        if (count && at > -1) count.textContent = at + 1 + ' / ' + steps.length;
       }
 
       /* ------------------------------------------------------------ the frame */
@@ -173,16 +270,49 @@ if (!customElements.get('studio-options')) {
       load(row, axis, selector) {
         const host = row.querySelector(selector);
         if (!host) return;
-        this.call('getOptions', { axis: axis })
-          .then((options) => {
+        // A carat has no picture of its own, so the tile shows the chosen
+        // shape's icon drawn at that weight - the same stone, bigger or smaller.
+        const shape =
+          axis === 'carat'
+            ? this.call('getOptions', { axis: 'shape' })
+                .then((shapes) => {
+                  const on = Array.isArray(shapes) ? shapes.find((o) => o && o.state === 'selected') : null;
+                  return on && on.icon ? on.icon : '';
+                })
+                .catch(() => '')
+            : Promise.resolve('');
+        Promise.all([this.call('getOptions', { axis: axis }), shape])
+          .then(([options, shapeIcon]) => {
             const all = Array.isArray(options) ? options.filter(Boolean) : [];
             const list = all.filter(
-              (option) => option.state !== 'hidden' && (this.showUnavailable || !unpickable(option))
+              (option) =>
+                option.state !== 'hidden' &&
+                !this.dropped(option) &&
+                (this.showUnavailable || !unpickable(option))
             );
+            if (shapeIcon) this.weigh(list, shapeIcon);
             this.paint(row, host, axis, list);
             if (selector === '.eso-choices') this.mark(row, list);
           })
           .catch(noop);
+      }
+
+      // A stone's width grows with the cube root of its weight, so 2 ct is
+      // about 1.26x the width of 1 ct, not twice it. The heaviest carat on
+      // offer fills the tile and the rest scale down from it.
+      weigh(list, icon) {
+        const weight = (option) => {
+          const m = String(option.label || option.key || '').match(/\d+(?:\.\d+)?/);
+          return m ? parseFloat(m[0]) : 0;
+        };
+        const top = Math.max(0, ...list.map(weight));
+        if (!top) return;
+        list.forEach((option) => {
+          const w = weight(option);
+          if (!w) return;
+          option.stone = icon;
+          option.scale = Math.max(0.3, Math.cbrt(w / top));
+        });
       }
 
       // The row's head carries the chosen value and the tick, so the list reads
@@ -191,13 +321,18 @@ if (!customElements.get('studio-options')) {
         const chosen = list.find((o) => o.state === 'selected');
         const value = row.querySelector('.eso-row__value');
         if (value) value.textContent = chosen ? chosen.label : '';
-        row.setAttribute('data-chosen', chosen ? 'true' : 'false');
+        const mine = this.restored || this.touched.has(row);
+        row.setAttribute('data-chosen', chosen && mine ? 'true' : 'false');
         row.toggleAttribute('data-empty', list.length === 0);
         this.recap();
+        if (this.stepped) this.drawSteps();
       }
 
       paint(row, host, axis, list) {
-        const style = host.classList.contains('eso-sublist') ? 'list' : row.dataset.style || 'tiles';
+        // A second axis offering the same materials as the first (band metal,
+        // then setting metal) is drawn the same way, so the two read as a pair.
+        const rowStyle = row.dataset.style || 'tiles';
+        const style = host.classList.contains('eso-sublist') && rowStyle !== 'tiles' ? 'list' : rowStyle;
         host.innerHTML = '';
         host.className = host.className.replace(/\s*eso-choices--\S+/g, '');
         if (style !== 'list' || !host.classList.contains('eso-sublist')) {
@@ -224,13 +359,25 @@ if (!customElements.get('studio-options')) {
             }
           }
 
-          // A tile is the material itself: its icon if the builder sends one,
-          // otherwise a colour the merchant mapped to the option's key.
-          if (style === 'tiles' || style === 'grid') {
+          // A tile is the material itself. The merchant's mapped colour wins over
+          // the builder's icon: iJewel's metal icons are mirror balls reflecting
+          // a studio, which read as photographs of a room, not as gold.
+          // A choice with no material to show (a carat weight) is its name in a
+          // box, not an empty swatch over its name.
+          const plain = style === 'tiles' && !option.stone && !option.icon && !this.colour(option);
+          if (plain) button.classList.add('eso-pick--text');
+          if ((style === 'tiles' && !plain) || style === 'grid') {
             const swatch = document.createElement('span');
             swatch.className = 'eso-pick__swatch';
-            const colour = this.colour(option);
-            if (option.icon) {
+            const colour = style === 'tiles' ? this.colour(option) : '';
+            if (option.stone) {
+              button.classList.add('eso-pick--stone');
+              const img = document.createElement('img');
+              img.src = option.stone;
+              img.alt = '';
+              img.style.setProperty('--eso-stone-scale', option.scale);
+              swatch.appendChild(img);
+            } else if (option.icon && !colour) {
               // iJewel sends a rendered photograph of the material, not a flat
               // colour, so the name cannot sit on top of it and be read. The
               // tile becomes the picture and the name goes underneath it.
@@ -265,7 +412,23 @@ if (!customElements.get('studio-options')) {
         });
       }
 
+      // Options the shop does not offer for now, named in the section settings.
+      // Left out of this list only - the builder itself still has them.
+      dropped(option) {
+        if (!this.hiddenNames) {
+          this.hiddenNames = (this.dataset.hide || '')
+            .split('\n')
+            .map((line) => line.trim().toLowerCase())
+            .filter(Boolean);
+        }
+        const label = String(option.label || '').toLowerCase();
+        const key = String(option.key || '').toLowerCase();
+        return this.hiddenNames.some((name) => name === label || name === key);
+      }
+
       choose(axis, option) {
+        const row = this.rows.find((r) => r.dataset.axis === axis || r.dataset.subAxis === axis);
+        if (row) this.touched.add(row);
         this.setAttribute('data-busy', 'true');
         this.call('select', { axis: axis, option: option.key })
           .catch(noop)
@@ -321,6 +484,8 @@ if (!customElements.get('studio-options')) {
       }
 
       toggle(row) {
+        // As a step the row is always open; its name is a heading, not a switch.
+        if (this.stepped && this.phone.matches) return;
         const open = row.hasAttribute('data-open');
         if (this.single) this.rows.forEach((other) => other.removeAttribute('data-open'));
         row.toggleAttribute('data-open', !open);

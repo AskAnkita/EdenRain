@@ -2220,12 +2220,15 @@ class SwiperComponent extends HTMLElement {
         effect,
         spaceBetween: defaultSpacebetween,
         autoplay: {
-          enabled: getOption("slide-autoplay", false) || (getOption("mobile-slide-autoplay", false) && window.matchMedia("(max-width: 989px)").matches && !window.matchMedia("(prefers-reduced-motion: reduce)").matches),
+          // "Auto-scroll on mobile" no longer cycles the row forever: it plays a
+          // single scroll hint the first time the row comes into view (see
+          // _scrollHintOnce), so the shopper learns it swipes and is then left alone.
+          enabled: getOption("slide-autoplay", false),
           delay: getOption("swiper-autoplay", 3) * 1000,
           pauseOnMouseEnter: true,
-          disableOnInteraction: getOption("mobile-slide-autoplay", false),
+          disableOnInteraction: false,
         },
-        rewind: getOption("mobile-slide-autoplay", false) && window.matchMedia("(max-width: 989px)").matches && !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+        rewind: false,
         slidesPerView: getOption("slides-per-view", 1),
         centeredSlides: getOption("centered-slides", false),
         autoHeight: getOption("auto-height", false),
@@ -2269,12 +2272,46 @@ class SwiperComponent extends HTMLElement {
         this.initSwiperMobile();
       } else {
         this.initSwiper = new Swiper(this.swiperEl, this.options);
+        this._scrollHintOnce(getOption("mobile-slide-autoplay", false));
 
         if (this._thumbnailSwiper && this._thumbsSwiper) {
           this._setupThumbnailSync();
         }
       }
     }
+  }
+
+  // One nudge, once per page view: the first time the row is properly on
+  // screen it glides on by one card and back, showing there is more to swipe
+  // to. Phones only, never with reduced motion, and never once the shopper has
+  // touched the row themselves.
+  _scrollHintOnce(enabled) {
+    if (!enabled || this._scrollHintDone || this._scrollHintObserver) return;
+    if (!window.matchMedia("(max-width: 989px)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!("IntersectionObserver" in window)) return;
+
+    const cancel = () => {
+      this._scrollHintDone = true;
+      clearTimeout(this._scrollHintTimer);
+      this._scrollHintObserver?.disconnect();
+    };
+    this.swiperEl?.addEventListener("pointerdown", cancel, { once: true, passive: true });
+
+    this._scrollHintObserver = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || this._scrollHintDone) return;
+      this._scrollHintObserver.disconnect();
+      this._scrollHintTimer = setTimeout(() => {
+        const swiper = this.initSwiper;
+        if (this._scrollHintDone || !swiper || swiper.destroyed || swiper.isEnd) return;
+        this._scrollHintDone = true;
+        swiper.slideNext();
+        this._scrollHintTimer = setTimeout(() => {
+          if (!swiper.destroyed) swiper.slideTo(0);
+        }, 1400);
+      }, 700);
+    }, { threshold: 0.4 });
+    this._scrollHintObserver.observe(this);
   }
 
   _setupThumbnailSync() {
@@ -2341,6 +2378,7 @@ class SwiperComponent extends HTMLElement {
         };
 
         this.initSwiper = new Swiper(this.swiperEl, swiperOptions);
+        this._scrollHintOnce(this.getAttribute("data-mobile-slide-autoplay") === "true");
 
         if (this._thumbnailSwiper && this._thumbsSwiper) {
           this._setupThumbnailSync();

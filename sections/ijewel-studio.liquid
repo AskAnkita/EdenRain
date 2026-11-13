@@ -505,6 +505,8 @@
   {%- endif -%}
   {%- if section.settings.splash_cover -%}
     {%- if section.settings.splash_background != blank and section.settings.splash_background != transparent -%}--ijw-splash-bg: {{ section.settings.splash_background }};{%- endif -%}
+    {%- if section.settings.progress_color != blank and section.settings.progress_color != transparent -%}--ijw-progress-color: {{ section.settings.progress_color }};{%- endif -%}
+    {%- if section.settings.progress_track_color != blank and section.settings.progress_track_color != transparent -%}--ijw-progress-track: {{ section.settings.progress_track_color }};{%- endif -%}
     {%- if splash_logo_width > 0 -%}--ijw-splash-logo-width: {{ splash_logo_width }}px;{%- endif -%}
     {%- if splash_logo_width_mobile > 0 -%}--ijw-splash-logo-width-mobile: {{ splash_logo_width_mobile }}px;{%- endif -%}
     {%- if splash_stage_width > 0 -%}--ijw-splash-stage-width: {{ splash_stage_width }}%;{%- endif -%}
@@ -595,6 +597,12 @@
               height="{{ splash_img_height }}"
               loading="eager"
             >
+          {%- endif -%}
+
+          {%- if section.settings.splash_cover and section.settings.show_progress -%}
+            <div class="ijw-poster__progress" role="progressbar" aria-label="Loading the designer" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <span class="ijw-poster__progress-bar"></span>
+            </div>
           {%- endif -%}
 
           {%- if section.settings.loading_label != blank -%}
@@ -877,7 +885,7 @@
     { "type": "range", "id": "frame_boost_mobile", "label": "Extra frame height (mobile)", "min": 0, "max": 400, "step": 20, "unit": "px", "default": 0, "info": "With \"Fill the screen\" on, height added on top of the window. It makes the ring bigger, but it pushes the builder's own add-to-cart bar below the fold, and a touch over the frame scrolls the builder rather than the page - so what goes below is hard to reach. Raise it a little at a time and check add-to-cart on a phone." },
     { "type": "range", "id": "frame_height", "label": "Frame height (desktop)", "min": 400, "max": 1400, "step": 20, "unit": "px", "default": 760 },
     { "type": "range", "id": "frame_height_mobile", "label": "Frame height (mobile)", "min": 320, "max": 1200, "step": 20, "unit": "px", "default": 560 },
-    { "type": "text", "id": "loading_label", "label": "Line shown while it loads", "info": "Leave empty to hide it.", "default": "Loading the designer" },
+    { "type": "text", "id": "loading_label", "label": "Line shown while it loads", "info": "Optional words under the progress bar. Leave empty to show the bar alone.", "default": "Loading the designer" },
 
     { "type": "header", "content": "Saving a design", "info": "Save writes the design to this browser and shows a quotable reference; Contact support carries that reference to the support page, where the whole design sits above a contact form. The record holds every choice, the builder's price and the key that reopens the identical 3D ring. A saved design can also be put in the cart - see \"Add the design to the cart\" below, which needs a product to charge it against." },
     { "type": "url", "id": "support_link", "label": "Support page", "info": "The page with the \"Design support\" section on it. Leave empty and the Contact support button is not drawn and the builder's own button only saves." },
@@ -919,9 +927,12 @@
 
     { "type": "header", "content": "Cover the builder's loading screen", "info": "The builder shows its own splash while its scene downloads, inside the frame where our CSS cannot reach it. This holds our own cover over the stage - the part of the frame the piece is drawn in - for a moment after the frame has loaded, then fades it out. It deliberately leaves the builder's own panel showing, so the page never looks empty while it loads. Lengthen the hold if their splash flashes up at the end of it; widen the cover if it shows at the edges." },
     { "type": "checkbox", "id": "splash_cover", "label": "Cover the builder's loading screen", "default": true },
-    { "type": "checkbox", "id": "splash_wait_ready", "label": "Hold the cover until the designer is ready", "default": false, "info": "The builder's page arrives quickly but its 3D scene waits to be tapped, so uncovering when the frame loads shows the builder's own poster, play button and logo. With this on the cover waits for the builder to say it is running, and it takes no clicks, so the tap goes straight through. The hold below still applies after that signal: the builder reports ready while it is still drawing the ring. Set the loading line to tell people to tap. Falls back after 45 seconds." },
+    { "type": "checkbox", "id": "splash_wait_ready", "label": "Hold the cover until the designer is ready", "default": false, "info": "The builder's page arrives quickly but its 3D scene waits to be tapped, so uncovering when the frame loads shows the builder's own poster, play button and logo. With this on the cover waits for the builder to say it is running, and it takes no clicks, so the tap goes straight through. The hold below still applies after that signal: the builder reports ready while it is still drawing the ring. Falls back after 45 seconds." },
     { "type": "range", "id": "splash_hold", "label": "Hold the cover after the frame loads", "min": 0, "max": 20, "step": 1, "unit": "s", "default": 6, "info": "Counted from whichever signal the box above selects. The scene needs a few seconds after that signal before the ring is on screen, so 0 uncovers the builder's own loading screen." },
     { "type": "color", "id": "splash_background", "label": "Cover colour", "default": "#ffffff" },
+    { "type": "checkbox", "id": "show_progress", "label": "Show a progress bar on the cover", "default": true, "info": "Fills as the builder loads: the page arriving, the builder starting, then the hold below." },
+    { "type": "color", "id": "progress_color", "label": "Progress bar colour", "default": "#1a1a1a" },
+    { "type": "color", "id": "progress_track_color", "label": "Progress bar track colour", "default": "#e6e6e6" },
     { "type": "image_picker", "id": "splash_image", "label": "Mark on the cover" },
     { "type": "text", "id": "splash_image_asset", "label": "Or a file name", "info": "A file in Content > Files or in the theme's assets folder.", "default": "eden-raine-logo.png" },
     { "type": "text", "id": "splash_image_url", "label": "Or an image URL" },

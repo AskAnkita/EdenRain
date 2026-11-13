@@ -37,11 +37,11 @@ if (!customElements.get('favourites-carousel')) {
       this.autoObserver = new IntersectionObserver(([entry]) => {
         this.autoVisible = entry.isIntersecting;
         this.syncAutoAdvance();
-      });
+      }, { threshold: 0.4 });
       this.autoObserver.observe(this);
       this.pauseAutoAdvance = () => {
         this.autoPausedByUser = true;
-        clearInterval(this.autoTimer);
+        clearTimeout(this.autoTimer);
       };
       this.track.addEventListener('pointerdown', this.pauseAutoAdvance, { passive: true });
 
@@ -59,7 +59,7 @@ if (!customElements.get('favourites-carousel')) {
 
     disconnectedCallback() {
       clearTimeout(this.settleTimer);
-      clearInterval(this.autoTimer);
+      clearTimeout(this.autoTimer);
       this.autoObserver?.disconnect();
       this.autoMedia?.removeEventListener('change', this.boundAutoState);
       document.removeEventListener('visibilitychange', this.boundAutoState);
@@ -67,19 +67,26 @@ if (!customElements.get('favourites-carousel')) {
       window.removeEventListener('resize', this.boundUpdate);
     }
 
+    // "Auto-scroll on mobile" plays a single hint rather than a loop: the first
+    // time the row is on screen it glides on by one card and back, so the
+    // shopper sees it swipes, and then it never moves by itself again.
     syncAutoAdvance() {
-      clearInterval(this.autoTimer);
-      if (!this.mobileAutoplay || this.autoPausedByUser || !this.autoVisible || !this.autoMedia?.matches || document.hidden) return;
+      clearTimeout(this.autoTimer);
+      if (this.autoHintDone || !this.mobileAutoplay || this.autoPausedByUser) return;
+      if (!this.autoVisible || !this.autoMedia?.matches || document.hidden) return;
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      this.autoTimer = setInterval(() => {
-        const max = this.maxScroll;
-        if (max <= 2) return;
-        if (this.track.scrollLeft >= max - 2) {
+      this.autoTimer = setTimeout(() => {
+        if (this.autoPausedByUser || this.maxScroll <= 2 || this.track.scrollLeft > 2) return;
+        this.autoHintDone = true;
+        this.autoObserver?.disconnect();
+        this.go(1);
+        this.autoTimer = setTimeout(() => {
+          if (this.autoPausedByUser) return;
           this.track.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          this.go(1);
-        }
-      }, 5000);
+          clearTimeout(this.settleTimer);
+          this.settleTimer = setTimeout(this.boundUpdate, 600);
+        }, 1400);
+      }, 700);
     }
 
     get maxScroll() {

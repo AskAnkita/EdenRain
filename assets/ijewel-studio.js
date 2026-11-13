@@ -94,6 +94,7 @@ if (!customElements.get('ijewel-studio')) {
           const message = event.data;
           if (!message || typeof message !== 'object' || message.source !== 'ijewel') return;
           this.setAttribute('data-live', 'true');
+          this.progress(0.75, 6000);
           if (this.waitReady && message.event === 'ready') this.ready();
         };
         window.addEventListener('message', this.listen);
@@ -123,15 +124,33 @@ if (!customElements.get('ijewel-studio')) {
         iframe.setAttribute('allowfullscreen', '');
         iframe.addEventListener('load', () => {
           if (guided && !iframe.srcdoc && !iframe.hasAttribute('src')) return;
+          this.progress(0.5, 8000);
           if (this.waitReady) return;
           this.ready();
         });
         this.appendChild(iframe);
+        this.progress(0.08, 300);
+        // Creep while the builder's document is on its way.
+        requestAnimationFrame(() => setTimeout(() => this.progress(0.4, 6000), 320));
 
         // A viewer that never fires load - a blocked frame, a slow CDN - would
         // otherwise sit behind the poster for good. Waiting on the bridge gets
         // longer rope, since it is waiting on a person to tap as well.
         this.timer = setTimeout(() => this.ready(), this.waitReady ? 45000 : 12000);
+      }
+
+      // Moves the cover's bar towards a share of its length over ms. A new
+      // target starts from wherever the bar is, and a lower one is ignored, so
+      // the bar only ever goes forward.
+      progress(to, ms, easing) {
+        const poster = this.parentElement?.querySelector('.ijw-poster');
+        const track = poster?.querySelector('.ijw-poster__progress');
+        const bar = track?.querySelector('.ijw-poster__progress-bar');
+        if (!bar || to <= (this.pct || 0)) return;
+        this.pct = to;
+        bar.style.transition = `transform ${ms}ms ${easing || 'cubic-bezier(0.1, 0.7, 0.3, 1)'}`;
+        bar.style.transform = `scaleX(${to})`;
+        track.setAttribute('aria-valuenow', String(Math.round(to * 100)));
       }
 
       ready() {
@@ -159,6 +178,7 @@ if (!customElements.get('ijewel-studio')) {
         };
 
         if (hold > 0 && poster.classList.contains('ijw-poster--cover')) {
+          this.progress(1, hold, 'cubic-bezier(0.4, 0, 0.6, 1)');
           setTimeout(fade, hold);
         } else {
           poster.remove();

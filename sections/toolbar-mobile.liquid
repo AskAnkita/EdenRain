@@ -123,7 +123,8 @@
           </a>
         {%- endif -%}
       {%- when 'cart' -%}
-        {%- if block.settings.action_type == 'drawer' -%}
+        {%- comment -%} The drawer only exists when the store's cart type is "drawer"; otherwise link to /cart {%- endcomment -%}
+        {%- if block.settings.action_type == 'drawer' and settings.cart_type == 'drawer' -%}
           <side-drawer-opener
             class="{{ class_toolbar_item }}"
             data-side-drawer="#Cart-Drawer"

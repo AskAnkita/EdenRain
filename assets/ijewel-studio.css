@@ -374,6 +374,26 @@ ijewel-studio {
   opacity: 0;
 }
 
+/* The bar under the mark. Each load signal sets a new target and a long
+   ease-out toward it, so the bar keeps creeping between signals instead of
+   stalling - and never reaches the end until the cover actually lifts. */
+.ijw-poster__progress {
+  position: relative;
+  width: var(--ijw-splash-logo-width-mobile, 150px);
+  max-width: 80%;
+  height: 2px;
+  overflow: hidden;
+  background: var(--ijw-progress-track, #e6e6e6);
+}
+
+.ijw-poster__progress-bar {
+  position: absolute;
+  inset: 0;
+  background: var(--ijw-progress-color, #1a1a1a);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
 .ijw-poster__mark {
   display: block;
   width: var(--ijw-splash-logo-width-mobile, 150px);
@@ -747,6 +767,10 @@ a.ijw-price__text:hover {
   }
 
   .ijw-poster__mark {
+    width: var(--ijw-splash-logo-width, 240px);
+  }
+
+  .ijw-poster__progress {
     width: var(--ijw-splash-logo-width, 240px);
   }
 }
