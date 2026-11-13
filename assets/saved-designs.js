@@ -84,6 +84,27 @@ if (!customElements.get('saved-designs')) {
 
         const count = this.querySelector('[data-saved-count]');
         if (count) count.textContent = String(rows.length);
+
+        this.land();
+      }
+
+      // Arriving from a save. The studio sends the shopper here with
+      // #saved-designs on the URL rather than scrolling its own page before
+      // leaving it, because this is the list they pressed the button to get
+      // to. The panel is hidden when the page is parsed and built here a
+      // moment later, so the browser's own anchor jump finds nothing - the
+      // scroll has to be made once there is something to scroll to. Only on
+      // the first paint: removing a design repaints the list, and a list that
+      // jumped up the page every time would be a trap.
+      land() {
+        if (this.landed) return;
+        if (window.location.hash !== '#saved-designs') return;
+        this.landed = true;
+        try {
+          this.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (error) {
+          this.scrollIntoView();
+        }
       }
 
       card(row) {

@@ -439,10 +439,24 @@ if (!customElements.get('ijewel-design')) {
       //
       // Nothing navigates in the theme editor. A customiser that jumps to the
       // cart every time the button is pressed cannot be worked in.
+      // Whether a save ends on another page. Asked before the panel is
+      // scrolled to as well as at the end of the save, so the two never
+      // disagree about where the shopper is going.
+      goes() {
+        if (this.dataset.cartGo !== 'true') return false;
+        if (window.Shopify && window.Shopify.designMode) return false;
+        return true;
+      }
+
       leave(row) {
-        if (this.dataset.cartGo !== 'true') return row;
-        if (window.Shopify && window.Shopify.designMode) return row;
-        window.location = this.dataset.cartUrl || '/cart';
+        if (!this.goes()) return row;
+        // The hash is what tells the cart page a save has just landed, so the
+        // saved list scrolls itself into view down there. The list is built in
+        // the browser and is still hidden when the page is parsed, so the
+        // browser's own anchor jump finds nothing to jump to - it has to be
+        // done once there is something to see.
+        const url = (this.dataset.cartUrl || '/cart').split('#')[0];
+        window.location = url + '#saved-designs';
         return row;
       }
 
@@ -574,6 +588,12 @@ if (!customElements.get('ijewel-design')) {
       // already in front of them, and left alone when it is.
       reveal() {
         if (!this.panel) return;
+        // Nothing is scrolled to when the page is about to be left: the panel
+        // would slide up into view for a quarter of a second and then be
+        // replaced by the cart, which reads as the page lurching rather than
+        // as an answer to the button. The scroll belongs on the page the
+        // shopper lands on, and saved-designs.js does it there.
+        if (this.goes()) return;
         try {
           const box = this.panel.getBoundingClientRect();
           const height = window.innerHeight || document.documentElement.clientHeight;
