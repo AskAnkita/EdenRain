@@ -345,6 +345,7 @@
             "object_position": "center",
             "card_background": "rgba(0,0,0,0)",
             "badge": "#1 Best Seller",
+            "badge_mobile": "Best Seller",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
             "title": "",

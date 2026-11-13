@@ -274,6 +274,20 @@
     white-space: nowrap;
   }
 
+  @media screen and (min-width: 990px) {
+    #fav-{{ section.id }} .fav-badge--mobile {
+      display: none;
+    }
+  }
+
+  /* On a panel that carries the heart and eye, the badge stops short of their column
+     (36px buttons + 8px padding either side) and wraps rather than running under them. */
+  #fav-{{ section.id }} .fav-card--buttons .fav-badge {
+    max-width: calc(100% - {{ section.settings.badge_offset }}px - 56px);
+    white-space: normal;
+    line-height: 1.3;
+  }
+
   #fav-{{ section.id }} .fav-caption {
     position: absolute;
     left: 0;
@@ -450,6 +464,14 @@
       font-size: {{ section.settings.badge_size_mobile }}px;
     }
 
+    #fav-{{ section.id }} .fav-card--buttons .fav-badge {
+      max-width: calc(100% - {{ section.settings.badge_offset_mobile }}px - 56px);
+    }
+
+    #fav-{{ section.id }} .fav-badge--desktop {
+      display: none;
+    }
+
     #fav-{{ section.id }} .fav-caption {
       bottom: {{ section.settings.badge_offset_mobile }}px;
     }
@@ -599,7 +621,7 @@
             endif
           endif
         -%}
-        <li class="fav-card" {% if slide_swatches %}data-swatch-card{% endif %} {{ block.shopify_attributes }}>
+        <li class="fav-card{% if show_card_buttons and slide_product != blank %} fav-card--buttons{% endif %}" {% if slide_swatches %}data-swatch-card{% endif %} {{ block.shopify_attributes }}>
           {%- if slide_swatches -%}
             {%- comment -%}
               What card-option-swatches.js reads to find the variant behind a tapped swatch.
@@ -617,14 +639,27 @@
             <template><div data-json-product="{{ slide_variants | escape }}"></div></template>
           {%- endif -%}
           {%- capture slide_body -%}
-            {%- if block.settings.badge != blank -%}
-              <span
-                class="fav-badge"
-                style="
-                  background-color: {{ block.settings.badge_background | default: '#ffffff' }};
-                  color: {{ block.settings.badge_text_color | default: '#1a1a1a' }};
-                "
-              >{{ block.settings.badge | escape }}</span>
+            {%- liquid
+              # A mobile badge, when filled in, replaces the badge below the desktop
+              # breakpoint; left empty, the one badge shows everywhere.
+              assign badge_desktop = block.settings.badge
+              assign badge_mobile = block.settings.badge_mobile | default: block.settings.badge
+            -%}
+            {%- capture badge_style -%}
+              background-color: {{ block.settings.badge_background | default: '#ffffff' }};
+              color: {{ block.settings.badge_text_color | default: '#1a1a1a' }};
+            {%- endcapture -%}
+            {%- if badge_desktop == badge_mobile -%}
+              {%- if badge_desktop != blank -%}
+                <span class="fav-badge" style="{{ badge_style | strip }}">{{ badge_desktop | escape }}</span>
+              {%- endif -%}
+            {%- else -%}
+              {%- if badge_desktop != blank -%}
+                <span class="fav-badge fav-badge--desktop" style="{{ badge_style | strip }}">{{ badge_desktop | escape }}</span>
+              {%- endif -%}
+              {%- if badge_mobile != blank -%}
+                <span class="fav-badge fav-badge--mobile" style="{{ badge_style | strip }}">{{ badge_mobile | escape }}</span>
+              {%- endif -%}
             {%- endif -%}
 
             {%- if slide_image != blank -%}
@@ -862,6 +897,7 @@
 
         { "type": "header", "content": "Badge" },
         { "type": "text", "id": "badge", "label": "Badge", "info": "A short label in the top corner, e.g. New. Leave empty to hide it." },
+        { "type": "text", "id": "badge_mobile", "label": "Badge on mobile", "info": "Shorter wording for phones and tablets, e.g. Best Seller. Leave empty to use the badge above." },
         { "type": "color", "id": "badge_background", "label": "Badge background", "default": "#ffffff" },
         { "type": "color", "id": "badge_text_color", "label": "Badge text", "default": "#1a1a1a" },
 
