@@ -2323,7 +2323,11 @@ class SwiperComponent extends HTMLElement {
       if (!button._listenerAttached) {
         button.addEventListener("click", (e) => {
           e.preventDefault();
-          mainSwiper.slideTo(index);
+          // The thumbnail's position now, not when the listener was attached: the metal
+          // filter (product-metal-media.js) takes other metals' slides out of both rows.
+          const slides = Array.from(button.parentElement ? button.parentElement.children : []);
+          const current = slides.indexOf(button);
+          mainSwiper.slideTo(current >= 0 ? current : index);
         });
         button._listenerAttached = true;
       }

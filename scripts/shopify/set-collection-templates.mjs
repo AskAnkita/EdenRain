@@ -1,5 +1,5 @@
 /*
- * Puts the Engagement and Wedding collections on their own theme templates.
+ * Puts each collection family (Engagement, Wedding, Earrings, Necklaces, Bracelets) on its own theme template.
  *
  * Every collection used to render through templates/collection.json, and a section's
  * settings belong to the template, not the collection - so a banner uploaded while
@@ -8,7 +8,10 @@
  *
  *   collection.engagement-collections.json   engagement rings, styles and shapes
  *   collection.wedding-collections.json      wedding bands and their sub-collections
- *   collection.json                          everything else (jewellery, shapes, stones)
+ *   collection.earrings-collections.json     earrings and their sub-collections
+ *   collection.necklaces-collections.json    necklaces and their sub-collections
+ *   collection.bracelets-collections.json    bracelets and their sub-collections
+ *   collection.json                          everything else (all, rings, shapes, stones)
  *
  * In the theme editor, pick the template from the dropdown at the top (Collections >
  * engagement-collections) and edit the banners there.
@@ -38,6 +41,15 @@ const ASSIGN = {
   'wedding-collections': [
     'wedding-bands', 'anniversary-rings', 'eternity-rings', 'curved-wedding-bands',
     'stackable-rings', 'bridal-sets', 'plain-metal-wedding-bands',
+  ],
+  'earrings-collections': [
+    'earrings', 'studs', 'hoops-huggies', 'dangles-drops', 'climbers-jackets-cuffs',
+  ],
+  'necklaces-collections': [
+    'necklaces', 'tennis-necklaces', 'pendants', 'chains', 'charms',
+  ],
+  'bracelets-collections': [
+    'bracelets', 'tennis-bracelets', 'chain-bracelets', 'charm-bracelets', 'station-bracelets',
   ],
 };
 const MANAGED = new Set(Object.keys(ASSIGN));

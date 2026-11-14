@@ -132,7 +132,13 @@
 
           @media screen and (max-width: 749px) {
             #collection-hero-{{ section.id }} .collection-hero__inner {
-              padding: 1.6rem 1.6rem 3.2rem;
+              padding: 2rem 1.6rem;
+            }
+
+            /* The title sits in the middle of the band: the text block's own desktop padding
+               would leave a deep empty strip under it on a phone. */
+            #collection-hero-{{ section.id }} .collection-hero__text-wrapper .text-block {
+              padding-block: 0;
             }
           }
         {%- endstyle -%}

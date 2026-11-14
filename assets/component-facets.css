@@ -3103,8 +3103,12 @@ input.mobile-facets__checkbox {
 
 @media screen and (max-width: 749px) {
   .collection-filter-toolbar {
-    min-height: 5.6rem;
-    padding-inline: 1.6rem;
+    min-height: 4.8rem;
+    padding: 0.8rem 1.6rem;
+  }
+
+  .facets-container-drawer:has(.collection-filter-toolbar) {
+    padding-top: 0;
   }
 }
 

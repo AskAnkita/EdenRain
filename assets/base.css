@@ -7240,8 +7240,12 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
   transform: none;
 }
 
+/* The thumbnail of the picture on show stays at full strength and is framed; fading it to
+   30% made the selected picture look missing from the strip on a white page. */
 .swiper-slide-thumb-active {
-  opacity: var(--opacity-30);
+  opacity: 1;
+  outline: 1px solid rgb(var(--color-foreground-rgb));
+  outline-offset: -1px;
 }
 
 .swiper-main {
