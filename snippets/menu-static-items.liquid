@@ -86,11 +86,11 @@
 
   comment
     The jewellery category lists, named once here. The desktop panel draws one column per
-    category now - Rings, Earrings, Necklaces, Bracelets, Men's, in that order
+    category now - Rings, Earrings, Necklaces, Bracelets, in that order
     ('header-menu-drawer-links') - and the groups further down hand the same names back one
     category at a time for anything that asks for a category on its own.
   endcomment
-  assign jewellery_earrings = 'Studs|studs~Hoops & Huggies|hoops-huggies~Dangles & Drops|dangles-drops~Climbers, Jackets & Cuffs|climbers-jackets-cuffs'
+  assign jewellery_earrings = 'Studs|studs~Hoops & Huggies|hoops-huggies~Dangles & Drops|dangles-drops'
   comment
     Tennis leads the column: it is the necklace the shop is known for and the one the featured
     card and the home carousel both push, so it should not sit below three sub-ranges that get
@@ -101,7 +101,7 @@
     `category:necklace` - so the row names the collection, which both filters and lights the
     card up as the one you are on.
   endcomment
-  assign jewellery_necklaces = 'Tennis|tennis-necklaces~Pendants|pendants~Chains|chains~Charms|charms'
+  assign jewellery_necklaces = 'Tennis|tennis-necklaces~Pendants|pendants~Charms|charms'
 
   comment
     Rings has no sub-ranges of its own under Jewellery, so rather than invent names for it the
@@ -109,7 +109,7 @@
     exists in scripts/shopify/store-config.mjs and is reachable from Engagement or Wedding as
     well; a ring shopper who came in through Jewellery should not have to go back out for them.
   endcomment
-  assign jewellery_rings = 'Engagement|engagement-rings~Wedding Bands|wedding-bands~Eternity|eternity-rings~Anniversary|anniversary-rings~Stackable|stackable-rings~Promise|promise'
+  assign jewellery_rings = 'Engagement|engagement-rings~Wedding Bands|wedding-bands~Eternity|eternity-rings~Anniversary|anniversary-rings~Stackable|stackable-rings'
 
   comment
     Bracelets is broken down by the kind of piece the bracelet is rather than by metal, which
@@ -146,16 +146,20 @@
   assign jewellery_bracelets = 'Tennis|tennis-bracelets~Chain Link|chain-bracelets~Charm|charm-bracelets~Station|station-bracelets'
 
   comment
+    Not on the menu since 2026-11-14 - the client removed Men's while there are no men's
+    pieces. Kept so the column comes back by adding Men's to 'menu-static-groups' and
+    'header-menu-drawer-links'.
+
     Men's. Rings and Engagement Rings are the two collections the store already carries under
     that name; both are empty, but they exist, so the links land somewhere.
 
-    Bracelets opens the bracelet collection itself rather than a men's one. There is no men's
-    tag in the catalogue and no mens-bracelets collection - store-config.mjs describes one now,
-    so `setup-store.mjs --apply --only=collections` creates it - and until it is there, sending
-    the row to /collections/bracelets shows the bracelets the shop does sell instead of a 404.
-    Swap it for mens-bracelets once the collection exists and has something in it.
+    Bracelets opens mens-bracelets, not the women's /collections/bracelets it used to borrow:
+    the shop stocks nothing for men yet, and a men's row showing women's bracelets was wrong
+    (client, 2026-11-14). That collection does not exist in the store, so the row lands on the
+    "No products found" category page (snippets/empty-category.liquid) - the same empty state
+    as Rings and Engagement Rings beside it. store-config.mjs describes it for when it is made.
   endcomment
-  assign jewellery_mens = 'Rings|mens-rings~Engagement Rings|mens-engagement-rings~Bracelets|bracelets'
+  assign jewellery_mens = 'Rings|mens-rings~Engagement Rings|mens-engagement-rings~Bracelets|mens-bracelets'
 
   comment
     Bracelets and Rings have no sub-ranges of their own, and New In and Best Sellers are
@@ -182,7 +186,7 @@
 
   case key
     when 'engagement/by-style' or 'engagement/shop-by-style'
-      echo '::Solitaire|solitaire~Side Stone|side-stone~Halo|halo~Hidden Halo|hidden-halo~Three Stone|three-stone~Bridal Sets|bridal-sets~Vintage|vintage~Nature Inspired|nature-inspired~Toi et Moi|toi-et-moi~Promise|promise'
+      echo '::Solitaire|solitaire~Side Stone|side-stone~Halo|halo~Hidden Halo|hidden-halo~Three Stone|three-stone~Bridal Sets|bridal-sets~Vintage|vintage~Nature Inspired|nature-inspired~Toi et Moi|toi-et-moi'
     when 'engagement/by-shape' or 'engagement/shop-by-shape'
       # Heart last. It was the one of the ten that was not a collection, and it opened the
       # engagement rings with a `shape:heart` tag filter instead - which quietly showed every
@@ -191,13 +195,8 @@
       # rings was created on 2026-11-05, so all ten rows are collection handles now.
       echo '::Round|round-engagement-rings~Oval|oval-engagement-rings~Cushion|cushion-engagement-rings~Emerald|emerald-engagement-rings~Pear|pear-engagement-rings~Princess|princess-engagement-rings~Radiant|radiant-engagement-rings~Marquise|marquise-engagement-rings~Asscher|asscher-engagement-rings~Heart|heart-engagement-rings'
     when 'wedding/by-style' or 'wedding/womens'
-      # Plain Metal is the one row here whose collection is not in the store. There is no `style:`
-      # tag for a band with no stones in it either (scripts/shopify/tag-rules.mjs), so it cannot be
-      # a filter URL the way Tennis and the bracelet styles are. It opens the category page
-      # 'empty-category' draws - "Plain Metal Wedding Bands", "No products found in this category"
-      # and the way back to Wedding Bands - rather than a 404. Declare it in store-config.mjs and
-      # run `setup-store.mjs --apply --only=collections` and the row starts answering for itself.
-      echo '::Wedding|wedding-bands~Anniversary|anniversary-rings~Eternity|eternity-rings~Plain Metal|plain-metal-wedding-bands'
+      # Plain Metal was removed at the client's request on 2026-11-14: the shop has no plain bands.
+      echo '::Wedding|wedding-bands~Anniversary|anniversary-rings~Eternity|eternity-rings'
       echo ';;Featured Collections::Curved|curved-wedding-bands~Stackable|stackable-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship'
     when 'wedding/featured'
       echo '::Curved|curved-wedding-bands~Stackable|stackable-rings~New Arrivals|new-in~Ready to Ship|ready-to-ship'

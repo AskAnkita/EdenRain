@@ -139,7 +139,7 @@
     when 'jewellery' or 'jewelry'
       comment
         A column per category, in the order a jewellery shopper reads them: Rings, Earrings,
-        Necklaces, Bracelets, Men's. Each heading is the category's own collection and the names
+        Necklaces, Bracelets. Each heading is the category's own collection and the names
         under it are its sub-ranges, which is the nesting the menu had on mobile but not here -
         the panel used to merge them all into one "Shop Jewellery" list, which read as a wall of
         names with no sign of where one category ended and the next began.
@@ -157,7 +157,7 @@
         it, "Shop by Shape" wraps onto a second line and takes its rule out of line with the
         four beside it, which is why the form above reads "By Shape".
       endcomment
-      assign browse_columns = "Rings|Rings|compact|/collections/rings,Earrings|Earrings|compact|/collections/earrings,Necklaces|Necklaces|compact|/collections/necklaces,Bracelets|Bracelets|compact|/collections/bracelets,Men's|Men's|compact|/collections/mens-rings" | split: ','
+      assign browse_columns = "Rings|Rings|compact|/collections/rings,Earrings|Earrings|compact|/collections/earrings,Necklaces|Necklaces|compact|/collections/necklaces,Bracelets|Bracelets|compact|/collections/bracelets" | split: ','
       assign promo_heading = 'Best Sellers'
       assign promo_url = '/collections/best-sellers'
       assign promo_image = 'category-best-sellers.png'

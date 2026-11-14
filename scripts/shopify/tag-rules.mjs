@@ -22,7 +22,11 @@ const rule = (value, any, extra = {}) => ({ value, any, not: [], from: 'title', 
 export const category = [
   rule('stud', [/\bstuds?\b/]),
   rule('hoop-huggie', [/\bhoops?\b/, /\bhuggies?\b/, /\bhuggers?\b/]),
-  rule('dangle-drop', [/\bdangles?\b/, /\bdrops?\b/, /\bteardrops?\b/, /\bchandeliers?\b/, /\bthreaders?\b/]),
+  // Earrings only: a "Drop Necklace" is a necklace, and this tag fills Dangles & Drops, which sits
+  // under Earrings. Without the `not`, two drop necklaces were its only products.
+  rule('dangle-drop', [/\bdangles?\b/, /\bdrops?\b/, /\bteardrops?\b/, /\bchandeliers?\b/, /\bthreaders?\b/], {
+    not: [/\bnecklaces?\b/, /\bpendants?\b/, /\bchains?\b/, /\bbracelets?\b/],
+  }),
   // "Ear cuff" is an earring; a plain "cuff" is a bracelet, so each side excludes the other.
   rule('climber-jacket-cuff', [/\bclimbers?\b/, /\bcrawlers?\b/, /\bear cuffs?\b/, /\bjackets?\b/]),
   rule('pendant', [/\bpendants?\b/]),
