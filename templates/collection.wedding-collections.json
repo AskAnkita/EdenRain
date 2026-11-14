@@ -16,10 +16,10 @@
           "type": "_breadcrumb",
           "name": "Breadcrumb",
           "settings": {
-            "separator": "caret",
-            "horizontal_alignment": "center",
-            "gap": 12,
-            "font_size": "1.6rem",
+            "separator": "slash",
+            "horizontal_alignment": "start",
+            "gap": 8,
+            "font_size": "1.4rem",
             "width": "fill",
             "custom_width": 100,
             "width_mobile": "fill",
@@ -47,8 +47,8 @@
             "extend_right_overlay": false,
             "overlay_style": "solid",
             "gradient_direction": "to top",
-            "padding-block-start": 24,
-            "padding-block-end": 24,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
@@ -108,11 +108,11 @@
             "alignment_mobile": "center",
             "type_preset": "custom",
             "font": "var(--font-heading--family)",
-            "font_size": "2.4rem",
+            "font_size": "3.2rem",
             "font_weight": "default",
             "line_height": "normal",
             "letter_spacing": "normal",
-            "case": "uppercase",
+            "case": "none",
             "wrap": "pretty",
             "color": "var(--color-foreground)",
             "background": false,
@@ -129,8 +129,8 @@
             "heading_only": false,
             "heading_effect": "none",
             "animation_repeat": false,
-            "padding-block-start": 26,
-            "padding-block-end": 20,
+            "padding-block-start": 8,
+            "padding-block-end": 24,
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
@@ -192,7 +192,7 @@
             "font": "var(--font-body--family)",
             "font_size": "1.6rem",
             "font_weight": "default",
-            "line_height": "normal",
+            "line_height": "loose",
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
@@ -212,7 +212,7 @@
             "heading_effect": "none",
             "animation_repeat": false,
             "padding-block-start": 0,
-            "padding-block-end": 20,
+            "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
           },
@@ -224,25 +224,25 @@
         "text_QYCLHk",
         "text_Lw7jtn"
       ],
-      "disabled": true,
       "settings": {
         "content_stacked": true,
         "page_width": "full-width",
         "section_height": "adapt",
         "alignment": "center",
         "vertical_alignment": "center",
-        "color_scheme": "scheme-1",
+        "color_scheme": "scheme-3",
         "collection_image": "{{ collection.image }}",
         "image_overlay_opacity": 40,
         "color_scheme_image": "scheme-1",
-        "padding-block-start": 36,
-        "padding-block-end": 36,
+        "padding-block-start": 0,
+        "padding-block-end": 0,
         "padding-inline-start": 0,
         "padding-inline-end": 0
       }
     },
     "breadcrumb_ztwnCj": {
       "type": "breadcrumb",
+      "disabled": true,
       "name": "Breadcrumb",
       "settings": {
         "separator": "slash",
@@ -433,6 +433,7 @@
         "text_6hAEYB",
         "text_HxRdAn"
       ],
+      "disabled": true,
       "name": "t:names.rich_text",
       "settings": {
         "content_direction": "column",
@@ -488,10 +489,13 @@
         "show_all_card": true,
         "all_label": "All",
         "all_link": "",
+        "hide_empty": false,
+        "show_drawings": false,
         "per_row": 6.4,
         "per_row_mobile": 2.2,
         "gap": 20,
         "card_height": 90,
+        "card_height_mobile": 64,
         "media_width": 84,
         "media_width_mobile": 72,
         "icon_size": 40,
@@ -513,8 +517,8 @@
         "extra_wedding_handles": "",
         "width": "page",
         "section_background": "rgba(0,0,0,0)",
-        "padding_top": 30,
-        "padding_bottom": 30
+        "padding_top": 24,
+        "padding_bottom": 12
       }
     },
     "product-grid": {
@@ -1030,7 +1034,7 @@
                 "custom_width": 80
               },
               "blocks": {
-                "card_product_group_button_gDnU8M": {
+                "card_product_group_button_bDjfEj": {
                   "type": "_card-product-group-button",
                   "name": "Button group",
                   "settings": {
@@ -1046,7 +1050,7 @@
                 }
               },
               "block_order": [
-                "card_product_group_button_gDnU8M"
+                "card_product_group_button_bDjfEj"
               ]
             },
             "card-product-information": {
@@ -1148,11 +1152,24 @@
                   },
                   "blocks": {}
                 },
+                "card_product_shapes_Qa7xTb": {
+                  "type": "_card-product-shapes",
+                  "name": "Product shapes",
+                  "settings": {
+                    "product": "{{ closest.product }}",
+                    "default_shapes": "Round, Oval, Cushion, Emerald, Princess, Radiant",
+                    "alignment": "left",
+                    "padding-block-start": 4,
+                    "padding-block-end": 0
+                  },
+                  "blocks": {}
+                },
                 "card_product_metals_Lm3rKd": {
                   "type": "_card-product-metals",
                   "name": "Product metals",
                   "settings": {
                     "product": "{{ closest.product }}",
+                    "default_metals": "White Gold, Yellow Gold, Rose Gold, Silver",
                     "alignment": "left",
                     "padding-block-start": 4,
                     "padding-block-end": 0
@@ -1164,6 +1181,7 @@
                 "card_product_title_flex_DiBw9p",
                 "card_product_price_flex_YQLH8i",
                 "card_product_variant_flex_nJPt9y",
+                "card_product_shapes_Qa7xTb",
                 "card_product_metals_Lm3rKd"
               ]
             }
@@ -1172,7 +1190,9 @@
         }
       },
       "custom_css": [
-        ".switcher-grid.flex.items-center {display: none;}"
+        ".switcher-grid.flex.items-center {display: none;}",
+        ".facets__display {width: 25rem !important;}",
+        ".facets__image-wrapper {width: 100px; height: 100px;}"
       ],
       "settings": {
         "layout_type": "grid",
@@ -1185,17 +1205,44 @@
         "columns_gap_vertical": 60,
         "padding-inline-start": 40,
         "padding-inline-end": 40,
-        "pagination_type": "pagination",
+        "banner_count": 2,
+        "banner_position_1": "3",
+        "banner_position_2": "11",
+        "banner_position_3": "23",
+        "show_banner_4": true,
+        "banner_category_4": "earring",
+        "img_banner4": "shopify://shop_images/ChatGPT_Image_13_Nov_2026_15_46_13.png",
+        "link_banner_4": "shopify://collections/earrings",
+        "banner_heading_4": "Confidence—Guaranteed",
+        "banner_text_4": "FREE SHIPPING & 30-DAY RETURNS",
+        "banner_text_color_4": "light",
+        "show_banner_2": true,
+        "banner_category_2": "bracelet",
+        "img_banner2": "shopify://shop_images/ChatGPT_Image_13_Nov_2026_20_22_10.png",
+        "link_banner_2": "shopify://collections/bracelets",
+        "banner_heading_2": "Crafted to Last",
+        "banner_text_2": "SHOP BRACELETS",
+        "banner_text_color_2": "light",
+        "show_banner_3": true,
+        "banner_category_3": "ring",
+        "link_banner_3": "shopify://collections/rings",
+        "banner_heading_3": "Made for Forever",
+        "banner_text_3": "SHOP RINGS",
+        "banner_text_color_3": "light",
+        "show_banner_1": true,
+        "banner_category_1": "necklace",
+        "img_banner1": "shopify://shop_images/ChatGPT_Image_13_Nov_2026_15_46_19.png",
+        "link_banner_1": "shopify://collections/necklaces",
+        "banner_heading_1": "Where Your Moment Begins",
+        "banner_text_1": "START YOUR CUSTOM DESIGN",
+        "banner_text_color_1": "light",
+        "pagination_type": "infinite",
+        "pagination_load_mode": "button",
+        "load_more_label": "View more",
         "padding-block-start-pagination": 50,
         "padding-block-end-pagination": 0,
-        "padding_top": 36,
-        "padding_bottom": 60,
-        "show_banner_1": true,
-        "banner_position_1": "3",
-        "show_banner_2": true,
-        "banner_position_2": "11",
-        "show_banner_3": false,
-        "banner_position_3": "12"
+        "padding_top": 0,
+        "padding_bottom": 60
       }
     },
     "recently_viewed_products_PjBQye": {
@@ -1546,8 +1593,8 @@
           "type": "accordion",
           "name": "t:names.accordion",
           "settings": {
-            "icon": "plus",
             "style": "editorial",
+            "icon": "plus",
             "dividers": true,
             "type_preset_heading": "paragraph",
             "inherit_color_scheme": true,
