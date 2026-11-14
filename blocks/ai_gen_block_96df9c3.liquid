@@ -575,7 +575,7 @@
       width: 100%;
       max-width: 680px;
       margin: 0 auto;
-      padding: 14px 18px;
+      padding: {{ block.settings.mobile_panel_padding }}px 18px;
       {% if block.settings.mobile_content_alignment == 'left' %}
         text-align: left;
       {% elsif block.settings.mobile_content_alignment == 'center' %}
@@ -821,7 +821,7 @@
       <h1 class="ai-luxury-video-hero-mobile-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h1>
     {% endif %}
 
-    {% if block.settings.description != blank %}
+    {% if block.settings.description != blank and block.settings.mobile_show_description %}
       <p class="ai-luxury-video-hero-mobile-description-{{ ai_gen_id }}">{{ block.settings.description }}</p>
     {% endif %}
 
@@ -940,7 +940,13 @@
         box.style.height = Math.round(film) + 'px';
 
         if (panel) {
+          {%- if block.settings.mobile_fill_screen %}
           panel.style.height = Math.round(Math.max(screen - film - row, words)) + 'px';
+          {%- else %}
+          // Hugging the words: the panel is only as tall as what is in it, and the
+          // sections below move up rather than the leftover screen turning into white space.
+          panel.style.height = Math.round(words) + 'px';
+          {%- endif %}
         }
       }
 
@@ -1173,6 +1179,29 @@
       "id": "description",
       "label": "Description",
       "default": "Elegantly crafted. Timelessly beautiful."
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_show_description",
+      "label": "Show description on mobile",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_fill_screen",
+      "label": "Stretch the panel under the picture to fill the first screen on mobile",
+      "default": false,
+      "info": "Off: the panel is only as tall as the heading and buttons, and the sections below move up."
+    },
+    {
+      "type": "range",
+      "id": "mobile_panel_padding",
+      "label": "Space above and below the words on mobile",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 28
     },
     {
       "type": "header",

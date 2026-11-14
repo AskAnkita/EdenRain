@@ -693,6 +693,57 @@
       <div class="section-global__blocks">
         {%- content_for 'blocks' -%}
       </div>
+
+      {%- comment -%}
+        View all: a link to the whole collection under a carousel that only shows the first few.
+        On desktop it sits on the progress bar's line, in the space the carousel already keeps
+        under the bar, so it adds no height; on mobile, where the bar runs wider, it goes below.
+        Label empty hides it; link empty opens the section's collection.
+      {%- endcomment -%}
+      {%- if sec_stts.view_all_label != blank -%}
+        {%- liquid
+          assign view_all_url = sec_stts.view_all_link
+          if view_all_url == blank
+            assign view_all_url = collections[sec_stts.collection].url | default: routes.all_products_collection_url
+          endif
+          case sec_stts.view_all_style
+            when 'solid'
+              assign view_all_class = 'eden-action eden-action--solid'
+            when 'link'
+              assign view_all_class = 'eden-link'
+            else
+              assign view_all_class = 'eden-action eden-action--outline'
+          endcase
+        -%}
+        {%- style -%}
+          /*
+            One footer row under the cards: the progress bar runs across the row and the link
+            closes it on the right, on the bar's own line. The link rises into the space the
+            carousel already keeps under its bar ("Lift"), so the row adds no height.
+          */
+          #collection-{{ sec_id }} .featured-collection__view-all {
+            position: relative;
+            display: flex;
+            justify-content: {% if sec_stts.view_all_style == 'link' %}flex-end{% else %}center{% endif %};
+            margin-top: calc({{ sec_stts.view_all_offset }}px * -1);
+            pointer-events: none;
+          }
+
+          #collection-{{ sec_id }} .featured-collection__view-all > a {
+            pointer-events: auto;
+          }
+
+          {%- if sec_stts.view_all_style == 'link' %}
+            #collection-{{ sec_id }} .swiper-pagination.swiper-pagination-progressbar {
+              /* base.css caps the bar at 280px with !important; the row needs it to run to the link. */
+              max-width: calc(100% - 16rem) !important;
+            }
+          {%- endif %}
+        {%- endstyle -%}
+        <div class="featured-collection__view-all">
+          <a class="{{ view_all_class }}" href="{{ view_all_url }}">{{ sec_stts.view_all_label | escape }}</a>
+        </div>
+      {%- endif -%}
     </div>
   </div>
 </div>
@@ -2004,6 +2055,44 @@
       "type": "url",
       "id": "content_button_link",
       "label": "t:settings.button_link"
+    },
+    {
+      "type": "header",
+      "content": "View all link"
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "Label",
+      "info": "A link to the whole collection under the row. Leave empty to hide it."
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "Link",
+      "info": "Leave empty to open the collection this section shows."
+    },
+    {
+      "type": "select",
+      "id": "view_all_style",
+      "label": "Style",
+      "options": [
+        { "value": "outline", "label": "Outline button" },
+        { "value": "solid", "label": "Solid button" },
+        { "value": "link", "label": "Underlined text" }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "range",
+      "id": "view_all_offset",
+      "label": "Lift on desktop",
+      "info": "How far the button rises into the space under the carousel. Raise it to line the button up with the progress bar; 0 puts it below.",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 66
     },
     {
       "type": "header",

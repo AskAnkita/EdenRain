@@ -2504,6 +2504,7 @@
                     },
                     "group_zeAii4": {
                       "type": "group",
+                      "disabled": true,
                       "settings": {
                         "link": "",
                         "open_in_new_tab": false,
@@ -3114,6 +3115,7 @@
       "settings": {
         "image": "shopify://shop_images/ER_Packaging_Home_Page.jpg",
         "image_position": "left",
+        "padding_bottom": 16,
         "heading": "Beautifully packaged",
         "text": "<p>We want you to be delighted with your jewellery purchase. Enjoy the big reveal as you unwrap the layers of our stylish packaging. Each item is presented in a luxurious velvet case which in turn is protected by an outer case. Our online shopping experience is wrapped and delivered with love.</p>"
       }
@@ -5064,9 +5066,9 @@
       "settings": {
         "product": "{{ closest.product }}",
         "recommendation_type": "related",
-        "layout_type": "grid",
+        "layout_type": "carousel",
         "carousel_on_mobile": false,
-        "products_to_show": 4,
+        "products_to_show": 10,
         "columns_desktop": 4,
         "columns_gap": 12,
         "rows_gap": 24,
@@ -5085,18 +5087,22 @@
         "show_more_product_top_offset": 40,
         "loop": false,
         "full_width": false,
-        "navigation": "arrows",
-        "arrows_position": "inside",
-        "pagination_type": "bullets",
+        "navigation": "arrows-pagination",
+        "arrows_position": "top_right",
+        "pagination_type": "progressbar",
         "dots_top_offset": 40,
-        "progress_top_offset": 40,
+        "progress_top_offset": 32,
         "page_width": "page-width",
         "page_width_custom": 1170,
-        "gap": 28,
+        "gap": 44,
         "color_scheme": "scheme-1",
         "columns_mobile": "2",
-        "padding-block-start": 48,
-        "padding-block-end": 48,
+        "padding-block-start": 24,
+        "padding-block-end": 40,
+        "more_label": "Explore More Collections",
+        "more_link": "",
+        "more_style": "outline",
+        "more_spacing": -16,
         "padding-inline-start": 0,
         "padding-inline-end": 0
       }
@@ -5134,7 +5140,7 @@
         "gradient_direction": "to top",
         "image_behavior": "none",
         "padding-block-start": 0,
-        "padding-block-end": 60,
+        "padding-block-end": 0,
         "padding-inline-start": 0,
         "padding-inline-end": 0,
         "custom_padding_more_devices": false,
@@ -5152,7 +5158,7 @@
       "type": "ethical-choice",
       "settings": {
         "heading": "The ethical choice",
-        "text": "<p>In recent times, attention has been turned to where our jewels come from. The diamond industry has in the past been associated with conflict, slavery and exploitation, but this isn't something you need to worry about when shopping with Eden Raine.<\/p><p>The semi-precious gemstones we use in our jewellery are sustainable, eco-friendly and are 100% conflict free. To the naked human eye, it is impossible to differentiate between Cubic Zirconia and a diamond, and you will see it featured in engagement rings, earrings, pendants and bracelets to name just a few. Unlike a diamond, Cubic Zirconia stones are optically flawless, and they have the sparkle to match.<\/p>",
+        "text": "<p>In recent times, attention has turned to where our jewels come from. The mined diamond industry has long been associated with conflict, exploitation and environmental damage, and none of that is something you need to worry about when shopping with Eden Raine.<\/p><p>Every diamond we set is lab-grown. Created above ground from pure carbon, a lab-grown diamond is chemically, physically and optically identical to a mined one: the same hardness, the same fire, the same sparkle, with a fully traceable origin and no conflict in its story. It is what you will find in our engagement rings, wedding bands, earrings, pendants and bracelets: real diamonds, without the compromise.<\/p>",
         "button_label": "Read more",
         "button_style": "outline",
         "panel_background": "#f4f3f2",
@@ -5160,7 +5166,7 @@
         "text_alignment": "left",
         "full_width": true,
         "custom_padding": true,
-        "padding_top": 24,
+        "padding_top": 0,
         "padding_bottom": 0,
         "padding_top_mobile": 24,
         "padding_bottom_mobile": 0

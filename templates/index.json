@@ -282,7 +282,8 @@
             "heading": "Design your own",
             "text": "<p>Choose your setting, select a centre stone, and make every detail your own in our Design Studio.</p>",
             "button_label": "Start designing",
-            "button_link": "shopify://pages/design-your-own"
+            "button_link": "shopify://pages/design-your-own",
+            "mobile_heading_arrow": true
           }
         },
         "route_stone": {
@@ -291,7 +292,8 @@
             "heading": "Speak with a designer",
             "text": "<p>Have an idea in mind? Get personal guidance and bring your perfect ring to life.</p>",
             "button_label": "Talk to a designer",
-            "button_link": "/pages/book-a-consultation"
+            "button_link": "/pages/book-a-consultation",
+            "mobile_heading_arrow": true
           }
         }
       },
@@ -459,7 +461,8 @@
         "panel_background": "#f5f5f5",
         "mobile_link_gap": 12,
         "mobile_header_gap": 24,
-        "link_label": "Shop the tennis collection",
+        "link_label": "Shop the Tennis Collection",
+        "link_style": "outline",
         "link_url": "shopify://collections/tennis-necklaces",
         "link_size": 13,
         "link_tracking": 12,
@@ -1052,6 +1055,10 @@
         "content_button_style": "button",
         "content_button_link": "",
         "show_more_product": false,
+        "view_all_label": "View all styles",
+        "view_all_link": "shopify://collections/best-sellers",
+        "view_all_style": "outline",
+        "view_all_offset": 16,
         "show_more_product_text": "Show more",
         "show_more_font_size": "",
         "show_more_font_weight": "default",
@@ -1069,7 +1076,7 @@
         "arrows_position": "top_right",
         "pagination_type": "progressbar",
         "dots_top_offset": 40,
-        "progress_top_offset": 20,
+        "progress_top_offset": 32,
         "page_width": "full-width",
         "page_width_custom": 1570,
         "color_scheme": "scheme-1",
@@ -1080,7 +1087,7 @@
         "show_arrows": false,
         "show_dots": true,
         "padding-block-start": 20,
-        "padding-block-end": 72,
+        "padding-block-end": 64,
         "padding-inline-start": 20,
         "padding-inline-end": 20
       }
@@ -1275,7 +1282,7 @@
         "padding_top": 24,
         "padding_bottom": 24,
         "padding_top_mobile": 24,
-        "padding_bottom_mobile": 24
+        "padding_bottom_mobile": 0
       }
     },
     "section_QeQfPU": {

@@ -104,8 +104,12 @@
         transform: translateX(0);
       }
 
+      /* One group's width: the track holds four identical groups, so a quarter of it is
+         exactly one, and the loop restarts on a frame that looks the same. Two groups were
+         not enough - on a wide screen one group is narrower than the strip, and the second
+         half of the strip sat empty while the first group scrolled out. */
       to {
-        transform: translateX(-50%);
+        transform: translateX(-25%);
       }
     }
 
@@ -239,7 +243,7 @@
       {%- liquid
         assign pass_count = 1
         if is_scroll
-          assign pass_count = 2
+          assign pass_count = 4
         endif
       -%}
       {%- for pass in (1..pass_count) -%}

@@ -3602,6 +3602,13 @@
     "name": "Mega menu featured media",
     "settings": [
       {
+        "type": "text",
+        "id": "hidden_menu_items",
+        "label": "Hide these top menu items",
+        "default": "Diamonds",
+        "info": "Comma-separated names of top-level menu items to leave out of the desktop and mobile menus without deleting them from Navigation. Example: Diamonds. Clear it to bring them back."
+      },
+      {
         "type": "paragraph",
         "content": "The large cards in each mega menu's Featured or Learn tab. Leave a field empty to keep what the theme ships with."
       },

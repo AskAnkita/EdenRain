@@ -1,0 +1,16 @@
+{%- comment -%}
+  Outputs ",handle,handle," for the top-level menu items named in the theme setting
+  "Hide these top menu items" (Mega menu featured media). Callers capture it and skip any
+  link whose title handle is in it, so an item can be hidden without touching Navigation.
+{%- endcomment -%}
+{%- liquid
+  assign out = ','
+  assign names = settings.hidden_menu_items | split: ','
+  for name in names
+    assign key = name | strip | handle
+    if key != blank
+      assign out = out | append: key | append: ','
+    endif
+  endfor
+  echo out
+-%}

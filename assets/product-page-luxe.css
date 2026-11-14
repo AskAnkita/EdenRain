@@ -373,7 +373,7 @@
 /* ---------- Dropdown options (ring size) ---------- */
 .template-product .variant-option--dropdowns,
 .template-product .variant-option--size {
-  max-width: 34rem;
+  max-width: none;
 }
 
 .template-product .variant-option--dropdowns .variant-option__select-wrapper,
@@ -383,7 +383,7 @@
   position: relative;
   display: block;
   width: 100%;
-  max-width: 34rem;
+  max-width: none;
   /* The theme sizes .select to a fixed 4rem; the pill below is 5.2rem, so the
      wrapper has to follow the select rather than box it in. */
   height: auto;
@@ -413,7 +413,7 @@
   align-items: baseline;
   justify-content: space-between;
   width: 100%;
-  max-width: 34rem;
+  max-width: none;
   margin-bottom: 1.2rem;
   gap: 1rem;
 }
@@ -446,7 +446,7 @@
 .template-product .variant-option--dropdowns .select__select,
 .template-product .variant-option--size .select__select {
   width: 100%;
-  height: 5.2rem;
+  height: 5.4rem;
   padding: 0 4.4rem 0 2.2rem;
   border: 1px solid rgb(var(--color-foreground-rgb) / 0.18);
   border-radius: 0;
@@ -541,6 +541,12 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--pdp-ink-soft);
+}
+
+/* An empty delivery-time group sits between the ring size and Add to Cart;
+   its 1.4rem margin plus the flex gap pushed the button ~20px further away. */
+.template-product .product-details .delivery-time:not(:has(.group-block-content > *)) {
+  display: none;
 }
 
 .template-product .product-details .delivery-time .icon-block__media {

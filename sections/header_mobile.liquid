@@ -65,10 +65,15 @@
                   types in that collection and three of its products, like the desktop panel.
                 {%- endcomment -%}
                 {%- assign mobile_menu = linklists['main-menu'] -%}
+                {%- capture hidden_menu_handles -%}{%- render 'menu-hidden-keys' -%}{%- endcapture -%}
                 <nav class="mnav" aria-label="{{ 'accessibility.menu' | t }}">
                   <ul class="mnav__list" role="list">
                     {%- for link in mobile_menu.links -%}
                       {%- liquid
+                        assign hidden_key = link.title | handle | prepend: ',' | append: ','
+                        if hidden_menu_handles contains hidden_key
+                          continue
+                        endif
                         assign link_collection = blank
                         if link.type == 'collection_link' and link.object.products_count > 0
                           assign link_collection = link.object

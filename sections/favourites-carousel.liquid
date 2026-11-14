@@ -112,7 +112,7 @@
 
   /* The link is a plain underlined label: a rule drawn under the whole label that
      thickens on hover, rather than a button. */
-  #fav-{{ section.id }} .fav-link {
+  #fav-{{ section.id }} .fav-link--underline {
     display: inline-block;
     padding-bottom: 0.6rem;
     border-bottom: 1px solid currentColor;
@@ -128,8 +128,21 @@
     transition: border-bottom-width 0.2s ease, opacity 0.2s ease;
   }
 
-  #fav-{{ section.id }} .fav-link:hover {
+  #fav-{{ section.id }} .fav-link--underline:hover {
     border-bottom-width: 2px;
+  }
+
+  /* Button style: the shared eden-action shape and hover; only the case and the
+     colour are the section's own. */
+  #fav-{{ section.id }} .fav-link.eden-action {
+    margin-top: 0.4rem;
+    text-transform: {{ section.settings.link_transform }};
+    {%- if section.settings.link_color != blank and section.settings.link_color != 'rgba(0,0,0,0)' %}
+    --cta-ink: {{ section.settings.link_color }};
+    --cta-edge: {{ section.settings.link_color }};
+    --cta-fill-hover: {{ section.settings.link_color }};
+    --cta-edge-hover: {{ section.settings.link_color }};
+    {%- endif %}
   }
 
   #fav-{{ section.id }} .fav-arrows {
@@ -416,8 +429,16 @@
     }
 
     #fav-{{ section.id }} .fav-link {
+    {%- if section.settings.link_position_mobile == 'above' %}
       order: 20;
       justify-self: {{ mobile_justify }};
+    {%- else %}
+      /* Below the row: the pictures follow straight on from the heading, and the link
+         closes the section where the swipe ends. */
+      order: 60;
+      justify-self: center;
+      margin-top: {{ section.settings.mobile_link_below_gap }}px;
+    {%- endif %}
     }
 
     #fav-{{ section.id }} .fav-track {
@@ -518,7 +539,17 @@
       {%- endif -%}
 
       {%- if section.settings.link_label != blank -%}
-        <a class="fav-link" href="{{ section.settings.link_url | default: '#' }}">
+        {%- liquid
+          case section.settings.link_style
+            when 'underline'
+              assign fav_link_class = 'fav-link fav-link--underline'
+            when 'solid'
+              assign fav_link_class = 'fav-link eden-action eden-action--solid'
+            else
+              assign fav_link_class = 'fav-link eden-action eden-action--outline'
+          endcase
+        -%}
+        <a class="{{ fav_link_class }}" href="{{ section.settings.link_url | default: '#' }}">
           {{- section.settings.link_label | escape -}}
         </a>
       {%- endif -%}
@@ -808,7 +839,10 @@
     { "type": "range", "id": "mobile_header_gap", "label": "Space between the heading and the pictures on mobile", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 24 },
 
     { "type": "header", "content": "Link" },
-    { "type": "text", "id": "link_label", "label": "Link label", "default": "Shop the tennis collection", "info": "Leave empty to hide the link." },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "Shop the Tennis Collection", "info": "Leave empty to hide the link." },
+    { "type": "select", "id": "link_position_mobile", "label": "Link position on mobile", "default": "below", "options": [ { "value": "below", "label": "Below the pictures" }, { "value": "above", "label": "Under the heading" } ] },
+    { "type": "range", "id": "mobile_link_below_gap", "label": "Space above the link on mobile", "min": 0, "max": 60, "step": 2, "unit": "px", "default": 16, "info": "Used when the link sits below the pictures." },
+    { "type": "select", "id": "link_style", "label": "Link style", "default": "outline", "options": [ { "value": "outline", "label": "Outline button" }, { "value": "solid", "label": "Solid button" }, { "value": "underline", "label": "Underlined text" } ] },
     { "type": "url", "id": "link_url", "label": "Link", "info": "Also used by any panel with no link of its own." },
     { "type": "range", "id": "link_size", "label": "Link size", "min": 9, "max": 24, "step": 1, "unit": "px", "default": 13 },
     { "type": "range", "id": "link_tracking", "label": "Link letter spacing", "min": 0, "max": 30, "step": 1, "unit": "%", "default": 12 },

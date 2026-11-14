@@ -9,6 +9,9 @@
 
 {%- liquid
   assign listmenu = section.settings.menu.links
+  capture hidden_menu_handles
+    render 'menu-hidden-keys'
+  endcapture
   assign listmenu_size = listmenu.size
   if localization.available_countries.size > 1 and section.settings.show_country or section.settings.show_language and localization.available_languages.size > 1
     assign localization_forms = true
@@ -59,6 +62,8 @@
           <nav class="menu-drawer__navigation">
             <ul class="menu-drawer__menu has-submenu list-menu" role="list">
               {%- for link in listmenu -%}
+                {%- assign hidden_key = link.title | handle | prepend: ',' | append: ',' -%}
+                {%- if hidden_menu_handles contains hidden_key -%}{%- continue -%}{%- endif -%}
                 <menu-drawer class="menu-drawer__list-item" style="--menu-drawer-animation-index: {{ forloop.index }};">
                   {%- if link.links != blank -%}
                     <details id="Details-menu-drawer-menu-item-{{ forloop.index }}">

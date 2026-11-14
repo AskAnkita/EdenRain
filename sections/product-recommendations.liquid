@@ -33,6 +33,13 @@
   endif
 
   assign layout_type = sec_stts.layout_type
+
+  # The home page's header arrows: bare chevrons beside the heading. global.js hands Swiper
+  # the pair inside .swiper-btns-on-header and base.css hides the pair under the slides.
+  assign arrows_on_header = false
+  if enable_navigation and layout_type == 'carousel' and sec_stts.arrows_position == 'top_right'
+    assign arrows_on_header = true
+  endif
   assign page_width = sec_stts.page_width
 
   assign intent = ''
@@ -41,6 +48,13 @@
   endif
 %}
 
+{%- style -%}
+  /* .collection is a block, not a flex column, so the section's "gap" setting never reached
+     the space under the heading and the title sat ~20px off the cards. */
+  #collection-{{ section.id }} > .section-resource-list__content:not(:empty) {
+    margin-bottom: max(24px, calc(var(--gap-scale, 1.0) * {{ section.settings.gap }}px));
+  }
+{%- endstyle -%}
 <product-recommendations
   id="product-recommendations-{{ section.id }}"
   class="product-recommendations"
@@ -69,7 +83,7 @@
     "
   >
     <div
-      class="collection{% if section.settings.quick_add == 'bulk' %} collection-quick-add-bulk{% endif %}{% if section.settings.full_width %} collection--full-width{% endif %} gap-style"
+      class="collection{% if section.settings.quick_add == 'bulk' %} collection-quick-add-bulk{% endif %}{% if section.settings.full_width %} collection--full-width{% endif %}{% if arrows_on_header %} arrow-on-header{% endif %} gap-style"
       id="collection-{{ section.id }}"
       data-id="{{ section.id }}"
       data-product-block
@@ -77,8 +91,18 @@
         {%  render 'gap-style', value: section.settings.gap %}
       "
     >
-      <div class="section-resource-list__content">
+      <div class="section-resource-list__content{% if arrows_on_header %} section-global__header{% endif %}">
         {% content_for 'blocks' %}
+        {%- if arrows_on_header -%}
+          <div class="swiper-btns-on-header swiper-btns-wrap small-hide">
+            <button type="button" class="swiper-button swiper-button-prev" aria-label="{{ 'content.slider.previous_slide' | t }}">
+              <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+            </button>
+            <button type="button" class="swiper-button swiper-button-next" aria-label="{{ 'content.slider.next_slide' | t }}">
+              <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+            </button>
+          </div>
+        {%- endif -%}
       </div>
 
       {%- if recommendations.performed or section.settings.product == blank -%}
@@ -288,6 +312,27 @@
               </div>
             </swiper-component>
         {% endcase %}
+
+        {%- comment -%}
+          A link onward under the row, for a shopper who saw nothing they liked here. Empty label
+          hides it; empty link opens the list of every collection.
+        {%- endcomment -%}
+        {%- if section.settings.more_label != blank and has_recommendations == 'true' -%}
+          {%- liquid
+            assign more_url = section.settings.more_link | default: routes.collections_url
+            case section.settings.more_style
+              when 'solid'
+                assign more_class = 'eden-action eden-action--solid'
+              when 'link'
+                assign more_class = 'eden-link'
+              else
+                assign more_class = 'eden-action eden-action--outline'
+            endcase
+          -%}
+          <div class="product-recommendations__more" style="display: flex; justify-content: center; margin-top: {{ section.settings.more_spacing }}px;">
+            <a class="{{ more_class }}" href="{{ more_url }}">{{ section.settings.more_label | escape }}</a>
+          </div>
+        {%- endif -%}
       {%- else -%}
         <div
           class="collection--grid-layout"
@@ -716,6 +761,10 @@
         {
           "value": "bottom",
           "label": "t:options.bottom_slide"
+        },
+        {
+          "value": "top_right",
+          "label": "t:options.top_right"
         }
       ],
       "default": "inside",
@@ -767,6 +816,43 @@
       "unit": "px",
       "default": 40,
       "visible_if": "{{ section.settings.pagination_type == 'progressbar' and section.settings.navigation == 'pagination' or section.settings.navigation == 'arrows-pagination' }}"
+    },
+    {
+      "type": "header",
+      "content": "Link under the row"
+    },
+    {
+      "type": "text",
+      "id": "more_label",
+      "label": "Label",
+      "info": "A button under the products, e.g. Explore more collections. Leave empty to hide it."
+    },
+    {
+      "type": "url",
+      "id": "more_link",
+      "label": "Link",
+      "info": "Leave empty to open the list of all collections."
+    },
+    {
+      "type": "select",
+      "id": "more_style",
+      "label": "Style",
+      "options": [
+        { "value": "outline", "label": "Outline button" },
+        { "value": "solid", "label": "Solid button" },
+        { "value": "link", "label": "Underlined text" }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "range",
+      "id": "more_spacing",
+      "label": "Space above",
+      "min": -40,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 40
     },
     {
       "type": "header",

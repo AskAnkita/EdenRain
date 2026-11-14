@@ -246,6 +246,7 @@
       --strip-per-row: {{ cs.per_row }};
       --strip-per-row-mobile: {{ cs.per_row_mobile }};
       --strip-card-height: {{ cs.card_height }}px;
+      --strip-card-height-mobile: {{ cs.card_height_mobile | default: 64 }}px;
       --strip-media-width: {{ cs.media_width }}px;
       --strip-media-width-mobile: {{ cs.media_width_mobile }}px;
       --strip-icon-size: {{ cs.icon_size }}px;
@@ -630,6 +631,7 @@
     { "type": "range", "id": "per_row_mobile", "label": "Cards across on mobile", "min": 1, "max": 4, "step": 0.1, "default": 2.2 },
     { "type": "range", "id": "gap", "label": "Space between cards", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 20 },
     { "type": "range", "id": "card_height", "label": "Card height", "min": 60, "max": 200, "step": 2, "unit": "px", "default": 90 },
+    { "type": "range", "id": "card_height_mobile", "label": "Card height on mobile", "min": 48, "max": 160, "step": 2, "unit": "px", "default": 64, "info": "On mobile each card also widens to fit its name, so a long one like Anniversary never spills out." },
     { "type": "range", "id": "media_width", "label": "Picture width", "min": 40, "max": 180, "step": 2, "unit": "px", "default": 84 },
     { "type": "range", "id": "media_width_mobile", "label": "Picture width on mobile", "min": 32, "max": 140, "step": 2, "unit": "px", "default": 72 },
     { "type": "range", "id": "icon_size", "label": "Drawing size", "min": 20, "max": 88, "step": 2, "unit": "px", "default": 40, "info": "Only cards drawing an outline, which needs \"Fall back to a line drawing\" above. A photographed card fills its box, so this does not move it." },

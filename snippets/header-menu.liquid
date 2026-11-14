@@ -17,6 +17,10 @@
   assign drawer_pages = ''
 
   # Top-level items listed in the header's "Menu items on the right" setting render on the right (side: 'right')
+  capture hidden_menu_handles
+    render 'menu-hidden-keys'
+  endcapture
+
   assign right_menu_handles = ','
   assign right_menu_items = header_settings.right_menu_items | split: ','
   for item in right_menu_items
@@ -66,6 +70,9 @@
               if is_right_link
                 assign skip_link = false
               endif
+            endif
+            if hidden_menu_handles contains link_handle_key
+              assign skip_link = true
             endif
           -%}
           {%- liquid

@@ -20,6 +20,7 @@
   --strip-per-row: 6.4;
   --strip-per-row-mobile: 2.2;
   --strip-card-height: 90px;
+  --strip-card-height-mobile: 64px;
   --strip-media-width: 84px;
   --strip-media-width-mobile: 72px;
   --strip-label-size: 13px;
@@ -272,5 +273,69 @@ svg.style-strip__icon {
 
   .style-strip--no-arrows-mobile .style-strip__head--bare {
     display: none;
+  }
+}
+
+/*
+  Phones: a fixed share of the row left a long name like ANNIVERSARY about 40px wider than the
+  space beside the picture, so it ran out over the border. On mobile the per-row width is now
+  a floor, not a size - a card grows to fit its name on one line - and the card is shorter,
+  since one line of label does not need the desktop height.
+*/
+@media screen and (max-width: 749px) {
+  .style-strip__item {
+    width: auto;
+    min-width: calc(
+      (100% - (var(--strip-per-row-mobile) - 1) * var(--strip-gap)) / var(--strip-per-row-mobile)
+    );
+  }
+
+  .style-strip__card {
+    grid-template-columns: var(--strip-media-width-mobile) auto;
+    min-height: var(--strip-card-height-mobile);
+    height: var(--strip-card-height-mobile);
+  }
+
+  .style-strip__media > img {
+    max-height: var(--strip-card-height-mobile);
+  }
+
+  .style-strip__label {
+    white-space: nowrap;
+    padding: 0.6rem 1.4rem;
+  }
+}
+
+/*
+  Desktop, no heading: the arrows used to take a row of their own above the cards - about 45px
+  of white between the banner and the row for two chevrons. With nothing else in that row they
+  now sit either side of the cards, on the cards' centre line, and the row above is gone.
+*/
+@media screen and (min-width: 750px) {
+  .style-strip__inner:has(> .style-strip__head--bare) {
+    display: grid;
+    grid-template-columns: 3.2rem minmax(0, 1fr) 3.2rem;
+    column-gap: 1.2rem;
+    align-items: center;
+  }
+
+  .style-strip__inner > .style-strip__head--bare,
+  .style-strip__head--bare > .style-strip__arrows:not([hidden]) {
+    display: contents;
+  }
+
+  .style-strip__head--bare .style-strip__arrow--prev {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .style-strip__inner:has(> .style-strip__head--bare) > .style-strip__track {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .style-strip__head--bare .style-strip__arrow--next {
+    grid-column: 3;
+    grid-row: 1;
   }
 }

@@ -96,7 +96,7 @@
   justify-content: center;
   gap: 2.8rem;
   background: var(--ecb-panel-bg);
-  padding: var(--ecb-pad-block) var(--ecb-pad-inline-mobile);
+  padding: var(--ecb-pad-block-mobile, var(--ecb-pad-block)) var(--ecb-pad-inline-mobile);
   text-align: left;
 }
 
@@ -224,10 +224,18 @@
   }
 
   .ecb-panel {
+    padding-block: var(--ecb-pad-block);
     padding-inline: var(--ecb-pad-inline);
   }
 
   .ecb-heading {
     font-size: var(--ecb-heading-size);
+  }
+}
+
+/* On a phone the paragraph under the heading steps aside; everything else stays. */
+@media screen and (max-width: 749px) {
+  .eden-consult--mobile-no-text .ecb-text {
+    display: none;
   }
 }
