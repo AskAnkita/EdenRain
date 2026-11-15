@@ -1,0 +1,53 @@
+{% comment %}
+  One panel of sections/page-content.liquid: a piece of the page body with a photograph beside it.
+
+  Accepts:
+  - body {String}: the admin's own markup for this panel, printed as written
+  - panel {Block}: the "panel" block whose picture goes beside it (may be blank)
+  - section_ratio {String}: the section's picture shape, used when the block says "inherit"
+  - modifier {String}: extra class for the panel (optional), e.g. 'pc-panel--prose'
+{% endcomment %}
+
+{%- liquid
+  assign has_media = false
+  if panel.settings.image != blank or panel.settings.image_asset != blank or panel.settings.image_url != blank
+    assign has_media = true
+  endif
+
+  assign media_side = panel.settings.image_position | default: 'right'
+
+  assign media_ratio = panel.settings.image_ratio | default: 'inherit'
+  if media_ratio == 'inherit'
+    assign media_ratio = section_ratio
+  endif
+-%}
+
+<div
+  class="pc-panel pc-panel--media-{{ media_side }}{% unless has_media %} pc-panel--no-media{% endunless %}{% if modifier != blank %} {{ modifier }}{% endif %}"
+  {%- if panel != blank %} {{ panel.shopify_attributes }}{% endif %}
+>
+  <div class="pc-panel__body rte">{{ body }}</div>
+
+  {%- if has_media -%}
+    <div
+      class="pc-panel__media{% if media_ratio == 'natural' %} pc-panel__media--natural{% elsif media_ratio == 'match' %} pc-panel__media--match{% endif %}"
+      style="
+        {%- unless media_ratio == 'natural' or media_ratio == 'match' -%}--pc-media-ratio: {{ media_ratio }};{%- endunless -%}
+        {%- if panel.settings.image_focus != blank -%}--pc-media-focus: {{ panel.settings.image_focus }};{%- endif -%}
+      "
+    >
+      {%- render 'homepage-journey-image',
+        image: panel.settings.image,
+        asset: panel.settings.image_asset,
+        image_url: panel.settings.image_url,
+        alt: panel.settings.image_alt,
+        class: 'pc-media__image',
+        placeholder_class: 'pc-media__image pc-media__placeholder',
+        placeholder: 'lifestyle-2',
+        sizes: '(min-width: 1440px) 760px, (min-width: 990px) 55vw, 100vw',
+        width: 1120,
+        height: 1400
+      -%}
+    </div>
+  {%- endif -%}
+</div>

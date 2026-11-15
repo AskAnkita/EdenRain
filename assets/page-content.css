@@ -211,6 +211,47 @@
   margin-bottom: 0;
 }
 
+/* "Tables together": the second table's label opens a new block in the same column, so it takes
+   the space a panel gap would have given it. */
+.section-page .pc-panel--grouped .pc-panel__body table + h1,
+.section-page .pc-panel--grouped .pc-panel__body table ~ h1:not(:empty) {
+  margin-top: clamp(3.2rem, 4vw, 4.8rem);
+}
+
+/*
+  Grouped layout: the picture column is exactly half the shell, gap included in the words' half.
+  The first picture then starts on the centre line and the second ends on it, so the two meet
+  on one vertical edge as they zig-zag down the page, as on the About page.
+*/
+@media screen and (min-width: 990px) {
+  .pc-panel--grouped.pc-panel--media-right,
+  .pc-panel--prose.pc-panel--media-right {
+    grid-template-columns: minmax(0, 1fr) 50%;
+  }
+
+  .pc-panel--grouped.pc-panel--media-left,
+  .pc-panel--prose.pc-panel--media-left {
+    grid-template-columns: 50% minmax(0, 1fr);
+  }
+}
+
+/* In the grouped layout the words keep a reading measure inside their column, as the About page's
+   chapters do: the rates sit at the outer edge and the gap opens towards the picture, rather than
+   every line running right up to it. */
+.pc-panel--grouped .pc-panel__body,
+.pc-panel--prose .pc-panel__body {
+  max-width: var(--pc-panel-measure, 50rem);
+}
+
+/* The text after the tables, in its own panel: its first heading is the top of the column. */
+.section-page .pc-panel--prose .pc-panel__body > h2:first-of-type {
+  margin-top: 0;
+}
+
+.section-page .pc-panel--prose .pc-panel__body > :last-child {
+  margin-bottom: 0;
+}
+
 /* ------------------------------------------------------- rich text, anywhere */
 
 /* The admin content leaves empty shells behind, and the title block wraps its text in a <p> the

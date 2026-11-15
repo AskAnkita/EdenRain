@@ -136,9 +136,9 @@
             "image": "shopify://shop_images/ChatGPT_Image_20_Oct_2026_13_59_37.png",
             "image_asset": "ER_Packaging_Home_Page.jpg",
             "image_url": "",
-            "image_alt": "Eden Raine ring boxes, gift bag and ribboned outer boxes, ready to be posted",
+            "image_alt": "Hands passing an Eden Raine gift box tied with the monogram ribbon",
             "image_position": "right",
-            "image_ratio": "match",
+            "image_ratio": "inherit",
             "image_focus": "center"
           }
         },
@@ -148,9 +148,9 @@
             "image": "shopify://shop_images/ChatGPT_Image_20_Oct_2026_10_25_28.png",
             "image_asset": "lifestyle-round-necklace.jpg",
             "image_url": "",
-            "image_alt": "A lab-grown diamond solitaire pendant worn at the neck",
+            "image_alt": "An Eden Raine gift box and velvet ring box beside the shipping carton",
             "image_position": "left",
-            "image_ratio": "match",
+            "image_ratio": "inherit",
             "image_focus": "center"
           }
         }
@@ -160,11 +160,12 @@
         "panel_international"
       ],
       "settings": {
-        "content_width": 1200,
+        "layout": "grouped",
+        "content_width": 1400,
         "text_measure": 1200,
-        "media_width": 40,
+        "media_width": 54,
         "column_gap": 48,
-        "media_ratio": "match",
+        "media_ratio": "1 / 1",
         "media_align": "center",
         "panel_gap": 72,
         "custom_padding": false,

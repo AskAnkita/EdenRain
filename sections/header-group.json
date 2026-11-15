@@ -59,7 +59,7 @@
                 "announcement_text_fUhgWe": {
                   "type": "_announcement-text",
                   "settings": {
-                    "text": "FREE Shipping + FREE 30-Day Returns",
+                    "text": "FREE Shipping across UK",
                     "font": "body",
                     "font_size": "1.4rem",
                     "font_weight": "300",
@@ -67,10 +67,10 @@
                   },
                   "blocks": {}
                 },
-                "announcement_text_BXhKCE": {
+                "announcement_text_returns": {
                   "type": "_announcement-text",
                   "settings": {
-                    "text": "Choose up to 36 monthly payments, from 0% APR financing. Terms apply.",
+                    "text": "FREE 30-Day Returns",
                     "font": "body",
                     "font_size": "1.4rem",
                     "font_weight": "300",
@@ -81,7 +81,7 @@
               },
               "block_order": [
                 "announcement_text_fUhgWe",
-                "announcement_text_BXhKCE"
+                "announcement_text_returns"
               ]
             }
           },

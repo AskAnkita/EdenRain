@@ -2463,9 +2463,13 @@ if (!customElements.get('sticky-atc')) {
           const screenBottom = (scr.availTop || 0) + scr.availHeight;
           const windowBottom = window.screenY + window.outerHeight;
           const overhang = windowBottom - screenBottom;
-          // a full-screen window covers the Dock area legitimately; leave it alone
-          const isFullScreen = window.outerHeight >= scr.height && window.outerWidth >= scr.width;
-          if (!isFullScreen && overhang > 0 &&window.outerWidth > 0 && window.innerWidth > 0) {
+          // A full-screen window covers the Dock area legitimately; leave it alone.
+          // Match the screen size exactly: a window that is merely TALLER than the
+          // screen (sized on a bigger monitor) is the case this fix exists for.
+          const isFullScreen =
+            window.matchMedia('(display-mode: fullscreen)').matches ||
+            (Math.abs(window.outerHeight - scr.height) <= 1 && Math.abs(window.outerWidth - scr.width) <= 1);
+          if (!isFullScreen && overhang > 0 && window.outerWidth > 0 && window.innerWidth > 0) {
             // screen coordinates are unzoomed; convert to CSS px for page zoom
             const cssPerScreenPx = window.innerWidth / window.outerWidth;
             lift = Math.min(Math.round(overhang * cssPerScreenPx), Math.round(window.innerHeight / 3));
@@ -2473,6 +2477,7 @@ if (!customElements.get('sticky-atc')) {
         } catch (e) {
           lift = 0;
         }
+        this.dataset.screenLift = String(lift);
         this.style.marginBottom = lift > 0 ? `${lift}px` : '';
       }
     }

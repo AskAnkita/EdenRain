@@ -31,6 +31,7 @@
   assign column_gap = section.settings.column_gap | plus: 0
   assign panel_gap = section.settings.panel_gap | plus: 0
   assign measure = section.settings.text_measure | plus: 0
+  assign panel_measure = section.settings.panel_text_width | plus: 0
   assign pad_top = section.settings.padding_top | plus: 0
   assign pad_bottom = section.settings.padding_bottom | plus: 0
   assign label_size = section.settings.label_size | plus: 0
@@ -56,6 +57,7 @@
 {%- capture section_styles -%}
   {%- if content_width > 0 -%}--pc-shell-max: {{ content_width }}px;{%- endif -%}
   {%- if measure > 0 -%}--pc-measure: {{ measure }}px;{%- endif -%}
+  {%- if panel_measure > 0 -%}--pc-panel-measure: {{ panel_measure }}px;{%- endif -%}
   {%- if media_width > 0 -%}--pc-media-col: {{ media_width }}fr;--pc-content-col: {{ 100 | minus: media_width }}fr;{%- endif -%}
   {%- if column_gap > 0 -%}--pc-column-gap: {{ column_gap }}px;{%- endif -%}
   {%- if section.settings.media_align != blank -%}--pc-media-align: {{ section.settings.media_align }};{%- endif -%}
@@ -88,70 +90,67 @@
   class="pc-shell pc-tables-{{ section.settings.table_style | default: 'rules' }}"
   style="{{ section_styles | strip_newlines | strip }}"
 >
-  {%- for chunk in chunks -%}
-    {%- if forloop.last -%}
-      {%- assign trailing = chunk | strip -%}
-      {%- if trailing != blank -%}
-        <div class="pc-prose rte">{{ chunk }}</div>
+  {%- liquid
+    # The split eats every </table>. The tag is built rather than typed, where a bare </table>
+    # reads as a stray close tag to theme check.
+    assign closing_tag = '</table' | append: '>'
+    assign trailing = chunks.last | strip
+    assign table_count = chunks.size | minus: 1
+  -%}
+
+  {%- if section.settings.layout == 'grouped' and table_count > 0 -%}
+    {%- comment -%}
+      Grouped: every table stacked in one column beside the first block's picture, then the text
+      after the last table (Delivery Information, Dispatch) beside the second block's picture.
+      Two tall panels instead of one short one per table, so a picture is never much taller than
+      the words next to it.
+    {%- endcomment -%}
+    {%- capture tables_body -%}
+      {%- for chunk in chunks -%}
+        {%- unless forloop.last -%}{{ chunk }}{{ closing_tag }}{%- endunless -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- render 'page-content-panel',
+      body: tables_body,
+      panel: panel_blocks[0],
+      section_ratio: section_ratio,
+      modifier: 'pc-panel--grouped'
+    -%}
+
+    {%- if trailing != blank -%}
+      {%- if panel_blocks.size > 1 -%}
+        {%- render 'page-content-panel',
+          body: chunks.last,
+          panel: panel_blocks[1],
+          section_ratio: section_ratio,
+          modifier: 'pc-panel--prose'
+        -%}
+      {%- else -%}
+        <div class="pc-prose rte">{{ chunks.last }}</div>
       {%- endif -%}
+    {%- endif -%}
 
-    {%- else -%}
-      {%- liquid
-        assign panel = panel_blocks[forloop.index0]
-
-        assign has_media = false
-        if panel.settings.image != blank or panel.settings.image_asset != blank or panel.settings.image_url != blank
-          assign has_media = true
-        endif
-
-        assign media_side = panel.settings.image_position | default: 'right'
-
-        assign media_ratio = panel.settings.image_ratio | default: 'inherit'
-        if media_ratio == 'inherit'
-          assign media_ratio = section_ratio
-        endif
-
-        # Put back the closing tag the split ate. It is built here rather than typed into the
-        # markup below, where a bare </table> reads as a stray close tag to theme check.
-        assign closing_tag = '</table' | append: '>'
-        assign panel_body = chunk | append: closing_tag
-      -%}
-
-      <div
-        class="pc-panel pc-panel--media-{{ media_side }}{% unless has_media %} pc-panel--no-media{% endunless %}"
-        {%- if panel != blank %} {{ panel.shopify_attributes }}{% endif %}
-      >
+  {%- else -%}
+    {%- for chunk in chunks -%}
+      {%- if forloop.last -%}
+        {%- if trailing != blank -%}
+          <div class="pc-prose rte">{{ chunk }}</div>
+        {%- endif -%}
+      {%- else -%}
         {%- comment -%}
           Everything from the previous table's end up to this one is one piece of the admin's own
           markup, so it is printed as it was written.
         {%- endcomment -%}
-        <div class="pc-panel__body rte">{{ panel_body }}</div>
-
-        {%- if has_media -%}
-          <div
-            class="pc-panel__media{% if media_ratio == 'natural' %} pc-panel__media--natural{% elsif media_ratio == 'match' %} pc-panel__media--match{% endif %}"
-            style="
-              {%- unless media_ratio == 'natural' or media_ratio == 'match' -%}--pc-media-ratio: {{ media_ratio }};{%- endunless -%}
-              {%- if panel.settings.image_focus != blank -%}--pc-media-focus: {{ panel.settings.image_focus }};{%- endif -%}
-            "
-          >
-            {%- render 'homepage-journey-image',
-              image: panel.settings.image,
-              asset: panel.settings.image_asset,
-              image_url: panel.settings.image_url,
-              alt: panel.settings.image_alt,
-              class: 'pc-media__image',
-              placeholder_class: 'pc-media__image pc-media__placeholder',
-              placeholder: 'lifestyle-2',
-              sizes: '(min-width: 990px) 40vw, 100vw',
-              width: 1120,
-              height: 1400
-            -%}
-          </div>
-        {%- endif -%}
-      </div>
-    {%- endif -%}
-  {%- endfor -%}
+        {%- assign panel_body = chunk | append: closing_tag -%}
+        {%- render 'page-content-panel',
+          body: panel_body,
+          panel: panel_blocks[forloop.index0],
+          section_ratio: section_ratio
+        -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
 
   {%- if section.settings.button_label != blank -%}
     <div class="pc-actions">
@@ -173,6 +172,28 @@
       "content": "Renders this page's body from Online Store > Pages. Each table in it is paired with the picture in the matching block below - first table, first block."
     },
     { "type": "header", "content": "Layout" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Panels",
+      "info": "Together: all tables beside the first picture, then the text below them beside the second.",
+      "options": [
+        { "value": "each", "label": "One picture per table" },
+        { "value": "grouped", "label": "Tables together, then text" }
+      ],
+      "default": "each"
+    },
+    {
+      "type": "range",
+      "id": "panel_text_width",
+      "label": "Text width beside a picture",
+      "info": "Tables together layout only. Narrower leaves more space between the words and the picture.",
+      "min": 360,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "default": 500
+    },
     {
       "type": "range",
       "id": "content_width",
@@ -198,7 +219,7 @@
       "type": "range",
       "id": "media_width",
       "label": "Picture column",
-      "info": "Share of the panel the photograph takes. The table gets the rest.",
+      "info": "Share of the panel the photograph takes. The table gets the rest. Tables together layout always uses half, so the pictures line up.",
       "min": 25,
       "max": 60,
       "step": 1,
