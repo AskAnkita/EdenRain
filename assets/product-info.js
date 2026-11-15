@@ -1937,6 +1937,7 @@ if (!customElements.get('sticky-atc')) {
           const observer = new IntersectionObserver(this.onScroll.bind(this));
           observer.observe(this.form);
           window.addEventListener('scroll', this._handleWindowScroll, { passive: true });
+          window.addEventListener('resize', this._handleWindowScroll, { passive: true });
         } else {
           console.warn('Sticky ATC: Could not find product form');
         }
@@ -1954,6 +1955,7 @@ if (!customElements.get('sticky-atc')) {
         }
         if (this._handleWindowScroll) {
           window.removeEventListener('scroll', this._handleWindowScroll);
+          window.removeEventListener('resize', this._handleWindowScroll);
         }
       }
 
@@ -2441,12 +2443,37 @@ if (!customElements.get('sticky-atc')) {
         this.classList.toggle('is-visible', shouldShow);
       
         if (shouldShow) {
+          this.liftAboveScreenEdge();
           document.body.style.setProperty('--sticky-atc-height', `${this.offsetHeight}px`);
         } else {
           document.body.style.setProperty('--sticky-atc-height', `0px`);
         }
 
         if (!shouldShow) this.classList.remove('sticky-open');
+      }
+
+      // A desktop browser window can hang off the bottom of the display (dragged
+      // down, or sitting behind the macOS Dock). The viewport then ends below
+      // the screen and a bar pinned to bottom:0 is half cut off. Measure how far
+      // the window overhangs the usable screen area and lift the bar by that much.
+      liftAboveScreenEdge() {
+        let lift = 0;
+        try {
+          const scr = window.screen;
+          const screenBottom = (scr.availTop || 0) + scr.availHeight;
+          const windowBottom = window.screenY + window.outerHeight;
+          const overhang = windowBottom - screenBottom;
+          // a full-screen window covers the Dock area legitimately; leave it alone
+          const isFullScreen = window.outerHeight >= scr.height && window.outerWidth >= scr.width;
+          if (!isFullScreen && overhang > 0 &&window.outerWidth > 0 && window.innerWidth > 0) {
+            // screen coordinates are unzoomed; convert to CSS px for page zoom
+            const cssPerScreenPx = window.innerWidth / window.outerWidth;
+            lift = Math.min(Math.round(overhang * cssPerScreenPx), Math.round(window.innerHeight / 3));
+          }
+        } catch (e) {
+          lift = 0;
+        }
+        this.style.marginBottom = lift > 0 ? `${lift}px` : '';
       }
     }
   );
