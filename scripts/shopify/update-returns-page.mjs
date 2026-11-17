@@ -156,7 +156,7 @@ export function buildReturnsHtml() {
 <li><strong>Post it within 7 days.</strong> Over the counter, and keep the receipt. The tracking number comes to you by email so you can follow the parcel yourself.</li>
 </ol>
 <h2>Refunds</h2>
-<p>Once the workshop has checked the piece, the refund goes back to the card or account the order was paid with — card, PayPal, Apple Pay, Google Pay or Klarna all return to source. We cannot refund to a different card from the one that paid.</p>
+<p>Once the workshop has checked the piece, the refund goes back to the card or account the order was paid with — card, Shop Pay, Apple Pay or Google Pay, it all returns to source. We cannot refund to a different card from the one that paid.</p>
 <p>The full amount comes back, including any shipping you paid on the original order. There is no restocking fee and no charge for the return label. If a certificate or a gift that came with the piece is missing when it reaches us, we will tell you what it costs to replace before anything is deducted.</p>
 <h2>Exchanges</h2>
 <p>If you would rather have a different piece than a refund, say so in your first email. We will send the label as usual, and once the first piece is back and checked we post the replacement free of charge. If the new piece costs more we send a payment link for the difference; if it costs less, the difference is refunded.</p>
@@ -203,7 +203,7 @@ export function buildPolicyHtml() {
 <p>Pack the piece in its own box with the certificate, inside the outer packaging, and hand the parcel over the counter at a Post Office rather than dropping it in a postbox. Keep the receipt as proof of posting.</p>
 
 <h3>Refunds and exchanges</h3>
-<p>Refunds go back to the original payment method — card, PayPal, Apple Pay, Google Pay or Klarna all return to source. The full amount comes back, including any shipping you paid on the original order. We cannot refund to a different card from the one that paid.</p>
+<p>Refunds go back to the original payment method — card, Shop Pay, Apple Pay or Google Pay, it all returns to source. The full amount comes back, including any shipping you paid on the original order. We cannot refund to a different card from the one that paid.</p>
 <p>If you would rather exchange than refund, say so in your first email. Once the first piece is back and checked we post the replacement free of charge, and settle any difference in price either way.</p>
 
 <h3>Ring resizing</h3>

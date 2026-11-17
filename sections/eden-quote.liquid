@@ -243,7 +243,7 @@
                   {% render 'image-source', file: desktop_asset, width: 2172 %} 2172w
                 "
                 sizes="100vw"
-                alt=""
+                alt="{{ section.settings.heading | strip_html | escape }}"
                 loading="lazy"
                 width="2172"
                 height="724"
@@ -263,7 +263,7 @@
                     src="{{ product.featured_image | image_url: width: 700 }}"
                     srcset="{{ product.featured_image | image_url: width: 350 }} 350w, {{ product.featured_image | image_url: width: 700 }} 700w"
                     sizes="(max-width: 989px) 45vw, 16vw"
-                    alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                    alt="{%- if product.featured_image.alt != blank and product.featured_image.alt contains '#' -%}{{ product.title | escape }}{%- else -%}{{ product.featured_image.alt | default: product.title | escape }}{%- endif -%}"
                     loading="lazy"
                     width="700"
                     height="574"

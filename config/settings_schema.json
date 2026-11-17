@@ -3585,6 +3585,21 @@
     ]
   },
   {
+    "name": "Search engines",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Shown by Google under the homepage link. Pages, products and collections take their own description from Search engine listing in the admin; this one is only used where that is left empty."
+      },
+      {
+        "type": "textarea",
+        "id": "home_meta_description",
+        "label": "Homepage description",
+        "default": "Lab-grown diamond engagement rings, wedding bands and fine jewellery, handcrafted to order in 9k, 14k and 18k gold, platinum and sterling silver. Free UK and worldwide delivery, 30-day returns and a 5 year warranty."
+      }
+    ]
+  },
+  {
     "name": "Education guide images",
     "settings": [
       {

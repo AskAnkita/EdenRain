@@ -30,7 +30,7 @@
       {%- if picker_type == 'swatch' -%}
         <fieldset class="js product-form__input product-form__input--swatch">
           <legend class="form__label">
-            {{ option.name }}:
+            {{ option.name | replace: 'Jewelry material', 'Jewellery material' }}:
             <span data-selected-value>
               {{- option.selected_value -}}
             </span>
@@ -45,7 +45,7 @@
       {%- elsif picker_type == 'button' -%}
         <fieldset class="js product-form__input product-form__input--pill">
           <legend class="form__label">
-            {{ option.name }}:
+            {{ option.name | replace: 'Jewelry material', 'Jewellery material' }}:
             <span data-selected-value>
               {{- option.selected_value -}}
             </span>
@@ -60,7 +60,7 @@
       {%- else -%}
         <div class="product-form__input product-form__input--dropdown">
           <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
-            {{ option.name }}:
+            {{ option.name | replace: 'Jewelry material', 'Jewellery material' }}:
             <span data-selected-value>
               {{- option.selected_value -}}
             </span>

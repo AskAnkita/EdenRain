@@ -146,7 +146,7 @@
       {%- if variant_style == 'pills' or variant_style == 'swatch' -%}
         <fieldset  class="js product-form__input variant-option variant-option--buttons{% if is_color %} product-form__input--swatch variant-option--swatches{% else %} product-form__input--pill variant-option--pill{% endif %}">
           <legend class="form__label">
-            {{ product_option.name  | escape }}:
+            {{ product_option.name | replace: 'Jewelry material', 'Jewellery material' | escape }}:
             <span data-selected-value>
               {{- product_option.selected_value -}}
             </span>
@@ -180,7 +180,7 @@
               {%- elsif is_size and option_name == 'size' and product_family == 'ring' -%}
                 U.S. Ring Size:
               {%- else -%}
-                {{ product_option.name  | escape }}:
+                {{ product_option.name | replace: 'Jewelry material', 'Jewellery material' | escape }}:
               {%- endif -%}
             </span>
             {%- if is_size -%}

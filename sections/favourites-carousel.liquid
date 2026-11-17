@@ -598,6 +598,11 @@
             endif
             if slide_alt == blank
               assign slide_alt = slide_product.featured_image.alt | default: slide_product.title
+              # "#Jewelry material_Gold" is the metal-grouping tag, not a description.
+              assign slide_alt_marker = slide_alt | strip | slice: 0
+              if slide_alt_marker == '#'
+                assign slide_alt = slide_product.title
+              endif
             endif
             if slide_title == blank
               assign slide_title = slide_product.title

@@ -90,7 +90,7 @@
       <img
         class="dsp-media__poster"
         src="{{ section.settings.media_video_poster_asset | default: 'design-split-ring-poster.jpg' | asset_url }}"
-        alt=""
+        alt="{{ section.settings.media_alt | escape }}"
         aria-hidden="true"
         width="712"
         height="708"

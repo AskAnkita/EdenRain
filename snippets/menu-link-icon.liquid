@@ -105,7 +105,7 @@
   <span class="{{ icon_prefix }}{{ icon_modifier }}" aria-hidden="true">
     <img
       src="{% render 'image-source', file: icon_asset, width: icon_source_width %}"
-      alt=""
+      alt="{{ key | split: '/' | last | replace: '-', ' ' | capitalize | escape }}"
       width="{{ icon_width }}"
       height="{{ icon_height }}"
       loading="lazy"

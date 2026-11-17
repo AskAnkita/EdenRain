@@ -122,9 +122,9 @@
         "service_guarantee": {
           "type": "service",
           "settings": {
-            "title": "Lifetime guarantee",
+            "title": "5 year warranty",
             "icon": "diamond",
-            "link": ""
+            "link": "/pages/refund-returns"
           }
         },
         "service_returns": {
@@ -1770,7 +1770,7 @@
                 "text_ymABBw": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Every piece is crafted with exceptional care and attention to detail. Our commitment to quality ensures your jewellery is designed to maintain its beauty, brilliance, and significance for years to come.</p>",
+                    "text": "<p>Yes. Every Eden Raine piece comes with a 5 year warranty against manufacturing defects, counted from the day it is delivered. If a stone works loose, a claw lifts or a clasp fails through a fault in how the piece was made, we repair it free of charge, or replace it if it cannot be repaired. The warranty does not cover everyday wear, accidental damage, loss or theft, or work done by another jeweller. To make a claim, email <a href=\"mailto:sales@edenraine.co.uk\">sales@edenraine.co.uk</a> with your order number and a photograph. The full terms are on our <a href=\"/pages/refund-returns\">Returns &amp; Warranty</a> page.</p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,

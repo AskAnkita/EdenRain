@@ -3737,7 +3737,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Lifetime Guarantee</p>",
+                    "text": "<p>5 Year Warranty</p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,

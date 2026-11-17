@@ -522,7 +522,7 @@
       {%- if is_size -%}
         {%- assign placeholder_label = 'Select Ring Size' -%}
         {%- unless option.name contains 'ring' or option.name contains 'Ring' or option.name == 'size' or option.name == 'Size' -%}
-          {%- assign placeholder_label = 'Select ' | append: option.name -%}
+          {%- assign placeholder_label = option.name | replace: 'Jewelry material', 'Jewellery material' | prepend: 'Select ' -%}
         {%- endunless -%}
         <option value="" disabled hidden{% if product.selected_variant == blank %} selected="selected"{% endif %}>
           {{ placeholder_label }}

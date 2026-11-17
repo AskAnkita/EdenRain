@@ -52,7 +52,7 @@
           <div class="has-perk color-comparison w-full flex justify-between items-center">
           {% endif %}
           <legend class="form__label">
-            {{ product_option.name | escape | prepend: 'Choose ' }}:
+            {{ product_option.name | replace: 'Jewelry material', 'Jewellery material' | escape | prepend: 'Choose ' }}:
             <span data-selected-value>
               {{- product_option.selected_value -}}
             </span>

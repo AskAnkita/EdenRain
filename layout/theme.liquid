@@ -56,8 +56,14 @@
       {%- endunless -%}
     </title>
 
-    {% if page_description %}
-      <meta name="description" content="{{ page_description | escape }}">
+    {%- liquid
+      assign meta_description = page_description
+      if meta_description == blank and request.page_type == 'index'
+        assign meta_description = settings.home_meta_description
+      endif
+    -%}
+    {% if meta_description != blank %}
+      <meta name="description" content="{{ meta_description | escape }}">
     {% endif %}
 
     {% render 'meta-tags' %}

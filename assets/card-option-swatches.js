@@ -173,7 +173,8 @@
     } else {
       img.removeAttribute('srcset');
     }
-    if (alt) img.setAttribute('alt', alt);
+    // "#Jewelry material_Gold" is the metal-grouping tag, not a description: keep the card's own alt.
+    if (alt && alt.trim().charAt(0) !== '#') img.setAttribute('alt', alt);
   }
 
   // `hover` is { src, srcset } for the chosen variant's own second photo, or null.

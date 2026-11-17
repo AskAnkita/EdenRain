@@ -760,6 +760,39 @@ body.apntly-modal-container .modal-container:has(> .error-message-container) .ap
   };
 
   /*
+    Apntly keeps its own copy of each service's variants, taken when the service was created,
+    and its variant dropdown prints that copy's title. Both services were made from products
+    with a single, unnamed variant, so the dropdown reads Shopify's placeholder "Default Title".
+    Renaming the option in Shopify does not reach Apntly's copy, so the placeholder is swapped
+    for the appointment type here.
+
+    Only the text node's value changes, never the element's content: Vue keeps a reference to
+    that node and writes into it on its next render, so a replaced node would be orphaned.
+  */
+  const PLACEHOLDER_VARIANT = 'Default Title';
+  const APPOINTMENT_TYPES = {
+    15966409916790: 'Virtual consultation',
+    15977665495414: 'Speak with a designer',
+  };
+
+  const appointmentType = () => {
+    const service = window.appointlyClient?.service;
+    if (!service) return '';
+    return APPOINTMENT_TYPES[service.shopifyProductId] || service.title || '';
+  };
+
+  const nameVariant = (doc) => {
+    const label = appointmentType();
+    if (!label) return;
+    const walker = doc.createTreeWalker(doc.body || doc.documentElement, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.nodeValue.trim() === PLACEHOLDER_VARIANT) {
+        node.nodeValue = node.nodeValue.replace(PLACEHOLDER_VARIANT, label);
+      }
+    }
+  };
+
+  /*
     The stylesheet goes in once per iframe document. Vue mounts on #app and leaves <head>
     alone, so nothing re-renders it away; the guard is only against the load event and the
     observer both firing for the same frame.
@@ -777,9 +810,14 @@ body.apntly-modal-container .modal-container:has(> .error-message-container) .ap
       to one: the modal's screens come and go inside this frame for as long as it is open.
     */
     addDone(doc);
-    new MutationObserver(() => addDone(doc)).observe(doc.body || doc.documentElement, {
+    nameVariant(doc);
+    new MutationObserver(() => {
+      addDone(doc);
+      nameVariant(doc);
+    }).observe(doc.body || doc.documentElement, {
       childList: true,
       subtree: true,
+      characterData: true,
     });
   };
 
