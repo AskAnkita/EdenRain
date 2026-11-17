@@ -2730,7 +2730,7 @@ class GridView extends HTMLElement {
           if (card && card.dataset && card.dataset.productId) {
             card.style.setProperty(
               "view-transition-name",
-              `product-card-${card.dataset.productId}`
+              `product-card-${card.dataset.productId}${card.dataset.cardShape ? `-${card.dataset.cardShape}` : ""}`
             );
           }
         });

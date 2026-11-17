@@ -259,4 +259,93 @@
     event.stopPropagation();
     select(button);
   });
+
+  /*
+   * Per-shape copies of a card (sections/main-collection-product-grid-banner-adv.liquid
+   * marks them data-card-shape="<cut>"). The card blocks only know the product, so the
+   * copy arrives drawn in the product's own cut; pressing its cut's icon here moves the
+   * photo, links and rows onto that cut. A copy whose cut has no icon button left to
+   * press would only repeat the original card, so it is removed.
+   */
+  function applyCardShapes(root) {
+    const items = (root || document).querySelectorAll('[data-card-shape]:not([data-card-shape-ready])');
+    items.forEach((item) => {
+      item.setAttribute('data-card-shape-ready', '');
+      const key = item.getAttribute('data-card-shape');
+      const button = Array.from(item.querySelectorAll('[data-card-swatch][data-swatch-role="shape"]')).find(
+        (candidate) => candidate.dataset.swatchKey === key
+      );
+      if (!button) {
+        item.remove();
+        return;
+      }
+      select(button);
+      applyCardMetal(item, button);
+    });
+  }
+
+  /*
+   * Copies also carry data-card-metal (yg / wg / rg, rotated in the section) so a
+   * product's cuts do not all open on the same metal. The metal is only pressed when
+   * this cut has a photo in it — otherwise the lookup would drift onto another cut and
+   * the copy would repeat a different card — and the next tone is tried instead.
+   */
+  const TONE_CYCLE = ['yg', 'wg', 'rg'];
+
+  function applyCardMetal(item, shapeButton) {
+    const wanted = item.getAttribute('data-card-metal');
+    if (!wanted) return;
+    const card = shapeButton.closest(CARD_SELECTOR);
+    if (!card) return;
+    const shapeIndex = Number(shapeButton.dataset.swatchOptionIndex);
+    const shapeKey = shapeButton.dataset.swatchKey;
+    const metalButtons = Array.from(card.querySelectorAll('[data-card-swatch][data-swatch-role="metal"]'));
+    if (!metalButtons.length) return;
+    const photographed = cardVariants(card).filter(
+      (variant) =>
+        variantImageSrc(variant) && normalize('shape', (variant.options || [])[shapeIndex]) === shapeKey
+    );
+    const start = Math.max(0, TONE_CYCLE.indexOf(wanted));
+    for (let step = 0; step < TONE_CYCLE.length; step += 1) {
+      const tone = TONE_CYCLE[(start + step) % TONE_CYCLE.length];
+      const metalButton = metalButtons.find((candidate) => candidate.dataset.swatchKey === tone);
+      if (!metalButton) continue;
+      const metalIndex = Number(metalButton.dataset.swatchOptionIndex);
+      const hasPhoto = photographed.some(
+        (variant) => normalize('metal', (variant.options || [])[metalIndex]) === tone
+      );
+      if (!hasPhoto) continue;
+      if (metalButton.getAttribute('aria-pressed') !== 'true') select(metalButton);
+      return;
+    }
+  }
+
+  let pending = false;
+  function scheduleApply() {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => {
+      pending = false;
+      applyCardShapes(document);
+    });
+  }
+
+  applyCardShapes(document);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => applyCardShapes(document), { once: true });
+  }
+  // Filtering, sorting and infinite scroll swap grid items in after load.
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (
+          node instanceof Element &&
+          (node.matches('[data-card-shape]') || node.querySelector('[data-card-shape]'))
+        ) {
+          scheduleApply();
+          return;
+        }
+      }
+    }
+  }).observe(document.documentElement, { childList: true, subtree: true });
 })();

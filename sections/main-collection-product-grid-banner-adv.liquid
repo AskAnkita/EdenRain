@@ -6,6 +6,13 @@
 {% endif %}
 
 {%- style -%}
+  /* A per-shape copy of a card (data-card-shape) is drawn in the product's own cut and
+     moved onto its cut by card-option-swatches.js; its photo stays hidden until then so
+     the grid never flashes the wrong cut. */
+  .product-grid--{{ section.id }} [data-card-shape]:not([data-card-shape-ready]) .card__media img {
+    visibility: hidden;
+  }
+
   /* Promo banners inside the product grid: see snippets/collection-grid-banner.liquid.
      Like MiaDonna's PLP: the image fills the whole tile and the copy sits on it,
      near the bottom, with no band of its own. */
@@ -398,59 +405,279 @@
               assign slot_positions = slot_positions | split: ','
             %}
 
+            {%- capture page_shape -%}{%- render 'shape-context' -%}{%- endcapture -%}
+            {%- liquid
+              assign shape_keys = 'round,oval,cushion,emerald,princess,radiant,asscher,heart,marquise,pear' | split: ','
+              assign page_shape = page_shape | strip
+              assign expand_shapes = section.settings.card_per_shape
+              if page_shape != blank
+                assign expand_shapes = false
+              endif
+            -%}
+
+            {%- liquid
+              # Copies of a merged product open on a different metal each (see data-card-metal
+              # below), unless the shopper has filtered the grid to one metal: then every card
+              # keeps the metal they asked for. Same test as 'card-default-metal'.
+              assign metal_filtered = false
+              for applied_filter in collection.filters
+                assign filter_label = applied_filter.label | downcase
+                for applied_value in applied_filter.active_values
+                  assign filter_text = applied_value.value | downcase
+                  if filter_label contains 'metal' or filter_label contains 'finish' or filter_label contains 'material' or filter_text contains 'metal:'
+                    assign metal_filtered = true
+                  endif
+                endfor
+              endfor
+              assign tone_cycle = 'yg,wg,rg' | split: ','
+
+              # Cards are rendered into two lists first and woven together below, so the
+              # per-shape copies are spread through the grid instead of sitting in a block
+              # right after their product.
+              assign card_split = '<!--er-card-->'
+              assign original_cards = ''
+              assign copy_cards = ''
+            -%}
+            {% for product in collection.products %}
+              {%- assign product_index = forloop.index -%}
+                {%- comment -%}
+                  One card per diamond shape. A merged shape product (side stone, bezel,
+                  crossover...) is one product with a Shape option, but the client wants every
+                  cut on the grid as its own card. The card blocks only receive the product, so
+                  the card for the product's own featured cut renders as usual and each other
+                  cut gets a copy marked data-card-shape; card-option-swatches.js presses that
+                  cut's icon on load, which moves the photo, the links (?variant=) and both
+                  swatch rows onto it. The shape swap on the card and on the product page stays.
+                  A page that is already about one cut (shape collection or Shape filter) keeps
+                  one card per product, showing that cut.
+                {%- endcomment -%}
+                {%- liquid
+                  assign card_shapes = ''
+                  if expand_shapes
+                    assign shape_index = -1
+                    for option in product.options_with_values
+                      assign option_name = option.name | downcase
+                      if option_name contains 'shape'
+                        assign shape_index = forloop.index0
+                        break
+                      endif
+                    endfor
+
+                    if shape_index >= 0
+                      assign featured_shape = ''
+                      for variant in product.variants
+                        if variant.featured_media != blank and variant.featured_media.id == product.featured_media.id
+                          assign featured_compare = variant.options[shape_index] | downcase
+                          for shape in shape_keys
+                            if featured_compare contains shape
+                              assign featured_shape = shape
+                              break
+                            endif
+                          endfor
+                          break
+                        endif
+                      endfor
+
+                      assign seen_shapes = ','
+                      for value in product.options_with_values[shape_index].values
+                        assign value_text = value | append: ''
+                        assign value_compare = value_text | downcase
+                        assign value_key = ''
+                        for shape in shape_keys
+                          if value_compare contains shape
+                            assign value_key = shape
+                            break
+                          endif
+                        endfor
+                        if value_key == blank
+                          continue
+                        endif
+                        assign seen_key = ',' | append: value_key | append: ','
+                        if seen_shapes contains seen_key
+                          continue
+                        endif
+
+                        # Same rules as the card's shape row ('card-shape-swatches'): a cut
+                        # needs a photographed variant, and a priced one when the product
+                        # mixes priced and unpriced variants. Otherwise its icon is not a
+                        # button and the copy could not move onto it.
+                        assign has_photo = false
+                        assign has_price = false
+                        for variant in product.variants
+                          if variant.options[shape_index] == value_text
+                            if variant.featured_image != blank
+                              assign has_photo = true
+                            endif
+                            if variant.price > 0
+                              assign has_price = true
+                            endif
+                          endif
+                        endfor
+                        if product.price_min == 0 and product.price_max > 0
+                          unless has_price
+                            continue
+                          endunless
+                        endif
+                        unless has_photo
+                          continue
+                        endunless
+
+                        assign seen_shapes = seen_shapes | append: value_key | append: ','
+                        assign card_shapes = card_shapes | append: value_key | append: ','
+                      endfor
+
+                      # The featured cut leads, rendered natively; a product whose featured
+                      # photo is not one of the listed cuts starts from its first cut.
+                      assign shape_list = card_shapes | split: ','
+                      if shape_list.size > 1
+                        assign featured_key = ',' | append: featured_shape | append: ','
+                        unless seen_shapes contains featured_key
+                          assign featured_shape = shape_list.first
+                        endunless
+                        assign card_shapes = featured_shape | append: ',' | append: card_shapes
+                      else
+                        assign card_shapes = ''
+                      endif
+                    endif
+                  endif
+
+                  if card_shapes == blank
+                    assign featured_shape = '-'
+                    assign card_shapes = '-'
+                  endif
+                  assign card_shapes = card_shapes | split: ',' | uniq
+                -%}
+              {%- liquid
+                # The tone the product's own card opens on, so its first copy differs from it.
+                assign start_tone = 0
+                if card_shapes.size > 1 and metal_filtered == false
+                  capture own_metal
+                    render 'card-default-metal', card_product: product
+                  endcapture
+                  assign own_metal = own_metal | downcase
+                  if own_metal contains 'rose' or own_metal contains 'pink'
+                    assign start_tone = 2
+                  elsif own_metal contains 'white'
+                    assign start_tone = 1
+                  endif
+                endif
+              -%}
+              {%- for card_shape in card_shapes -%}
+                {%- liquid
+                  assign is_copy = false
+                  assign copy_tone = ''
+                  if card_shape != featured_shape
+                    assign is_copy = true
+                    unless metal_filtered
+                      assign tone_at = start_tone | plus: forloop.index0 | modulo: 3
+                      assign copy_tone = tone_cycle[tone_at]
+                    endunless
+                  endif
+                -%}
+                {%- capture card_html -%}
+                  <li
+                    id="{{ section.id }}-{{ product.id }}{% if is_copy %}-{{ card_shape }}{% endif %}"
+                    class="product-grid__item product-grid__item--{{ product_index | minus: 1 }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+                    data-page="{{ paginate.current_page }}"
+                    data-product-id="{{ product.id }}"
+                    {% if is_copy %}
+                      data-card-shape="{{ card_shape }}"
+                      {% if copy_tone != blank %}data-card-metal="{{ copy_tone }}"{% endif %}
+                    {% endif %}
+                    {% if settings.animations_reveal_on_scroll %}
+                      data-cascade
+                      style="--animation-order: {{ product_index }};"
+                    {% endif %}
+                  >
+                    {% # theme-check-disable %}
+                    {% content_for "block", type: "_product-card", id: "product-card", closest.product: product %}
+                    {% # theme-check-enable %}
+                  </li>
+                {%- endcapture -%}
+                {%- if is_copy -%}
+                  {%- comment -%}
+                    Sort key: the copy's round (2nd cut, 3rd cut...) then the product, so the
+                    copies of different products alternate rather than one product's cuts
+                    arriving together. Fixed width (9 characters) so it can be cut off again.
+                  {%- endcomment -%}
+                  {%- assign copy_key = forloop.index0 | plus: 100 | append: '-' -%}
+                  {%- assign copy_key = product_index | plus: 10000 | prepend: copy_key -%}
+                  {%- assign copy_cards = copy_cards | append: card_split | append: copy_key | append: card_html -%}
+                {%- else -%}
+                  {%- assign original_cards = original_cards | append: card_split | append: card_html -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {% endfor %}
+
+            {%- liquid
+              assign original_list = original_cards | remove_first: card_split | split: card_split
+              assign copy_list = copy_cards | remove_first: card_split | split: card_split | sort
+              assign original_total = original_list.size
+              assign copy_total = copy_list.size
+              assign copies_out = 0
+              assign card_count = 0
+            -%}
             {% capture children %}
-              {% for product in collection.products %}
-                {%- assign product_index = forloop.index -%}
-                {%- for slot_position in slot_positions limit: banner_count -%}
-                  {%- assign slot_at = slot_position | plus: 0 -%}
-                  {%- if slot_at == product_index -%}
-                    {%- liquid
-                      assign n = banner_queue[forloop.index0]
-                      assign key_image = 'img_banner' | append: n
-                      assign key_video = 'video_banner_' | append: n
-                      assign key_link = 'link_banner_' | append: n
-                      assign key_heading = 'banner_heading_' | append: n
-                      assign key_text = 'banner_text_' | append: n
-                      assign key_color = 'banner_text_color_' | append: n
-                      assign key_category = 'banner_category_' | append: n
-                      case section.settings[key_category]
-                        when 'ring'
-                          assign banner_fallback = 'lifestyle-princess-ring.jpg'
-                        when 'bracelet'
-                          assign banner_fallback = 'lifestyle-bracelet.jpg'
-                        when 'necklace'
-                          assign banner_fallback = 'lifestyle-necklace.jpg'
-                        else
-                          assign banner_fallback = 'lifestyle-earring.jpg'
-                      endcase
-                    -%}
-                    {% render 'collection-grid-banner',
-                      index: n,
-                      image: section.settings[key_image],
-                      fallback: banner_fallback,
-                      url: section.settings[key_link],
-                      heading: section.settings[key_heading],
-                      subheading: section.settings[key_text],
-                      video: section.settings[key_video],
-                      text_color: section.settings[key_color]
-                    %}
+              {%- for original_html in original_list -%}
+                {%- liquid
+                  # Every product card in collection order; after each one, the copies due by
+                  # then, spread evenly from the second card to the last.
+                  assign copies_due = copy_total
+                  if original_total > 1
+                    assign copies_due = forloop.index0 | times: copy_total | divided_by: original_total
+                    if forloop.last
+                      assign copies_due = copy_total
+                    endif
+                  endif
+                  assign batch = copies_due | minus: copies_out | plus: 1
+                -%}
+                {%- for step in (1..batch) -%}
+                  {%- assign card_count = card_count | plus: 1 -%}
+                  {%- assign product_index = forloop.index -%}
+                  {%- for slot_position in slot_positions limit: banner_count -%}
+                    {%- assign slot_at = slot_position | plus: 0 -%}
+                    {%- if slot_at == card_count -%}
+                      {%- liquid
+                        assign n = banner_queue[forloop.index0]
+                        assign key_image = 'img_banner' | append: n
+                        assign key_video = 'video_banner_' | append: n
+                        assign key_link = 'link_banner_' | append: n
+                        assign key_heading = 'banner_heading_' | append: n
+                        assign key_text = 'banner_text_' | append: n
+                        assign key_color = 'banner_text_color_' | append: n
+                        assign key_category = 'banner_category_' | append: n
+                        case section.settings[key_category]
+                          when 'ring'
+                            assign banner_fallback = 'lifestyle-princess-ring.jpg'
+                          when 'bracelet'
+                            assign banner_fallback = 'lifestyle-bracelet.jpg'
+                          when 'necklace'
+                            assign banner_fallback = 'lifestyle-necklace.jpg'
+                          else
+                            assign banner_fallback = 'lifestyle-earring.jpg'
+                        endcase
+                      -%}
+                      {% render 'collection-grid-banner',
+                        index: n,
+                        image: section.settings[key_image],
+                        fallback: banner_fallback,
+                        url: section.settings[key_link],
+                        heading: section.settings[key_heading],
+                        subheading: section.settings[key_text],
+                        video: section.settings[key_video],
+                        text_color: section.settings[key_color]
+                      %}
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- if step == 1 -%}
+                    {{ original_html }}
+                  {%- else -%}
+                    {%- assign copy_entry = copy_list[copies_out] -%}
+                    {{ copy_entry | slice: 9, copy_entry.size }}
+                    {%- assign copies_out = copies_out | plus: 1 -%}
                   {%- endif -%}
                 {%- endfor -%}
-                <li
-                  id="{{ section.id }}-{{ product.id }}"
-                  class="product-grid__item product-grid__item--{{ forloop.index0 }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-                  data-page="{{ paginate.current_page }}"
-                  data-product-id="{{ product.id }}"
-                  {% if settings.animations_reveal_on_scroll %}
-                    data-cascade
-                    style="--animation-order: {{ forloop.index }};"
-                  {% endif %}
-                >
-                  {% # theme-check-disable %}
-                  {% content_for "block", type: "_product-card", id: "product-card", closest.product: product %}
-                  {% # theme-check-enable %}
-                </li>
-              {% endfor %}
+              {%- endfor -%}
             {% endcapture %}
 
             {% render 'product-grid',
@@ -523,6 +750,13 @@
       "step": 8,
       "default": 16,
       "label": "t:settings.products_per_page"
+    },
+    {
+      "type": "checkbox",
+      "id": "card_per_shape",
+      "label": "One card per diamond shape",
+      "info": "A product with a Shape option shows each photographed shape as its own card. Shape collections and the Shape filter still show one card per product.",
+      "default": true
     },
     {
       "type": "select",

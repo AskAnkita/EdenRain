@@ -46,7 +46,7 @@ const ASSIGN = {
     'earrings', 'studs', 'hoops-huggies', 'dangles-drops', 'climbers-jackets-cuffs',
   ],
   'necklaces-collections': [
-    'necklaces', 'tennis-necklaces', 'pendants', 'chains', 'charms',
+    'necklaces', 'tennis-necklaces', 'pendants', 'chains', 'charms', 'toi-et-moi-necklaces',
   ],
   'bracelets-collections': [
     'bracelets', 'tennis-bracelets', 'chain-bracelets', 'charm-bracelets', 'station-bracelets',

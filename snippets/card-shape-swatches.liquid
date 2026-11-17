@@ -7,8 +7,9 @@
   Values come from the first product option whose name contains "shape", else the
   `custom.diamond_shapes` metafield (a list of single-line text values, or one
   comma-separated value), else the product's "Shape:<cut>" tags, else `default_shapes`.
-  The default is what makes the row show across a catalogue that carries no per-product
-  shape data yet; pass nothing to show the row only for products that do. Only shapes
+  The default list applies to rings only (tagged `category:ring`). On an earring, necklace
+  or bracelet a single tag/metafield shape is drawn (the piece's own cut), but two or more
+  are hidden: they are the stones one piece holds, not a choice of cut. Pass nothing to show the row only for products that carry their own shapes. Only shapes
   the theme ships an icon for are drawn.
 
   The cut the row underlines is the cut the card's photo is in, which 'card-default-variant'
@@ -59,6 +60,11 @@
     endif
   endfor
 
+  assign is_ring = false
+  if card_product.tags contains 'category:ring'
+    assign is_ring = true
+  endif
+
   if shape_source == blank
     assign meta_shapes = card_product.metafields.custom.diamond_shapes.value
     if meta_shapes != blank
@@ -81,7 +87,19 @@
     assign shape_source = tag_shapes | remove_first: '||'
   endif
 
-  if shape_source == blank
+  # Off a ring, two or more tag/metafield shapes are the stones one piece already holds
+  # (a toi et moi's pear AND emerald, a graduated necklace's pear AND round). Drawn as a
+  # row they read as a choice of cut the shopper cannot make, so only a single shape - the
+  # piece's own cut - is drawn. A real Shape option (shape_index >= 0) is always drawn.
+  # The tags themselves stay and still drive the shape filters.
+  if is_ring == false and shape_index < 0 and shape_source contains '||'
+    assign shape_source = ''
+  endif
+
+  # The default list is a choice of centre stone, which only a ring offers. An earring,
+  # necklace or bracelet with no shape data of its own (a pavé huggie, a coloured-stone
+  # bracelet, a plain tag pendant) has no cut to choose, so its row stays empty.
+  if shape_source == blank and is_ring
     assign shape_source = default_shapes
   endif
 

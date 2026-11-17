@@ -131,6 +131,11 @@ export const collections = [
   // the two collections would hold exactly the same products.
   { handle: 'tennis-bracelets', title: 'Tennis Bracelets', rules: [tag('style:tennis'), tag('category:bracelet')] },
   { handle: 'tennis-necklaces', title: 'Tennis Necklaces', rules: [tag('style:tennis'), tag('category:necklace')] },
+  // Two stones claw-set side by side on the chain. Its own collection, not the `toi-et-moi`
+  // handle: that one is Toi et Moi Engagement Rings, manual and empty until the shop stocks a
+  // ring. `category:necklace` keeps the Toi et Moi stud earrings (same style tag) out. The
+  // four necklaces stay in Charms as well - tag-rules.mjs files them there by construction.
+  { handle: 'toi-et-moi-necklaces', title: 'Toi et Moi Necklaces', rules: [tag('style:toi-et-moi'), tag('category:necklace')] },
 
   // The rest of the bracelet styles the Bracelets column browses by. They were `filter.p.tag`
   // URLs on the bracelet collection until 2026-11-13, which never filtered anything - Shopify
@@ -358,6 +363,7 @@ export const menu = {
             { title: 'Pendants', collection: 'pendants' },
             { title: 'Chains', collection: 'chains' },
             { title: 'Charms', collection: 'charms' },
+            { title: 'Toi et Moi', collection: 'toi-et-moi-necklaces' },
           ],
         },
         // Bracelets breaks down by the kind of piece - tennis, chain link - not by metal, which

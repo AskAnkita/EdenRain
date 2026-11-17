@@ -42,14 +42,24 @@ const MERGES = [
     id: 'twist-engagement-ring',
     option: 'Shape',
     keep: { sku: 'AJLR257', shape: 'Cushion' },
-    donors: [{ sku: 'AJLR262', shape: 'Pear' }],
+    // AJLR254-261 arrived 2026-11-03 in Render/Ring/3.Halo — the same twist with a hidden halo,
+    // cut in six more shapes. 8 shapes x 10 metals = 80 variants.
+    donors: [
+      { sku: 'AJLR262', shape: 'Pear' },
+      { sku: 'AJLR254', shape: 'Round' },
+      { sku: 'AJLR256', shape: 'Oval' },
+      { sku: 'AJLR258', shape: 'Princess' },
+      { sku: 'AJLR259', shape: 'Emerald' },
+      { sku: 'AJLR260', shape: 'Radiant' },
+      { sku: 'AJLR261', shape: 'Marquise' },
+    ],
     title: '2.2 CTW Lab-Grown Diamond Twist Engagement Ring',
     handle: '2-2-ctw-lab-grown-diamond-twist-engagement-ring',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
       '<p>A lab-grown diamond raised in fine claws above a band that splits and crosses beneath it,',
-      ' each strand pavé-set with round accents. Choose the cushion cut for a soft, square outline or',
-      ' the pear for a tapered one — the twisted shoulders are the same on both.</p>',
+      ' each strand pavé-set with round accents. Choose the centre stone below — the twisted',
+      ' shoulders and the hidden halo beneath the stone are the same on every shape.</p>',
       '<p>The twist lifts the centre stone and carries light along the shoulders, so the ring sparkles',
       ' even where there is no large stone.</p>',
       '<p><strong>Cushion cut</strong></p>',
@@ -68,12 +78,70 @@ const MERGES = [
       '<li>Diamonds: 75</li>',
       '<li>Metal Weight: Silver 3 g, 14K 3.7 g, 18K 4.4 g</li>',
       '</ul>',
-      '<p><strong>Both shapes</strong></p>',
+      '<p><strong>Round brilliant</strong></p>',
+      '<ul><li>Shape: Round Brilliant</li><li>Carat: 2.28 CTW</li></ul>',
+      '<p><strong>Oval cut</strong></p>',
+      '<ul><li>Shape: Oval Cut</li><li>Carat: 2.27 CTW</li></ul>',
+      '<p><strong>Princess cut</strong></p>',
+      '<ul><li>Shape: Princess Cut</li><li>Carat: 2.28 CTW</li></ul>',
+      '<p><strong>Emerald cut</strong></p>',
+      '<ul><li>Shape: Emerald Cut</li><li>Carat: 2.29 CTW</li></ul>',
+      '<p><strong>Radiant cut</strong></p>',
+      '<ul><li>Shape: Radiant Cut</li><li>Carat: 2.29 CTW</li></ul>',
+      '<p><strong>Marquise cut</strong></p>',
+      '<ul><li>Shape: Marquise Cut</li><li>Carat: 2.32 CTW</li></ul>',
+      '<p><strong>Every shape</strong></p>',
       '<ul>',
       '<li>Color: E-F</li>',
       '<li>Clarity: VVS-VS</li>',
       '<li>Metal: 925 Sterling Silver, 10K, 14K &amp; 18K Gold</li>',
       '<li>Style: Twist Engagement Ring</li>',
+      '</ul>',
+    ].join(''),
+  },
+  {
+    // The classic halo, 3 CTW, from Render/Ring/3.Halo (2026-11-03). The marquise (AJLR188) is
+    // the client's 1 CTW version of the same setting, so the title carries no carat figure.
+    // 7 shapes x 10 metals = 70 variants, no ring sizes (see shape-merges-use-up-the-variant-cap).
+    id: 'halo-engagement-ring',
+    option: 'Shape',
+    keep: { sku: 'AJLR181', shape: 'Round' },
+    donors: [
+      { sku: 'AJLR182', shape: 'Oval' },
+      { sku: 'AJLR183', shape: 'Emerald' },
+      { sku: 'AJLR184', shape: 'Radiant' },
+      { sku: 'AJLR186', shape: 'Cushion' },
+      { sku: 'AJLR187', shape: 'Princess' },
+      { sku: 'AJLR188', shape: 'Marquise' },
+    ],
+    title: 'Lab-Grown Diamond Halo Engagement Ring',
+    handle: 'lab-grown-diamond-halo-engagement-ring',
+    descriptionHtml: [
+      '<p><strong>Description</strong></p>',
+      '<p>A lab-grown diamond ringed by a halo of small round brilliants, set on a slim polished band.',
+      ' Choose the centre stone below — the halo follows each shape, and the band is the same on every one.</p>',
+      '<p>A halo makes the centre stone read a size larger than its weight, and frames it with a bright',
+      ' border from every angle.</p>',
+      '<p><strong>Round brilliant</strong></p>',
+      '<ul><li>Shape: Round Brilliant</li><li>Carat: 3.21 CTW</li></ul>',
+      '<p><strong>Oval cut</strong></p>',
+      '<ul><li>Shape: Oval Cut</li><li>Carat: 3.22 CTW</li></ul>',
+      '<p><strong>Emerald cut</strong></p>',
+      '<ul><li>Shape: Emerald Cut</li><li>Carat: 3.22 CTW</li></ul>',
+      '<p><strong>Radiant cut</strong></p>',
+      '<ul><li>Shape: Radiant Cut</li><li>Carat: 3.22 CTW</li></ul>',
+      '<p><strong>Cushion cut</strong></p>',
+      '<ul><li>Shape: Cushion Cut</li><li>Carat: 3.19 CTW</li></ul>',
+      '<p><strong>Princess cut</strong></p>',
+      '<ul><li>Shape: Princess Cut</li><li>Carat: 3.22 CTW</li></ul>',
+      '<p><strong>Marquise cut</strong></p>',
+      '<ul><li>Shape: Marquise Cut</li><li>Carat: 1.13 CTW</li></ul>',
+      '<p><strong>Every shape</strong></p>',
+      '<ul>',
+      '<li>Color: E-F</li>',
+      '<li>Clarity: VVS-VS</li>',
+      '<li>Metal: 925 Sterling Silver, 10K, 14K &amp; 18K Gold</li>',
+      '<li>Style: Halo Engagement Ring</li>',
       '</ul>',
     ].join(''),
   },
@@ -290,6 +358,119 @@ const MERGES = [
       '</ul>',
     ].join(''),
   },
+  {
+    // The pavé-halo pendant, east–west on a cable chain. AJPD403 (1.35 emerald) is the same pendant a
+    // size up and stays its own listing; AJPD405 (1.43 marquise) has bezel stations on the chain and
+    // is a different design; AJPD201 is a cluster, not a single stone.
+    // Every donor is 10 metals x 5 lengths = 50 variants, so 6 shapes with length would be 300 — over
+    // the Basic plan's 100. `fixed` drops the Length option and sells each shape at its 18 in price.
+    id: 'halo-necklace',
+    option: 'Shape',
+    fixed: { Length: '18 in' },
+    keep: { sku: 'AJPD413', shape: 'Round' },
+    donors: [
+      { sku: 'AJPD404', shape: 'Oval' },
+      { sku: 'AJPD409', shape: 'Emerald' },
+      { sku: 'AJPD412', shape: 'Pear' },
+      { sku: 'AJPD411', shape: 'Marquise' },
+      { sku: 'AJPD410', shape: 'Heart' },
+    ],
+    title: 'Lab-Grown Diamond Halo Necklace',
+    handle: 'lab-grown-diamond-halo-necklace',
+    descriptionHtml: [
+      '<p><strong>Description</strong></p>',
+      '<p>A lab-grown diamond centre ringed by a pavé halo of small round brilliants, set east–west on a',
+      ' fine cable chain. Choose the centre stone below — the halo follows each shape, and the chain and',
+      ' setting are the same on every one.</p>',
+      '<p>A halo makes the centre stone read a size larger than its weight, and keeps the pendant bright',
+      ' from every angle.</p>',
+      '<p><strong>Round brilliant</strong></p>',
+      '<p>The most classic halo there is, and still the one that gives the most light for the money.</p>',
+      '<ul><li>Carat: 1.17 CTW</li><li>Measurement: 6.5 mm centre, 1.3 mm accents</li><li>Diamonds: 18</li>',
+      '<li>Metal Weight: 14K 0.65 g, 18K 0.8 g (without chain)</li></ul>',
+      '<p><strong>Oval cut</strong></p>',
+      '<p>The oval follows the line of the collarbone, and oval and halo read together as one larger stone.</p>',
+      '<ul><li>Carat: 1.41 CTW</li><li>Measurement: 8.2 x 5.75 mm centre, 1.3–2.1 mm accents</li><li>Diamonds: 25</li>',
+      '<li>Metal Weight: 14K 1.3 g, 18K 1.6 g (without chain)</li></ul>',
+      '<p><strong>Emerald cut</strong></p>',
+      '<p>A step cut inside a close pavé frame — the halo softens its hard corners and frames a long rectangle.</p>',
+      '<ul><li>Carat: 1.15 CTW</li><li>Measurement: 7.2 x 4.8 mm centre, 1.1–1.3 mm accents</li><li>Diamonds: 19</li>',
+      '<li>Metal Weight: 14K 0.7 g, 18K 0.8 g (without chain)</li></ul>',
+      '<p><strong>Pear cut</strong></p>',
+      '<p>The halo tapers with the stone rather than circling it, which keeps the point crisp.</p>',
+      '<ul><li>Carat: 1.18 CTW</li><li>Measurement: 9.1 x 5.6 mm centre, 1.2–1.3 mm accents</li><li>Diamonds: 20</li>',
+      '<li>Metal Weight: 14K 0.6 g, 18K 0.75 g (without chain)</li></ul>',
+      '<p><strong>Marquise cut</strong></p>',
+      '<p>An elongated eye of light: the halo widens the silhouette while the centre stone keeps its length.</p>',
+      '<ul><li>Carat: 1.2 CTW</li><li>Measurement: 10.5 x 5.25 mm centre, 1.3 mm accents</li><li>Diamonds: 21</li>',
+      '<li>Metal Weight: 14K 0.75 g, 18K 0.85 g (without chain)</li></ul>',
+      '<p><strong>Heart cut</strong></p>',
+      '<p>Pavé follows the heart all the way round, including into the cleft, so the shape still reads clearly at this size.</p>',
+      '<ul><li>Carat: 1.17 CTW</li><li>Measurement: 6.5 mm centre, 1–1.3 mm accents</li><li>Diamonds: 19</li>',
+      '<li>Metal Weight: 14K 0.6 g, 18K 0.75 g (without chain)</li></ul>',
+      '<p><strong>Every shape</strong></p>',
+      '<ul>',
+      '<li>Color: E-F</li>',
+      '<li>Clarity: VVS-VS</li>',
+      '<li>Metal: 925 Sterling Silver, 10K, 14K &amp; 18K Gold</li>',
+      '<li>Chain Length: 18 in — other lengths on request</li>',
+      '<li>Style: Halo Necklace</li>',
+      '</ul>',
+    ].join(''),
+  },
+  {
+    // The claw-set solitaire on a cable chain with bezel-set stations, AJNT59–64. Two carat tiers
+    // (1.09 and 2.09 CTW), so the title carries no CTW. Same 300-variant problem as the halo, so the
+    // Length option is pinned to 18 in. Not to be confused with the AJPD solitaire *pendants*, which
+    // hang from a bale and have no stations.
+    id: 'solitaire-station-necklace',
+    option: 'Shape',
+    fixed: { Length: '18 in' },
+    keep: { sku: 'AJNT60', shape: 'Round' },
+    donors: [
+      { sku: 'AJNT59', shape: 'Oval' },
+      { sku: 'AJNT64', shape: 'Emerald' },
+      { sku: 'AJNT62', shape: 'Asscher' },
+      { sku: 'AJNT63', shape: 'Marquise' },
+      { sku: 'AJNT61', shape: 'Heart' },
+    ],
+    title: 'Lab-Grown Diamond Solitaire Necklace',
+    handle: 'lab-grown-diamond-solitaire-necklace',
+    descriptionHtml: [
+      '<p><strong>Description</strong></p>',
+      '<p>A lab-grown diamond claw-set at the centre of a fine cable chain, with small bezel-set diamonds',
+      ' spaced along its length. Choose the centre stone below — the chain, the stations and the setting',
+      ' are the same on every shape.</p>',
+      '<p>The stations carry the sparkle out along the chain, so the necklace still catches the light',
+      ' when the centre stone turns.</p>',
+      '<p><strong>Round brilliant — 2.09 CTW</strong></p>',
+      '<p>The most forgiving of all the cuts — it returns light from every angle. A two carat centre is',
+      ' substantial without being showy.</p>',
+      '<p><strong>Oval cut — 1.09 CTW</strong></p>',
+      '<p>Set east–west, lying along the collarbone rather than pointing down it. It reads wider and',
+      ' lighter than the same stone set upright. 8.1 x 5.5 mm centre.</p>',
+      '<p><strong>Emerald cut — 1.09 CTW</strong></p>',
+      '<p>Set east–west, its long step facets running across the collarbone. Clarity shows in a step cut',
+      ' in a way it never does in a brilliant, which is the point of choosing one. 7.2 x 4.8 mm centre.</p>',
+      '<p><strong>Asscher cut — 2.09 CTW</strong></p>',
+      '<p>A square step cut: concentric facets that give long flashes of light rather than scatter. Deco in',
+      ' origin and quietly architectural.</p>',
+      '<p><strong>Marquise cut — 2.09 CTW</strong></p>',
+      '<p>Set east–west, the marquise spans the hollow of the throat. Two carats in a marquise looks larger',
+      ' than two carats in a round — the shape spreads its weight across the surface.</p>',
+      '<p><strong>Heart cut — 2.09 CTW</strong></p>',
+      '<p>A heart only works at scale, and two carats is where the outline reads clearly from across a room.',
+      ' Cut so the cleft stays crisp and the lobes stay even.</p>',
+      '<p><strong>Every shape</strong></p>',
+      '<ul>',
+      '<li>Color: E-F</li>',
+      '<li>Clarity: VVS-VS</li>',
+      '<li>Metal: 925 Sterling Silver, 10K, 14K &amp; 18K Gold</li>',
+      '<li>Chain Length: 18 in — other lengths on request</li>',
+      '<li>Style: Solitaire Necklace</li>',
+      '</ul>',
+    ].join(''),
+  },
 ];
 
 // ---------- arguments ----------
@@ -364,8 +545,19 @@ const optionValues = (product, name) => {
   return option ? option.optionValues.map((v) => v.name) : null;
 };
 
-const materialOption = (product, shapeOptionName) =>
-  product.options.find((o) => o.name.toLowerCase() !== shapeOptionName.toLowerCase());
+// `fixed` options (a merge's { Length: '18 in' }) are pinned to one value and dropped, so they are
+// never the material option either.
+const materialOption = (product, shapeOptionName, fixed = {}) => {
+  const skip = [shapeOptionName, ...Object.keys(fixed)].map((n) => n.toLowerCase());
+  return product.options.find((o) => !skip.includes(o.name.toLowerCase()));
+};
+
+// True when a variant carries the pinned value of every `fixed` option the product still has.
+const matchesFixed = (variant, fixed = {}) =>
+  Object.entries(fixed).every(([name, value]) => {
+    const option = variant.selectedOptions.find((o) => o.name.toLowerCase() === name.toLowerCase());
+    return !option || option.value === value;
+  });
 
 // "#Jewelry material_Gold" -> "#Jewelry material_Pear Gold". The group name is only ever compared
 // to itself (product-metal-media.js matches a variant's photo group against each photo's), so the
@@ -387,14 +579,15 @@ function describeProduct(product) {
 // Everything a merge would change, worked out before anything is written.
 function planMerge(merge, keeper, donors) {
   const shapeName = merge.option;
-  const keeperMaterial = materialOption(keeper, shapeName);
+  const fixed = merge.fixed || {};
+  const keeperMaterial = materialOption(keeper, shapeName, fixed);
   if (!keeperMaterial) throw new Error(`${keeper.handle} has no option other than "${shapeName}".`);
 
   const problems = [];
   const ungrouped = [];
 
   for (const product of [keeper, ...donors.map((d) => d.product)]) {
-    const material = materialOption(product, shapeName);
+    const material = materialOption(product, shapeName, fixed);
     if (!material) {
       problems.push(`${product.handle} has no material option`);
       continue;
@@ -426,7 +619,8 @@ function planMerge(merge, keeper, donors) {
       newMedia.push({ donorMediaId: m.id, url: m.image.url, alt: scopedAlt(m.alt, shape) || m.alt, shape });
     }
     for (const v of product.variants.nodes) {
-      const material = v.selectedOptions.find((o) => o.name === materialOption(product, shapeName).name);
+      if (!matchesFixed(v, fixed)) continue;
+      const material = v.selectedOptions.find((o) => o.name === materialOption(product, shapeName, fixed).name);
       if (!material) {
         problems.push(`${product.handle} variant ${v.sku} has no ${keeperMaterial.name} value`);
         continue;
@@ -470,9 +664,19 @@ function planMerge(merge, keeper, donors) {
   if (merge.handle && merge.handle !== keeper.handle)
     redirects.unshift([`/products/${keeper.handle}`, `/products/${merge.handle}`]);
 
+  // The keeper's own variants off the pinned value go, and then the pinned option itself.
+  const fixedOptions = keeper.options.filter((o) => Object.keys(fixed).some((n) => n.toLowerCase() === o.name.toLowerCase()));
+  const variantsToDrop = keeper.variants.nodes.filter((v) => !matchesFixed(v, fixed));
+  for (const o of fixedOptions) {
+    const want = Object.entries(fixed).find(([n]) => n.toLowerCase() === o.name.toLowerCase())[1];
+    if (!o.optionValues.some((v) => v.name === want)) problems.push(`${keeper.handle} has no ${o.name} "${want}" to keep`);
+  }
+
   return {
     shapeName,
     materialName: keeperMaterial.name,
+    fixedOptions,
+    variantsToDrop,
     needsShapeOption: !existingShapes.length,
     shapeValuesToAdd: [merge.keep.shape, ...donors.map((d) => d.shape)].filter(
       (s) => !existingShapes.includes(s)
@@ -490,6 +694,32 @@ function planMerge(merge, keeper, donors) {
 }
 
 // ---------- writing ----------
+
+async function dropFixedOptions(keeper, plan) {
+  if (plan.variantsToDrop.length) {
+    await gql(
+      cfg,
+      `mutation($productId: ID!, $variantsIds: [ID!]!) {
+        productVariantsBulkDelete(productId: $productId, variantsIds: $variantsIds) { userErrors { field message } }
+      }`,
+      { productId: keeper.id, variantsIds: plan.variantsToDrop.map((v) => v.id) },
+      'productVariantsBulkDelete'
+    );
+  }
+  if (plan.fixedOptions.length) {
+    // Only one value is left on each, so POSITION has nothing to choose between — no variant is lost.
+    await gql(
+      cfg,
+      `mutation($productId: ID!, $options: [ID!]!) {
+        productOptionsDelete(productId: $productId, options: $options, strategy: POSITION) {
+          deletedOptionsIds userErrors { field message }
+        }
+      }`,
+      { productId: keeper.id, options: plan.fixedOptions.map((o) => o.id) },
+      'productOptionsDelete'
+    );
+  }
+}
 
 async function addShapeOption(keeper, plan, shape) {
   const data = await gql(
@@ -790,6 +1020,8 @@ async function main() {
     for (const d of donors) log(`  fold   ${describeProduct(d.product)} as "${d.shape}"`);
     log(`  option "${plan.shapeName}" ${plan.needsShapeOption ? 'to be created in position 1' : 'already exists'}` +
       (plan.shapeValuesToAdd.length ? `, values to add: ${plan.shapeValuesToAdd.join(', ')}` : ''));
+    for (const o of plan.fixedOptions)
+      log(`  option "${o.name}" removed from the keeper, keeping only "${merge.fixed[o.name]}" (${plan.variantsToDrop.length} variants deleted)`);
     log(`  photos ${plan.newMedia.length} copied across; all of the keeper's alt groups get "${merge.keep.shape} " folded in`);
     log(`  variants ${plan.newVariants.length} to create:`);
     for (const v of plan.newVariants) log(`           ${v.shape} / ${v.material.padEnd(20)} ${String(v.price).padStart(8)}  ${v.sku}`);
@@ -815,6 +1047,11 @@ async function main() {
 
   for (const { merge, keeper, donors, plan } of groups) {
     log(`\n=== applying ${merge.id} ===`);
+
+    if (plan.fixedOptions.length || plan.variantsToDrop.length) {
+      await dropFixedOptions(keeper, plan);
+      log(`  deleted ${plan.variantsToDrop.length} variant(s) and the ${plan.fixedOptions.map((o) => `"${o.name}"`).join(', ')} option`);
+    }
 
     let shapeOptionId = keeper.options.find((o) => o.name.toLowerCase() === plan.shapeName.toLowerCase())?.id;
     if (!shapeOptionId) {

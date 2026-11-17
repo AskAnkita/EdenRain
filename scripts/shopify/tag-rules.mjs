@@ -73,7 +73,9 @@ export const shape = [
   rule('radiant', [/\bradiant\b/], { from: 'all' }),
   rule('marquise', [/\bmarquise\b/], { from: 'all' }),
   rule('asscher', [/\basscher\b/], { from: 'all' }),
-  rule('heart', [/\bhearts?\b/], { from: 'all' }),
+  // A heart-shaped pendant or charm is the metal's outline, not the cut: "Marquise Cut Blue
+  // Gemstone Heart Pendant" holds one marquise stone and no heart-cut stone at all.
+  rule('heart', [/\bhearts?\b/], { from: 'all', not: [/\bhearts? (pendant|charm|locket)s?\b/] }),
   rule('baguette', [/\bbaguettes?\b/], { from: 'all' }),
   rule('trillion', [/\btrillions?\b/, /\btriangles?\b/], { from: 'all' }),
   rule('square', [/\bsquares?\b/], { from: 'all' }),
