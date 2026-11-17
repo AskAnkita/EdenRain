@@ -33,6 +33,7 @@
 
   const variantCache = new WeakMap();
   const selectionCache = new WeakMap();
+  const mediaCache = new WeakMap();
 
   /*
    * The same collapsing the Liquid blocks do, so a swatch's key matches the option
@@ -68,11 +69,26 @@
     return media ? media.querySelector(':scope > img') : null;
   }
 
+  /*
+   * The card's product data. A per-shape copy is sent without its own (the section strips
+   * it to keep the page light) and reads the one on its product's main card.
+   */
+  function jsonHolder(card) {
+    let template = card.querySelector('template');
+    if (!template) {
+      const item = card.closest('[data-card-shape]');
+      const id = item && item.getAttribute('data-product-id');
+      const grid = item && item.parentElement;
+      const main = id && grid && grid.querySelector(':scope > [data-product-id="' + id + '"]:not([data-card-shape])');
+      template = main && main.querySelector('template');
+    }
+    return template ? template.content.querySelector('[data-json-product]') : null;
+  }
+
   function cardVariants(card) {
     if (variantCache.has(card)) return variantCache.get(card);
     let list = [];
-    const template = card.querySelector('template');
-    const holder = template && template.content.querySelector('[data-json-product]');
+    const holder = jsonHolder(card);
     if (holder) {
       try {
         const data = JSON.parse(holder.getAttribute('data-json-product'));
@@ -150,9 +166,7 @@
     return best;
   }
 
-  function showImage(card, src, srcset, alt) {
-    const img = primaryImage(card);
-    if (!img || !src) return;
+  function setImage(img, src, srcset, alt) {
     img.setAttribute('src', src);
     if (srcset) {
       img.setAttribute('srcset', srcset);
@@ -160,21 +174,80 @@
       img.removeAttribute('srcset');
     }
     if (alt) img.setAttribute('alt', alt);
-    // The hover image belongs to the card's default variant, so hold it back
-    // once a swatch has been chosen.
+  }
+
+  // `hover` is { src, srcset } for the chosen variant's own second photo, or null.
+  function showImage(card, src, srcset, alt, hover) {
+    const img = primaryImage(card);
+    if (!img || !src) return;
+    setImage(img, src, srcset, alt);
     const media = img.parentElement;
+    const hoverImg = img.nextElementSibling instanceof HTMLImageElement ? img.nextElementSibling : null;
+    if (hover && hoverImg) {
+      setImage(hoverImg, hover.src, hover.srcset, '');
+      if (media) media.classList.remove('is-swatch-selected');
+      return;
+    }
+    // No second photo of the chosen variant: the hover image still shows the card's
+    // default variant, so hold it back.
     if (media) media.classList.add('is-swatch-selected');
+  }
+
+  function cardMedia(card) {
+    if (mediaCache.has(card)) return mediaCache.get(card);
+    let list = [];
+    const holder = jsonHolder(card);
+    if (holder) {
+      try {
+        const data = JSON.parse(holder.getAttribute('data-json-product'));
+        if (data && Array.isArray(data.media)) list = data.media.filter((item) => item.media_type === 'image');
+      } catch (error) {
+        /* no hover swap without the media list */
+      }
+    }
+    mediaCache.set(card, list);
+    return list;
+  }
+
+  function mediaSrc(item) {
+    return item.src || (item.preview_image && item.preview_image.src) || '';
+  }
+
+  function srcsetFor(src, width) {
+    return SRCSET_WIDTHS.filter((candidate) => !width || candidate <= width)
+      .map((candidate) => sizedUrl(src, candidate) + ' ' + candidate + 'w')
+      .join(', ');
+  }
+
+  /*
+   * The hover photo for a variant: the next photo in the same alt group. Every render
+   * of a shape-and-metal pair shares one alt ("#Jewelry material_Pear Rose gold"), so
+   * the photo after the variant's own is another angle of the same ring.
+   */
+  function hoverFor(card, variant) {
+    const featured = variant.featured_image;
+    if (!featured) return null;
+    const list = cardMedia(card);
+    const index = list.findIndex(
+      (item) => item.position === featured.position || (featured.id && item.id === featured.id)
+    );
+    if (index === -1) return null;
+    const group = (list[index].alt || '').trim().toLowerCase();
+    if (!group) return null;
+    const sameGroup = (item) => (item.alt || '').trim().toLowerCase() === group;
+    const next = list.slice(index + 1).find(sameGroup) || list.slice(0, index).find(sameGroup);
+    const src = next && mediaSrc(next);
+    if (!src) return null;
+    const width = (next.preview_image && next.preview_image.width) || next.width || 0;
+    return { src: sizedUrl(src, DISPLAY_WIDTH), srcset: srcsetFor(src, width) };
   }
 
   function showVariantImage(card, variant) {
     const src = variantImageSrc(variant);
     if (!src) return;
     const width = (variant.featured_image && variant.featured_image.width) || 0;
-    const srcset = SRCSET_WIDTHS.filter((candidate) => !width || candidate <= width)
-      .map((candidate) => sizedUrl(src, candidate) + ' ' + candidate + 'w')
-      .join(', ');
     const alt = (variant.featured_image && variant.featured_image.alt) || '';
-    showImage(card, sizedUrl(src, DISPLAY_WIDTH), srcset, alt);
+    showImage(card, sizedUrl(src, DISPLAY_WIDTH), srcsetFor(src, width), alt, hoverFor(card, variant));
   }
 
   function updateLinks(card, variantId) {

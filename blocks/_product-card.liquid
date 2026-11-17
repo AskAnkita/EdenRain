@@ -55,10 +55,31 @@
       {%- endif -%}
     "
   >
+    {%- comment -%}
+      The card scripts (card-option-swatches.js, the swatch handler in global.js) read only
+      these fields. Shopify's full `product.variants | json` ran to ~150 KB for a merged ring
+      of 80 variants, and the grid repeats it on every per-shape card: 6.5 MB of an 8.3 MB
+      collection page. Add a field here if a script starts reading one.
+    {%- endcomment -%}
+    {%- capture card_json -%}
+      {"id":{{ product.id }},"handle":{{ product.handle | json }},"media":[
+      {%- for item in product.media -%}
+        {%- unless forloop.first %},{% endunless -%}
+        {"id":{{ item.id }},"position":{{ item.position }},"media_type":{{ item.media_type | json }},"alt":{{ item.alt | json }},"src":{{ item.preview_image.src | image_url: width: 1200 | json }},"width":{{ item.preview_image.width | default: 0 }}}
+      {%- endfor -%}
+      ],"variants":[
+      {%- for variant in product.variants -%}
+        {%- unless forloop.first %},{% endunless -%}
+        {"id":{{ variant.id }},"title":{{ variant.title | json }},"options":{{ variant.options | json }},"price":{{ variant.price }},"compare_at_price":{{ variant.compare_at_price | json }},"available":{{ variant.available }},"featured_image":
+        {%- if variant.featured_image -%}
+          {"id":{{ variant.featured_image.id }},"position":{{ variant.featured_image.position }},"alt":{{ variant.featured_image.alt | json }},"width":{{ variant.featured_image.width | default: 0 }},"src":{{ variant.featured_image | image_url: width: 1200 | json }}}
+        {%- else -%}null{%- endif -%}
+        }
+      {%- endfor -%}
+      ]}
+    {%- endcapture -%}
     <template>
-      <div
-        data-json-product='{"id": {{product.id}},"handle": "{{product.handle}}","media": {{product.media | json | escape}},"variants": {{ product.variants | json | escape}}}'
-      ></div>
+      <div data-json-product='{{ card_json | strip_newlines | escape }}'></div>
     </template>
     {% content_for 'block',
       type: '_card-product-media',

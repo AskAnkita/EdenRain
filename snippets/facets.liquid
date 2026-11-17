@@ -9,6 +9,7 @@
   - filter_type: {String} Type of filter
   - filter_variant_pill: {Object}
   - paginate: {Object}
+  - card_count: {Number} Optional. Grid cards when merged products show one card per cut; shown instead of the product count.
   - results_size: {Number} Optional. The number of results the caller actually renders,
     used in place of results.results_count when the two differ -- the search template
     shows products only, Shopify still counts the pages and articles it returned.
@@ -62,7 +63,9 @@
       <div class="results-count results-count--mobile flex items-center lg:none{% if filter_type == 'vertical' %} hidden{% endif %}">
         <span class="results">
           <span id="ProductCountMobile">
-            {%- if results.results_count -%}
+            {%- if card_count != blank -%}
+              {{ 'products.facets.product_count_simple' | t: count: card_count }}
+            {%- elsif results.results_count -%}
               {{ 'content.results_with_count' | t: terms: results.terms, count: results_count_display }}
             {%- elsif results.products_count == results.all_products_count -%}
               {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
@@ -146,7 +149,9 @@
                     </facet-remove>
                     {% if enable_count %}
                       <div class="results-count w-full">
-                        {%- if results.results_count -%}
+                        {%- if card_count != blank -%}
+                          {{ 'products.facets.product_count_simple' | t: count: card_count }}
+                        {%- elsif results.results_count -%}
                           {{
                             'content.results_with_count'
                             | t: terms: results.terms, count: results_count_display
@@ -896,7 +901,9 @@
               <div class="results-count none lg:block">
                 <span class="results">
                   <span id="ProductCount">
-                    {%- if results.results_count -%}
+                    {%- if card_count != blank -%}
+                      {{ 'products.facets.product_count_simple' | t: count: card_count }}
+                    {%- elsif results.results_count -%}
                       {{ 'content.results_with_count' | t: terms: results.terms, count: results_count_display }}
                     {%- elsif results.products_count == results.all_products_count -%}
                       {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
@@ -968,7 +975,9 @@
       {%- if filter_type == 'drawer' and enable_count -%}
         <p class="collection-filter-toolbar__count" role="status">
           <span id="ProductCount">
-            {%- if results.results_count -%}
+            {%- if card_count != blank -%}
+              {{ 'products.facets.product_count_simple' | t: count: card_count }}
+            {%- elsif results.results_count -%}
               {{ 'content.results_with_count' | t: terms: results.terms, count: results_count_display }}
             {%- elsif results.products_count == results.all_products_count -%}
               {{ 'products.facets.product_count_simple' | t: count: results.products_count }}

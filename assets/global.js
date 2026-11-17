@@ -4150,7 +4150,50 @@ class InfiniteScrolling extends HTMLElement {
     this.currentPage = parseInt(this.productGrid.dataset.currentPage) || 1;
     this.hasNextPage = parseInt(this.productGrid.dataset.totalPages) > this.currentPage;
 
+    // One card per diamond shape: the server sends a page of products but shows only the
+    // first data-card-batch cards; the rest arrive with .is-card-held and "View more"
+    // reveals them a batch at a time before fetching the next page.
+    this.cardBatch = parseInt(this.dataset.cardBatch, 10) || 0;
+    this.cardTotal = parseInt(this.dataset.cardTotal, 10) || 0;
+    const startEl = this.querySelector('[data-total-start]');
+    this.cardsBefore = startEl ? Math.max(0, (parseInt(startEl.textContent, 10) || 1) - 1) : 0;
+
     this.bindEvents();
+  }
+
+  countsCards() {
+    return this.cardBatch > 0 && this.cardTotal > 0;
+  }
+
+  heldCards() {
+    return this.productGrid ? this.productGrid.querySelectorAll(':scope > .is-card-held') : [];
+  }
+
+  hasMore() {
+    return this.hasNextPage || (this.countsCards() && this.heldCards().length > 0);
+  }
+
+  // Shows the next `batch` held cards (and any banner that sits among them).
+  revealCards(batch) {
+    let shown = 0;
+    for (const item of this.heldCards()) {
+      const isCard = !item.classList.contains('product-grid__item--banner');
+      if (isCard && shown >= batch) break;
+      item.classList.remove('is-card-held');
+      if (isCard) shown += 1;
+    }
+    this.showCardCount();
+  }
+
+  showCardCount() {
+    const endEl = this.querySelector('[data-total-end]');
+    const bar = this.querySelector('.pagination-total-item');
+    const visible = this.productGrid.querySelectorAll(
+      ':scope > .product-grid__item:not(.product-grid__item--banner):not(.is-card-held)'
+    ).length;
+    const end = Math.min(this.cardsBefore + visible, this.cardTotal);
+    if (endEl) endEl.textContent = end;
+    if (bar) bar.style.width = `${Math.min((end / this.cardTotal) * 100, 100)}%`;
   }
 
   bindEvents() {
@@ -4177,7 +4220,7 @@ class InfiniteScrolling extends HTMLElement {
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting && !this.isLoading && this.hasNextPage) {
+        if (entry.isIntersecting && !this.isLoading && this.hasMore()) {
           this.loadNextPage();
         }
       });
@@ -4188,7 +4231,7 @@ class InfiniteScrolling extends HTMLElement {
 
   handleScroll() {
     const infiniteButton = this.querySelector('[data-infinite-scrolling]');
-    if (!infiniteButton || this.isLoading || !this.hasNextPage) return;
+    if (!infiniteButton || this.isLoading || !this.hasMore()) return;
 
     const rect = infiniteButton.getBoundingClientRect();
     const height = rect.height + 100;
@@ -4200,7 +4243,14 @@ class InfiniteScrolling extends HTMLElement {
   }
 
   async loadNextPage() {
-    if (this.isLoading || !this.hasNextPage) return;
+    if (this.isLoading || !this.hasMore()) return;
+
+    if (this.countsCards() && (this.heldCards().length >= this.cardBatch || (!this.hasNextPage && this.heldCards().length))) {
+      this.revealCards(this.cardBatch);
+      this.hideLoadingState();
+      this.updateButtonVisibility();
+      return;
+    }
 
     this.isLoading = true;
     this.showLoadingState();
@@ -4222,6 +4272,9 @@ class InfiniteScrolling extends HTMLElement {
         newProducts.forEach(product => {
           const clonedProduct = product.cloneNode(true);
           clonedProduct.dataset.page = nextPage;
+          // The next page arrives with its own first batch shown; hold it all and reveal
+          // one batch from here, so each click adds the same number of cards.
+          if (this.countsCards()) clonedProduct.classList.add('is-card-held');
           this.productGrid.appendChild(clonedProduct);
         });
 
@@ -4237,17 +4290,16 @@ class InfiniteScrolling extends HTMLElement {
 
         this.productGrid.dataset.currentPage = this.currentPage;
 
-        this.updatePaginationProgress();
+        if (this.countsCards()) {
+          this.revealCards(this.cardBatch);
+        } else {
+          this.updatePaginationProgress();
+        }
 
         // The address bar deliberately keeps pointing at page 1. Rewriting it to
         // ?page=2 made a reload or a shared link return only that page's products,
         // dropping everything already loaded along with the page-1 promo banners.
-        if (!this.hasNextPage) {
-          const infiniteButton = this.querySelector('[data-infinite-scrolling]');
-          if (infiniteButton) {
-            infiniteButton.style.display = 'none';
-          }
-        }
+        this.updateButtonVisibility();
 
         this.reinitializeComponents();
 
@@ -4263,6 +4315,12 @@ class InfiniteScrolling extends HTMLElement {
       this.hideLoadingState();
       this.isLoading = false;
     }
+  }
+
+  updateButtonVisibility() {
+    if (this.hasMore()) return;
+    const infiniteButton = this.querySelector('[data-infinite-scrolling]');
+    if (infiniteButton) infiniteButton.style.display = 'none';
   }
 
   showLoadingState() {
@@ -4284,10 +4342,12 @@ class InfiniteScrolling extends HTMLElement {
     const spinner = infiniteButton.querySelector('.loading__spinner');
     const text = infiniteButton.querySelector('.text');
     if (infiniteButton) {
-      if (!this.hasNextPage) {
+      // Keep the label the section rendered ("View more"); the global default differs.
+      if (!this.initialLabel) this.initialLabel = text.innerHTML;
+      if (!this.hasMore()) {
         text.innerHTML = window.button_load_more.no_more;
       } else {
-        text.innerHTML = window.button_load_more.default;
+        text.innerHTML = this.initialLabel;
       }
       infiniteButton.classList.remove('loading');
       spinner.classList.add('hidden');

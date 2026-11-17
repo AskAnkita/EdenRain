@@ -49,3 +49,10 @@
     font-size: 1.2rem;
   }
 }
+
+/* Grid cards held back until "View more" (one card per diamond shape, see
+   sections/main-collection-product-grid-banner-adv.liquid). Hidden, so their lazy photos
+   never load until shown. */
+.product-grid > .is-card-held {
+  display: none !important;
+}

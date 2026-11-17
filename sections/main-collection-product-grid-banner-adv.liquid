@@ -258,6 +258,46 @@
   assign limit = paginate_by
 %}
 
+{%- capture page_shape -%}{%- render 'shape-context' -%}{%- endcapture -%}
+{%- liquid
+  assign shape_keys = 'round,oval,cushion,emerald,princess,radiant,asscher,heart,marquise,pear' | split: ','
+  assign page_shape = page_shape | strip
+  assign expand_shapes = section.settings.card_per_shape
+  if page_shape != blank
+    assign expand_shapes = false
+  endif
+
+  # The count shoppers see ("20 products", "Showing 1 - 16 of 20") is Shopify's, and Shopify
+  # counts products. With one card per cut, a merged ring is one product but seven cards, so
+  # the count is redone here in cards from the same list the grid draws (card-shape-list).
+  # Outside the paginate tag collection.products holds at most 50 products; a bigger collection
+  # keeps Shopify's own count rather than show a wrong one.
+  assign card_total = blank
+  assign cards_before_page = 0
+  # Cards shown before "View more", and again on each click. Only a grid that counts cards
+  # holds any back; everything else pages by products as before.
+  assign card_batch = section.settings.cards_per_load | default: 12
+  # Numbered pages have no "View more" to reveal held cards with, so they hold none.
+  if section.settings.pagination_type != 'infinite'
+    assign card_batch = 100000
+  endif
+  if expand_shapes and collection.products_count <= 50
+    assign page_number = current_page | default: 1
+    assign page_start = page_number | minus: 1 | times: paginate_by
+    assign card_total = 0
+    for product in collection.products limit: 50
+      capture product_shapes
+        render 'card-shape-list', product: product, expand_shapes: expand_shapes, shape_keys: shape_keys
+      endcapture
+      assign product_cards = product_shapes | strip | split: ',' | size
+      assign card_total = card_total | plus: product_cards
+      if forloop.index0 < page_start
+        assign cards_before_page = cards_before_page | plus: product_cards
+      endif
+    endfor
+  endif
+-%}
+
 <div
   class="template-collection{%- if section.settings.product_grid_width == 'full-width' %} template-collection--full-width{% endif %} collection-wrapper grid-base gap-style gradient color-{{ section.settings.color_scheme }} spacing"
   style="
@@ -272,6 +312,7 @@
     id: 'filters',
     results: collection,
     results_size: collection.products_count,
+    card_count: card_total,
     limit: limit
   %}
 
@@ -361,16 +402,56 @@
                 assign page_category = ''
               endif
 
-              assign banner_queue = ''
-              for n in (1..4)
+              # Sub-categories share a template - Solitaire, Halo, Oval and the rest all render
+              # engagement-collections.json - so the same settings would hand every one of them
+              # the same pair. Three things keep them apart:
+              #   1. a banner that links to the page itself is dropped (no "Shop Halo" on Halo);
+              #   2. a banner limited to some collections shows only there, and ahead of the rest;
+              #   3. the open banners take turns: each collection starts the list at its own
+              #      offset (its id modulo the pool), so neighbouring pages draw different pairs.
+              assign targeted_queue = ''
+              assign open_queue = ''
+              for n in (1..8)
                 assign show_key = 'show_banner_' | append: n
                 assign category_key = 'banner_category_' | append: n
+                assign link_key = 'link_banner_' | append: n
+                assign only_key = 'banner_collections_' | append: n
                 assign banner_category = section.settings[category_key] | default: 'general'
-                if section.settings[show_key] and banner_category != page_category
-                  assign banner_queue = banner_queue | append: n | append: ','
+                unless section.settings[show_key] and banner_category != page_category
+                  continue
+                endunless
+
+                assign link_path = section.settings[link_key] | split: '?' | first
+                if link_path != blank and link_path == collection.url
+                  continue
+                endif
+
+                assign only_on = section.settings[only_key]
+                if only_on != blank and only_on.size > 0
+                  assign on_this_page = false
+                  for only_collection in only_on
+                    if only_collection.handle == collection.handle
+                      assign on_this_page = true
+                      break
+                    endif
+                  endfor
+                  if on_this_page
+                    assign targeted_queue = targeted_queue | append: n | append: ','
+                  endif
+                else
+                  assign open_queue = open_queue | append: n | append: ','
                 endif
               endfor
-              assign banner_queue = banner_queue | split: ','
+              assign targeted_queue = targeted_queue | split: ','
+              assign open_queue = open_queue | split: ','
+
+              if section.settings.rotate_banners and open_queue.size > 1 and collection.id != blank
+                assign rotate_by = collection.id | modulo: open_queue.size
+                assign queue_head = open_queue | slice: rotate_by, open_queue.size
+                assign queue_tail = open_queue | slice: 0, rotate_by
+                assign open_queue = queue_head | concat: queue_tail
+              endif
+              assign banner_queue = targeted_queue | concat: open_queue
 
               # Banners belong to the first page only: later pages are appended to the same grid
               # by infinite scroll, and re-inserting at the same index would repeat them.
@@ -405,16 +486,6 @@
               assign slot_positions = slot_positions | split: ','
             %}
 
-            {%- capture page_shape -%}{%- render 'shape-context' -%}{%- endcapture -%}
-            {%- liquid
-              assign shape_keys = 'round,oval,cushion,emerald,princess,radiant,asscher,heart,marquise,pear' | split: ','
-              assign page_shape = page_shape | strip
-              assign expand_shapes = section.settings.card_per_shape
-              if page_shape != blank
-                assign expand_shapes = false
-              endif
-            -%}
-
             {%- liquid
               # Copies of a merged product open on a different metal each (see data-card-metal
               # below), unless the shopper has filtered the grid to one metal: then every card
@@ -441,111 +512,15 @@
             {% for product in collection.products %}
               {%- assign product_index = forloop.index -%}
                 {%- comment -%}
-                  One card per diamond shape. A merged shape product (side stone, bezel,
-                  crossover...) is one product with a Shape option, but the client wants every
-                  cut on the grid as its own card. The card blocks only receive the product, so
-                  the card for the product's own featured cut renders as usual and each other
-                  cut gets a copy marked data-card-shape; card-option-swatches.js presses that
-                  cut's icon on load, which moves the photo, the links (?variant=) and both
-                  swatch rows onto it. The shape swap on the card and on the product page stays.
-                  A page that is already about one cut (shape collection or Shape filter) keeps
-                  one card per product, showing that cut.
+                  One card per diamond shape: the card for the product's own featured cut
+                  renders as usual and each other cut gets a copy marked data-card-shape, which
+                  card-option-swatches.js moves onto that cut. Which cuts get a card is worked
+                  out in card-shape-list, the same list the product count adds up.
                 {%- endcomment -%}
+                {%- capture card_shapes -%}{%- render 'card-shape-list', product: product, expand_shapes: expand_shapes, shape_keys: shape_keys -%}{%- endcapture -%}
                 {%- liquid
-                  assign card_shapes = ''
-                  if expand_shapes
-                    assign shape_index = -1
-                    for option in product.options_with_values
-                      assign option_name = option.name | downcase
-                      if option_name contains 'shape'
-                        assign shape_index = forloop.index0
-                        break
-                      endif
-                    endfor
-
-                    if shape_index >= 0
-                      assign featured_shape = ''
-                      for variant in product.variants
-                        if variant.featured_media != blank and variant.featured_media.id == product.featured_media.id
-                          assign featured_compare = variant.options[shape_index] | downcase
-                          for shape in shape_keys
-                            if featured_compare contains shape
-                              assign featured_shape = shape
-                              break
-                            endif
-                          endfor
-                          break
-                        endif
-                      endfor
-
-                      assign seen_shapes = ','
-                      for value in product.options_with_values[shape_index].values
-                        assign value_text = value | append: ''
-                        assign value_compare = value_text | downcase
-                        assign value_key = ''
-                        for shape in shape_keys
-                          if value_compare contains shape
-                            assign value_key = shape
-                            break
-                          endif
-                        endfor
-                        if value_key == blank
-                          continue
-                        endif
-                        assign seen_key = ',' | append: value_key | append: ','
-                        if seen_shapes contains seen_key
-                          continue
-                        endif
-
-                        # Same rules as the card's shape row ('card-shape-swatches'): a cut
-                        # needs a photographed variant, and a priced one when the product
-                        # mixes priced and unpriced variants. Otherwise its icon is not a
-                        # button and the copy could not move onto it.
-                        assign has_photo = false
-                        assign has_price = false
-                        for variant in product.variants
-                          if variant.options[shape_index] == value_text
-                            if variant.featured_image != blank
-                              assign has_photo = true
-                            endif
-                            if variant.price > 0
-                              assign has_price = true
-                            endif
-                          endif
-                        endfor
-                        if product.price_min == 0 and product.price_max > 0
-                          unless has_price
-                            continue
-                          endunless
-                        endif
-                        unless has_photo
-                          continue
-                        endunless
-
-                        assign seen_shapes = seen_shapes | append: value_key | append: ','
-                        assign card_shapes = card_shapes | append: value_key | append: ','
-                      endfor
-
-                      # The featured cut leads, rendered natively; a product whose featured
-                      # photo is not one of the listed cuts starts from its first cut.
-                      assign shape_list = card_shapes | split: ','
-                      if shape_list.size > 1
-                        assign featured_key = ',' | append: featured_shape | append: ','
-                        unless seen_shapes contains featured_key
-                          assign featured_shape = shape_list.first
-                        endunless
-                        assign card_shapes = featured_shape | append: ',' | append: card_shapes
-                      else
-                        assign card_shapes = ''
-                      endif
-                    endif
-                  endif
-
-                  if card_shapes == blank
-                    assign featured_shape = '-'
-                    assign card_shapes = '-'
-                  endif
-                  assign card_shapes = card_shapes | split: ',' | uniq
+                  assign card_shapes = card_shapes | strip | split: ','
+                  assign featured_shape = card_shapes.first
                 -%}
               {%- liquid
                 # The tone the product's own card opens on, so its first copy differs from it.
@@ -595,6 +570,14 @@
                   </li>
                 {%- endcapture -%}
                 {%- if is_copy -%}
+                  {%- comment -%}
+                    A copy carries the same product data as the product's own card, which is
+                    tens of KB for a merged ring, so it drops its <template> and
+                    card-option-swatches.js reads the main card's instead.
+                  {%- endcomment -%}
+                  {%- assign card_head = card_html | split: '<template>' | first -%}
+                  {%- assign card_tail = card_html | split: '</template>' | last -%}
+                  {%- assign card_html = card_head | append: card_tail -%}
                   {%- comment -%}
                     Sort key: the copy's round (2nd cut, 3rd cut...) then the product, so the
                     copies of different products alternate rather than one product's cuts
@@ -657,24 +640,40 @@
                             assign banner_fallback = 'lifestyle-earring.jpg'
                         endcase
                       -%}
-                      {% render 'collection-grid-banner',
-                        index: n,
-                        image: section.settings[key_image],
-                        fallback: banner_fallback,
-                        url: section.settings[key_link],
-                        heading: section.settings[key_heading],
-                        subheading: section.settings[key_text],
-                        video: section.settings[key_video],
-                        text_color: section.settings[key_color]
-                      %}
+                      {%- capture banner_html -%}
+                        {% render 'collection-grid-banner',
+                          index: n,
+                          image: section.settings[key_image],
+                          fallback: banner_fallback,
+                          url: section.settings[key_link],
+                          heading: section.settings[key_heading],
+                          subheading: section.settings[key_text],
+                          video: section.settings[key_video],
+                          text_color: section.settings[key_color]
+                        %}
+                      {%- endcapture -%}
+                      {%- if card_total != blank and card_count > card_batch -%}
+                        {{ banner_html | replace_first: 'class="product-grid__item ', 'class="product-grid__item is-card-held ' }}
+                      {%- else -%}
+                        {{ banner_html }}
+                      {%- endif -%}
                     {%- endif -%}
                   {%- endfor -%}
                   {%- if step == 1 -%}
-                    {{ original_html }}
+                    {%- assign card_out = original_html -%}
                   {%- else -%}
                     {%- assign copy_entry = copy_list[copies_out] -%}
-                    {{ copy_entry | slice: 9, copy_entry.size }}
+                    {%- assign card_out = copy_entry | slice: 9, copy_entry.size -%}
                     {%- assign copies_out = copies_out | plus: 1 -%}
+                  {%- endif -%}
+                  {%- comment -%}
+                    Cards past the first batch are held back (hidden, so their photos never
+                    load) until "View more"; assets/global.js (InfiniteScrolling) reveals them.
+                  {%- endcomment -%}
+                  {%- if card_total != blank and card_count > card_batch -%}
+                    {{ card_out | replace_first: 'class="product-grid__item ', 'class="product-grid__item is-card-held ' }}
+                  {%- else -%}
+                    {{ card_out }}
                   {%- endif -%}
                 {%- endfor -%}
               {%- endfor -%}
@@ -690,7 +689,9 @@
             <div class="product-count pos-relative light left hidden" role="status">
               <h2 class="product-count__text text-body mar-0">
                 <span id="ProductCount">
-                  {% if collection.results_count %}
+                  {% if card_total != blank %}
+                    {{ 'products.facets.product_count_simple' | t: count: card_total }}
+                  {% elsif collection.results_count %}
                     {{
                       'content.results_with_count'
                       | t: terms: collection.terms, count: collection.results_count
@@ -708,8 +709,27 @@
               {% render 'loading-spinner' %}
             </div>
 
-            {% if paginate.pages > 1 %}
-              {% render 'pagination', paginate: paginate, anchor: '', settings: section.settings, suffix: 'pagination' %}
+            {%- liquid
+              assign count_end = blank
+              assign holds_cards = false
+              if card_total != blank
+                assign count_end = cards_before_page | plus: card_count
+                if card_count > card_batch
+                  assign holds_cards = true
+                endif
+              endif
+            -%}
+            {% if paginate.pages > 1 or holds_cards %}
+              {% render 'pagination',
+                paginate: paginate,
+                anchor: '',
+                settings: section.settings,
+                suffix: 'pagination',
+                count_start: cards_before_page,
+                count_end: count_end,
+                count_total: card_total,
+                card_batch: card_batch
+              %}
             {% endif %}
           </div>
         {% endif %}
@@ -757,6 +777,16 @@
       "label": "One card per diamond shape",
       "info": "A product with a Shape option shows each photographed shape as its own card. Shape collections and the Shape filter still show one card per product.",
       "default": true
+    },
+    {
+      "type": "range",
+      "id": "cards_per_load",
+      "min": 4,
+      "max": 32,
+      "step": 4,
+      "default": 12,
+      "label": "Cards shown before View more",
+      "info": "With one card per diamond shape on. The rest load 12 at a time as shoppers click View more."
     },
     {
       "type": "select",
@@ -864,7 +894,7 @@
     {
       "type": "header",
       "content": "Banners in the grid",
-      "info": "Each page cross-sells: a banner that promotes the page's own category is skipped, so Rings never shows the rings banner. The next banner in the list moves up into its slot."
+      "info": "Each page cross-sells: a banner that promotes the page's own category, or links to the page itself, is skipped. Banners limited to the page's collection come first; the rest take turns, so sub-categories such as Halo and Solitaire each open on a different pair."
     },
     {
       "type": "range",
@@ -874,6 +904,13 @@
       "max": 3,
       "step": 1,
       "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "rotate_banners",
+      "label": "Vary banners between collections",
+      "info": "Each collection starts the list at a different banner. Off: every page shows the first banners in order.",
+      "default": true
     },
     {
       "type": "text",
@@ -949,6 +986,12 @@
       "type": "url",
       "id": "link_banner_1",
       "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_1",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
     },
     {
       "type": "text",
@@ -1035,6 +1078,12 @@
       "label": "Link"
     },
     {
+      "type": "collection_list",
+      "id": "banner_collections_2",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
       "type": "text",
       "id": "banner_heading_2",
       "label": "Heading",
@@ -1117,6 +1166,12 @@
       "type": "url",
       "id": "link_banner_3",
       "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_3",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
     },
     {
       "type": "text",
@@ -1203,6 +1258,12 @@
       "label": "Link"
     },
     {
+      "type": "collection_list",
+      "id": "banner_collections_4",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
       "type": "text",
       "id": "banner_heading_4",
       "label": "Heading",
@@ -1217,6 +1278,358 @@
     {
       "type": "select",
       "id": "banner_text_color_4",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 5"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_5",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_5",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner5",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_5",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_5",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_5",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_5",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_5",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_5",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 6"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_6",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_6",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner6",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_6",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_6",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_6",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_6",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_6",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_6",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 7"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_7",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_7",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner7",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_7",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_7",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_7",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_7",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_7",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_7",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 8"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_8",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_8",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner8",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_8",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_8",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_8",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_8",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_8",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_8",
       "label": "Text color",
       "options": [
         {

@@ -3,6 +3,10 @@
 
   @param {object} paginate - Shopify paginate object
   @param {object} section - section object with settings
+  @param {number} [count_start] - cards before this page, when the grid counts cards not products
+  @param {number} [count_end] - cards up to the end of this page
+  @param {number} [count_total] - cards in the whole collection
+  @param {number} [card_batch] - cards shown at first and per "View more"; the rest arrive hidden
 {% enddoc %}
 
 {% liquid
@@ -26,7 +30,7 @@
   {% endif %}
 {% endcapture %}
 
-{%- if paginate.parts.size > 0 -%}
+{%- if paginate.parts.size > 0 or count_total != blank -%}
   <div
     class="
       pagination-wrapper
@@ -115,21 +119,47 @@
         endif
       -%}
       {{ 'pagination-load-more.css' | asset_url | stylesheet_tag }}
-      <infinite-scrolling class="infinite-scrolling-wrapper block center" data-load-mode="{{ load_mode }}">
+      {%- liquid
+        # A grid that shows one card per cut counts cards (sections/main-collection-product-
+        # grid-banner-adv); everything else counts products, as Shopify does.
+        if count_total != blank
+          assign pg_start = count_start | plus: 1
+          assign pg_current = count_end
+          assign pg_total = count_total
+        else
+          assign pg_start = paginate.current_offset | plus: 1
+          assign pg_current = paginate.current_offset | plus: paginate.page_size
+          assign pg_total = paginate.items
+        endif
+        unless paginate.next
+          assign pg_current = pg_total
+        endunless
+        # Held-back cards are not shown yet, so they are not counted yet.
+        assign has_more = false
+        if paginate.next
+          assign has_more = true
+        endif
+        if count_total != blank and card_batch
+          assign pg_shown = pg_start | minus: 1 | plus: card_batch
+          if pg_shown < pg_current
+            assign pg_current = pg_shown
+            assign has_more = true
+          endif
+        endif
+      -%}
+      <infinite-scrolling
+        class="infinite-scrolling-wrapper block center"
+        data-load-mode="{{ load_mode }}"
+        {% if count_total != blank %}data-card-total="{{ count_total }}" data-card-batch="{{ card_batch }}"{% endif %}
+      >
         <div class="pagination-page-item pagination-page-total flex-center flex-wrap gap-2xs">
           <span>{{ 'content.start_count' | t }}</span>
-          <span data-total-start>{{ paginate.current_offset | plus: 1 }}</span>
+          <span data-total-start>{{ pg_start }}</span>
           <span>-</span>
-          {%- if paginate.next -%}
-            <span data-total-end>{{ paginate.current_offset | plus: paginate.page_size }}</span>
-          {%- else -%}
-            <span data-total-end>{{ paginate.items }}</span>
-          {%- endif -%}
-          <span>{{ 'content.end_count' | t: count: paginate.items }}</span>
-          {%- if paginate.next -%}
+          <span data-total-end>{{ pg_current }}</span>
+          <span>{{ 'content.end_count' | t: count: pg_total }}</span>
+          {%- if has_more -%}
             {% liquid
-              assign pg_current = paginate.current_offset | plus: paginate.page_size
-              assign pg_total = paginate.items
               assign total_progress = pg_current | times: 100 | divided_by: pg_total | append: '%'
             %}
           {%- else -%}
@@ -149,7 +179,7 @@
           aria-label="{{ 'content.show_more' | t }}"
         >
           <span class="text">
-            {%- if paginate.next -%}
+            {%- if has_more -%}
               {{ load_more_label }}
             {%- else -%}
               {{ 'content.no_more' | t }}

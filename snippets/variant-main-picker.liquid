@@ -73,6 +73,34 @@
       </div>
     {%- endif -%}
     {%- if show_variant_picker -%}
+    {%- liquid
+      # What kind of piece this is, so ring sizing only ever reaches rings.
+      # Substring tests on the title are not enough: "earring" and "fringe"
+      # both contain "ring". The category: tags win; the title is matched on
+      # whole words only when a product has no category tag.
+      assign product_family = ''
+      assign family_tags = product_resource.tags | join: ',' | downcase | prepend: ',' | append: ','
+      if family_tags contains ',category:earring,'
+        assign product_family = 'earring'
+      elsif family_tags contains ',category:necklace,'
+        assign product_family = 'necklace'
+      elsif family_tags contains ',category:bracelet,'
+        assign product_family = 'bracelet'
+      elsif family_tags contains ',category:ring,'
+        assign product_family = 'ring'
+      else
+        assign family_title = product_resource.title | downcase | replace: '-', ' ' | prepend: ' ' | append: ' '
+        if family_title contains 'earring' or family_title contains ' stud' or family_title contains ' hoop'
+          assign product_family = 'earring'
+        elsif family_title contains 'necklace' or family_title contains 'pendant'
+          assign product_family = 'necklace'
+        elsif family_title contains 'bracelet' or family_title contains 'bangle'
+          assign product_family = 'bracelet'
+        elsif family_title contains ' ring ' or family_title contains ' rings ' or family_title contains ' band '
+          assign product_family = 'ring'
+        endif
+      endif
+    -%}
     {%- for product_option in product_resource.options_with_values -%}
       {%- liquid
         assign variant_style = bl_stts.variant_style
@@ -149,7 +177,7 @@
             <span class="variant-option__label-title">
               {%- if is_size and option_name contains 'ring' -%}
                 U.S. Ring Size:
-              {%- elsif is_size and option_name == 'size' -%}
+              {%- elsif is_size and option_name == 'size' and product_family == 'ring' -%}
                 U.S. Ring Size:
               {%- else -%}
                 {{ product_option.name  | escape }}:
@@ -208,16 +236,7 @@
       endfor
     -%}
     {%- unless has_size_option -%}
-      {%- liquid
-        assign is_ring = false
-        assign p_title_lower = product_resource.title | downcase
-        assign p_type_lower = product_resource.type | downcase
-        assign p_tags_string = product_resource.tags | join: ' ' | downcase
-        if p_title_lower contains 'ring' or p_type_lower contains 'ring' or p_tags_string contains 'ring'
-          assign is_ring = true
-        endif
-      -%}
-      {%- if is_ring -%}
+      {%- if product_family == 'ring' -%}
         <div class="product-form__input product-form__input--dropdown variant-option variant-option--dropdowns variant-option--size">
           <label class="form__label" for="Option-{{ block.id }}-ring-size">
             <span class="variant-option__label-title">U.S. Ring Size:</span>

@@ -1,0 +1,108 @@
+{% doc %}
+  The cuts a product gets a grid card for, as a comma list with the product's own featured cut
+  first ("pear,round,oval"), or "-" for a product that gets one ordinary card.
+
+  A merged shape product (side stone, bezel, crossover...) is one product with a Shape option,
+  but the grid shows every cut as its own card. Both the grid and the "Showing 1 - 16 of 57"
+  count read this one list, so the count always matches the cards on screen.
+
+  Same rules as the card's shape row ('card-shape-swatches'): a cut needs a photographed
+  variant, and a priced one when the product mixes priced and unpriced variants. Otherwise its
+  icon is not a button and the copy could not move onto it.
+
+  @param {object} product - the product
+  @param {boolean} expand_shapes - false on a page already about one cut: one card per product
+  @param {string[]} shape_keys - the cut handles to look for in an option value
+{% enddoc %}
+{%- liquid
+  assign card_shapes = ''
+  if expand_shapes
+    assign shape_index = -1
+    for option in product.options_with_values
+      assign option_name = option.name | downcase
+      if option_name contains 'shape'
+        assign shape_index = forloop.index0
+        break
+      endif
+    endfor
+
+    if shape_index >= 0
+      assign featured_shape = ''
+      for variant in product.variants
+        if variant.featured_media != blank and variant.featured_media.id == product.featured_media.id
+          assign featured_compare = variant.options[shape_index] | downcase
+          for shape in shape_keys
+            if featured_compare contains shape
+              assign featured_shape = shape
+              break
+            endif
+          endfor
+          break
+        endif
+      endfor
+
+      assign seen_shapes = ','
+      for value in product.options_with_values[shape_index].values
+        assign value_text = value | append: ''
+        assign value_compare = value_text | downcase
+        assign value_key = ''
+        for shape in shape_keys
+          if value_compare contains shape
+            assign value_key = shape
+            break
+          endif
+        endfor
+        if value_key == blank
+          continue
+        endif
+        assign seen_key = ',' | append: value_key | append: ','
+        if seen_shapes contains seen_key
+          continue
+        endif
+
+        assign has_photo = false
+        assign has_price = false
+        for variant in product.variants
+          if variant.options[shape_index] == value_text
+            if variant.featured_image != blank
+              assign has_photo = true
+            endif
+            if variant.price > 0
+              assign has_price = true
+            endif
+          endif
+        endfor
+        if product.price_min == 0 and product.price_max > 0
+          unless has_price
+            continue
+          endunless
+        endif
+        unless has_photo
+          continue
+        endunless
+
+        assign seen_shapes = seen_shapes | append: value_key | append: ','
+        assign card_shapes = card_shapes | append: value_key | append: ','
+      endfor
+
+      # The featured cut leads, rendered natively; a product whose featured photo is not one
+      # of the listed cuts starts from its first cut.
+      assign shape_list = card_shapes | split: ','
+      if shape_list.size > 1
+        assign featured_key = ',' | append: featured_shape | append: ','
+        unless seen_shapes contains featured_key
+          assign featured_shape = shape_list.first
+        endunless
+        assign card_shapes = featured_shape | append: ',' | append: card_shapes
+      else
+        assign card_shapes = ''
+      endif
+    endif
+  endif
+
+  if card_shapes == blank
+    echo '-'
+  else
+    echo card_shapes | split: ',' | uniq | join: ','
+  endif
+-%}
