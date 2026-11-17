@@ -1523,6 +1523,29 @@ a.menu-drawer-desktop__group-heading:hover {
     max-width: 17rem;
   }
 
+  /* Jewellery takes the same layout as Wedding now that it carries a second picture: four
+     compact columns at 16rem (4 x 16rem + 3 gaps of 2.4rem = 71.2rem) and the promo half takes
+     the rest, so the room that read as a hole beside Bracelets holds the second picture. */
+  .menu-drawer-desktop__page--links.menu-drawer-desktop__page--jewellery {
+    grid-template-columns: calc(71.2rem + var(--page-margin, 4rem)) minmax(34rem, 1fr);
+    gap: 0 4rem;
+  }
+
+  .menu-drawer-desktop__page--jewellery .menu-drawer-desktop__half--promo {
+    width: 100%;
+    max-width: calc(110rem + var(--page-margin, 4rem));
+    margin-left: auto;
+  }
+
+  .menu-drawer-desktop__page--jewellery .menu-drawer-desktop__columns {
+    flex-wrap: nowrap;
+  }
+
+  .menu-drawer-desktop__page--jewellery .menu-drawer-desktop__column--compact {
+    flex: 0 0 16rem;
+    max-width: 16rem;
+  }
+
   .menu-drawer-desktop__promo-pair > .menu-drawer-desktop__promo--secondary {
     display: flex;
   }

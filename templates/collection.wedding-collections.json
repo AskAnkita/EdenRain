@@ -1206,6 +1206,8 @@
         "padding-inline-start": 40,
         "padding-inline-end": 40,
         "banner_count": 2,
+        "rotate_banners": true,
+        "banner_fixed_collections": ["wedding-bands"],
         "banner_position_1": "3",
         "banner_position_2": "11",
         "banner_position_3": "23",

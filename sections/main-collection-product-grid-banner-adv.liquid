@@ -445,7 +445,17 @@
               assign targeted_queue = targeted_queue | split: ','
               assign open_queue = open_queue | split: ','
 
-              if section.settings.rotate_banners and open_queue.size > 1 and collection.id != blank
+              # The main page of a family (Engagement Rings, Wedding Bands) keeps the banners in
+              # the order they are set: only its sub-categories take turns.
+              assign keep_order = false
+              for fixed_collection in section.settings.banner_fixed_collections
+                if fixed_collection.handle == collection.handle
+                  assign keep_order = true
+                  break
+                endif
+              endfor
+
+              if section.settings.rotate_banners and keep_order == false and open_queue.size > 1 and collection.id != blank
                 assign rotate_by = collection.id | modulo: open_queue.size
                 assign queue_head = open_queue | slice: rotate_by, open_queue.size
                 assign queue_tail = open_queue | slice: 0, rotate_by
@@ -911,6 +921,12 @@
       "label": "Vary banners between collections",
       "info": "Each collection starts the list at a different banner. Off: every page shows the first banners in order.",
       "default": true
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_fixed_collections",
+      "label": "Keep the set order on",
+      "info": "These collections always show Banner 1, then Banner 2, as set. Use it for main pages such as Engagement Rings."
     },
     {
       "type": "text",

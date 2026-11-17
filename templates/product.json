@@ -305,14 +305,15 @@
             "product_info_TLqmLe": {
               "type": "product-info",
               "name": "t:names.product_info",
-              "disabled": true,
               "settings": {
                 "show_vendor": false,
                 "show_sku": false,
                 "show_barcode": false,
                 "show_availability": false,
                 "stock_level_display": "none",
-                "show_product_type": true,
+                "show_product_type": false,
+                "show_carat": true,
+                "carat_label": "Total Carat Weight:",
                 "gap": 10,
                 "padding-block-start": 0,
                 "padding-block-end": 0,

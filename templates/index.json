@@ -1220,15 +1220,15 @@
           "settings": {
             "icon": "virtual",
             "icon_asset": "",
-            "label": "Video call"
+            "label": "Virtual consultation"
           }
         },
         "mode_in_person": {
           "type": "mode",
           "settings": {
-            "icon": "phone",
+            "icon": "in-person",
             "icon_asset": "",
-            "label": "Phone"
+            "label": "Speak with a designer"
           }
         }
       },

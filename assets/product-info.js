@@ -1018,8 +1018,19 @@ if (!customElements.get('product-info-list')) {
             }
           }
 
+          // Total carat weight follows the variant (a merged shape product weighs differently per
+          // shape), and hides for a variant that has none
+          const caratItem = currentInfoList.querySelector('[data-carat]');
+          if (caratItem) {
+            const newCaratValue = newInfoListContent.querySelector('[data-carat] .product-info-value');
+            const currentValue = caratItem.querySelector('.product-info-value');
+            const text = newCaratValue?.textContent?.trim() || '';
+            if (currentValue) currentValue.textContent = text;
+            caratItem.style.display = text ? '' : 'none';
+          }
+
           // Update all other items (vendor, product type) that don't have special data attributes
-          const otherItems = currentInfoList.querySelectorAll('.product-info-item:not([data-sku]):not([data-barcode]):not([data-inventory])');
+          const otherItems = currentInfoList.querySelectorAll('.product-info-item:not([data-sku]):not([data-barcode]):not([data-inventory]):not([data-carat])');
           otherItems.forEach((item) => {
             const infoName = item.querySelector('.product-info-name')?.textContent?.trim();
             if (!infoName) return;

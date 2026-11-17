@@ -506,7 +506,7 @@ class PriceRange extends HTMLElement {
   }
 
   onRangeChange(event) {
-    // this.adjustToValidValues(event.currentTarget);
+    if (event.currentTarget.classList.contains('filter__price_number')) this.adjustToValidValues();
     this.setMinAndMaxValues();
     // Note: Form submission is now handled by the apply button click
   }
@@ -529,14 +529,27 @@ class PriceRange extends HTMLElement {
     if (maxInput.value === '') minInput.setAttribute('data-max', maxInput.getAttribute('data-max'));
   }
 
-  // adjustToValidValues(input) {
-  //   const value = Number(input.value);
-  //   const min = Number(input.getAttribute('data-min'));
-  //   const max = Number(input.getAttribute('data-max'));
+  // A typed price outside 0..highest price is pulled back inside it, and a
+  // "from" above the "to" swaps the two, so the sliders always mirror the boxes.
+  adjustToValidValues() {
+    const numbers = this.querySelectorAll('.filter__price_number');
+    const sliders = this.querySelectorAll('.filter__price_change');
+    const max = Number(sliders[0].max);
+    const read = (input, fallback) => {
+      const value = parseFloat(String(input.value).replace(/[^0-9.]/g, ''));
+      return Number.isNaN(value) ? fallback : Math.min(Math.max(value, 0), max);
+    };
 
-  //   if (value < min) input.value = min;
-  //   if (value > max) input.value = max;
-  // }
+    let low = read(numbers[0], 0);
+    let high = read(numbers[1], max);
+    if (low > high) [low, high] = [high, low];
+
+    numbers[0].value = low;
+    numbers[1].value = high;
+    sliders[0].value = low;
+    sliders[1].value = high;
+    this.updateDisplay(low, high);
+  }
 
   rangeSliderPrice() {
     let rangeS = this.querySelectorAll('.filter__price_change'),
@@ -586,24 +599,17 @@ class PriceRange extends HTMLElement {
 
     numberS.forEach((element) => {
       element.oninput = () => {
-        var number1 = parseFloat(numberS[0].placeholder),
-            checkValue1 = number1 != number1,
-            number2 = parseFloat(numberS[1].placeholder),
-            checkValue2 = number2 != number2;
+        const max = Number(rangeS[0].max);
+        const clamp = (input, fallback) => {
+          const value = parseFloat(String(input.value).replace(/[^0-9.]/g, ''));
+          return Number.isNaN(value) ? fallback : Math.min(Math.max(value, 0), max);
+        };
+        const number1 = clamp(numberS[0], 0);
+        const number2 = clamp(numberS[1], max);
 
-        if (!checkValue1) {
-          rangeS[0].placeholder = number1;
-        }
-
-        if (!checkValue2) {
-          rangeS[1].placeholder = number2;
-        }
-
-        if (number1 > number2) {
-          if (!isFireFox) this.updateDisplay(number2, number1);
-        } else {
-          if (!isFireFox) this.updateDisplay(number1, number2);
-        }
+        rangeS[0].value = Math.min(number1, number2);
+        rangeS[1].value = Math.max(number1, number2);
+        if (!isFireFox) this.updateDisplay(Math.min(number1, number2), Math.max(number1, number2));
       }
     });
   }
@@ -613,8 +619,10 @@ class PriceRange extends HTMLElement {
     const max = this.querySelector('.filter__price_change').max;
     const width = priceRange.clientWidth;
 
-    priceRange.style.setProperty('--left-space', (parseInt(value1) / parseInt(max)) * width + 'px');
-    priceRange.style.setProperty('--right-space', (width - (parseInt(value2) / parseInt(max)) * width) + 'px');
+    const share = (value) => Math.min(Math.max(parseFloat(value) / parseFloat(max) || 0, 0), 1);
+
+    priceRange.style.setProperty('--left-space', share(value1) * width + 'px');
+    priceRange.style.setProperty('--right-space', (1 - share(value2)) * width + 'px');
   }
 }
 if (!customElements.get('price-range')) customElements.define('price-range', PriceRange);

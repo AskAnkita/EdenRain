@@ -462,3 +462,28 @@
     gap: 1.8rem 1.2rem;
   }
 }
+
+/* The drawer never scrolls sideways. On Android, focusing a price box with
+   the keyboard open nudged the whole panel left, so the inputs and Apply
+   looked narrower than the drawer and the slider ran off its right edge. */
+.collection-filter-toolbar .mobile-facets__inner,
+.collection-filter-toolbar .mobile-facets__main {
+  overflow-x: hidden;
+}
+
+.collection-filter-toolbar .facets__priceblock,
+.collection-filter-toolbar .facets-price__range,
+.collection-filter-toolbar .facets-price__input,
+.collection-filter-toolbar .facets-price__apply {
+  max-width: 100%;
+}
+
+.collection-filter-toolbar .facets-price__input .field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.collection-filter-toolbar .facets-price__input .field__input {
+  width: 100%;
+  min-width: 0;
+}

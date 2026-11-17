@@ -64,13 +64,13 @@
     below centre, where the collection pictures are framed on the piece and want none.
   endcomment
   assign promo_heading = 'Design Studio'
-  assign promo_url = '/pages/design-studio'
+  assign promo_url = '/pages/design-your-own'
   assign promo_image = 'about-craft-workshop.png'
   assign promo_width = 1086
   assign promo_height = 1448
   assign promo_style = 'studio'
   assign promo_text = 'Have a piece made to your own design, or ask us to remake something you love.'
-  assign promo_actions = 'Explore the studio|/pages/design-studio,Talk to a designer|/pages/book-a-consultation' | split: ','
+  assign promo_actions = 'Explore the studio|/pages/design-your-own,Talk to a designer|/pages/book-a-consultation' | split: ','
 
   comment
     An optional second picture, standing beside the promo in the same half as
@@ -166,6 +166,13 @@
       assign promo_style = ''
       assign promo_text = 'The pieces that leave the workshop most often, in earrings, necklaces and rings.'
       assign promo_actions = 'Shop best sellers|/collections/best-sellers,Shop new in|/collections/new-in' | split: ','
+      comment
+        A second picture beside Best Sellers, for the same reason Wedding has one: four short
+        category lists leave about a fifth of the panel as a hole between the last column and
+        the promo. Tennis bracelets, the range's deepest collection, from the same picture the
+        mobile menu's featured card uses. Theme settings > Mega menu panels > Jewellery changes it.
+      endcomment
+      assign promo_secondary = 'Tennis Bracelets|/collections/tennis-bracelets|featured-jewellery-bracelets.jpg|800|1020'
   endcase
 
   comment

@@ -38,10 +38,6 @@
       </div>
     {%- endif -%}
 
-    <div class="cart-page__message">
-      {%- content_for 'block', id: 'cart-page-countdown', type: '_cart-countdown' %}
-    </div>
-
     <div
       class="cart-page spacing-style{% if cart.empty? %} cart-page--empty{% endif %}"
       style="{% render 'spacing-style', settings: section.settings %}"

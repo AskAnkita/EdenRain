@@ -117,6 +117,12 @@
 
     const filtering = Boolean(group) && tagged.some((item) => itemGroup(item) === group);
 
+    /* A piece photographed in one metal only (the 12 CTW tennis bracelet has rose-gold renders
+       and nothing else) shows those photos whatever metal is chosen. Say so under the gallery,
+       rather than let the rose-gold pictures pass for the sterling silver one. */
+    const groupsShot = new Set(tagged.map(itemGroup));
+    showcaseNote(section, !filtering && groupsShot.size === 1 ? groupsShot.values().next().value : null);
+
     const shownPerGrid = new Map();
     for (const item of tagged) {
       const show = !filtering || itemGroup(item) === group;
@@ -139,6 +145,30 @@
     }
 
     syncSwipers(section, group, filtering);
+  }
+
+  /* "#jewelry material_rose gold" -> "rose gold"; the bare "gold" group is the yellow one. */
+  function metalName(group) {
+    const name = group.replace(/^#[^_]*_/, '').replace(/_/g, ' ').trim();
+    return name === 'gold' ? 'yellow gold' : name;
+  }
+
+  function showcaseNote(section, group) {
+    const gallery = section.querySelector('media-gallery');
+    let note = section.querySelector('.metal-media-note');
+    if (!group || !gallery) {
+      if (note) note.hidden = true;
+      return;
+    }
+    if (!note || note.previousElementSibling !== gallery) {
+      if (note) note.remove();
+      note = document.createElement('p');
+      note.className = 'metal-media-note';
+      note.style.cssText = 'margin:1.2rem 0 0;font-size:1.3rem;line-height:1.5;opacity:.75;';
+      gallery.insertAdjacentElement('afterend', note);
+    }
+    note.textContent = `Photographed in ${metalName(group)}. Your piece is made in the metal you choose.`;
+    note.hidden = false;
   }
 
   function applyForVariant(section, variantId) {

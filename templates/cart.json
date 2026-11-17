@@ -61,34 +61,6 @@
           },
           "blocks": {}
         },
-        "cart-page-countdown": {
-          "type": "_cart-countdown",
-          "static": true,
-          "settings": {
-            "alignment": "center",
-            "cart_countdown_text": "[icon] Please, hurry! Someone has placed an order on one of the items you have in the cart. We'll keep it for you for [time] minutes.",
-            "cart_countdown_text_empty": "[icon] Please, hurry! The [product] product is being sold at a shocking promotional price. We'll keep it for you for [time] minutes.",
-            "icon": "alert",
-            "cart_countdown_product": "game-cover-23",
-            "countdown_time": 60,
-            "inherit_color_scheme": false,
-            "scheme_background": "#fbf8e5",
-            "scheme_background_gradient": "",
-            "scheme_foreground_heading": "#000000",
-            "scheme_foreground": "#8b714a",
-            "scheme_primary": "#000f9f",
-            "scheme_primary_hover": "#000000",
-            "margin-block-start": 0,
-            "margin-block-end": 45,
-            "margin-inline-start": 0,
-            "margin-inline-end": 0,
-            "padding-block-start": 7,
-            "padding-block-end": 14,
-            "padding-inline-start": 10,
-            "padding-inline-end": 10
-          },
-          "blocks": {}
-        },
         "cart-page-items": {
           "type": "_cart-items",
           "static": true,

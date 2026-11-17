@@ -70,6 +70,43 @@
         </span>
       </div>
     {%- endif -%}
+    {%- comment -%}
+      Total carat weight, per VARIANT (custom.total_carat_weight, written by
+      scripts/shopify/sync-carat-weights.mjs): a merged shape product holds one style code per
+      centre-stone shape and they do not all weigh the same. Rendered whenever any variant has a
+      weight, hidden for one that has none, so switching shape on the page can bring it back -
+      product-info.js swaps the value on every variant change.
+    {%- endcomment -%}
+    {%- if bl_stts.show_carat -%}
+      {%- liquid
+        assign carat_any = false
+        for v in product_resource.variants
+          if v.metafields.custom.total_carat_weight.value != blank
+            assign carat_any = true
+            break
+          endif
+        endfor
+        assign carat_value = current_variant.metafields.custom.total_carat_weight.value
+        comment
+          A whole-carat stone reads "4 CTW", not the decimal's "4.0 CTW".
+        endcomment
+        if carat_value != blank
+          assign carat_text = carat_value | round: 2 | append: ''
+          assign carat_tail = carat_text | slice: -2, 2
+          if carat_tail == '.0'
+            assign carat_text = carat_text | remove_last: '.0'
+          endif
+        endif
+      -%}
+      {%- if carat_any -%}
+        <div class="product-info-item product-info-item--carat" data-carat {% if carat_value == blank %} style="display: none;"{% endif %}>
+          <span class="product-info-name">{{ bl_stts.carat_label | default: 'Total Carat Weight:' | escape }}</span>
+          <span class="product-info-value">
+            {%- if carat_value != blank -%}{{ carat_text }} CTW{%- endif -%}
+          </span>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
     {%- if show_product_type and product_resource.type != blank -%}
       <div class="product-info-item">
         <span class="product-info-name">
@@ -134,6 +171,20 @@
         "id": "show_product_type",
         "label": "t:settings.show_product_type",
         "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_carat",
+        "label": "Show total carat weight",
+        "info": "From the variant metafield custom.total_carat_weight. Follows the selected shape.",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "carat_label",
+        "label": "Carat weight label",
+        "default": "Total Carat Weight:",
+        "visible_if": "{{ block.settings.show_carat == true }}"
       },
       {
         "type": "range",
