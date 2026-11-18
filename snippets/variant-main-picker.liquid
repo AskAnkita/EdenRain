@@ -176,9 +176,9 @@
           <label class="form__label" for="Option-{{ block.id }}-{{ forloop.index0 }}">
             <span class="variant-option__label-title">
               {%- if is_size and option_name contains 'ring' -%}
-                U.S. Ring Size:
+                Ring Size:
               {%- elsif is_size and option_name == 'size' and product_family == 'ring' -%}
-                U.S. Ring Size:
+                Ring Size:
               {%- else -%}
                 {{ product_option.name | replace: 'Jewelry material', 'Jewellery material' | escape }}:
               {%- endif -%}
@@ -239,7 +239,7 @@
       {%- if product_family == 'ring' -%}
         <div class="product-form__input product-form__input--dropdown variant-option variant-option--dropdowns variant-option--size">
           <label class="form__label" for="Option-{{ block.id }}-ring-size">
-            <span class="variant-option__label-title">U.S. Ring Size:</span>
+            <span class="variant-option__label-title">Ring Size:</span>
             <a
               href="#size-chart"
               class="size-guide-link"
