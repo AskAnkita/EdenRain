@@ -411,7 +411,7 @@
               #      offset (its id modulo the pool), so neighbouring pages draw different pairs.
               assign targeted_queue = ''
               assign open_queue = ''
-              for n in (1..8)
+              for n in (1..16)
                 assign show_key = 'show_banner_' | append: n
                 assign category_key = 'banner_category_' | append: n
                 assign link_key = 'link_banner_' | append: n
@@ -609,6 +609,18 @@
               assign copy_total = copy_list.size
               assign copies_out = 0
               assign card_count = 0
+
+              # A sub-category's own promotion (a banner limited to this collection) must not
+              # vanish because the page is too short to reach slot 1: on a page with fewer
+              # cards than that, it moves up to sit before the last card.
+              if targeted_queue.size > 0 and banner_count > 0
+                assign page_cards = original_total | plus: copy_total
+                assign first_slot = slot_positions.first | plus: 0
+                if page_cards > 0 and page_cards < first_slot
+                  assign later_slots = slot_positions | slice: 1, 2 | join: ','
+                  assign slot_positions = page_cards | append: ',' | append: later_slots | split: ','
+                endif
+              endif
             -%}
             {% capture children %}
               {%- for original_html in original_list -%}
@@ -1646,6 +1658,711 @@
     {
       "type": "select",
       "id": "banner_text_color_8",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 9",
+      "info": "Banners 9-16 work like the ones above. Give each one a collection under 'Only on these collections' to make it that sub-category's own promotion: it opens the grid there, ahead of the shared banners, even when the page has only a few products."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_9",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_9",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner9",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_9",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_9",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_9",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_9",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_9",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_9",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 10"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_10",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_10",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner10",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_10",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_10",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_10",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_10",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_10",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_10",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 11"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_11",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_11",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner11",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_11",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_11",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_11",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_11",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_11",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_11",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 12"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_12",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_12",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner12",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_12",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_12",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_12",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_12",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_12",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_12",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 13"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_13",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_13",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner13",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_13",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_13",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_13",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_13",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_13",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_13",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 14"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_14",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_14",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner14",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_14",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_14",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_14",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_14",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_14",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_14",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 15"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_15",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_15",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner15",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_15",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_15",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_15",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_15",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_15",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_15",
+      "label": "Text color",
+      "options": [
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "dark",
+          "label": "Dark"
+        }
+      ],
+      "default": "light"
+    },
+    {
+      "type": "header",
+      "content": "Banner 16"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner_16",
+      "label": "Show",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "banner_category_16",
+      "label": "Promotes",
+      "info": "Hidden on pages of this category.",
+      "options": [
+        {
+          "value": "ring",
+          "label": "Rings"
+        },
+        {
+          "value": "earring",
+          "label": "Earrings"
+        },
+        {
+          "value": "bracelet",
+          "label": "Bracelets"
+        },
+        {
+          "value": "necklace",
+          "label": "Necklaces"
+        },
+        {
+          "value": "general",
+          "label": "Nothing (show on every page)"
+        }
+      ],
+      "default": "general"
+    },
+    {
+      "type": "image_picker",
+      "id": "img_banner16",
+      "label": "Image",
+      "info": "Without one, a lifestyle photo of the category is shown."
+    },
+    {
+      "type": "video",
+      "id": "video_banner_16",
+      "label": "Video",
+      "info": "Plays muted on a loop in place of the image."
+    },
+    {
+      "type": "url",
+      "id": "link_banner_16",
+      "label": "Link"
+    },
+    {
+      "type": "collection_list",
+      "id": "banner_collections_16",
+      "label": "Only on these collections",
+      "info": "Leave empty to show it anywhere. Picked collections show this banner first."
+    },
+    {
+      "type": "text",
+      "id": "banner_heading_16",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "banner_text_16",
+      "label": "Text"
+    },
+    {
+      "type": "select",
+      "id": "banner_text_color_16",
       "label": "Text color",
       "options": [
         {

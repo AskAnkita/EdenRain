@@ -778,7 +778,8 @@ body.apntly-modal-container .modal-container:has(> .error-message-container) .ap
   const appointmentType = () => {
     const service = window.appointlyClient?.service;
     if (!service) return '';
-    return APPOINTMENT_TYPES[service.shopifyProductId] || service.title || '';
+    // Apntly's service carries the Shopify product id as `productId`, a string.
+    return APPOINTMENT_TYPES[service.productId] || service.title || '';
   };
 
   const nameVariant = (doc) => {

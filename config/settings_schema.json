@@ -3595,7 +3595,7 @@
         "type": "textarea",
         "id": "home_meta_description",
         "label": "Homepage description",
-        "default": "Lab-grown diamond engagement rings, wedding bands and fine jewellery, handcrafted to order in 9k, 14k and 18k gold, platinum and sterling silver. Free UK and worldwide delivery, 30-day returns and a 5 year warranty."
+        "default": "Lab-grown diamond engagement rings, wedding bands and fine jewellery, handcrafted to order in 9k, 14k and 18k gold and sterling silver. Free UK and worldwide delivery, 30-day returns and a 5 year warranty."
       }
     ]
   },

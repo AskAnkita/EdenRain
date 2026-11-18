@@ -338,7 +338,7 @@
               "type": "text",
               "name": "t:names.heading",
               "settings": {
-                "text": "<h1>GET IN TOUCH</h1>",
+                "text": "<h2>GET IN TOUCH</h2>",
                 "collection_description_only": false,
                 "collapse_text": false,
                 "typing_text": false,

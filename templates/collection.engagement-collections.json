@@ -1272,7 +1272,87 @@
         "link_banner_8": "shopify://collections/engagement-rings",
         "banner_heading_8": "Every Shape, Every Style",
         "banner_text_8": "SHOP ALL ENGAGEMENT RINGS",
-        "banner_text_color_8": "light"
+        "banner_text_color_8": "light",
+        "show_banner_9": true,
+        "banner_category_9": "general",
+        "img_banner9": "shopify://shop_images/ChatGPT_Image_15_Oct_2026_10_46_08.png",
+        "link_banner_9": "shopify://collections/tennis-necklaces",
+        "banner_collections_9": [
+          "solitaire"
+        ],
+        "banner_heading_9": "A Line of Light",
+        "banner_text_9": "SHOP TENNIS NECKLACES",
+        "banner_text_color_9": "light",
+        "show_banner_10": true,
+        "banner_category_10": "general",
+        "img_banner10": "shopify://shop_images/lifestyle-radiant-bracelet.jpg",
+        "link_banner_10": "shopify://collections/tennis-bracelets",
+        "banner_collections_10": [
+          "side-stone"
+        ],
+        "banner_heading_10": "Sparkle on Every Wrist",
+        "banner_text_10": "SHOP TENNIS BRACELETS",
+        "banner_text_color_10": "light",
+        "show_banner_11": true,
+        "banner_category_11": "general",
+        "img_banner11": "shopify://shop_images/ChatGPT_Image_5_Oct_2026_12_28_01.png",
+        "link_banner_11": "shopify://collections/studs",
+        "banner_collections_11": [
+          "halo"
+        ],
+        "banner_heading_11": "A Halo for Every Day",
+        "banner_text_11": "SHOP STUD EARRINGS",
+        "banner_text_color_11": "light",
+        "show_banner_12": true,
+        "banner_category_12": "general",
+        "img_banner12": "shopify://shop_images/lifestyle-round-necklace.jpg",
+        "link_banner_12": "shopify://collections/pendants",
+        "banner_collections_12": [
+          "hidden-halo"
+        ],
+        "banner_heading_12": "Close to the Heart",
+        "banner_text_12": "SHOP PENDANTS",
+        "banner_text_color_12": "light",
+        "show_banner_13": true,
+        "banner_category_13": "general",
+        "img_banner13": "shopify://shop_images/ChatGPT_Image_15_Oct_2026_10_39_25.png",
+        "link_banner_13": "shopify://collections/eternity-rings",
+        "banner_collections_13": [
+          "three-stone"
+        ],
+        "banner_heading_13": "Stack the Story",
+        "banner_text_13": "SHOP ETERNITY RINGS",
+        "banner_text_color_13": "light",
+        "show_banner_14": true,
+        "banner_category_14": "general",
+        "img_banner14": "shopify://shop_images/lifestyle-pear-necklace.jpg",
+        "link_banner_14": "shopify://collections/toi-et-moi-necklaces",
+        "banner_collections_14": [
+          "toi-et-moi"
+        ],
+        "banner_heading_14": "You and Me, Again",
+        "banner_text_14": "SHOP TOI ET MOI NECKLACES",
+        "banner_text_color_14": "light",
+        "show_banner_15": true,
+        "banner_category_15": "general",
+        "img_banner15": "shopify://shop_images/lifestyle-heart-necklace.jpg",
+        "link_banner_15": "shopify://collections/charms",
+        "banner_collections_15": [
+          "vintage"
+        ],
+        "banner_heading_15": "Keepsakes with Character",
+        "banner_text_15": "SHOP CHARMS",
+        "banner_text_color_15": "light",
+        "show_banner_16": true,
+        "banner_category_16": "general",
+        "img_banner16": "shopify://shop_images/lifestyle-emerald-earring.jpg",
+        "link_banner_16": "shopify://collections/hoops-huggies",
+        "banner_collections_16": [
+          "nature-inspired"
+        ],
+        "banner_heading_16": "Softly Framed",
+        "banner_text_16": "SHOP HOOPS & HUGGIES",
+        "banner_text_color_16": "light"
       }
     },
     "recently_viewed_products_PjBQye": {
