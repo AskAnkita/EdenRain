@@ -185,8 +185,11 @@
   endcomment
 
   case key
+    # Vintage, Nature Inspired and Toi et Moi are held back until their renders exist (client,
+    # 2026-11-18): their collections are empty. Add them back to the end of this list then -
+    # ~Vintage|vintage~Nature Inspired|nature-inspired~Toi et Moi|toi-et-moi
     when 'engagement/by-style' or 'engagement/shop-by-style'
-      echo '::Solitaire|solitaire~Side Stone|side-stone~Halo|halo~Hidden Halo|hidden-halo~Three Stone|three-stone~Bridal Sets|bridal-sets~Vintage|vintage~Nature Inspired|nature-inspired~Toi et Moi|toi-et-moi'
+      echo '::Solitaire|solitaire~Side Stone|side-stone~Halo|halo~Hidden Halo|hidden-halo~Three Stone|three-stone~Bridal Sets|bridal-sets'
     when 'engagement/by-shape' or 'engagement/shop-by-shape'
       # Heart last. It was the one of the ten that was not a collection, and it opened the
       # engagement rings with a `shape:heart` tag filter instead - which quietly showed every
