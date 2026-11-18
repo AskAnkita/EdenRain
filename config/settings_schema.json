@@ -1669,7 +1669,7 @@
         "type": "checkbox",
         "id": "show_dynamic_browser_title",
         "label": "Show dynamic browser tab title",
-        "default": true
+        "default": false
       },
       {
         "type": "text",

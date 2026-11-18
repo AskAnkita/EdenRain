@@ -9,6 +9,7 @@
  */
 {
   "current": {
+    "show_dynamic_browser_title": false,
     "logo": "",
     "logo_inverse": "",
     "sale_badge_color": "#000000",
