@@ -320,6 +320,11 @@
     assign promo_srcset = promo_srcset | append: promo_src | append: ' 900w'
     assign promo_width = promo_picked.width
     assign promo_height = promo_picked.height
+    # The 'bands' pull-back is for a portrait picture in the wide frame; a landscape one
+    # already fits it, so it fills the frame like every other promo.
+    if promo_style == 'bands' and promo_width > promo_height
+      assign promo_style = ''
+    endif
   else
     capture promo_src_900
       render 'image-source', file: promo_image, width: 900
