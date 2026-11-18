@@ -298,7 +298,7 @@
               "name": "Button",
               "settings": {
                 "label": "Return to Store",
-                "link": "",
+                "link": "/",
                 "open_in_new_tab": false,
                 "style_class": "link",
                 "button_style": "default",

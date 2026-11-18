@@ -164,8 +164,12 @@
       if (note) note.remove();
       note = document.createElement('p');
       note.className = 'metal-media-note';
-      note.style.cssText = 'margin:1.2rem 0 0;font-size:1.3rem;line-height:1.5;opacity:.75;';
+      /* The gallery's parent (.product-information__media) is a nowrap flex row, so a plain
+         sibling lands BESIDE the gallery, floating in the gap by the product details. Let the
+         row wrap and give the note a full line of its own so it sits under the photos. */
+      note.style.cssText = 'flex:0 0 100%;margin:1.2rem 0 0;font-size:1.3rem;line-height:1.5;opacity:.75;';
       gallery.insertAdjacentElement('afterend', note);
+      if (note.parentElement) note.parentElement.style.flexWrap = 'wrap';
     }
     note.textContent = `Photographed in ${metalName(group)}. Your piece is made in the metal you choose.`;
     note.hidden = false;

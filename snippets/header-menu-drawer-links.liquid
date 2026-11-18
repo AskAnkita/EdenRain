@@ -124,7 +124,7 @@
       assign promo_heading = 'Signature Wedding Bands'
       assign promo_url = '/collections/wedding-bands'
       assign promo_image = 'category-wedding-bands.png'
-      assign promo_style = ''
+      assign promo_style = 'bands'
       assign promo_text = 'Plain metal, pavé and eternity bands, made to sit with the ring they are worn beside.'
       assign promo_actions = 'Shop wedding bands|/collections/wedding-bands,Shop eternity rings|/collections/eternity-rings' | split: ','
       assign promo_secondary = 'Eternity Rings|/collections/eternity-rings|featured-wedding-eternity.jpg|800|1020'
@@ -507,7 +507,11 @@
           {%- if promo_style != '' %} menu-drawer-desktop__promo--{{ promo_style }}{% endif -%}
         "
       >
-        <span class="menu-drawer-desktop__promo-media" aria-hidden="true">
+        <span
+          class="menu-drawer-desktop__promo-media"
+          style="--promo-backdrop: url('{{ promo_src }}');"
+          aria-hidden="true"
+        >
           <img
             src="{{ promo_src }}"
             srcset="{{ promo_srcset }}"

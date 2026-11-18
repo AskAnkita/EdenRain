@@ -1363,6 +1363,33 @@ a.menu-drawer-desktop__group-heading:hover {
   object-position: center 40%;
 }
 
+/* Wedding's bands picture is a portrait close-up, and cropped to cover the wide frame it showed
+   only a strip across the knuckles. Pulled back instead: the picture sits in the right of the
+   frame at a size that shows the whole stack of bands, feathered into a blurred, darkened copy of
+   itself that fills the rest - and that dark field is where the words and buttons sit. */
+.menu-drawer-desktop__promo--bands .menu-drawer-desktop__promo-media::before {
+  content: "";
+  position: absolute;
+  inset: -4rem;
+  background: var(--promo-backdrop) center / cover no-repeat;
+  filter: blur(2.4rem) brightness(0.6);
+}
+
+.menu-drawer-desktop__promo--bands .menu-drawer-desktop__promo-media img {
+  position: relative;
+  width: 64%;
+  margin-left: auto;
+  object-position: center 40%;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 22%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 22%);
+}
+
+/* The second picture's ring sits low in the frame, under the label over its foot: hold the
+   picture on its bottom edge so the ring rides as high up the frame as it can go. */
+.menu-drawer-desktop__promo--secondary .menu-drawer-desktop__promo-media img {
+  object-position: center 100%;
+}
+
 .menu-drawer-desktop__promo:hover .menu-drawer-desktop__promo-media img {
   transform: scale(1.03);
 }

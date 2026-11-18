@@ -431,7 +431,7 @@
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
             "title": "",
-            "price": "Price on request",
+            "price": "",
             "caption": "",
             "caption_color": "rgba(0,0,0,0)",
             "link": ""

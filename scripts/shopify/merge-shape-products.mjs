@@ -100,6 +100,42 @@ const MERGES = [
     ].join(''),
   },
   {
+    // The pear-sided three stone from Render/Ring/4.Trilogy (2026-11-18): AJLR290-296, every
+    // shape 2.20 CTW. AJLR299 is the heart of the same design but stays its own product - it was
+    // already live with ring sizes (90 variants), and folding it in would cost it the Size option.
+    // 7 shapes x 10 metals = 70 variants, no ring sizes (see shape-merges-use-up-the-variant-cap).
+    id: 'pear-three-stone-engagement-ring',
+    option: 'Shape',
+    keep: { sku: 'AJLR290', shape: 'Round' },
+    donors: [
+      { sku: 'AJLR293', shape: 'Oval' },
+      { sku: 'AJLR291', shape: 'Emerald' },
+      { sku: 'AJLR292', shape: 'Radiant' },
+      { sku: 'AJLR294', shape: 'Cushion' },
+      { sku: 'AJLR296', shape: 'Princess' },
+      { sku: 'AJLR295', shape: 'Asscher' },
+    ],
+    title: '2.2 CTW Lab-Grown Diamond Three Stone Engagement Ring',
+    handle: '2-2-ctw-lab-grown-diamond-three-stone-engagement-ring',
+    descriptionHtml: [
+      '<p><strong>Description</strong></p>',
+      '<p>A lab-grown diamond with a pear-cut diamond to either side, claw-set above an open scrolled',
+      ' gallery on a slim tapering band. Choose the centre stone below — the pears and the band are the',
+      ' same on every one.</p>',
+      '<p>The pears turn outward from the centre so the three stones read as one shape, and the open',
+      ' gallery lets light in beneath the centre stone.</p>',
+      '<p><strong>Every shape</strong></p>',
+      '<ul>',
+      '<li>Carat: 2.20 CTW</li>',
+      '<li>Side stones: Pear cut</li>',
+      '<li>Color: E-F</li>',
+      '<li>Clarity: VVS-VS</li>',
+      '<li>Metal: 925 Sterling Silver, 10K, 14K &amp; 18K Gold</li>',
+      '<li>Style: Three Stone Engagement Ring</li>',
+      '</ul>',
+    ].join(''),
+  },
+  {
     // The classic halo, 3 CTW, from Render/Ring/3.Halo (2026-11-03). The marquise (AJLR188) is
     // the client's 1 CTW version of the same setting, so the title carries no carat figure.
     // 7 shapes x 10 metals = 70 variants, no ring sizes (see shape-merges-use-up-the-variant-cap).
