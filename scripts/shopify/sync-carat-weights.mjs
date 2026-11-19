@@ -35,9 +35,9 @@ const ONLY = onlyArg ? onlyArg.slice(7).split(',').map((s) => s.trim().toUpperCa
 const NAMESPACE = 'custom';
 const KEY = 'total_carat_weight';
 
-// AJLR302 reads 0.09 in the client sheet where every other crossover shape is 2.09 - a typo in
-// a row that is still #N/A on price. Left blank until the client confirms it.
-const SUSPECT = new Set(['AJLR302']);
+// Codes whose sheet weight is known to be wrong are listed here and never written. AJLR302 sat
+// here while the client sheet read 0.09 for it; the 2026-11-18 sheet corrected it to 2.09.
+const SUSPECT = new Set([]);
 
 const codeOf = (s) => (String(s || '').toUpperCase().replace(/\s+/g, '').match(/^[A-Z]+\d+/) || [''])[0];
 
