@@ -1,0 +1,94 @@
+{%- doc -%}
+  The "3.21 CTW " that leads a product card's title when the product's own title carries no
+  carat. A merged shape product (halo, solitaire, side stone...) is titled without one because
+  each centre-stone shape weighs differently, so the figure comes from the variant metafield
+  custom.total_carat_weight (scripts/shopify/sync-carat-weights.mjs) for the shape the card
+  shows. Outputs nothing for a product whose title already says CTW, or that has no weight.
+
+  The span carries every shape's weight, so card-option-swatches.js can swap the figure when
+  a shopper presses another shape, and when a per-shape copy of the card moves onto its cut.
+
+  @param {object} card_product - the product
+{%- enddoc -%}
+{%- liquid
+  assign title_compare = card_product.title | downcase
+  assign carat_map = ''
+  assign shown_text = ''
+  assign shape_index = -1
+
+  unless title_compare contains 'ctw'
+    for option in card_product.options_with_values
+      assign option_name = option.name | downcase
+      if option_name contains 'shape'
+        assign shape_index = forloop.index0
+        break
+      endif
+    endfor
+
+    # One lookup per shape value (at most ten), never a walk over every variant - a merged
+    # ring has 100 of them, and the grid renders each card once per shape.
+    if shape_index >= 0
+      assign option_key = shape_index | plus: 1 | prepend: 'option'
+      for value in card_product.options_with_values[shape_index].values
+        assign value_text = value | append: ''
+        assign shape_variant = card_product.variants | where: option_key, value_text | first
+        assign value_carat = shape_variant.metafields.custom.total_carat_weight.value
+        if value_carat != blank
+          assign carat_text = value_carat | round: 2 | append: ''
+          assign carat_tail = carat_text | slice: -2, 2
+          if carat_tail == '.0'
+            assign carat_text = carat_text | remove_last: '.0'
+          endif
+          assign carat_map = carat_map | append: ',' | append: value_text | json | append: ':' | append: carat_text
+        endif
+      endfor
+    endif
+
+    # The card opens on the variant behind the product's featured photo, the same one
+    # 'card-shape-list' treats as the product's own cut.
+    assign shown_variant = card_product.selected_or_first_available_variant
+    for variant in card_product.variants
+      if variant.featured_media != blank and variant.featured_media.id == card_product.featured_media.id
+        assign shown_variant = variant
+        break
+      endif
+    endfor
+
+    assign shown_carat = shown_variant.metafields.custom.total_carat_weight.value
+    if shown_carat == blank and shape_index < 0
+      for variant in card_product.variants limit: 20
+        if variant.metafields.custom.total_carat_weight.value != blank
+          assign shown_carat = variant.metafields.custom.total_carat_weight.value
+          break
+        endif
+      endfor
+    endif
+    if shown_carat != blank
+      assign shown_text = shown_carat | round: 2 | append: ''
+      assign shown_tail = shown_text | slice: -2, 2
+      if shown_tail == '.0'
+        assign shown_text = shown_text | remove_last: '.0'
+      endif
+      assign shown_text = shown_text | append: ' CTW '
+    endif
+  endunless
+
+  if carat_map != blank
+    assign brace_open = '{'
+    assign brace_close = '}'
+    assign carat_json = carat_map | remove_first: ',' | prepend: brace_open | append: brace_close
+  endif
+-%}
+{%- if shown_text != blank or carat_map != blank -%}
+  <span
+    class="card-carat"
+    data-card-carat
+    {% if carat_map != blank %}
+      data-carat-index="{{ shape_index }}"
+      data-carats="{{ carat_json | escape }}"
+    {% endif %}
+    {% if shown_text == blank %}
+      hidden
+    {% endif %}
+  >{{ shown_text }}</span>
+{%- endif -%}

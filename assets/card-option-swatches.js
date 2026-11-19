@@ -264,6 +264,30 @@
     });
   }
 
+  /*
+   * The "3.21 CTW " leading the card title (snippets/card-carat-prefix.liquid) follows the
+   * shape on screen: a merged shape product weighs differently per cut. The span holds every
+   * shape's weight, keyed by the shape option's value; a cut with none hides the figure.
+   */
+  function updateCarat(card, variant) {
+    const span = card.querySelector('[data-card-carat][data-carats]');
+    if (!span) return;
+    let carats;
+    try {
+      carats = JSON.parse(span.dataset.carats);
+    } catch (error) {
+      return;
+    }
+    const value = (variant.options || [])[Number(span.dataset.caratIndex)];
+    const carat = carats[value];
+    if (carat === undefined) {
+      span.hidden = true;
+      return;
+    }
+    span.textContent = carat + ' CTW ';
+    span.hidden = false;
+  }
+
   function markActive(list, active) {
     list.querySelectorAll('.is-active').forEach((item) => item.classList.remove('is-active'));
     list.querySelectorAll('[data-card-swatch]').forEach((button) => {
@@ -313,6 +337,7 @@
       showVariantImage(card, variant);
       updateLinks(card, variant.id);
       syncRows(card, variant);
+      updateCarat(card, variant);
       return;
     }
 

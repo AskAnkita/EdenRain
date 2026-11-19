@@ -5075,16 +5075,33 @@ function animateValue({
 }
 
 if (window.dynamicBrowserTitle && window.dynamicBrowserTitle.show && typeof window.dynamicBrowserTitle.text === "string" && window.dynamicBrowserTitle.text.trim() !== "") {
-  const originalTitle = document.title;
+  // Swap only when the tab is really hidden. window blur/focus misfires in
+  // Safari: clicking the address bar, a menu or another app blurs the window
+  // while the page is still on screen, and focus often never comes back, so
+  // the tab stayed stuck on the reminder text.
   const customTitle = window.dynamicBrowserTitle.text;
+  let savedTitle = null;
 
-  window.addEventListener("blur", function () {
+  const showReminder = function () {
+    if (savedTitle !== null) return;
+    savedTitle = document.title;
     document.title = customTitle;
+  };
+
+  const restoreTitle = function () {
+    if (savedTitle === null) return;
+    document.title = savedTitle;
+    savedTitle = null;
+  };
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") showReminder();
+    else restoreTitle();
   });
 
-  window.addEventListener("focus", function () {
-    document.title = originalTitle;
-  });
+  // Safari restores pages from the back/forward cache with the reminder still set.
+  window.addEventListener("pageshow", restoreTitle);
+  window.addEventListener("focus", restoreTitle);
 }
 
 class AccordionCustom extends HTMLElement {
