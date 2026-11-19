@@ -39,7 +39,8 @@
           if carat_tail == '.0'
             assign carat_text = carat_text | remove_last: '.0'
           endif
-          assign carat_map = carat_map | append: ',' | append: value_text | json | append: ':' | append: carat_text
+          assign value_json = value_text | json
+          assign carat_map = carat_map | append: ',' | append: value_json | append: ':' | append: carat_text
         endif
       endfor
     endif
