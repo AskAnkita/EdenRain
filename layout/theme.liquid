@@ -96,6 +96,12 @@
     {{ 'page-progress.css' | asset_url | stylesheet_tag }}
     <script src="{{ 'page-progress.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'ring-size-required.js' | asset_url }}" defer="defer"></script>
+    {%- comment -%}
+      The Hextom Ultimate Sales Boost app injects a "Don't Miss Out! mm:ss" countdown on cart
+      lines that is tied to no real deadline - fake urgency under the DMCC Act 2024. The app
+      loads as a ScriptTag we cannot remove, so everything it draws (htusb-* classes) is hidden.
+    {%- endcomment -%}
+    <style>[class^="htusb"],[class*=" htusb"],[id^="htusb"]{display:none!important}</style>
 
     {%- render 'global-script' -%}
 
