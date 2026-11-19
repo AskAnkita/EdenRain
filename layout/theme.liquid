@@ -56,14 +56,20 @@
       {%- endunless -%}
     </title>
 
+    {%- capture meta_description -%}
+      {%- if request.page_type == 'product' -%}
+        {%- render 'clean-description', text: page_description, product: product -%}
+      {%- else -%}
+        {%- render 'clean-description', text: page_description -%}
+      {%- endif -%}
+    {%- endcapture -%}
     {%- liquid
-      assign meta_description = page_description
       if meta_description == blank and request.page_type == 'index'
         assign meta_description = settings.home_meta_description
       endif
     -%}
     {% if meta_description != blank %}
-      <meta name="description" content="{{ meta_description | escape }}">
+      <meta name="description" content="{{ meta_description | escape_once }}">
     {% endif %}
 
     {% render 'meta-tags' %}
@@ -89,6 +95,7 @@
     {%- endcomment -%}
     {{ 'page-progress.css' | asset_url | stylesheet_tag }}
     <script src="{{ 'page-progress.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'ring-size-required.js' | asset_url }}" defer="defer"></script>
 
     {%- render 'global-script' -%}
 

@@ -277,21 +277,41 @@ svg.style-strip__icon {
 }
 
 /*
-  Phones: a fixed share of the row left a long name like ANNIVERSARY about 40px wider than the
-  space beside the picture, so it ran out over the border. On mobile the per-row width is now
-  a floor, not a size - a card grows to fit its name on one line - and the card is shorter,
-  since one line of label does not need the desktop height.
+  A fixed share of the row left a long name like ANNIVERSARY wider than the space beside the
+  picture, so it ran out over the border. The per-row width is a floor, not a size, at EVERY
+  width - a card grows to fit its name on one line. This was first fixed for phones only, and
+  the same overflow came straight back on laptops (2026-11-19), so the rule is not in a media
+  query any more.
 */
-@media screen and (max-width: 749px) {
+.style-strip__item {
+  width: auto;
+  min-width: calc(
+    (100% - (var(--strip-per-row-mobile) - 1) * var(--strip-gap)) / var(--strip-per-row-mobile)
+  );
+}
+
+.style-strip__card {
+  grid-template-columns: var(--strip-media-width-mobile) auto;
+}
+
+.style-strip__label {
+  white-space: nowrap;
+}
+
+@media screen and (min-width: 750px) {
   .style-strip__item {
     width: auto;
-    min-width: calc(
-      (100% - (var(--strip-per-row-mobile) - 1) * var(--strip-gap)) / var(--strip-per-row-mobile)
-    );
+    min-width: calc((100% - (var(--strip-per-row) - 1) * var(--strip-gap)) / var(--strip-per-row));
   }
 
   .style-strip__card {
-    grid-template-columns: var(--strip-media-width-mobile) auto;
+    grid-template-columns: var(--strip-media-width) auto;
+  }
+}
+
+/* Phones: the card is shorter, since one line of label does not need the desktop height. */
+@media screen and (max-width: 749px) {
+  .style-strip__card {
     min-height: var(--strip-card-height-mobile);
     height: var(--strip-card-height-mobile);
   }

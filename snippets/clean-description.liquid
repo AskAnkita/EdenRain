@@ -1,0 +1,29 @@
+{%- doc -%}
+  Prints a page's meta / og description as clean plain text, at most 160 characters.
+
+  A product with no SEO description falls back to its body, and Shopify's own page_description
+  for that body has three faults: it opens on the body's "Description" heading
+  ("DescriptionA 2.00 carat..."), it runs paragraphs together ("the stone.The oval"), and it is
+  already HTML-escaped, so escaping it again prints &amp;#39; for an apostrophe. This rebuilds
+  the text from the body instead. Print it with escape_once, never escape.
+
+  @param {string} text - page_description
+  @param {object} [product] - the product, on product pages only
+{%- enddoc -%}
+{%- liquid
+  assign d = text
+  if product != blank and product.metafields.global.description_tag == blank and product.description != blank
+    assign d = product.description
+  endif
+  assign d = d | replace: '<', ' <' | strip_html | strip_newlines | split: ' ' | join: ' '
+  assign head = d | slice: 0, 11
+  if head == 'Description'
+    assign d = d | remove_first: 'Description' | strip
+  endif
+  if d.size > 160
+    assign d = d | slice: 0, 158
+    assign last_word = d | split: ' ' | last
+    assign d = d | remove_last: last_word | strip | append: '…'
+  endif
+  echo d
+-%}

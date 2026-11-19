@@ -189,3 +189,15 @@ variant-selects[data-context="main"] .variant-option--buttons input[type='radio'
     --swatch-input--size: 2.8rem;
   }
 }
+
+/* Ring size not picked yet: assets/ring-size-required.js adds these. */
+.ring-size--missing .variant-option__select {
+  outline: 1px solid var(--color-error-text, #b3261e);
+  outline-offset: -1px;
+}
+
+.ring-size__error {
+  margin: 0.6rem 0 0;
+  font-size: 1.3rem;
+  color: var(--color-error-text, #b3261e);
+}

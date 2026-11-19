@@ -451,7 +451,7 @@
               category itself takes the "View all" under the names, which is the one place a
               column's own destination is offered.
             {%- endcomment -%}
-            <h2 class="menu-drawer-desktop__column-heading">{{ column_heading | escape }}</h2>
+            <p class="menu-drawer-desktop__column-heading">{{ column_heading | escape }}</p>
             <ul class="menu-drawer-desktop__link-list" role="list">
               {%- for item in column_items -%}
                 {%- liquid
@@ -495,11 +495,11 @@
   </section>
 
   <section class="menu-drawer-desktop__half menu-drawer-desktop__half--promo">
-    <h2 class="menu-drawer-desktop__column-heading">
+    <p class="menu-drawer-desktop__column-heading">
       <a class="menu-drawer-desktop__promo-heading-link" href="{{ promo_url }}">
         {{- promo_heading | escape -}}
       </a>
-    </h2>
+    </p>
 
     {%- comment -%}
       A row, so that a menu carrying a second picture sets it beside the first under the one

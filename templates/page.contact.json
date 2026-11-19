@@ -338,7 +338,7 @@
               "type": "text",
               "name": "t:names.heading",
               "settings": {
-                "text": "<h2>GET IN TOUCH</h2>",
+                "text": "<h1>GET IN TOUCH</h1>",
                 "collection_description_only": false,
                 "collapse_text": false,
                 "typing_text": false,
@@ -670,7 +670,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Have a question or need assistance? We’re here to help. Get in touch with the Eden Raine team for jewellery enquiries, bespoke requests, order updates or any support you may need.</p>",
+                    "text": "<p>Have a question or need assistance? We’re here to help. Get in touch with the Eden Raine team for jewellery enquiries, bespoke requests, order updates or any support you may need.</p><p>Prefer email? Write to us at <a href=\"mailto:sales@edenraine.co.uk\" title=\"Email Eden Raine\">sales@edenraine.co.uk</a>.</p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,

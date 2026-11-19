@@ -586,6 +586,9 @@
     }
 
     .ai-luxury-video-hero-mobile-heading-{{ ai_gen_id }} {
+      font-family: var(--font-h1--family);
+      font-style: var(--font-h1--style);
+      text-transform: var(--font-h1--case);
       color: {{ block.settings.mobile_heading_color }};
       font-size: {{ block.settings.mobile_heading_font_size }}px;
       font-weight: {{ block.settings.mobile_heading_font_weight }};
@@ -818,7 +821,8 @@
 
   <div class="ai-luxury-video-hero-mobile-content-{{ ai_gen_id }}">
     {% if block.settings.heading != blank %}
-      <h1 class="ai-luxury-video-hero-mobile-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h1>
+      {%- comment -%} The desktop copy above is the page's one H1; this is the same words for phones, so it is not a second H1 tag. {%- endcomment -%}
+      <p class="ai-luxury-video-hero-mobile-heading-{{ ai_gen_id }}" role="heading" aria-level="1">{{ block.settings.heading }}</p>
     {% endif %}
 
     {% if block.settings.description != blank and block.settings.mobile_show_description %}

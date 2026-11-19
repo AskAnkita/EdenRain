@@ -654,7 +654,7 @@
     { "type": "header", "content": "Hero" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Private appointments" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Book an appointment" },
-    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Meet one to one with an Eden Raine jewellery specialist by video call. Pick a time that suits you and your confirmation arrives by email.<\/p>" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Meet one to one with an Eden Raine jewellery specialist by video or audio call. Pick a time that suits you and your confirmation arrives by email.<\/p>" },
     { "type": "text", "id": "button_label", "label": "Button label", "default": "Book an appointment" },
     { "type": "text", "id": "smallprint", "label": "Line under the button", "default": "Free, and never any obligation to buy." },
     { "type": "text", "id": "link_label", "label": "Link beside the button", "default": "Prefer to write to us?" },
@@ -664,7 +664,7 @@
     { "type": "paragraph", "content": "The cards come from the \"Way to meet\" blocks at the bottom of this panel. Each one opens the booking dialog on its own calendar." },
     { "type": "text", "id": "ways_heading", "label": "Heading above the cards", "default": "Ways to meet" },
     { "type": "text", "id": "card_cue", "label": "Line at the foot of each card", "default": "Choose a time" },
-    { "type": "richtext", "id": "notes_text", "label": "What happens next", "default": "<ul><li>A confirmation email with a calendar invitation arrives within a minute.<\/li><li>For a video call we send the link; there is nothing to install.<\/li><li>Every confirmation carries a link to move or cancel the time.<\/li><\/ul>" },
+    { "type": "richtext", "id": "notes_text", "label": "What happens next", "default": "<ul><li>A confirmation email with a calendar invitation arrives within a minute.<\/li><li>For a video call we send the link; there is nothing to install. For an audio call we ring the number you give us.<\/li><li>Every confirmation carries a link to move or cancel the time.<\/li><\/ul>" },
 
     { "type": "header", "content": "Other ways to reach us" },
     { "type": "paragraph", "content": "The row of telephone, WhatsApp, email and Instagram comes from the \"Contact\" blocks at the bottom of this panel." },
@@ -849,8 +849,8 @@
       "type": "meeting",
       "name": "Way to meet",
       "settings": [
-        { "type": "text", "id": "label", "label": "Name", "default": "Virtual consultation" },
-        { "type": "text", "id": "meta", "label": "Duration or place", "default": "30 minutes, by video" },
+        { "type": "text", "id": "label", "label": "Name", "default": "Video consultation" },
+        { "type": "text", "id": "meta", "label": "Duration or place", "default": "30 minutes, video call" },
         { "type": "text", "id": "text", "label": "Description", "default": "A one to one call with a specialist, wherever you are." },
         { "type": "text", "id": "badge", "label": "Badge", "info": "A small label on the card, e.g. \"Most booked\". Leave empty for none." },
         { "type": "text", "id": "apntly_product_id", "label": "Apntly service product ID", "info": "The numeric product id of this appointment's service product, from the end of its URL in Products. With one, the card opens Apntly's own calendar and the booking lands in the app - the booking link and the request calendar are then ignored." },
@@ -903,8 +903,8 @@
     {
       "name": "Consultation booking",
       "blocks": [
-        { "type": "meeting", "settings": { "icon": "virtual", "label": "Virtual consultation", "meta": "30 minutes, by video", "text": "A one to one call with a specialist, wherever you are." } },
-        { "type": "meeting", "settings": { "icon": "in-person", "label": "Speak with a designer", "meta": "45 minutes, by video", "text": "For a bespoke piece or a reset: bring the idea and we will draw it with you." } },
+        { "type": "meeting", "settings": { "icon": "virtual", "label": "Video consultation", "meta": "30 minutes, video call", "text": "A one to one video call with a specialist, wherever you are." } },
+        { "type": "meeting", "settings": { "icon": "phone", "label": "Speak with a designer", "meta": "45 minutes, audio call", "text": "For a bespoke piece or a reset: we ring you and shape the idea with you." } },
         { "type": "contact", "settings": { "icon": "phone", "label": "Call us", "value": "+44 7879 914339" } },
         { "type": "contact", "settings": { "icon": "whatsapp", "label": "WhatsApp", "value": "+44 7879 914339" } },
         { "type": "contact", "settings": { "icon": "instagram", "label": "Instagram", "value": "@edenraine" } }

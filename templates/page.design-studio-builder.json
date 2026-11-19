@@ -107,7 +107,7 @@
         "price_feather_mobile": 0,
         "eyebrow": "",
         "heading": "",
-        "heading_is_h1": false,
+        "heading_is_h1": true,
         "intro": "",
         "alignment": "center",
         "poster_image_asset": "",

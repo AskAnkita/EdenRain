@@ -31,6 +31,9 @@
             "overlay_opacity": 30,
             "heading": "Diamonds, made for your moment",
             "description": "Elegantly Crafted. Timelessly Beautiful.",
+            "mobile_show_description": false,
+            "mobile_fill_screen": false,
+            "mobile_panel_padding": 28,
             "desktop_vertical_position": "bottom",
             "desktop_horizontal_alignment": "center",
             "desktop_content_bottom_padding": 88,
@@ -269,6 +272,7 @@
         "label_scrim": 45,
         "label_scrim_height": 55,
         "color_scheme": "scheme-1",
+        "mobile_gap": 8,
         "padding_top": 24,
         "padding_bottom": 24
       }
@@ -311,6 +315,7 @@
         "media_video_asset": "3d-render-ring.mp4",
         "media_video_poster_asset": "",
         "media_zoom": 100,
+        "media_height": 0,
         "footnote": "",
         "section_background": "rgba(0,0,0,0)",
         "heading_color": "rgba(0,0,0,0)",
@@ -339,7 +344,7 @@
         "tennis_33": {
           "type": "slide",
           "settings": {
-            "product": "33-ctw-round-brilliant-lab-grown-diamond-tennis-necklace",
+            "product": "2-ctw-round-brilliant-lab-grown-diamond-tennis-bracelet",
             "image_asset": "",
             "image_url": "",
             "image_alt": "",
@@ -360,7 +365,7 @@
         "bracelet_bezel": {
           "type": "slide",
           "settings": {
-            "product": "3-33-ctw-round-brilliant-lab-grown-diamond-bezel-set-tennis-bracelet",
+            "product": "33-ctw-round-brilliant-lab-grown-diamond-tennis-necklace",
             "image_asset": "",
             "image_url": "",
             "image_alt": "",
@@ -368,6 +373,7 @@
             "object_position": "center",
             "card_background": "rgba(0,0,0,0)",
             "badge": "",
+            "badge_mobile": "",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
             "title": "",
@@ -380,7 +386,7 @@
         "tennis_354": {
           "type": "slide",
           "settings": {
-            "product": "35-4-ctw-marquise-cut-lab-grown-diamond-statement-necklace",
+            "product": "6-ctw-oval-cut-lab-grown-diamond-tennis-bracelet",
             "image_asset": "",
             "image_url": "",
             "image_alt": "",
@@ -388,6 +394,7 @@
             "object_position": "center",
             "card_background": "rgba(0,0,0,0)",
             "badge": "",
+            "badge_mobile": "",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
             "title": "",
@@ -400,7 +407,7 @@
         "tennis_14": {
           "type": "slide",
           "settings": {
-            "product": "14-ctw-marquise-pear-cut-lab-grown-diamond-cluster-necklace",
+            "product": "19-5-ctw-emerald-cut-lab-grown-diamond-tennis-bracelet",
             "image_asset": "",
             "image_url": "",
             "image_alt": "",
@@ -408,6 +415,7 @@
             "object_position": "center",
             "card_background": "rgba(0,0,0,0)",
             "badge": "",
+            "badge_mobile": "",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
             "title": "",
@@ -420,7 +428,7 @@
         "bracelet_tennis_12": {
           "type": "slide",
           "settings": {
-            "product": "12-ctw-round-brilliant-lab-grown-diamond-tennis-bracelet",
+            "product": "23-ctw-round-brilliant-lab-grown-diamond-tennis-necklace",
             "image_asset": "",
             "image_url": "",
             "image_alt": "",
@@ -428,6 +436,28 @@
             "object_position": "center",
             "card_background": "rgba(0,0,0,0)",
             "badge": "",
+            "badge_mobile": "",
+            "badge_background": "#ffffff",
+            "badge_text_color": "#1a1a1a",
+            "title": "",
+            "price": "",
+            "caption": "",
+            "caption_color": "rgba(0,0,0,0)",
+            "link": ""
+          }
+        },
+        "slide_GkpBbN": {
+          "type": "slide",
+          "settings": {
+            "product": "1-07-ctw-round-brilliant-lab-grown-diamond-micro-pave-tennis-bracelet",
+            "image_asset": "",
+            "image_url": "",
+            "image_alt": "",
+            "image_scale": 100,
+            "object_position": "center",
+            "card_background": "rgba(0,0,0,0)",
+            "badge": "",
+            "badge_mobile": "",
             "badge_background": "#ffffff",
             "badge_text_color": "#1a1a1a",
             "title": "",
@@ -443,7 +473,8 @@
         "bracelet_bezel",
         "tennis_354",
         "tennis_14",
-        "bracelet_tennis_12"
+        "bracelet_tennis_12",
+        "slide_GkpBbN"
       ],
       "settings": {
         "heading": "Tennis Favourites",
@@ -462,12 +493,15 @@
         "mobile_link_gap": 12,
         "mobile_header_gap": 24,
         "link_label": "Shop the Tennis Collection",
+        "link_position_mobile": "below",
+        "mobile_link_below_gap": 16,
         "link_style": "outline",
-        "link_url": "shopify://collections/tennis-necklaces",
+        "link_url": "shopify://collections/tennis-favourites",
         "link_size": 13,
         "link_tracking": 12,
         "link_transform": "uppercase",
         "link_color": "rgba(0,0,0,0)",
+        "mobile_autoplay": true,
         "show_arrows": true,
         "show_arrows_mobile": false,
         "loop_arrows": false,
@@ -480,7 +514,6 @@
         "arrow_color": "rgba(0,0,0,0)",
         "per_row": 3,
         "per_row_mobile": 2,
-        "mobile_autoplay": true,
         "ratio": "1 / 1",
         "card_background": "#f5f5f5",
         "image_fit": "cover",
@@ -531,7 +564,7 @@
         "heading": "Find the perfect gift",
         "uppercase_heading": true,
         "text": "",
-        "collection": "best-sellers",
+        "collection": "find-a-perfect-gift",
         "product_count": 6,
         "columns": 3,
         "columns_mobile": 2,
@@ -1054,11 +1087,11 @@
         "content_button_label": "",
         "content_button_style": "button",
         "content_button_link": "",
-        "show_more_product": false,
         "view_all_label": "View all styles",
         "view_all_link": "shopify://collections/best-sellers",
         "view_all_style": "outline",
         "view_all_offset": 16,
+        "show_more_product": false,
         "show_more_product_text": "Show more",
         "show_more_font_size": "",
         "show_more_font_weight": "default",
@@ -1090,6 +1123,30 @@
         "padding-block-end": 64,
         "padding-inline-start": 20,
         "padding-inline-end": 20
+      }
+    },
+    "1795088593abef82fe": {
+      "type": "apps",
+      "blocks": {
+        "reputon_etsy_reviews_carousel_widget_block_cLKimz": {
+          "type": "shopify://apps/reputon-etsy-reviews/blocks/carousel-widget-block/8df530b9-db50-44f9-a43b-c93c6bac56a9",
+          "settings": {
+            "themeId": "light",
+            "font": "default",
+            "autoscroll": true,
+            "showRating": true,
+            "showProductPicture": false,
+            "showDate": true,
+            "showAvatar": true,
+            "fixedReviewsHeight": true
+          }
+        }
+      },
+      "block_order": [
+        "reputon_etsy_reviews_carousel_widget_block_cLKimz"
+      ],
+      "settings": {
+        "include_margins": true
       }
     },
     "eden_reviews": {
@@ -1170,6 +1227,7 @@
         "review_7",
         "review_8"
       ],
+      "disabled": true,
       "settings": {
         "kicker": "Loved by our clients",
         "heading": "A little love, from real life.",
@@ -1220,15 +1278,15 @@
           "settings": {
             "icon": "virtual",
             "icon_asset": "",
-            "label": "Virtual consultation"
+            "label": "Video consultation"
           }
         },
         "mode_in_person": {
           "type": "mode",
           "settings": {
-            "icon": "in-person",
+            "icon": "phone",
             "icon_asset": "",
-            "label": "Speak with a designer"
+            "label": "Audio call with a designer"
           }
         }
       },
@@ -1239,6 +1297,7 @@
       "settings": {
         "heading": "Book a private appointment",
         "text": "<p>Meet one to one with an Eden Raine jewellery specialist. Share what you have in mind, explore stones and settings together, and receive thoughtful guidance as you shape a piece that feels entirely your own.</p>",
+        "mobile_hide_text": true,
         "button_label": "Book a consultation",
         "button_link": "/pages/book-a-consultation",
         "button_style": "solid",
@@ -1278,6 +1337,7 @@
         "padding_horizontal": 72,
         "padding_horizontal_mobile": 0,
         "padding_vertical": 72,
+        "padding_vertical_mobile": 32,
         "custom_padding": true,
         "padding_top": 24,
         "padding_bottom": 24,
@@ -1910,6 +1970,12 @@
         "padding-inline-start-mb": 0,
         "padding-inline-end-mb": 0
       }
+    },
+    "17950883364307c44a": {
+      "type": "apps",
+      "settings": {
+        "include_margins": true
+      }
     }
   },
   "order": [
@@ -1920,8 +1986,10 @@
     "favourites_carousel",
     "eden_quote",
     "featured_collection_QbxCWk",
+    "1795088593abef82fe",
     "eden_reviews",
     "consultation_banner",
-    "section_QeQfPU"
+    "section_QeQfPU",
+    "17950883364307c44a"
   ]
 }

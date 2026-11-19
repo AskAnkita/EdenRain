@@ -771,8 +771,8 @@ body.apntly-modal-container .modal-container:has(> .error-message-container) .ap
   */
   const PLACEHOLDER_VARIANT = 'Default Title';
   const APPOINTMENT_TYPES = {
-    15966409916790: 'Virtual consultation',
-    15977665495414: 'Speak with a designer',
+    15966409916790: 'Video consultation',
+    15977665495414: 'Speak with a designer (audio call)',
   };
 
   const appointmentType = () => {

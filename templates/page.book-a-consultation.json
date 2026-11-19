@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "booking": {
@@ -6,9 +15,9 @@
         "virtual": {
           "type": "meeting",
           "settings": {
-            "label": "Virtual consultation",
-            "meta": "30 minutes, by video",
-            "text": "A one to one call with a specialist, wherever you are. Share a sketch, a photograph or an idea and we will talk it through.",
+            "label": "Video consultation",
+            "meta": "30 minutes, video call",
+            "text": "A one to one video call with a specialist, wherever you are. Share a sketch, a photograph or an idea and we will talk it through on screen.",
             "badge": "Most booked",
             "apntly_product_id": "15966409916790",
             "booking_link": "",
@@ -19,11 +28,11 @@
           "type": "meeting",
           "settings": {
             "label": "Speak with a designer",
-            "meta": "45 minutes, by video",
-            "text": "For a bespoke piece or a reset: bring the idea, however rough, and we will draw it with you.",
+            "meta": "45 minutes, audio call",
+            "text": "For a bespoke piece or a reset: we ring you, you describe the idea, however rough, and we will shape it with you.",
             "apntly_product_id": "15977665495414",
             "booking_link": "",
-            "icon": "in-person"
+            "icon": "phone"
           }
         },
         "contact_phone": {
@@ -67,14 +76,14 @@
       "settings": {
         "eyebrow": "Private appointments",
         "heading": "Book an appointment",
-        "text": "<p>Meet one to one with an Eden Raine jewellery specialist by video call. Pick a time that suits you and your confirmation arrives by email.<\/p>",
+        "text": "<p>Meet one to one with an Eden Raine jewellery specialist by video or audio call. Pick a time that suits you and your confirmation arrives by email.<\/p>",
         "button_label": "Book an appointment",
         "smallprint": "Free, and never any obligation to buy.",
         "link_label": "Prefer to write to us?",
         "link_url": "/pages/contact",
         "ways_heading": "Ways to meet",
         "card_cue": "Choose a time",
-        "notes_text": "<ul><li>A confirmation email with a calendar invitation arrives within a minute.<\/li><li>For a video call we send the link; there is nothing to install.<\/li><li>Every confirmation carries a link to move or cancel the time.<\/li><\/ul>",
+        "notes_text": "<ul><li>A confirmation email with a calendar invitation arrives within a minute.<\/li><li>For a video call we send the link; there is nothing to install. For an audio call we ring the number you give us.<\/li><li>Every confirmation carries a link to move or cancel the time.<\/li><\/ul>",
         "contact_heading": "Or reach us directly",
         "contact_text": "<p>No appointment needed. We answer Monday to Saturday, and usually within a few hours.<\/p>",
         "provider": "cal",
@@ -108,6 +117,7 @@
         "team_any_label": "Whoever is free",
         "team_members": "",
         "ask_for_message": false,
+        "ask_for_phone": true,
         "email_label": "Email",
         "phone_label": "Telephone",
         "message_label": "What would you like to talk about?",

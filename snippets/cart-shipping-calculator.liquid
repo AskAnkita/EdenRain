@@ -3,12 +3,21 @@
 {% endif %}
 <form class="shipping-calculator-form customer" action="{{ routes.cart_url }}" method="POST" novalidate is="shipping-calculator-component">
   <div class="grid gap-xl">
+    {%- comment -%}
+      A guest starts on the country they are browsing from. The UK's regions are listed
+      alphabetically, so without this the region box opened on "British Forces".
+    {%- endcomment -%}
     <country-province-component
       class="grid gap-xl"
       {% if shop.customer_accounts_enabled and customer and customer.default_address %}
         data-country="{{ customer.default_address.country }}"
         {% if customer.default_address.province != blank %}
           data-province="{{ customer.default_address.province }}"
+        {% endif %}
+      {% else %}
+        data-country="{{ localization.country.name }}"
+        {% if localization.country.iso_code == 'GB' %}
+          data-province="England"
         {% endif %}
       {% endif %}
     >

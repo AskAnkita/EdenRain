@@ -1135,7 +1135,7 @@ if (!customElements.get("variant-selects")){
         if (tagName === "SELECT" && target.selectedOptions.length) {
           Array.from(target.options)
             .find((option) => option.getAttribute("selected"))
-            .removeAttribute("selected");
+            ?.removeAttribute("selected");
           target.selectedOptions[0].setAttribute("selected", "selected");
 
           const swatchValue = target.selectedOptions[0].dataset.optionSwatchValue;

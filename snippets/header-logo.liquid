@@ -81,7 +81,7 @@
 >
   {% unless preload_screen %}
     {%- if request.page_type == 'index'-%}
-      <h1 class="header__heading">
+      <div class="header__heading">
     {%- endif -%}
   {% endunless %}
   <a href="{{ routes.root_url }}" class="header__heading-link inline-block link link--text focus-inset{% if has_menu_tab %} header-menu--tab{% endif %}{% if has_menu_tab == true %} hidden{% endif %}" data-logo-page aria-label="{{ shop.name }}" rel="preload" as="image">
@@ -143,7 +143,7 @@
   </a>
   {% unless preload_screen %}
     {%- if request.page_type == 'index'-%}
-      </h1>
+      </div>
     {%- endif -%}
   {%- endunless -%}
 </div>

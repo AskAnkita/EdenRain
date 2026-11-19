@@ -238,4 +238,22 @@
   .eden-consult--mobile-no-text .ecb-text {
     display: none;
   }
+
+  /*
+    Two ways to meet will not fit side by side on a phone, and once the row wraps the second
+    one keeps its divider and indent and sits out of line with the first. Stack them instead:
+    one column, icons on a shared left edge, no hairline. The list itself stays centred in a
+    centred panel because it only takes the width of its longest label.
+  */
+  .ecb-modes {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 1.4rem;
+  }
+
+  .ecb-mode + .ecb-mode {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
 }

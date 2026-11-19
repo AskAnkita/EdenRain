@@ -101,7 +101,7 @@
     `category:necklace` - so the row names the collection, which both filters and lights the
     card up as the one you are on.
   endcomment
-  assign jewellery_necklaces = 'Tennis|tennis-necklaces~Pendants|pendants~Charms|charms~Toi et Moi|toi-et-moi-necklaces'
+  assign jewellery_necklaces = 'Tennis|tennis-necklaces~Pendants|pendants~Toi et Moi|toi-et-moi-necklaces'
 
   comment
     Rings has no sub-ranges of its own under Jewellery, so rather than invent names for it the
@@ -126,11 +126,8 @@
     and station-bracelets - automated in store-config.mjs on the `style:` tag plus
     `category:bracelet`, so they filter and they light their own card.
 
-    Charm and Station stay in the column while they hold next to nothing. The bracelet range is
-    being filled a kind at a time; a row that disappears the week before its stock lands has to
-    be put back by hand the week after, and an empty collection page is the lesser fault. This is
-    also why the strip's "Hide cards with nothing in them" setting is off everywhere except
-    Engagement, whose style list is finished.
+    Station was taken out of the column on 2026-11-19 at the client's request, and Charms out of
+    the Necklaces column the same day. Both collections still exist; only the menu rows are gone.
 
     `category:charm` is a third thing again, not to be confused with `style:charm` on a bracelet:
     it is the necklace sense of the word, and the Charms collection under Necklaces is built on
@@ -143,7 +140,7 @@
     Pendant Necklaces - and rows that all end in the same word read as a block of repetition
     rather than a list of ranges.
   endcomment
-  assign jewellery_bracelets = 'Tennis|tennis-bracelets~Chain Link|chain-bracelets~Charm|charm-bracelets~Station|station-bracelets'
+  assign jewellery_bracelets = 'Tennis|tennis-bracelets~Chain Link|chain-bracelets~Charm|charm-bracelets'
 
   comment
     Not on the menu since 2026-11-14 - the client removed Men's while there are no men's
