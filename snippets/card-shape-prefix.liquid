@@ -5,7 +5,9 @@
   variant behind the product's featured photo (as card-carat-prefix.liquid does).
   card-option-swatches.js swaps the word when a shopper presses another shape, and when a
   per-shape copy of the card moves onto its cut. Outputs nothing for a product with no
-  Shape option. The product page does the same in assets/product-title-carat.js.
+  Shape option. The product page does the same in assets/product-title-carat.js. Never name
+  its attribute data-card-shape: that marks a per-shape grid copy, and the grid script deletes
+  any such element with no matching cut button.
 
   @param {object} card_product - the product
 {%- enddoc -%}
@@ -31,8 +33,7 @@
   endif
 -%}
 {%- if shape_index >= 0 -%}
-  <span class="card-shape" data-card-shape data-shape-index="{{ shape_index }}">
-    {{- shown_shape | escape -}}
-    {%- if shown_shape != blank %} {% endif -%}
+  <span class="card-shape-word" data-card-shape-word data-shape-index="{{ shape_index }}">
+    {%- if shown_shape != blank -%}{{ shown_shape | escape | append: ' ' }}{%- endif -%}
   </span>
 {%- endif -%}

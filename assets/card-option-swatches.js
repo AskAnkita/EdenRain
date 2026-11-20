@@ -293,7 +293,7 @@
    * names the shape on screen, read straight off the variant's Shape option.
    */
   function updateShape(card, variant) {
-    const span = card.querySelector('[data-card-shape]');
+    const span = card.querySelector('[data-card-shape-word]');
     if (!span) return;
     const value = (variant.options || [])[Number(span.dataset.shapeIndex)];
     span.textContent = value ? value + ' ' : '';
