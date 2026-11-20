@@ -20767,7 +20767,7 @@ accordion-custom.block.spacing-style .details .details-content p {
 .product-info-list .product-info-value {
   font-size: 12px;
 }
-fieldset.variant-option .form__label {
+body:not(.template-product) fieldset.variant-option .form__label {
   font-family: var(--font-body--family), sans-serif !important;
   font-size: 12px !important;
   font-weight: 300 !important;
