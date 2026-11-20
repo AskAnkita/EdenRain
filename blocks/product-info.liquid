@@ -99,7 +99,7 @@
         endif
       -%}
       {%- if carat_any -%}
-        <div class="product-info-item product-info-item--carat" data-carat {% if carat_value == blank %} style="display: none;"{% endif %}><product-title-carat hidden></product-title-carat><script src="{{ 'product-title-carat.js' | asset_url }}" defer="defer"></script>
+        <div class="product-info-item product-info-item--carat" data-carat {% if carat_value == blank %} style="display: none;"{% endif %}><product-title-carat hidden{% assign padded_title = product_resource.title | downcase | prepend: ' ' %}{% if padded_title contains ' ring' or padded_title contains ' band' %} data-min-carat="2"{% endif %}></product-title-carat><script src="{{ 'product-title-carat.js' | asset_url }}" defer="defer"></script>
           <span class="product-info-name">{{ bl_stts.carat_label | default: 'Total Carat Weight:' | escape }}</span>
           <span class="product-info-value">
             {%- if carat_value != blank -%}{{ carat_text }} CTW{%- endif -%}

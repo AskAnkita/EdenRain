@@ -6,8 +6,10 @@
  * differently. The figure is the one the "Total Carat Weight" row already shows
  * (blocks/product-info.liquid, the variant metafield custom.total_carat_weight), and
  * product-info.js rewrites that row on every variant change, so watching it keeps the title
- * on the selected shape. A custom element rather than an inline script so it survives the
- * section re-rendering in the editor and on theme dev.
+ * on the selected shape. A ring of 2 CTW or less is titled by its design alone: the block sets
+ * data-min-carat="2" on rings, and a figure at or under it leaves the title untouched. A custom
+ * element rather than an inline script so it survives the section re-rendering in the editor
+ * and on theme dev.
  */
 if (!customElements.get('product-title-carat')) {
   customElements.define(
@@ -45,7 +47,9 @@ if (!customElements.get('product-title-carat')) {
 
       update() {
         const text = this.value.textContent.trim();
-        const shown = text && this.row.style.display !== 'none';
+        const min = Number(this.dataset.minCarat) || 0;
+        const carat = parseFloat(text);
+        const shown = text && this.row.style.display !== 'none' && !(min && carat <= min);
         this.span.textContent = shown ? text + ' ' : '';
         this.span.hidden = !shown;
       }
