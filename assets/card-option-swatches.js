@@ -288,6 +288,18 @@
     span.hidden = false;
   }
 
+  /*
+   * The "Pear " in front of a merged shape product's design (snippets/card-shape-prefix.liquid)
+   * names the shape on screen, read straight off the variant's Shape option.
+   */
+  function updateShape(card, variant) {
+    const span = card.querySelector('[data-card-shape]');
+    if (!span) return;
+    const value = (variant.options || [])[Number(span.dataset.shapeIndex)];
+    span.textContent = value ? value + ' ' : '';
+    span.hidden = !value;
+  }
+
   function markActive(list, active) {
     list.querySelectorAll('.is-active').forEach((item) => item.classList.remove('is-active'));
     list.querySelectorAll('[data-card-swatch]').forEach((button) => {
@@ -338,6 +350,7 @@
       updateLinks(card, variant.id);
       syncRows(card, variant);
       updateCarat(card, variant);
+      updateShape(card, variant);
       return;
     }
 

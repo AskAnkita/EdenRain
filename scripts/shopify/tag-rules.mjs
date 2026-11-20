@@ -126,7 +126,7 @@ export const style = [
   // rings say "Side Stone" in the title, but a crossover, a three-stone, a cluster and a pave
   // shoulder are all the same thing to a shopper looking for stones either side of the centre,
   // and they were all missing from the collection. So the rule reads the setting as well as the
-  // name, and the titles carry both words - "Lab-Grown Diamond Crossover Engagement Ring" - so
+  // name, and the titles carry both words - "Crossover Lab-Grown Diamond Engagement Ring" - so
   // each pattern asks for the style AND "engagement ring". That is what keeps a pave bracelet
   // or a cluster necklace out of a collection titled Side Stone Engagement Rings; the two tag
   // rules on the collection itself (store-config.mjs) are the second guard.
@@ -195,7 +195,7 @@ export const style = [
   // itself. Add a line when another hidden halo is stocked; delete this comment when the range
   // is big enough for a real pattern.
   rule('hidden-halo', [
-    /^2\.2 ctw lab-grown diamond twist engagement ring$/,
+    /^2\.2 ctw twist lab-grown diamond engagement ring$/,
     /^2\.52 ctw pear cut lab-grown diamond pav\S* engagement ring$/,
   ], { from: 'title' }),
 ];

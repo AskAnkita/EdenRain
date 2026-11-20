@@ -21,7 +21,20 @@
 -%}
 
 {%- capture card_carat -%}{%- render 'card-carat-prefix', card_product: card_product -%}{%- endcapture -%}
-{%- assign card_title_text = card_carat | strip | append: card_product.title -%}
+{%- capture card_shape -%}{%- render 'card-shape-prefix', card_product: card_product -%}{%- endcapture -%}
+{%- liquid
+  # The shape goes in front of the design, after any carat - the title's own "2.2 CTW " too:
+  # "3.21 CTW Round Halo ...", "2.2 CTW Pear Twist ...", "Pear Solitaire ...".
+  assign title_head = ''
+  assign title_rest = card_product.title
+  assign title_words = card_product.title | split: ' '
+  assign second_word = title_words[1] | downcase
+  if second_word == 'ctw'
+    assign title_head = title_words[0] | append: ' ' | append: title_words[1] | append: ' '
+    assign title_rest = card_product.title | remove_first: title_head
+  endif
+  assign card_title_text = card_carat | strip | append: title_head | append: card_shape | append: title_rest
+-%}
 
 <div class="card__heading">
   <a

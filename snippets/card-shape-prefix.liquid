@@ -1,0 +1,38 @@
+{%- doc -%}
+  The "Pear " that goes in front of a merged shape product's design on its card title:
+  "Pear Solitaire Lab-Grown Diamond Engagement Ring". A merged product holds every
+  centre-stone shape, so its own title names none; the card names the one it shows, the
+  variant behind the product's featured photo (as card-carat-prefix.liquid does).
+  card-option-swatches.js swaps the word when a shopper presses another shape, and when a
+  per-shape copy of the card moves onto its cut. Outputs nothing for a product with no
+  Shape option. The product page does the same in assets/product-title-carat.js.
+
+  @param {object} card_product - the product
+{%- enddoc -%}
+{%- liquid
+  assign shape_index = -1
+  for option in card_product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name contains 'shape'
+      assign shape_index = forloop.index0
+      break
+    endif
+  endfor
+
+  if shape_index >= 0
+    assign shown_variant = card_product.selected_or_first_available_variant
+    for variant in card_product.variants
+      if variant.featured_media != blank and variant.featured_media.id == card_product.featured_media.id
+        assign shown_variant = variant
+        break
+      endif
+    endfor
+    assign shown_shape = shown_variant.options[shape_index]
+  endif
+-%}
+{%- if shape_index >= 0 -%}
+  <span class="card-shape" data-card-shape data-shape-index="{{ shape_index }}">
+    {{- shown_shape | escape -}}
+    {%- if shown_shape != blank %} {% endif -%}
+  </span>
+{%- endif -%}

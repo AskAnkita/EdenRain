@@ -53,7 +53,7 @@ const MERGES = [
       { sku: 'AJLR260', shape: 'Radiant' },
       { sku: 'AJLR261', shape: 'Marquise' },
     ],
-    title: '2.2 CTW Lab-Grown Diamond Twist Engagement Ring',
+    title: '2.2 CTW Twist Lab-Grown Diamond Engagement Ring',
     handle: '2-2-ctw-lab-grown-diamond-twist-engagement-ring',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
@@ -115,7 +115,7 @@ const MERGES = [
       { sku: 'AJLR296', shape: 'Princess' },
       { sku: 'AJLR295', shape: 'Asscher' },
     ],
-    title: '2.2 CTW Lab-Grown Diamond Three Stone Engagement Ring',
+    title: '2.2 CTW Three Stone Lab-Grown Diamond Engagement Ring',
     handle: '2-2-ctw-lab-grown-diamond-three-stone-engagement-ring',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
@@ -150,7 +150,7 @@ const MERGES = [
       { sku: 'AJLR187', shape: 'Princess' },
       { sku: 'AJLR188', shape: 'Marquise' },
     ],
-    title: 'Lab-Grown Diamond Halo Engagement Ring',
+    title: 'Halo Lab-Grown Diamond Engagement Ring',
     handle: 'lab-grown-diamond-halo-engagement-ring',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
@@ -194,7 +194,7 @@ const MERGES = [
       { sku: 'AJLR209', shape: 'Princess' },
       { sku: 'AJLR210', shape: 'Marquise' },
     ],
-    title: 'Lab-Grown Diamond Side Stone Engagement Ring',
+    title: 'Side Stone Lab-Grown Diamond Engagement Ring',
     handle: 'lab-grown-diamond-side-stone-engagement-ring',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
@@ -244,7 +244,7 @@ const MERGES = [
       { sku: 'AJLR301', shape: 'Cushion' },
       { sku: 'AJLR304', shape: 'Princess' },
     ],
-    title: 'Lab-Grown Diamond Crossover Engagement Ring',
+    title: 'Crossover Lab-Grown Diamond Engagement Ring',
     handle: 'lab-grown-diamond-crossover-engagement-ring',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
@@ -276,7 +276,7 @@ const MERGES = [
       { sku: 'AJLR349', shape: 'Oval' },
       { sku: 'AJLR350', shape: 'Emerald' },
     ],
-    title: 'Lab-Grown Diamond Cathedral Solitaire Engagement Ring',
+    title: 'Cathedral Solitaire Lab-Grown Diamond Engagement Ring',
     handle: 'lab-grown-diamond-cathedral-solitaire-engagement-ring',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
@@ -313,7 +313,7 @@ const MERGES = [
       { sku: 'AJLR252', shape: 'Asscher' },
       { sku: 'AJLR253', shape: 'Pear' },
     ],
-    title: 'Lab-Grown Diamond Bezel Set Engagement Ring',
+    title: 'Bezel Set Lab-Grown Diamond Engagement Ring',
     handle: 'lab-grown-diamond-bezel-set-engagement-ring',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
@@ -362,7 +362,7 @@ const MERGES = [
       { sku: 'AJLR136', shape: 'Pear' },
       { sku: 'AJLR137', shape: 'Radiant' },
     ],
-    title: 'Lab-Grown Diamond Solitaire Engagement Ring',
+    title: 'Solitaire Lab-Grown Diamond Engagement Ring',
     handle: 'lab-grown-diamond-solitaire-engagement-ring',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
@@ -411,7 +411,7 @@ const MERGES = [
       { sku: 'AJPD411', shape: 'Marquise' },
       { sku: 'AJPD410', shape: 'Heart' },
     ],
-    title: 'Lab-Grown Diamond Halo Necklace',
+    title: 'Halo Lab-Grown Diamond Necklace',
     handle: 'lab-grown-diamond-halo-necklace',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
@@ -470,7 +470,7 @@ const MERGES = [
       { sku: 'AJNT63', shape: 'Marquise' },
       { sku: 'AJNT61', shape: 'Heart' },
     ],
-    title: 'Lab-Grown Diamond Solitaire Necklace',
+    title: 'Solitaire Lab-Grown Diamond Necklace',
     handle: 'lab-grown-diamond-solitaire-necklace',
     descriptionHtml: [
       '<p><strong>Description</strong></p>',
