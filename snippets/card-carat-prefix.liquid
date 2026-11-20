@@ -4,7 +4,7 @@
   each centre-stone shape weighs differently, so the figure comes from the variant metafield
   custom.total_carat_weight (scripts/shopify/sync-carat-weights.mjs) for the shape the card
   shows. Outputs nothing for a product whose title already says CTW, or that has no weight.
-  A ring of 2 CTW or less is titled by its design alone, so it never gets the figure: a shape
+  A piece of 2 CTW or less is titled by its design alone, so it never gets the figure: a shape
   at or under 2 is left out of the map, which hides the span when the card moves onto it.
 
   The span carries every shape's weight, so card-option-swatches.js can swap the figure when
@@ -18,12 +18,8 @@
   assign shown_text = ''
   assign shape_index = -1
 
-  # Rings only: ' ring' and ' band' with the space, so earrings and fringe necklaces stay out.
-  assign min_carat = 0
-  assign padded_title = title_compare | prepend: ' '
-  if padded_title contains ' ring' or padded_title contains ' band'
-    assign min_carat = 2
-  endif
+  # A piece of 2 CTW or less is titled by its design alone, in every category.
+  assign min_carat = 2
 
   unless title_compare contains 'ctw'
     for option in card_product.options_with_values
