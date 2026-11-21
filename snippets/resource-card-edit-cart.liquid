@@ -332,7 +332,7 @@
               {%- if variant_style == 'pills' or variant_style == 'swatch' -%}
                 <fieldset  class="js product-form__input variant-option variant-option--buttons{% if is_color %} product-form__input--swatch variant-option--swatches{% else %} product-form__input--pill variant-option--pill{% endif %}">
                   <legend class="form__label">
-                    {{ product_option.name | replace: 'Jewelry material', 'Jewellery material' | escape }}:
+                    {{ product_option.name | replace: 'Jewelry material', 'Metal Type' | escape }}:
                     <span data-selected-value>
                       {{- product_option.selected_value -}}
                     </span>
@@ -357,7 +357,7 @@
                 %}
                 <div class="product-form__input product-form__input--dropdown variant-option variant-option--dropdowns">
                   <label class="form__label" for="Option-{{ product.id }}-{{ forloop.index0 }}">
-                    {{ product_option.name | replace: 'Jewelry material', 'Jewellery material' | escape }}:
+                    {{ product_option.name | replace: 'Jewelry material', 'Metal Type' | escape }}:
                     <span data-selected-value>
                       {{- product_option.selected_value -}}
                     </span>

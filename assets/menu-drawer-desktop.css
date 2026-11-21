@@ -1498,9 +1498,10 @@ a.menu-drawer-desktop__group-heading:hover {
    pictures away from the names. */
 @media screen and (min-width: 1400px) {
   .menu-drawer-desktop__page--links.menu-drawer-desktop__page--wedding {
-    /* 17rem + 16rem + 16rem + 16rem of columns, 3 gaps of 2.4rem between them, and the page
-       margin the half carries as padding. */
-    grid-template-columns: calc(72.2rem + var(--page-margin, 4rem)) minmax(34rem, 1fr);
+    /* 17rem + 16rem + 16rem of columns (By Style, By Metal, Guides - Featured went on
+       2026-11-21), 2 gaps of 4rem between them, and the page margin the half carries as
+       padding. */
+    grid-template-columns: calc(57rem + var(--page-margin, 4rem)) minmax(34rem, 1fr);
     /* Closer than the 5.6rem the other menus run at. Four short lists do not need a channel
        that wide between them and the picture, and the room buys the columns below their width. */
     gap: 0 4rem;

@@ -39,7 +39,7 @@
       -%}
       <fieldset class="js product-form__input variant-option variant-option--buttons{% if is_color %} product-form__input--swatch variant-option--swatches{% else %} product-form__input--pill variant-option--pill{% endif %}" data-option-idx="{{ forloop.index0 }}">
         <legend class="form__label">
-          {{ option.name | replace: 'Jewelry material', 'Jewellery material' }}:
+          {{ option.name | replace: 'Jewelry material', 'Metal Type' }}:
           <span data-selected-value>
             {{- option.selected_value -}}
           </span>
