@@ -465,7 +465,13 @@
 
               # Banners belong to the first page only: later pages are appended to the same grid
               # by infinite scroll, and re-inserting at the same index would repeat them.
-              assign banner_count = section.settings.banner_count
+              # A banner made for this page comes on top of the count rather than taking a turn
+              # from the rotating ones: Three Stone keeps its two shared banners and gains its own
+              # photo above them. Three slots exist, so that is the ceiling.
+              assign banner_count = section.settings.banner_count | plus: targeted_queue.size
+              if banner_count > 3
+                assign banner_count = 3
+              endif
               if paginate.current_page != 1
                 assign banner_count = 0
               endif
